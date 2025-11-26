@@ -605,8 +605,8 @@
     <!-- 首页 -->
     <div class="page active" id="homePage">
         <div class="hero">
-            <h1>🎯 德州扑克训练师</h1>
-            <p>形成肌肉记忆，杜绝低级错误</p>
+            <h1>🎯 德州扑克训练师 V2.0</h1>
+            <p>基础巩固 + 职业级深化</p>
         </div>
 
         <div class="stats-grid">
@@ -630,38 +630,62 @@
 
         <div class="progress-section">
             <div class="progress-header">
-                <div class="progress-title">🏆 肌肉记忆进度</div>
+                <div class="progress-title">🏆 训练进度</div>
                 <div class="progress-percent" id="progressPercent">0%</div>
             </div>
             <div class="progress-bar-container">
                 <div class="progress-bar-fill" id="progressBarFill" style="width: 0%"></div>
             </div>
-            <div class="progress-text" id="progressText">目标：1000次训练</div>
+            <div class="progress-text" id="progressText">基础训练0次 | 职业级0次</div>
         </div>
 
         <div class="mode-grid">
-            <div class="mode-card primary" onclick="startTraining('complete')">
+            <div class="mode-card primary" onclick="startTraining('complete', 'basic')">
                 <div class="mode-header">
                     <div class="mode-icon">📚</div>
-                    <div class="mode-title">完整训练</div>
+                    <div class="mode-title">基础训练 (26问)</div>
                 </div>
-                <div class="mode-desc">按7个阶段逐步学习，每条都要记忆</div>
+                <div class="mode-desc">7阶段26个基础问题，巩固已掌握的内容</div>
             </div>
 
-            <div class="mode-card warning" onclick="startTraining('quick')">
+            <div class="mode-card warning" onclick="startTraining('complete', 'pro')">
                 <div class="mode-header">
-                    <div class="mode-icon">⚡</div>
-                    <div class="mode-title">快速复习</div>
+                    <div class="mode-icon">💎</div>
+                    <div class="mode-title">职业级训练 (42问)</div>
                 </div>
-                <div class="mode-desc">快速过一遍所有要点，强化记忆</div>
+                <div class="mode-desc">7阶段42个职业级深度问题，提升决策深度</div>
             </div>
 
-            <div class="mode-card success" onclick="startTraining('test')">
+            <div class="mode-card success" onclick="startTraining('complete', 'complete')">
+                <div class="mode-header">
+                    <div class="mode-icon">🎯</div>
+                    <div class="mode-title">完整训练 (68问)</div>
+                </div>
+                <div class="mode-desc">基础26问+职业级42问，全面训练</div>
+            </div>
+            
+            <div class="mode-card" style="border-color: #ff6b6b; background: rgba(255, 107, 107, 0.1);" onclick="startTraining('complete', 'traps')">
+                <div class="mode-header">
+                    <div class="mode-icon">⚠️</div>
+                    <div class="mode-title">陷阱识别 (30个)</div>
+                </div>
+                <div class="mode-desc">职业玩家常犯错误，避免实战陷阱</div>
+            </div>
+            
+            <div class="mode-card" style="border-color: #9632c8; background: rgba(150, 50, 200, 0.1);" onclick="startTraining('complete', 'gto')">
+                <div class="mode-header">
+                    <div class="mode-icon">🧠</div>
+                    <div class="mode-title">GTO概念 (20个)</div>
+                </div>
+                <div class="mode-desc">核心理论深度理解，提升战略思维</div>
+            </div>
+
+            <div class="mode-card" style="border-color: #00ff88; background: rgba(0, 255, 136, 0.1);" onclick="startTraining('test', 'basic')">
                 <div class="mode-header">
                     <div class="mode-icon">🎲</div>
                     <div class="mode-title">随机测试</div>
                 </div>
-                <div class="mode-desc">随机抽取问题，检验记忆效果</div>
+                <div class="mode-desc">随机抽取10个问题，快速检验效果</div>
             </div>
         </div>
     </div>
@@ -783,7 +807,7 @@
         </div>
     </div>
 
-    <script src="poker_trainer.js"></script>
+    <script src="poker_trainer_v2.js"></script>
 </body>
 </html>
 
