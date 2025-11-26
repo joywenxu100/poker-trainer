@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快速体验 - 德州扑克训练师</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            color: #00d4ff;
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 30px;
+        }
+        
+        .feature {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #00ff88;
+        }
+        
+        .feature h3 {
+            color: #00ff88;
+            margin-bottom: 10px;
+        }
+        
+        .feature ul {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+        
+        .btn {
+            display: block;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-radius: 15px;
+            text-decoration: none;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 30px 0;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+            transition: transform 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+        }
+        
+        .steps {
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid #ffd700;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+        
+        .steps h3 {
+            color: #ffd700;
+            margin-bottom: 15px;
+        }
+        
+        .steps ol {
+            margin-left: 25px;
+            line-height: 2;
+        }
+        
+        .note {
+            background: rgba(255, 107, 107, 0.1);
+            border: 2px solid #ff6b6b;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .note h4 {
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 德州扑克训练师 V2.0</h1>
+        <p style="text-align: center; color: #ffd700; font-size: 18px; margin-bottom: 20px;">
+            从1000+次基础训练 → 职业级决策深度
+        </p>
+        
+        <div class="feature">
+            <h3>✨ V2.0 全新升级</h3>
+            <ul>
+                <li>📚 基础训练：7个阶段26个问题（已掌握✅）</li>
+                <li>💎 职业级深度：每阶段新增6个PRO问题（42个深度问题）</li>
+                <li>⚠️ 实战陷阱：30个职业玩家常犯错误识别</li>
+                <li>🧠 GTO概念：20个核心理论深度解析</li>
+                <li>📊 进度追踪：目标2000次训练达到职业级</li>
+                <li>🏆 成就系统：解锁8个不同成就</li>
+                <li>📱 PWA支持：添加到主屏幕像原生APP</li>
+                <li>🔌 离线可用：无网络也能训练</li>
+            </ul>
+        </div>
+        
+        <a href="poker_trainer.html" class="btn">🚀 立即开始训练</a>
+        
+        <div class="steps">
+            <h3>📱 如何添加到手机主屏幕？</h3>
+            <ol>
+                <li><strong>iPhone用户</strong>：Safari浏览器打开 → 点击分享 → 添加到主屏幕</li>
+                <li><strong>Android用户</strong>：Chrome/Edge打开 → 右上角菜单 → 添加到主屏幕</li>
+                <li>完成后，桌面会出现APP图标，点击使用！</li>
+            </ol>
+        </div>
+        
+        <div class="feature">
+            <h3>🎯 训练目标</h3>
+            <ul>
+                <li><strong>1-2周</strong>：完成100次训练，掌握7个阶段</li>
+                <li><strong>1-3月</strong>：完成500次训练，形成习惯</li>
+                <li><strong>3-6月</strong>：完成1000次训练，达到条件反射</li>
+            </ul>
+        </div>
+        
+        <div class="feature">
+            <h3>💡 使用建议</h3>
+            <ul>
+                <li>每天训练5-10次，每次2-3分钟</li>
+                <li>利用碎片时间（等车、排队、休息）</li>
+                <li>实战前快速复习一遍</li>
+                <li>重点关注⚠️阶段5（情绪自检）</li>
+            </ul>
+        </div>
+        
+        <div class="note">
+            <h4>⚠️ 重要提示</h4>
+            <ul>
+                <li>确保4个文件在同一目录：poker_trainer.html, poker_trainer.js, manifest.json, sw.js</li>
+                <li>首次打开需要联网，之后离线也能用</li>
+                <li>数据保存在本地，清除浏览器数据会丢失</li>
+                <li>微信/QQ内置浏览器功能受限，建议用系统浏览器</li>
+            </ul>
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px; color: #999;">
+            <p>保持纪律 · 理性决策 · 长期盈利</p>
+            <p style="margin-top: 10px;">🏆♠️♥️♣️♦️</p>
+        </div>
+    </div>
+</body>
+</html>
+
+
