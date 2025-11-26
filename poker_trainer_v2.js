@@ -447,6 +447,29 @@ function startTraining(mode, trainingType = 'basic') {
         sourcePhases = PHASES_PRO;
     } else if (trainingType === 'complete') {
         sourcePhases = [...PHASES_BASIC, ...PHASES_PRO];
+    } else if (trainingType === 'all') {
+        // 随机测试：包含所有问题（基础+职业+陷阱+GTO）
+        sourcePhases = [...PHASES_BASIC, ...PHASES_PRO];
+        // 添加陷阱问题
+        TRAPS.forEach(category => {
+            category.questions.forEach(q => {
+                currentTraining.questions.push({
+                    phase: { id: 0, title: category.category, warning: true, level: "陷阱" },
+                    question: q.q,
+                    answer: q.a
+                });
+            });
+        });
+        // 添加GTO概念
+        GTO_CONCEPTS.forEach(category => {
+            category.questions.forEach(q => {
+                currentTraining.questions.push({
+                    phase: { id: 0, title: category.category, warning: false, level: "GTO" },
+                    question: q.q,
+                    answer: q.a
+                });
+            });
+        });
     } else if (trainingType === 'traps') {
         // 陷阱训练
         TRAPS.forEach(category => {
@@ -471,8 +494,19 @@ function startTraining(mode, trainingType = 'basic') {
         });
     }
     
-    // 如果不是陷阱或GTO训练，从phase中提取问题
-    if (trainingType !== 'traps' && trainingType !== 'gto') {
+    // 如果不是陷阱、GTO或all训练，从phase中提取问题
+    if (trainingType !== 'traps' && trainingType !== 'gto' && trainingType !== 'all') {
+        sourcePhases.forEach(phase => {
+            phase.questions.forEach(q => {
+                currentTraining.questions.push({
+                    phase: phase,
+                    question: q.q,
+                    answer: q.a
+                });
+            });
+        });
+    } else if (trainingType === 'all') {
+        // all类型已经在上面处理了陷阱和GTO，这里只需要添加基础和职业问题
         sourcePhases.forEach(phase => {
             phase.questions.forEach(q => {
                 currentTraining.questions.push({
@@ -799,4 +833,5 @@ window.addEventListener('beforeunload', (e) => {
         e.returnValue = '';
     }
 });
+
 
