@@ -1,5 +1,5 @@
 // Service Worker for PWA offline support
-const CACHE_NAME = 'poker-trainer-v2.0.2';
+const CACHE_NAME = 'poker-trainer-v2.1.0';
 const urlsToCache = [
   'poker_trainer.html',
   'poker_trainer.js',
