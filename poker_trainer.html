@@ -605,8 +605,8 @@
     <!-- 首页 -->
     <div class="page active" id="homePage">
         <div class="hero">
-            <h1>🎯 德州扑克训练师 V2.3</h1>
-            <p>基础巩固 + 职业级深化 + 必背数据 + 深筹码专精 + 桌型选择</p>
+            <h1>🎯 德州扑克训练师 V2.4</h1>
+            <p>基础巩固 + 职业级深化 + 必背数据 + 深筹码专精 + 桌型选择 + 翻前策略</p>
             <p style="font-size: 16px; margin-top: 15px;">
                 当前模式：<span id="currentTableType" style="font-weight: bold; color: #00d4ff;">6人桌</span>
             </p>
@@ -718,6 +718,14 @@
                     <div class="mode-title">8人桌专精 (54个)</div>
                 </div>
                 <div class="mode-desc">8人桌独特策略，位置为王，价值至上</div>
+            </div>
+
+            <div class="mode-card" style="border-color: #ff3366; background: rgba(255, 51, 102, 0.1); display: none;" onclick="startTraining('practice', 'preflop')" id="preflopRingCard">
+                <div class="mode-header">
+                    <div class="mode-icon">📋</div>
+                    <div class="mode-title">8人桌翻前策略 (106个)</div>
+                </div>
+                <div class="mode-desc">各位置Open/3bet/4bet/Limp/防守范围全覆盖</div>
             </div>
         </div>
     </div>
@@ -839,7 +847,7 @@
         </div>
     </div>
 
-    <script src="poker_trainer_v2.js?v=2.3.0"></script>
+    <script src="poker_trainer_v2.js?v=2.4.0"></script>
 </body>
 </html>
 

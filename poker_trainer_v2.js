@@ -1,5 +1,5 @@
-// 德州扑克训练师 V2.3 - 完整版（基础+职业级+数据+深筹码+桌型选择）
-// 保留原有26个基础问题 + 新增42个职业级问题 + 30个陷阱 + 20个GTO概念 + 92个必背数据 + 48个深筹码 + 54个8人桌
+// 德州扑克训练师 V2.4 - 完整版（基础+职业级+数据+深筹码+桌型选择+翻前策略）
+// 保留原有26个基础问题 + 新增42个职业级问题 + 30个陷阱 + 20个GTO概念 + 92个必背数据 + 48个深筹码 + 54个8人桌 + 106个8人桌翻前策略
 
 // ==================== 桌型选择 ====================
 let currentTableType = localStorage.getItem('tableType') || '6max'; // '6max' 或 'ring'
@@ -449,14 +449,17 @@ function updateHomePage() {
     // 根据桌型切换训练模式卡片
     const deepStackCard = document.getElementById('deepStackCard');
     const fullRingCard = document.getElementById('fullRingCard');
+    const preflopRingCard = document.getElementById('preflopRingCard');
     
-    if (deepStackCard && fullRingCard) {
+    if (deepStackCard && fullRingCard && preflopRingCard) {
         if (currentTableType === '6max') {
             deepStackCard.style.display = 'block';
             fullRingCard.style.display = 'none';
+            preflopRingCard.style.display = 'none';
         } else {
             deepStackCard.style.display = 'none';
             fullRingCard.style.display = 'block';
+            preflopRingCard.style.display = 'block';
         }
     }
 }
@@ -560,10 +563,21 @@ function startTraining(mode, trainingType = 'basic') {
                 });
             });
         });
+    } else if (trainingType === 'preflop') {
+        // 8人桌翻前策略训练
+        PREFLOP_RING.forEach(category => {
+            category.questions.forEach(q => {
+                currentTraining.questions.push({
+                    phase: { id: 0, title: category.category, warning: false, level: "翻前策略" },
+                    question: q.q,
+                    answer: q.a
+                });
+            });
+        });
     }
 
-    // 如果不是陷阱、GTO、all、data、deep或ring训练，从phase中提取问题
-    if (trainingType !== 'traps' && trainingType !== 'gto' && trainingType !== 'all' && trainingType !== 'data' && trainingType !== 'deep' && trainingType !== 'ring') {
+    // 如果不是陷阱、GTO、all、data、deep、ring或preflop训练，从phase中提取问题
+    if (trainingType !== 'traps' && trainingType !== 'gto' && trainingType !== 'all' && trainingType !== 'data' && trainingType !== 'deep' && trainingType !== 'ring' && trainingType !== 'preflop') {
         sourcePhases.forEach(phase => {
             phase.questions.forEach(q => {
                 currentTraining.questions.push({
@@ -855,6 +869,178 @@ function exitTraining() {
         switchPage('home');
     }
 }
+
+// ==================== 8人桌翻前策略训练模块 (Preflop Ranges) ====================
+const PREFLOP_RING = [
+    {
+        category: "UTG位置策略（5-8%范围）",
+        questions: [
+            { q: "UTG Open范围核心牌？", a: "AA-99（所有对子99+）, AKo-AQo, AKs-AJs（强Ax同花）" },
+            { q: "UTG是否应该打AQo？", a: "可打可不打，取决于对手。标准GTO：打。对抗紧手：不打" },
+            { q: "UTG是否应该打88-77？", a: "88必打（set mining），77看桌况（深筹码可打）" },
+            { q: "UTG是否应该打KQs？", a: "标准不打（易被支配），激进玩家可偶尔打" },
+            { q: "UTG Open后，面对MP 3-bet应该如何？", a: "4-bet: AA-KK, AKs | Call: QQ-JJ, AKo | Fold: 其他所有" },
+            { q: "UTG Open后，面对BTN 3-bet应该如何？", a: "4-bet: AA-QQ, AKs | Call: JJ-99, AKo, AQs | Fold: 其他" },
+            { q: "UTG Open后，被3-bet，何时5-bet全压？", a: "仅AA-KK，且筹码<100BB时" },
+            { q: "UTG Open尺寸？", a: "2.5-3BB（最大，保护极紧范围）" },
+            { q: "UTG是否可以Limp？", a: "严格不建议（除非桌上3+Limper，可用22-66 Limp）" },
+            { q: "UTG Open后，SB/BB都弃牌，CO Cold Call，应该如何？", a: "C-bet 70%+（CO范围弱，你极强）" },
+            { q: "UTG用AA-KK是否应该Limp？", a: "绝不！必须Open，失去价值太多" },
+            { q: "UTG Open后，被Squeeze（3-bet），应该如何？", a: "与正常3-bet相同处理（4-bet强牌，Call中等，Fold弱牌）" }
+        ]
+    },
+    {
+        category: "UTG+1位置策略（8-11%范围）",
+        questions: [
+            { q: "UTG+1 Open范围vs UTG增加了什么？", a: "增加88-77, AJs, KQs（轻微放宽）" },
+            { q: "UTG+1是否应该打AJo？", a: "不建议（易被支配），AJs可打" },
+            { q: "UTG+1 Open后，面对CO 3-bet应该如何？", a: "4-bet: AA-QQ, AKs | Call: JJ-99, AKo, AQs | Fold: 其他" },
+            { q: "UTG+1 Open后，面对BTN 3-bet应该如何？", a: "4-bet: AA-KK, AKs | Call: QQ-99, AKo, AQs, AJs | Fold: 其他" },
+            { q: "UTG Open后，UTG+1应该如何？", a: "3-bet: AA-KK, AKs（极紧） | Call: QQ-77, AKo, AQs（set mining）| Fold: 其他" },
+            { q: "UTG+1 Open尺寸？", a: "2.5-3BB（与UTG相同）" },
+            { q: "UTG+1是否可以打66-55？", a: "深筹码（150BB+）可打，浅筹码弃牌" },
+            { q: "UTG+1 vs UTG Open，是否应该3-bet AKo？", a: "不建议（UTG范围极强，Call更好）" },
+            { q: "UTG Limp后，UTG+1应该如何？", a: "Iso-raise: JJ+, AK（5-6BB） | Limp behind: 77-22, AJs（看免费牌）" }
+        ]
+    },
+    {
+        category: "MP位置策略（12-16%范围）",
+        questions: [
+            { q: "MP Open范围vs UTG+1增加了什么？", a: "增加66-22, ATs, KJs, QJs, JTs（小对子+同花连牌）" },
+            { q: "MP是否应该打ATo？", a: "不建议（易被支配），边缘牌，弃牌更安全" },
+            { q: "MP Open后，面对CO 3-bet应该如何？", a: "4-bet: AA-KK, AKs | Call: QQ-77, AKo, AQs-ATs | Fold: 其他" },
+            { q: "MP Open后，面对BTN 3-bet应该如何？", a: "4-bet: AA-KK | Call: QQ-66, AK, AQs-AJs | Fold: 其他（BTN范围宽）" },
+            { q: "EP Open后，MP应该如何？", a: "3-bet: AA-QQ, AKs（极少诈唬） | Call: JJ-66, AKo, AQs（set mining） | Fold: 其他" },
+            { q: "MP 3-bet尺寸vs EP Open？", a: "3.5-4x原加注（保护范围，防止多人跟注）" },
+            { q: "MP是否应该打KQo？", a: "不建议（易被AK/AQ支配），KQs可打" },
+            { q: "MP Open后，被Squeeze，应该如何？", a: "4-bet: AA-KK | Call: QQ-TT, AK | Fold: 其他" },
+            { q: "EP Limp后，MP应该如何？", a: "Iso-raise: TT+, AQ+（5-6BB）| Limp: 99-22, AJs-ATs" },
+            { q: "MP用小对子22-66的策略？", a: "仅看翻牌追暗三（11.8%概率），未中立即弃牌" },
+            { q: "MP是否可以打同花连牌（如T9s, 98s）？", a: "深筹码（200BB+）可打，浅筹码不建议" }
+        ]
+    },
+    {
+        category: "CO位置策略（18-24%范围）",
+        questions: [
+            { q: "CO Open范围vs MP增加了什么？", a: "增加A9s-A2s（所有Ax同花）, KTs, QTs, JTs, T9s, 98s, 87s（同花连牌）" },
+            { q: "CO Open尺寸？", a: "2.2-2.5BB（可略小，偷盲开始）" },
+            { q: "CO Open后，面对BTN 3-bet应该如何？", a: "4-bet: AA-JJ, AKs（价值+诈唬A5s-A2s偶尔） | Call: TT-77, AK, AQs-AJs | Fold: 其他" },
+            { q: "CO Open后，面对SB/BB 3-bet应该如何？", a: "4-bet: AA-JJ, AK（盲注范围宽）| Call: TT-66, AQs-ATs | Fold: 弱牌" },
+            { q: "EP/MP Open后，CO 3-bet范围？", a: "价值: AA-QQ, AKs | 诈唬: A5s-A2s（阻断AA）, KQs偶尔 | 8-12%总频率" },
+            { q: "CO 3-bet尺寸vs EP/MP？", a: "3-3.5x原加注" },
+            { q: "CO是否应该打Kxs（K9s-K2s）？", a: "不建议（易被更大K支配），KTs+可打" },
+            { q: "CO vs BTN 3-bet，何时5-bet？", a: "仅AA-KK，且筹码<100BB" },
+            { q: "CO是否可以打杂色Ax（A9o-A2o）？", a: "不建议（逆向隐含赔率高），同花Ax才打" },
+            { q: "EP/MP Limp后，CO应该如何？", a: "Iso-raise: 99+, AJ+（4-5BB） | Limp: 小对子, 同花连牌" }
+        ]
+    },
+    {
+        category: "BTN位置策略（25-35%范围）",
+        questions: [
+            { q: "BTN Open范围vs CO增加了什么？", a: "增加所有对子, 所有Ax, Kxs, Qxs, 所有同花连牌（极宽）" },
+            { q: "BTN Open尺寸？", a: "2-2.2BB（最小，偷盲最优）" },
+            { q: "BTN Open后，面对SB 3-bet应该如何？", a: "4-bet: AA-TT, AK, AQs（价值+诈唬A5s-A2s, KQs）| Call: 99-77, AQo, AJs-ATs | Fold: 弱牌" },
+            { q: "BTN Open后，面对BB 3-bet应该如何？", a: "4-bet: AA-TT, AK（BB范围更宽）| Call: 99-22, AQ, AJs-A9s | Fold: 最弱牌" },
+            { q: "前位Open后，BTN 3-bet范围？", a: "价值: AA-JJ, AK | 诈唬: A5s-A2s, KQs, QJs, 小对子偶尔 | 12-18%总频率" },
+            { q: "BTN 3-bet尺寸vs EP？", a: "2.5-3x（范围强，小尺寸即可）" },
+            { q: "BTN 3-bet尺寸vs CO？", a: "3-3.5x（范围宽，需稍大保护）" },
+            { q: "BTN是否应该打所有同花牌？", a: "可以（位置最佳），但最弱的（如72s, 83s）仍应弃牌" },
+            { q: "BTN vs SB 3-bet，何时5-bet？", a: "价值: AA-QQ, AKs | 诈唬: A5s-A3s偶尔 | 筹码<100BB可全压" },
+            { q: "BTN是否可以打杂色连牌（如QJo, JTo）？", a: "可以（QJo必打，JTo可打，T9o边缘）" },
+            { q: "Fold to BTN（前面全弃牌），BTN应该打多少牌？", a: "40-50%（极宽偷盲，几乎所有有价值的牌）" },
+            { q: "EP/MP Limp后，BTN应该如何？", a: "Iso-raise: 88+, AT+（3-4BB）| Limp: 所有小对子, 同花牌" }
+        ]
+    },
+    {
+        category: "SB位置策略（最难位置）",
+        questions: [
+            { q: "Fold to SB（前面全弃牌），SB Open范围？", a: "25-35%（与BTN相近，但尺寸更大）" },
+            { q: "Fold to SB，SB Open尺寸？", a: "2.5-3BB（OOP需保护）" },
+            { q: "前位Open后，SB应该如何？", a: "3-bet: 10-15%（AA-JJ, AK, AQs, 诈唬A5s-A2s, KQs）| Call: 很少 | Fold: 大部分" },
+            { q: "SB 3-bet尺寸vs EP/MP？", a: "3.5-4x（OOP最差，需大尺寸保护）" },
+            { q: "SB 3-bet尺寸vs CO/BTN？", a: "3-4x" },
+            { q: "SB vs BTN Open，应该如何？", a: "3-bet: 12-18%（价值+诈唬）| Call: 8-12%（强听牌型）| Fold: 70%+" },
+            { q: "SB Complete（补齐盲注）策略？", a: "20-30%范围（小对子, 同花Ax, 同花连牌）当前面全弃牌" },
+            { q: "SB Complete后，BB Check，SB翻后策略？", a: "OOP极难，谨慎投入，优先控制底池" },
+            { q: "SB vs BB 3-bet（SB Open后被BB 3-bet），应该如何？", a: "4-bet: AA-QQ, AKs | Call: JJ-99, AKo, AQs | Fold: 其他" },
+            { q: "SB是否应该用弱牌Complete？", a: "不建议（OOP难打），弃牌或3-bet" },
+            { q: "EP Limp后，SB应该如何？", a: "Iso-raise: TT+, AQ+（5-6BB）| Complete: 99-22, Axs" }
+        ]
+    },
+    {
+        category: "BB位置防守策略",
+        questions: [
+            { q: "BB vs UTG Open，防守范围？", a: "25-30%（QQ-22, AK-A9s, A9o+, KQs-KTs, QJs, JTs, T9s, 98s）" },
+            { q: "BB vs UTG+1 Open，防守范围？", a: "30-35%（增加弱Ax, 更多同花连牌）" },
+            { q: "BB vs MP Open，防守范围？", a: "35-40%（继续放宽）" },
+            { q: "BB vs CO Open，防守范围？", a: "40-45%" },
+            { q: "BB vs BTN Open，防守范围？", a: "45-55%（最宽，BTN范围极宽）" },
+            { q: "BB vs SB Open，防守范围？", a: "50-60%（最宽，SB范围宽+底池赔率极好）" },
+            { q: "BB vs UTG Open，3-bet范围？", a: "6-8%（AA-QQ, AKs, 诈唬A5s-A4s偶尔）" },
+            { q: "BB vs MP Open，3-bet范围？", a: "8-12%（增加JJ, AKo, AQs, 诈唬KQs, A5s-A2s）" },
+            { q: "BB vs BTN Open，3-bet范围？", a: "12-18%（价值+大量诈唬）" },
+            { q: "BB vs SB Open，3-bet范围？", a: "15-20%（最宽，SB范围极宽）" },
+            { q: "BB 3-bet尺寸？", a: "3-4x原加注（已投入1BB，相对便宜）" },
+            { q: "BB防守需要多少胜率？", a: "vs 2.5BB Open = 28%（底池赔率好，必须广泛防守）" },
+            { q: "BB是否应该用弱牌3-bet诈唬？", a: "vs LP（CO/BTN/SB）应该，vs EP不建议" }
+        ]
+    },
+    {
+        category: "Squeeze Play（挤压打法）",
+        questions: [
+            { q: "什么是Squeeze？", a: "面对1个Open + 1个或多个Call，用强牌或空气3-bet孤立" },
+            { q: "Squeeze的理想条件？", a: "EP Open + MP Call（双方范围上限明确，容易弃牌）" },
+            { q: "Squeeze范围？", a: "价值: AA-JJ, AK | 诈唬: A5s-A2s, KQs, QJs（阻断强牌）| 8-12%总频率" },
+            { q: "Squeeze尺寸？", a: "4-5x原Open + 每个Caller额外+1BB" },
+            { q: "Squeeze成功率需要多少？", a: "50-60%（比普通3-bet更容易成功）" },
+            { q: "何时不应该Squeeze？", a: "对手是Calling Station（不会弃牌）或已有2+个Caller" },
+            { q: "SB/BB Squeeze的优势？", a: "死钱多（盲注+多个Caller），成功率高" },
+            { q: "Squeeze后被Call，翻后策略？", a: "C-bet 60-70%（对手范围上限低，你代表极强）" }
+        ]
+    },
+    {
+        category: "4-Bet策略",
+        questions: [
+            { q: "IP 4-bet尺寸？", a: "2.2-2.5x 3-bet（有位置，可小一些）" },
+            { q: "OOP 4-bet尺寸？", a: "2.5-3x 3-bet（无位置，需保护）" },
+            { q: "4-bet价值范围？", a: "AA-QQ, AKs（核心价值）" },
+            { q: "4-bet诈唬范围？", a: "A5s-A3s（阻断AA/AK）, KQs偶尔（阻断KK/AK）" },
+            { q: "何时4-bet全压？", a: "筹码<40BB时，4-bet = 全压（避免尴尬SPR）" },
+            { q: "面对4-bet，何时5-bet？", a: "仅AA-KK，且确信对手会Call" },
+            { q: "面对4-bet，何时Call？", a: "QQ-JJ（深筹码），看翻牌决策" },
+            { q: "面对4-bet，何时Fold？", a: "所有诈唬牌、边缘价值牌（如AQs）" },
+            { q: "EP vs LP 4-bet策略差异？", a: "EP 4-bet极紧（仅AA-KK），LP 4-bet可略宽" }
+        ]
+    },
+    {
+        category: "对抗Limp策略",
+        questions: [
+            { q: "面对1个EP Limper，应该如何？", a: "Iso-raise: TT+, AJ+（5-6BB）| Limp: 99-22, Axs, 同花连牌 | Fold: 弱牌" },
+            { q: "面对2个Limper，应该如何？", a: "Iso-raise: JJ+, AQ+（6-7BB）| Limp: 所有小对子, 同花牌 | Fold: 弱牌" },
+            { q: "面对3+个Limper，应该如何？", a: "几乎不Iso-raise（会形成多人底池）| Limp: 所有小对子, 同花连牌（隐含赔率极高）" },
+            { q: "Limp behind（跟随Limp）的牌？", a: "22-77（set mining）, Axs, 同花连牌（可玩性高）" },
+            { q: "Over-Limp后，翻后策略？", a: "仅用强成牌投入，放弃诈唬" },
+            { q: "SB面对多个Limper，应该如何？", a: "Complete: 所有小对子, 同花牌 | Iso-raise: QQ+, AK | Fold: 弱牌" },
+            { q: "BB面对多个Limper，应该如何？", a: "Check看免费牌（已投入1BB，赔率极好）" },
+            { q: "对抗Limp-Reraise（先Limp再3-bet）策略？", a: "警惕！通常是AA-KK，仅用AA-QQ继续投入" }
+        ]
+    },
+    {
+        category: "实战范围微调",
+        questions: [
+            { q: "对抗极紧Nit（VPIP<10%），如何调整？", a: "仅用超强牌对抗（AA-QQ, AK），其他全弃" },
+            { q: "对抗极松鱼（VPIP>40%），如何调整？", a: "放宽价值范围（增加Ax, Kx价值下注），减少诈唬" },
+            { q: "对抗激进3-bet狂人，如何调整？", a: "增加4-bet频率（价值+诈唬），Call更多中等对子" },
+            { q: "深筹码（300BB+）如何调整翻前范围？", a: "Open尺寸减小（2-2.2BB），增加小对子/同花连牌（隐含赔率高）" },
+            { q: "浅筹码（30-50BB）如何调整翻前范围？", a: "减少投机牌（小对子, 同花连牌），增加全压频率" },
+            { q: "对抗Calling Station（跟注站），如何调整？", a: "减少诈唬，增加薄价值下注，用强牌榨取" },
+            { q: "湿润桌况（多人Limp），如何调整？", a: "减少Iso-raise，增加Over-Limp看翻牌" },
+            { q: "紧桌况（频繁弃牌到BTN），如何调整？", a: "LP大幅放宽偷盲范围（BTN可打50%+）" },
+            { q: "对抗不懂弃牌的鱼，如何调整3-bet？", a: "仅用价值牌3-bet（AA-JJ, AK），放弃所有诈唬" },
+            { q: "自己Table Image紧（形象很紧），如何利用？", a: "增加偷盲/诈唬频率，对手会尊重你的3-bet" }
+        ]
+    }
+];
 
 // ==================== 8人桌训练模块 (Full Ring) ====================
 const FULL_RING = [

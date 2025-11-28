@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8人桌翻前范围表 - 快速参考</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            color: #e0e0e0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #ff9d50;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #999;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .position-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 157, 80, 0.3);
+        }
+
+        .position-title {
+            color: #ff9d50;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #ff9d50;
+            padding-bottom: 8px;
+        }
+
+        .range-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+
+        .range-table th {
+            background: rgba(255, 157, 80, 0.2);
+            color: #ffd700;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            border: 1px solid rgba(255, 157, 80, 0.3);
+        }
+
+        .range-table td {
+            padding: 10px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .range-table tr:hover td {
+            background: rgba(255, 157, 80, 0.1);
+        }
+
+        .range-value {
+            color: #00d4ff;
+            font-weight: bold;
+        }
+
+        .range-3bet {
+            color: #ff3366;
+            font-weight: bold;
+        }
+
+        .range-call {
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        .range-fold {
+            color: #999;
+        }
+
+        .legend {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #ff9d50;
+            color: #0a0e27;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .back-btn:hover {
+            background: #ffb366;
+        }
+
+        .note {
+            background: rgba(255, 215, 0, 0.1);
+            border-left: 4px solid #ffd700;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #ffd700;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            .range-table th,
+            .range-table td {
+                padding: 8px;
+                font-size: 13px;
+            }
+
+            .position-section {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="poker_trainer.html" class="back-btn">← 返回训练器</a>
+
+        <h1>📋 8人桌翻前范围表</h1>
+        <p class="subtitle">标准GTO范围 - 快速参考指南</p>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #00d4ff;"></div>
+                <span>Open加注范围</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ff3366;"></div>
+                <span>3-bet范围</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #00ff88;"></div>
+                <span>Call跟注范围</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #666;"></div>
+                <span>Fold弃牌</span>
+            </div>
+        </div>
+
+        <!-- UTG Position -->
+        <div class="position-section">
+            <div class="position-title">🔴 UTG（枪口位）- 5-8% 范围</div>
+            <table class="range-table">
+                <tr>
+                    <th width="30%">动作</th>
+                    <th width="70%">范围</th>
+                </tr>
+                <tr>
+                    <td>Open 2.5-3BB</td>
+                    <td class="range-value">AA-99, AKo-AQo, AKs-AJs</td>
+                </tr>
+                <tr>
+                    <td>vs MP 3-bet</td>
+                    <td>
+                        <span class="range-3bet">4-bet: AA-KK, AKs</span> |
+                        <span class="range-call">Call: QQ-JJ, AKo</span> |
+                        <span class="range-fold">Fold: 其他</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>vs BTN 3-bet</td>
+                    <td>
+                        <span class="range-3bet">4-bet: AA-QQ, AKs</span> |
+                        <span class="range-call">Call: JJ-99, AKo, AQs</span> |
+                        <span class="range-fold">Fold: 其他</span>
+                    </td>
+                </tr>
+            </table>
+            <div class="note">⚠️ UTG范围极紧，只打最强牌。避免打AQo（边缘牌）和88-（深筹码除外）。</div>
+        </div>
+
+        <!-- UTG+1 Position -->
+        <div class="position-section">
+            <div class="position-title">🟠 UTG+1 - 8-11% 范围</div>
+            <table class="range-table">
+                <tr>
+                    <th>动作</th>
+                    <th>范围</th>
+                </tr>
+                <tr>
+                    <td>Open 2.5-3BB</td>
+                    <td class="range-value">AA-77, AKo-AQo, AKs-AJs, KQs</td>
+                </tr>
+                <tr>
+                    <td>vs UTG Open</td>
+                    <td>
+                        <span class="range-3bet">3-bet: AA-KK, AKs</span> |
+                        <span class="range-call">Call: QQ-77, AKo, AQs（set mining）</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- MP Position -->
+        <div class="position-section">
+            <div class="position-title">🟡 MP（中位）- 12-16% 范围</div>
+            <table class="range-table">
+                <tr>
+                    <th>动作</th>
+                    <th>范围</th>
+                </tr>
+                <tr>
+                    <td>Open 2.5-2.8BB</td>
+                    <td class="range-value">AA-22, AKo-ATo, AKs-A9s, KQs-KJs, QJs, JTs</td>
+                </tr>
+                <tr>
+                    <td>vs EP Open</td>
+                    <td>
+                        <span class="range-3bet">3-bet: AA-QQ, AKs（3.5-4x）</span> |
+                        <span class="range-call">Call: JJ-66, AKo, AQs</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>vs CO 3-bet</td>
+                    <td>
+                        <span class="range-3bet">4-bet: AA-KK, AKs</span> |
+                        <span class="range-call">Call: QQ-77, AKo, AQs-ATs</span>
+                    </td>
+                </tr>
+            </table>
+            <div class="note">💡 MP开始可打小对子（set mining），避免ATo（易被支配）。</div>
+        </div>
+
+        <!-- CO Position -->
+        <div class="position-section">
+            <div class="position-title">🟢 CO（关位）- 18-24% 范围</div>
+            <table class="range-table">
+                <tr>
+                    <th>动作</th>
+                    <th>范围</th>
+                </tr>
+                <tr>
+                    <td>Open 2.2-2.5BB</td>
+                    <td class="range-value">AA-22, AKo-A9o, AKs-A2s, KQo-KTo, KQs-K9s, QJs-QTs, JTs-J9s, T9s, 98s, 87s</td>
+                </tr>
+                <tr>
+                    <td>vs EP/MP Open</td>
+                    <td>
+                        <span class="range-3bet">3-bet: AA-QQ, AKs, A5s-A2s（诈唬）, KQs（3-3.5x）</span> |
+                        <span class="range-call">Call: JJ-77, AK, AQs-AJs</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>vs BTN 3-bet</td>
+                    <td>
+                        <span class="range-3bet">4-bet: AA-JJ, AKs, A5s-A2s（诈唬）</span> |
+                        <span class="range-call">Call: TT-77, AK, AQs-AJs</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- BTN Position -->
+        <div class="position-section">
+            <div class="position-title">🔵 BTN（按钮）- 25-35% 范围</div>
+            <table class="range-table">
+                <tr>
+                    <th>动作</th>
+                    <th>范围</th>
+                </tr>
+                <tr>
+                    <td>Open 2-2.2BB</td>
+                    <td class="range-value">所有对子, 所有Ax, Kxs, Qxs, 所有同花连牌, QJo+, JTo+</td>
+                </tr>
+                <tr>
+                    <td>Fold to BTN</td>
+                    <td class="range-value">40-50%（极宽偷盲）</td>
+                </tr>
+                <tr>
+                    <td>vs EP/MP Open</td>
+                    <td>
+                        <span class="range-3bet">3-bet: AA-JJ, AK, A5s-A2s, KQs, QJs（2.5-3x）</span> |
+                        <span class="range-call">Call: TT-22, AQ, AJs-A9s, 同花连牌</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>vs SB 3-bet</td>
+                    <td>
+                        <span class="range-3bet">4-bet: AA-TT, AK, AQs, A5s-A2s（诈唬）</span> |
+                        <span class="range-call">Call: 99-77, AQo, AJs-ATs</span>
+                    </td>
+                </tr>
+            </table>
+            <div class="note">💎 BTN位置最佳，可极宽偷盲。但注意不要过度，被3-bet后代价高。</div>
+        </div>
+
+        <!-- SB Position -->
+        <div class="position-section">
+            <div class="position-title">🟣 SB（小盲）- 最难位置</div>
+            <table class="range-table">
+                <tr>
+                    <th>动作</th>
+                    <th>范围</th>
+                </tr>
+                <tr>
+                    <td>Fold to SB Open</td>
+                    <td class="range-value">25-35% (2.5-3BB)</td>
+                </tr>
+                <tr>
+                    <td>Complete范围</td>
+                    <td class="range-value">22-66, Axs, 同花连牌（20-30%）</td>
+                </tr>
+                <tr>
+                    <td>vs EP/MP Open</td>
+                    <td>
+                        <span class="range-3bet">3-bet: AA-JJ, AK, AQs, A5s-A2s（3.5-4x）</span> |
+                        <span class="range-fold">Fold: 大部分（OOP极难）</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>vs BTN Open</td>
+                    <td>
+                        <span class="range-3bet">3-bet: 12-18%（价值+大量诈唬）</span> |
+                        <span class="range-call">Call: 8-12%（强听牌型）</span>
+                    </td>
+                </tr>
+            </table>
+            <div class="note">⚠️ SB位置最差，OOP极难打。优先3-bet或Fold，少Call。</div>
+        </div>
+
+        <!-- BB Position -->
+        <div class="position-section">
+            <div class="position-title">🔴 BB（大盲）- 防守为主</div>
+            <table class="range-table">
+                <tr>
+                    <th>对抗位置</th>
+                    <th>防守范围 | 3-bet范围</th>
+                </tr>
+                <tr>
+                    <td>vs UTG Open</td>
+                    <td>
+                        <span class="range-call">防守: 25-30%</span> |
+                        <span class="range-3bet">3-bet: 6-8%（AA-QQ, AKs, A5s-A4s诈唬）</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>vs MP Open</td>
+                    <td>
+                        <span class="range-call">防守: 35-40%</span> |
+                        <span class="range-3bet">3-bet: 8-12%（增加JJ, AKo, AQs, A5s-A2s）</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>vs CO Open</td>
+                    <td>
+                        <span class="range-call">防守: 40-45%</span> |
+                        <span class="range-3bet">3-bet: 10-14%</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>vs BTN Open</td>
+                    <td>
+                        <span class="range-call">防守: 45-55%</span> |
+                        <span class="range-3bet">3-bet: 12-18%（大量诈唬）</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>vs SB Open</td>
+                    <td>
+                        <span class="range-call">防守: 50-60%（最宽）</span> |
+                        <span class="range-3bet">3-bet: 15-20%</span>
+                    </td>
+                </tr>
+            </table>
+            <div class="note">💡 BB防守需要28%胜率（vs 2.5BB Open），底池赔率好，必须广泛防守。</div>
+        </div>
+
+        <!-- 4-bet Strategy -->
+        <div class="position-section">
+            <div class="position-title">⚡ 4-Bet 策略</div>
+            <table class="range-table">
+                <tr>
+                    <th>动作</th>
+                    <th>范围 | 尺寸</th>
+                </tr>
+                <tr>
+                    <td>IP 4-bet</td>
+                    <td class="range-3bet">价值: AA-QQ, AKs | 诈唬: A5s-A3s, KQs | 尺寸: 2.2-2.5x</td>
+                </tr>
+                <tr>
+                    <td>OOP 4-bet</td>
+                    <td class="range-3bet">价值: AA-QQ, AKs | 诈唬: A5s-A3s | 尺寸: 2.5-3x</td>
+                </tr>
+                <tr>
+                    <td>浅筹码<40BB</td>
+                    <td class="range-3bet">4-bet = 全压（避免尴尬SPR）</td>
+                </tr>
+                <tr>
+                    <td>vs 4-bet</td>
+                    <td>
+                        <span class="range-3bet">5-bet: 仅AA-KK</span> |
+                        <span class="range-call">Call: QQ-JJ（深筹码）</span> |
+                        <span class="range-fold">Fold: 其他</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Squeeze Strategy -->
+        <div class="position-section">
+            <div class="position-title">🎯 Squeeze（挤压）策略</div>
+            <table class="range-table">
+                <tr>
+                    <th>场景</th>
+                    <th>策略</th>
+                </tr>
+                <tr>
+                    <td>理想场景</td>
+                    <td>EP Open + MP Call（双方范围上限明确）</td>
+                </tr>
+                <tr>
+                    <td>Squeeze范围</td>
+                    <td class="range-3bet">价值: AA-JJ, AK | 诈唬: A5s-A2s, KQs, QJs | 8-12%</td>
+                </tr>
+                <tr>
+                    <td>Squeeze尺寸</td>
+                    <td class="range-value">4-5x原Open + 每个Caller +1BB</td>
+                </tr>
+                <tr>
+                    <td>成功率要求</td>
+                    <td>50-60%（死钱多，成功率高）</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- vs Limp Strategy -->
+        <div class="position-section">
+            <div class="position-title">🎲 对抗Limp策略</div>
+            <table class="range-table">
+                <tr>
+                    <th>场景</th>
+                    <th>策略</th>
+                </tr>
+                <tr>
+                    <td>1个EP Limper</td>
+                    <td>
+                        <span class="range-3bet">Iso-raise: TT+, AJ+ (5-6BB)</span> |
+                        <span class="range-call">Limp: 99-22, Axs, 同花连牌</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2个Limper</td>
+                    <td>
+                        <span class="range-3bet">Iso-raise: JJ+, AQ+ (6-7BB)</span> |
+                        <span class="range-call">Limp: 所有小对子, 同花牌</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>3+个Limper</td>
+                    <td>
+                        <span class="range-call">几乎不Iso-raise | Limp: 所有小对子, 同花连牌（隐含赔率极高）</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Limp-Reraise</td>
+                    <td class="range-fold">⚠️ 警惕！通常是AA-KK，仅用AA-QQ继续</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="note" style="margin-top: 30px; border-color: #00d4ff;">
+            📌 <strong>使用提示：</strong><br>
+            1. 这些范围是标准GTO基准，实战需根据对手调整<br>
+            2. 对抗极紧Nit（VPIP<10%），收紧对抗范围<br>
+            3. 对抗极松鱼（VPIP>40%），放宽价值范围，减少诈唬<br>
+            4. 深筹码（300BB+）增加投机牌（小对子/同花连牌）<br>
+            5. 浅筹码（<50BB）减少投机牌，增加全压频率
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="poker_trainer.html" class="back-btn">返回训练器开始练习 →</a>
+        </div>
+    </div>
+</body>
+</html>
+
