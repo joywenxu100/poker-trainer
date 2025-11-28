@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8人桌翻前范围热力图 PRO - 深筹码+多人底池版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            color: #e0e0e0;
+            padding: 12px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #ff9d50;
+            margin-bottom: 8px;
+            font-size: 22px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #999;
+            margin-bottom: 15px;
+            font-size: 12px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 6px 14px;
+            background: #ff9d50;
+            color: #0a0e27;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .control-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 157, 80, 0.3);
+        }
+
+        .control-label {
+            font-size: 13px;
+            color: #ffd700;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .selector-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 6px;
+        }
+
+        .selector-btn {
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 157, 80, 0.3);
+            border-radius: 6px;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            text-align: center;
+            font-size: 11px;
+        }
+
+        .selector-btn:hover {
+            border-color: #ff9d50;
+            color: #ff9d50;
+        }
+
+        .selector-btn.active {
+            background: #ff9d50;
+            color: #0a0e27;
+            border-color: #ff9d50;
+        }
+
+        .range-info {
+            background: linear-gradient(135deg, rgba(255, 157, 80, 0.15), rgba(255, 107, 157, 0.15));
+            border: 2px solid #ff9d50;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .range-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ff9d50;
+            margin-bottom: 4px;
+        }
+
+        .range-percentage {
+            font-size: 22px;
+            color: #00d4ff;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .range-desc {
+            font-size: 11px;
+            color: #ffd700;
+        }
+
+        .heatmap-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+        }
+
+        .heatmap {
+            display: grid;
+            grid-template-columns: repeat(13, 1fr);
+            gap: 2px;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        .hand-cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 11px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .hand-cell:hover {
+            transform: scale(1.2);
+            z-index: 10;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        /* 颜色方案 */
+        .freq-0 { background: #f5f5f5; color: #999; }
+        .freq-25 { background: #fff4e6; color: #e67700; }
+        .freq-50 { background: #fff176; color: #f57f17; }
+        .freq-75 { background: #aed581; color: #33691e; }
+        .freq-100 { background: #4caf50; color: #fff; }
+        
+        .hand-cell.pair {
+            font-weight: 900;
+        }
+
+        .hand-cell.suited::after {
+            content: 's';
+            font-size: 7px;
+            position: absolute;
+            top: 1px;
+            right: 2px;
+            opacity: 0.7;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .note {
+            background: rgba(255, 215, 0, 0.1);
+            border-left: 3px solid #ffd700;
+            padding: 10px;
+            margin: 12px 0;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #ffd700;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: 10px 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 157, 80, 0.3);
+            border-radius: 8px;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            border-color: #ff9d50;
+            color: #ff9d50;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border-color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 8px;
+            }
+
+            h1 {
+                font-size: 18px;
+            }
+
+            .hand-cell {
+                font-size: 9px;
+            }
+
+            .heatmap {
+                gap: 1px;
+            }
+
+            .selector-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="poker_trainer.html" class="back-btn">← 返回训练器</a>
+
+        <h1>🔥 8人桌翻前范围热力图 PRO</h1>
+        <p class="subtitle">深筹码+多人底池+对手类型 - 专业版可视化训练系统</p>
+
+        <!-- 标签页切换 -->
+        <div class="tabs">
+            <div class="tab-btn active" onclick="switchTab('standard')">标准场景</div>
+            <div class="tab-btn" onclick="switchTab('multiway')">多人底池</div>
+            <div class="tab-btn" onclick="switchTab('defense')">防守范围</div>
+            <div class="tab-btn" onclick="switchTab('advanced')">高级场景</div>
+        </div>
+
+        <!-- 标准场景 -->
+        <div id="tab-standard" class="tab-content">
+            <!-- 筹码深度选择 -->
+            <div class="control-section">
+                <div class="control-label">💰 筹码深度（影响投机牌价值）</div>
+                <div class="selector-grid">
+                    <div class="selector-btn" onclick="setStack('short')">20-50BB<br><small>短筹码</small></div>
+                    <div class="selector-btn active" onclick="setStack('standard')">50-100BB<br><small>标准</small></div>
+                    <div class="selector-btn" onclick="setStack('deep')">100-200BB<br><small>深筹码</small></div>
+                    <div class="selector-btn" onclick="setStack('verydeep')">200-300BB<br><small>很深</small></div>
+                    <div class="selector-btn" onclick="setStack('ultradeep')">300BB+<br><small>超深</small></div>
+                </div>
+            </div>
+
+            <!-- 位置选择 -->
+            <div class="control-section">
+                <div class="control-label">📍 位置选择</div>
+                <div class="selector-grid">
+                    <div class="selector-btn active" onclick="setPosition('UTG')">UTG<br><small>5-8%</small></div>
+                    <div class="selector-btn" onclick="setPosition('UTG1')">UTG+1<br><small>8-11%</small></div>
+                    <div class="selector-btn" onclick="setPosition('MP')">MP<br><small>12-16%</small></div>
+                    <div class="selector-btn" onclick="setPosition('CO')">CO<br><small>18-24%</small></div>
+                    <div class="selector-btn" onclick="setPosition('BTN')">BTN<br><small>25-35%</small></div>
+                    <div class="selector-btn" onclick="setPosition('SB')">SB<br><small>25-35%</small></div>
+                </div>
+            </div>
+
+            <!-- 动作选择 -->
+            <div class="control-section">
+                <div class="control-label">⚡ 动作选择</div>
+                <div class="selector-grid">
+                    <div class="selector-btn active" onclick="setAction('open')">Open加注</div>
+                    <div class="selector-btn" onclick="setAction('3bet')">3-Bet</div>
+                    <div class="selector-btn" onclick="setAction('4bet')">4-Bet</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 多人底池场景 -->
+        <div id="tab-multiway" class="tab-content" style="display: none;">
+            <!-- 场景选择 -->
+            <div class="control-section">
+                <div class="control-label">🎰 多人底池场景</div>
+                <div class="selector-grid">
+                    <div class="selector-btn active" onclick="setScenario('vs1limper')">vs 1个Limper<br><small>Iso-raise</small></div>
+                    <div class="selector-btn" onclick="setScenario('vs2limpers')">vs 2个Limpers<br><small>Iso或Limp</small></div>
+                    <div class="selector-btn" onclick="setScenario('vs3limpers')">vs 3+个Limpers<br><small>Over-limp</small></div>
+                    <div class="selector-btn" onclick="setScenario('squeeze')">Open+Call<br><small>Squeeze机会</small></div>
+                    <div class="selector-btn" onclick="setScenario('coldcall')">Cold Call<br><small>跟注Open</small></div>
+                </div>
+            </div>
+
+            <!-- 位置选择 -->
+            <div class="control-section">
+                <div class="control-label">📍 你的位置</div>
+                <div class="selector-grid">
+                    <div class="selector-btn active" onclick="setPosition('MP')">MP</div>
+                    <div class="selector-btn" onclick="setPosition('CO')">CO</div>
+                    <div class="selector-btn" onclick="setPosition('BTN')">BTN</div>
+                    <div class="selector-btn" onclick="setPosition('SB')">SB</div>
+                    <div class="selector-btn" onclick="setPosition('BB')">BB</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 防守范围 -->
+        <div id="tab-defense" class="tab-content" style="display: none;">
+            <!-- 对手位置 -->
+            <div class="control-section">
+                <div class="control-label">🎯 对手Open位置</div>
+                <div class="selector-grid">
+                    <div class="selector-btn active" onclick="setVsPosition('vsUTG')">vs UTG</div>
+                    <div class="selector-btn" onclick="setVsPosition('vsMP')">vs MP</div>
+                    <div class="selector-btn" onclick="setVsPosition('vsCO')">vs CO</div>
+                    <div class="selector-btn" onclick="setVsPosition('vsBTN')">vs BTN</div>
+                    <div class="selector-btn" onclick="setVsPosition('vsSB')">vs SB</div>
+                </div>
+            </div>
+
+            <!-- 你的位置 -->
+            <div class="control-section">
+                <div class="control-label">📍 你的位置（防守）</div>
+                <div class="selector-grid">
+                    <div class="selector-btn active" onclick="setDefensePos('BB')">BB<br><small>大盲防守</small></div>
+                    <div class="selector-btn" onclick="setDefensePos('SB')">SB<br><small>小盲防守</small></div>
+                    <div class="selector-btn" onclick="setDefensePos('BTN')">BTN<br><small>按钮防守</small></div>
+                    <div class="selector-btn" onclick="setDefensePos('CO')">CO<br><small>CO防守</small></div>
+                </div>
+            </div>
+
+            <!-- 防守动作 -->
+            <div class="control-section">
+                <div class="control-label">⚡ 防守动作</div>
+                <div class="selector-grid">
+                    <div class="selector-btn active" onclick="setDefenseAction('call')">Call跟注</div>
+                    <div class="selector-btn" onclick="setDefenseAction('3bet')">3-Bet反加</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 高级场景 -->
+        <div id="tab-advanced" class="tab-content" style="display: none;">
+            <!-- 对手类型 -->
+            <div class="control-section">
+                <div class="control-label">👥 对手类型（范围调整）</div>
+                <div class="selector-grid">
+                    <div class="selector-btn active" onclick="setOpponent('gto')">GTO标准<br><small>平衡范围</small></div>
+                    <div class="selector-btn" onclick="setOpponent('nit')">Nit紧手<br><small>VPIP<12%</small></div>
+                    <div class="selector-btn" onclick="setOpponent('lag')">LAG激进<br><small>3-bet多</small></div>
+                    <div class="selector-btn" onclick="setOpponent('fish')">Fish鱼<br><small>VPIP>40%</small></div>
+                </div>
+            </div>
+
+            <!-- 特殊场景 -->
+            <div class="control-section">
+                <div class="control-label">🎲 特殊场景</div>
+                <div class="selector-grid">
+                    <div class="selector-btn active" onclick="setSpecial('vs3bet')">vs 3-Bet<br><small>防守/4-bet</small></div>
+                    <div class="selector-btn" onclick="setSpecial('vs4bet')">vs 4-Bet<br><small>5-bet或弃牌</small></div>
+                    <div class="selector-btn" onclick="setSpecial('limpreaise')">Limp-Reraise<br><small>陷阱打法</small></div>
+                </div>
+            </div>
+
+            <!-- 位置 -->
+            <div class="control-section">
+                <div class="control-label">📍 位置</div>
+                <div class="selector-grid">
+                    <div class="selector-btn active" onclick="setPosition('CO')">CO</div>
+                    <div class="selector-btn" onclick="setPosition('BTN')">BTN</div>
+                    <div class="selector-btn" onclick="setPosition('SB')">SB</div>
+                    <div class="selector-btn" onclick="setPosition('BB')">BB</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 范围信息 -->
+        <div class="range-info">
+            <div class="range-title" id="rangeTitle">UTG Open范围 - 标准筹码（50-100BB）</div>
+            <div class="range-percentage" id="rangePercentage">5-8%</div>
+            <div class="range-desc" id="rangeDesc">极紧范围，只打最强牌。标准筹码下，避免小对子和投机牌。</div>
+        </div>
+
+        <!-- 热力图 -->
+        <div class="heatmap-container">
+            <div class="heatmap" id="heatmap"></div>
+        </div>
+
+        <!-- 图例 -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color freq-100"></div>
+                <span>100% 必打</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color freq-75"></div>
+                <span>75% 常打</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color freq-50"></div>
+                <span>50% 选择性</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color freq-25"></div>
+                <span>25% 偶尔</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color freq-0"></div>
+                <span>0% 弃牌</span>
+            </div>
+        </div>
+
+        <!-- 说明 -->
+        <div class="note">
+            💡 <strong>PRO版特色：</strong><br>
+            • <strong>筹码深度影响</strong>：300BB+增加小对子/同花连牌（隐含赔率高）<br>
+            • <strong>多人底池调整</strong>：vs 3+个Limper，几乎不Iso，广泛Over-limp<br>
+            • <strong>Squeeze机会</strong>：EP Open + MP Call = 挤压良机（4-5x尺寸）<br>
+            • <strong>对手类型调整</strong>：vs Nit收紧对抗，vs Fish放宽价值减少诈唬<br>
+            • <strong>深筹码核心</strong>：200BB+显著增加投机牌，300BB+接近翻倍
+        </div>
+    </div>
+
+    <script>
+        const ranks = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
+        
+        let currentTab = 'standard';
+        let currentStack = 'standard';
+        let currentPosition = 'UTG';
+        let currentAction = 'open';
+        let currentScenario = 'vs1limper';
+        let currentVsPosition = 'vsUTG';
+        let currentDefensePos = 'BB';
+        let currentDefenseAction = 'call';
+        let currentOpponent = 'gto';
+        let currentSpecial = 'vs3bet';
+
+        // 深度筹码范围数据库
+        const rangesDatabase = {
+            // 标准场景 - 不同筹码深度
+            standard: {
+                // 短筹码（20-50BB）
+                short: {
+                    UTG: {
+                        open: {
+                            'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 100, 'TT': 100, '99': 100,
+                            'AKs': 100, 'AKo': 100, 'AQs': 100, 'AQo': 100, 'AJs': 100
+                            // 短筹码减少小对子（隐含赔率低）
+                        }
+                    },
+                    CO: {
+                        open: {
+                            'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 100, 'TT': 100, '99': 100, '88': 100, '77': 75,
+                            'AKs': 100, 'AKo': 100, 'AQs': 100, 'AQo': 100, 'AJs': 100, 'AJo': 75, 'ATs': 100, 'A9s': 75,
+                            'KQs': 100, 'KQo': 75, 'KJs': 100, 'QJs': 100, 'JTs': 75
+                            // 短筹码减少投机牌
+                        }
+                    },
+                    BTN: {
+                        open: {
+                            'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 100, 'TT': 100, '99': 100, '88': 100, '77': 100, '66': 75, '55': 75,
+                            'AKs': 100, 'AKo': 100, 'AQs': 100, 'AQo': 100, 'AJs': 100, 'AJo': 100, 'ATs': 100, 'ATo': 75, 'A9s': 100, 'A8s': 75, 'A7s': 75, 'A6s': 75, 'A5s': 75,
+                            'KQs': 100, 'KQo': 100, 'KJs': 100, 'KTs': 100, 'K9s': 75,
+                            'QJs': 100, 'QTs': 100, 'JTs': 100, 'T9s': 75, '98s': 50, '87s': 25
+                        }
+                    }
+                },
+                // 300BB+超深筹码
+                ultradeep: {
+                    UTG: {
+                        open: {
+                            'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 100, 'TT': 100, '99': 100, '88': 75, '77': 75, '66': 50, '55': 50, '44': 25, '33': 25, '22': 25,
+                            'AKs': 100, 'AKo': 100, 'AQs': 100, 'AQo': 75, 'AJs': 100, 'ATs': 75,
+                            'KQs': 75
+                            // 300BB+增加小对子（隐含赔率极高）
+                        }
+                    },
+                    CO: {
+                        open: {
+                            'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 100, 'TT': 100, '99': 100, '88': 100, '77': 100, '66': 100, '55': 100, '44': 100, '33': 100, '22': 100,
+                            'AKs': 100, 'AKo': 100, 'AQs': 100, 'AQo': 100, 'AJs': 100, 'AJo': 75, 'ATs': 100, 'A9s': 100, 'A8s': 100, 'A7s': 100, 'A6s': 100, 'A5s': 100, 'A4s': 100, 'A3s': 100, 'A2s': 100,
+                            'KQs': 100, 'KQo': 75, 'KJs': 100, 'KTs': 100, 'K9s': 75, 'K8s': 50, 'K7s': 50, 'K6s': 50, 'K5s': 50,
+                            'QJs': 100, 'QTs': 100, 'Q9s': 75, 'JTs': 100, 'J9s': 75, 'T9s': 100, '98s': 100, '87s': 75, '76s': 50, '65s': 50, '54s': 25
+                            // 300BB+大幅增加同花连牌（可玩性高）
+                        }
+                    },
+                    BTN: {
+                        open: {
+                            'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 100, 'TT': 100, '99': 100, '88': 100, '77': 100, '66': 100, '55': 100, '44': 100, '33': 100, '22': 100,
+                            'AKs': 100, 'AKo': 100, 'AQs': 100, 'AQo': 100, 'AJs': 100, 'AJo': 100, 'ATs': 100, 'ATo': 100, 'A9s': 100, 'A9o': 75, 'A8s': 100, 'A8o': 50, 'A7s': 100, 'A6s': 100, 'A5s': 100, 'A4s': 100, 'A3s': 100, 'A2s': 100,
+                            'KQs': 100, 'KQo': 100, 'KJs': 100, 'KJo': 100, 'KTs': 100, 'KTo': 75, 'K9s': 100, 'K8s': 100, 'K7s': 100, 'K6s': 100, 'K5s': 75, 'K4s': 75, 'K3s': 75, 'K2s': 75,
+                            'QJs': 100, 'QJo': 100, 'QTs': 100, 'QTo': 100, 'Q9s': 100, 'Q8s': 100, 'Q7s': 75, 'Q6s': 75, 'Q5s': 50,
+                            'JTs': 100, 'JTo': 100, 'J9s': 100, 'J9o': 75, 'J8s': 100, 'J7s': 75, 'J6s': 50,
+                            'T9s': 100, 'T9o': 100, 'T8s': 100, 'T8o': 75, 'T7s': 100, 'T6s': 75,
+                            '98s': 100, '98o': 75, '97s': 100, '96s': 75, '87s': 100, '87o': 50, '86s': 100, '85s': 75, '76s': 100, '75s': 75, '65s': 100, '64s': 75, '54s': 100, '53s': 50
+                            // 300BB+ BTN接近打所有有价值的牌
+                        }
+                    }
+                }
+            },
+            // 多人底池场景
+            multiway: {
+                vs1limper: {
+                    CO: {
+                        iso: {
+                            'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 100, 'TT': 100, '99': 75,
+                            'AKs': 100, 'AKo': 100, 'AQs': 100, 'AQo': 100, 'AJs': 100, 'AJo': 75,
+                            'KQs': 75
+                        },
+                        limp: {
+                            '88': 100, '77': 100, '66': 100, '55': 100, '44': 100, '33': 100, '22': 100,
+                            'ATs': 75, 'A9s': 75, 'A8s': 75, 'A7s': 75, 'A6s': 75, 'A5s': 100,
+                            'KJs': 75, 'KTs': 75, 'QJs': 75, 'JTs': 100, 'T9s': 100, '98s': 100, '87s': 100, '76s': 75, '65s': 75, '54s': 75
+                        }
+                    }
+                },
+                vs3limpers: {
+                    BTN: {
+                        limp: {
+                            '99': 100, '88': 100, '77': 100, '66': 100, '55': 100, '44': 100, '33': 100, '22': 100,
+                            'AJs': 75, 'ATs': 100, 'A9s': 100, 'A8s': 100, 'A7s': 100, 'A6s': 100, 'A5s': 100, 'A4s': 100, 'A3s': 100, 'A2s': 100,
+                            'KQs': 75, 'KJs': 100, 'KTs': 100, 'K9s': 100, 'QJs': 100, 'QTs': 100, 'Q9s': 100,
+                            'JTs': 100, 'J9s': 100, 'J8s': 100, 'T9s': 100, 'T8s': 100, 'T7s': 100, '98s': 100, '97s': 100, '87s': 100, '86s': 100, '76s': 100, '75s': 100, '65s': 100, '64s': 100, '54s': 100
+                            // vs 3+ Limpers：几乎所有投机牌都打（隐含赔率极高）
+                        }
+                    }
+                },
+                squeeze: {
+                    BTN: {
+                        squeeze: {
+                            'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 100, 'TT': 75,
+                            'AKs': 100, 'AKo': 100, 'AQs': 75,
+                            'A5s': 75, 'A4s': 75, 'A3s': 75, 'A2s': 75,
+                            'KQs': 75, 'QJs': 50
+                            // Squeeze: 价值 + 诈唬（阻断强牌）
+                        }
+                    }
+                }
+            },
+            // 防守范围
+            defense: {
+                BB: {
+                    vsUTG: {
+                        call: {
+                            'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 100, 'TT': 100, '99': 100, '88': 100, '77': 75, '66': 75, '55': 75, '44': 50, '33': 50, '22': 50,
+                            'AKs': 100, 'AKo': 100, 'AQs': 100, 'AQo': 75, 'AJs': 100, 'ATs': 75, 'A9s': 50,
+                            'KQs': 75, 'KJs': 50, 'QJs': 50, 'JTs': 50, 'T9s': 25, '98s': 25
+                        },
+                        '3bet': {
+                            'AA': 100, 'KK': 100, 'QQ': 100, 'AKs': 100,
+                            'A5s': 25, 'A4s': 25
+                        }
+                    },
+                    vsBTN: {
+                        call: {
+                            'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 100, 'TT': 100, '99': 100, '88': 100, '77': 100, '66': 100, '55': 100, '44': 100, '33': 100, '22': 100,
+                            'AKs': 100, 'AKo': 100, 'AQs': 100, 'AQo': 100, 'AJs': 100, 'AJo': 100, 'ATs': 100, 'ATo': 75, 'A9s': 100, 'A9o': 75, 'A8s': 100, 'A7s': 100, 'A6s': 100, 'A5s': 100, 'A4s': 100, 'A3s': 100, 'A2s': 100,
+                            'KQs': 100, 'KQo': 100, 'KJs': 100, 'KJo': 75, 'KTs': 100, 'K9s': 100, 'K8s': 75, 'K7s': 75, 'K6s': 75, 'K5s': 50,
+                            'QJs': 100, 'QJo': 100, 'QTs': 100, 'Q9s': 100, 'Q8s': 75,
+                            'JTs': 100, 'JTo': 100, 'J9s': 100, 'J8s': 75,
+                            'T9s': 100, 'T9o': 75, 'T8s': 100, 'T7s': 50,
+                            '98s': 100, '97s': 75, '87s': 100, '76s': 75, '65s': 75, '54s': 50
+                        },
+                        '3bet': {
+                            'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 75, 'TT': 75,
+                            'AKs': 100, 'AKo': 100, 'AQs': 100,
+                            'A5s': 75, 'A4s': 75, 'A3s': 75, 'A2s': 75,
+                            'KQs': 75, 'QJs': 50, 'JTs': 50
+                        }
+                    }
+                }
+            },
+            // 高级场景
+            advanced: {
+                vs3bet: {
+                    CO: {
+                        '4bet': {
+                            'AA': 100, 'KK': 100, 'AKs': 100,
+                            'A5s': 50, 'A4s': 50, 'A3s': 50
+                        },
+                        call: {
+                            'QQ': 100, 'JJ': 100, 'TT': 75, '99': 75,
+                            'AKo': 100, 'AQs': 100, 'AJs': 75,
+                            'KQs': 50
+                        }
+                    }
+                },
+                vsNit: {
+                    BTN: {
+                        open: {
+                            'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 100, 'TT': 100, '99': 100, '88': 100, '77': 100, '66': 100, '55': 100, '44': 100, '33': 100, '22': 100,
+                            'AKs': 100, 'AKo': 100, 'AQs': 100, 'AQo': 100, 'AJs': 100, 'AJo': 100, 'ATs': 100, 'ATo': 100, 'A9s': 100, 'A9o': 100, 'A8s': 100, 'A8o': 75, 'A7s': 100, 'A6s': 100, 'A5s': 100, 'A4s': 100, 'A3s': 100, 'A2s': 100,
+                            'KQs': 100, 'KQo': 100, 'KJs': 100, 'KJo': 100, 'KTs': 100, 'KTo': 100, 'K9s': 100, 'K8s': 100, 'K7s': 100, 'K6s': 100, 'K5s': 100,
+                            'QJs': 100, 'QJo': 100, 'QTs': 100, 'QTo': 100, 'Q9s': 100, 'Q8s': 100, 'Q7s': 100,
+                            'JTs': 100, 'JTo': 100, 'J9s': 100, 'J9o': 100, 'J8s': 100, 'J7s': 100,
+                            'T9s': 100, 'T9o': 100, 'T8s': 100, 'T8o': 100, 'T7s': 100,
+                            '98s': 100, '98o': 100, '97s': 100, '87s': 100, '86s': 100, '76s': 100, '75s': 100, '65s': 100, '54s': 100
+                            // vs Nit：极宽偷盲（Nit频繁弃牌）
+                        }
+                    }
+                }
+            }
+        };
+
+        function generateHeatmap() {
+            const heatmap = document.getElementById('heatmap');
+            heatmap.innerHTML = '';
+
+            for (let i = 0; i < 13; i++) {
+                for (let j = 0; j < 13; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'hand-cell';
+
+                    let hand = '';
+                    let frequency = 0;
+
+                    if (i === j) {
+                        hand = ranks[i] + ranks[j];
+                        cell.classList.add('pair');
+                    } else if (i < j) {
+                        hand = ranks[i] + ranks[j] + 's';
+                        cell.classList.add('suited');
+                    } else {
+                        hand = ranks[j] + ranks[i] + 'o';
+                    }
+
+                    frequency = getFrequency(hand);
+
+                    if (frequency >= 90) {
+                        cell.classList.add('freq-100');
+                    } else if (frequency >= 65) {
+                        cell.classList.add('freq-75');
+                    } else if (frequency >= 40) {
+                        cell.classList.add('freq-50');
+                    } else if (frequency >= 15) {
+                        cell.classList.add('freq-25');
+                    } else {
+                        cell.classList.add('freq-0');
+                    }
+
+                    cell.textContent = hand.replace('s', '').replace('o', '');
+                    cell.title = hand + ' - ' + frequency + '%';
+
+                    heatmap.appendChild(cell);
+                }
+            }
+        }
+
+        function getFrequency(hand) {
+            let range = null;
+
+            if (currentTab === 'standard') {
+                range = rangesDatabase.standard[currentStack]?.[currentPosition]?.[currentAction];
+            } else if (currentTab === 'multiway') {
+                // 多人底池逻辑
+                range = rangesDatabase.multiway[currentScenario]?.[currentPosition]?.[currentAction];
+            } else if (currentTab === 'defense') {
+                // 防守逻辑
+                range = rangesDatabase.defense[currentDefensePos]?.[currentVsPosition]?.[currentDefenseAction];
+            } else if (currentTab === 'advanced') {
+                // 高级场景逻辑
+                if (currentOpponent !== 'gto') {
+                    range = rangesDatabase.advanced['vs' + capitalizeFirst(currentOpponent)]?.[currentPosition]?.[currentAction];
+                } else {
+                    range = rangesDatabase.advanced[currentSpecial]?.[currentPosition]?.[currentAction];
+                }
+            }
+
+            return range && range[hand] ? range[hand] : 0;
+        }
+
+        function capitalizeFirst(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            document.querySelectorAll('.tab-content').forEach(content => content.style.display = 'none');
+            document.getElementById('tab-' + tab).style.display = 'block';
+
+            updateRangeInfo();
+            generateHeatmap();
+        }
+
+        function setStack(stack) {
+            currentStack = stack;
+            updateButtons('.control-section:first-child .selector-btn');
+            updateRangeInfo();
+            generateHeatmap();
+        }
+
+        function setPosition(position) {
+            currentPosition = position;
+            updateButtons('.control-section:nth-child(2) .selector-btn, .control-section:nth-child(1) .selector-btn');
+            updateRangeInfo();
+            generateHeatmap();
+        }
+
+        function setAction(action) {
+            currentAction = action;
+            updateButtons('.control-section:nth-child(3) .selector-btn, .control-section:last-child .selector-btn');
+            updateRangeInfo();
+            generateHeatmap();
+        }
+
+        function setScenario(scenario) {
+            currentScenario = scenario;
+            updateButtons('.control-section:first-child .selector-btn');
+            updateRangeInfo();
+            generateHeatmap();
+        }
+
+        function setVsPosition(pos) {
+            currentVsPosition = pos;
+            updateButtons('.control-section:first-child .selector-btn');
+            updateRangeInfo();
+            generateHeatmap();
+        }
+
+        function setDefensePos(pos) {
+            currentDefensePos = pos;
+            updateButtons('.control-section:nth-child(2) .selector-btn');
+            updateRangeInfo();
+            generateHeatmap();
+        }
+
+        function setDefenseAction(action) {
+            currentDefenseAction = action;
+            updateButtons('.control-section:nth-child(3) .selector-btn');
+            updateRangeInfo();
+            generateHeatmap();
+        }
+
+        function setOpponent(opp) {
+            currentOpponent = opp;
+            updateButtons('.control-section:first-child .selector-btn');
+            updateRangeInfo();
+            generateHeatmap();
+        }
+
+        function setSpecial(special) {
+            currentSpecial = special;
+            updateButtons('.control-section:nth-child(2) .selector-btn');
+            updateRangeInfo();
+            generateHeatmap();
+        }
+
+        function updateButtons(selector) {
+            document.querySelectorAll(selector).forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function updateRangeInfo() {
+            const stackLabels = {
+                'short': '短筹码（20-50BB）',
+                'standard': '标准筹码（50-100BB）',
+                'deep': '深筹码（100-200BB）',
+                'verydeep': '很深筹码（200-300BB）',
+                'ultradeep': '超深筹码（300BB+）'
+            };
+
+            let title = currentPosition + ' ' + currentAction + '范围';
+            let pct = '5-8%';
+            let desc = '标准场景';
+
+            if (currentTab === 'standard') {
+                title += ' - ' + stackLabels[currentStack];
+                if (currentStack === 'ultradeep') {
+                    desc = '300BB+超深筹码：大幅增加小对子和同花连牌（隐含赔率极高）';
+                } else if (currentStack === 'short') {
+                    desc = '短筹码：减少投机牌，专注高牌力';
+                }
+            } else if (currentTab === 'multiway') {
+                const scenarioLabels = {
+                    'vs1limper': 'vs 1个Limper',
+                    'vs2limpers': 'vs 2个Limpers',
+                    'vs3limpers': 'vs 3+个Limpers',
+                    'squeeze': 'Squeeze挤压',
+                    'coldcall': 'Cold Call跟注'
+                };
+                title = currentPosition + ' ' + scenarioLabels[currentScenario];
+                desc = '多人底池场景：隐含赔率优先';
+            } else if (currentTab === 'defense') {
+                title = currentDefensePos + ' 防守 ' + currentVsPosition + ' - ' + currentDefenseAction;
+                desc = '防守范围：根据对手位置和底池赔率调整';
+            } else if (currentTab === 'advanced') {
+                if (currentOpponent !== 'gto') {
+                    title = currentPosition + ' vs ' + currentOpponent.toUpperCase();
+                    desc = '对手类型调整：针对性剥削';
+                } else {
+                    title = currentPosition + ' ' + currentSpecial;
+                    desc = '高级场景：复杂情况处理';
+                }
+            }
+
+            document.getElementById('rangeTitle').textContent = title;
+            document.getElementById('rangePercentage').textContent = pct;
+            document.getElementById('rangeDesc').textContent = desc;
+        }
+
+        // 初始化
+        generateHeatmap();
+        updateRangeInfo();
+    </script>
+</body>
+</html>
+
