@@ -465,6 +465,7 @@
         </div>
     </div>
 
+    <script src="preflop_ranges_data.js"></script>
     <script>
         const ranks = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
         
@@ -479,8 +480,8 @@
         let currentOpponent = 'gto';
         let currentSpecial = 'vs3bet';
 
-        // 深度筹码范围数据库
-        const rangesDatabase = {
+        // 使用完整的范围数据库（从外部文件加载）
+        const rangesDatabase = COMPLETE_RANGES || {
             // 标准场景 - 不同筹码深度
             standard: {
                 // 短筹码（20-50BB）
