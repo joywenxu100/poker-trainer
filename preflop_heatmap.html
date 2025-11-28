@@ -226,6 +226,12 @@
             border-color: #00d4ff;
         }
 
+        .action-btn.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
         .note {
             background: rgba(255, 215, 0, 0.1);
             border-left: 4px solid #ffd700;
@@ -344,6 +350,9 @@
                 },
                 '3bet': {
                     'AA': 100, 'KK': 100, 'AKs': 100
+                },
+                '4bet': {
+                    'AA': 100, 'KK': 100
                 }
             },
             UTG1: {
@@ -353,6 +362,9 @@
                 },
                 '3bet': {
                     'AA': 100, 'KK': 100, 'AKs': 100
+                },
+                '4bet': {
+                    'AA': 100, 'KK': 100, 'AKs': 75
                 }
             },
             MP: {
@@ -363,6 +375,9 @@
                 },
                 '3bet': {
                     'AA': 100, 'KK': 100, 'QQ': 100, 'AKs': 100
+                },
+                '4bet': {
+                    'AA': 100, 'KK': 100, 'QQ': 75, 'AKs': 100
                 }
             },
             CO: {
@@ -375,6 +390,10 @@
                 '3bet': {
                     'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 100, 'AKs': 100, 'AKo': 100,
                     'A5s': 50, 'A4s': 50, 'A3s': 50, 'A2s': 50, 'KQs': 50
+                },
+                '4bet': {
+                    'AA': 100, 'KK': 100, 'QQ': 100, 'AKs': 100, 'AKo': 75,
+                    'A5s': 25, 'A4s': 25, 'A3s': 25
                 }
             },
             BTN: {
@@ -392,6 +411,12 @@
                     'AKs': 100, 'AKo': 100, 'AQs': 100,
                     'A5s': 75, 'A4s': 75, 'A3s': 75, 'A2s': 75,
                     'KQs': 75, 'QJs': 50
+                },
+                '4bet': {
+                    'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 75,
+                    'AKs': 100, 'AKo': 100,
+                    'A5s': 50, 'A4s': 50, 'A3s': 50, 'A2s': 50,
+                    'KQs': 25
                 }
             },
             SB: {
@@ -407,6 +432,11 @@
                     'AKs': 100, 'AKo': 100, 'AQs': 100,
                     'A5s': 75, 'A4s': 75, 'A3s': 75, 'A2s': 75,
                     'KQs': 75
+                },
+                '4bet': {
+                    'AA': 100, 'KK': 100, 'QQ': 100,
+                    'AKs': 100, 'AKo': 100,
+                    'A5s': 50, 'A4s': 50, 'A3s': 50
                 }
             },
             BB_UTG: {
@@ -418,6 +448,9 @@
                 '3bet': {
                     'AA': 100, 'KK': 100, 'QQ': 100, 'AKs': 100,
                     'A5s': 25, 'A4s': 25
+                },
+                '4bet': {
+                    'AA': 100, 'KK': 100, 'AKs': 100
                 }
             },
             BB_BTN: {
@@ -435,6 +468,11 @@
                     'AKs': 100, 'AKo': 100, 'AQs': 100,
                     'A5s': 75, 'A4s': 75, 'A3s': 75, 'A2s': 75,
                     'KQs': 75, 'QJs': 50, 'JTs': 50
+                },
+                '4bet': {
+                    'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 75,
+                    'AKs': 100, 'AKo': 100,
+                    'A5s': 75, 'A4s': 75, 'A3s': 75, 'A2s': 75
                 }
             }
         };
@@ -499,11 +537,46 @@
             });
             event.target.closest('.position-btn').classList.add('active');
 
+            // 更新动作按钮可用状态
+            updateActionButtons();
+
             // 更新范围信息
             updateRangeInfo();
 
             // 重新生成热力图
             generateHeatmap();
+        }
+
+        function updateActionButtons() {
+            const positionRange = ranges[currentPosition];
+            const actionButtons = document.querySelectorAll('.action-btn');
+            
+            actionButtons.forEach(btn => {
+                const action = btn.textContent.includes('Open') ? 'open' :
+                              btn.textContent.includes('3-Bet') ? '3bet' :
+                              btn.textContent.includes('4-Bet') ? '4bet' : 'call';
+                
+                // 检查当前位置是否有此动作的数据
+                if (positionRange && positionRange[action]) {
+                    btn.classList.remove('disabled');
+                } else {
+                    btn.classList.add('disabled');
+                    // 如果当前选中的动作不可用，自动切换到可用的动作
+                    if (currentAction === action) {
+                        // 切换到第一个可用动作
+                        if (positionRange.open) {
+                            currentAction = 'open';
+                            document.querySelector('.action-btn[onclick*="open"]').classList.add('active');
+                        } else if (positionRange['3bet']) {
+                            currentAction = '3bet';
+                            document.querySelector('.action-btn[onclick*="3bet"]').classList.add('active');
+                        } else if (positionRange.call) {
+                            currentAction = 'call';
+                            document.querySelector('.action-btn[onclick*="call"]').classList.add('active');
+                        }
+                    }
+                }
+            });
         }
 
         function setAction(action) {
@@ -536,14 +609,22 @@
 
             if (currentAction === '3bet') {
                 info['UTG'].desc = '仅用AA-KK, AKs 3-bet（极紧）';
+                info['UTG1'].desc = '价值：AA-KK, AKs（极紧）';
+                info['MP'].desc = '价值：AA-QQ, AKs（紧）';
                 info['CO'].desc = '价值：AA-JJ, AK | 诈唬：A5s-A2s, KQs';
                 info['BTN'].desc = '价值：AA-TT, AK | 诈唬：A5s-A2s, KQs, QJs';
+                info['SB'].desc = '价值：AA-JJ, AK | 诈唬：A5s-A2s, KQs';
                 info['BB_UTG'].desc = '价值：AA-QQ, AKs | 诈唬：A5s-A4s偶尔';
                 info['BB_BTN'].desc = '价值+大量诈唬（12-18%）';
             } else if (currentAction === '4bet') {
-                info['UTG'].desc = '仅AA-KK（极紧）';
-                info['CO'].desc = '价值：AA-KK, AKs | 诈唬：A5s-A3s偶尔';
-                info['BTN'].desc = '价值：AA-KK, AKs | 诈唬：A5s-A3s';
+                info['UTG'].desc = '仅AA-KK（极紧，vs强3-bet）';
+                info['UTG1'].desc = '价值：AA-KK, AKs（极紧）';
+                info['MP'].desc = '价值：AA-QQ, AKs（紧）';
+                info['CO'].desc = '价值：AA-QQ, AK | 诈唬：A5s-A3s偶尔';
+                info['BTN'].desc = '价值：AA-JJ, AK | 诈唬：A5s-A2s, KQs偶尔';
+                info['SB'].desc = '价值：AA-QQ, AK | 诈唬：A5s-A3s偶尔';
+                info['BB_UTG'].desc = '仅AA-KK, AKs（极紧，vs强位置）';
+                info['BB_BTN'].desc = '价值：AA-JJ, AK | 诈唬：A5s-A2s（平衡）';
             }
 
             const currentInfo = info[currentPosition];
@@ -553,6 +634,7 @@
         }
 
         // 初始化
+        updateActionButtons();
         generateHeatmap();
         updateRangeInfo();
     </script>
