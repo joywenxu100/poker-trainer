@@ -1,5 +1,19 @@
-// 德州扑克训练师 V2.0 - 完整版（基础+职业级）
-// 保留原有26个基础问题 + 新增42个职业级问题 + 30个陷阱 + 20个GTO概念
+// 德州扑克训练师 V2.3 - 完整版（基础+职业级+数据+深筹码+桌型选择）
+// 保留原有26个基础问题 + 新增42个职业级问题 + 30个陷阱 + 20个GTO概念 + 92个必背数据 + 48个深筹码 + 54个8人桌
+
+// ==================== 桌型选择 ====================
+let currentTableType = localStorage.getItem('tableType') || '6max'; // '6max' 或 'ring'
+
+function setTableType(type) {
+    currentTableType = type;
+    localStorage.setItem('tableType', type);
+    updateHomePage();
+    alert(`已切换至${type === '6max' ? '6人桌' : '8人桌'}模式！`);
+}
+
+function getTableType() {
+    return currentTableType;
+}
 
 // ==================== 基础7阶段26问（保持不变） ====================
 const PHASES_BASIC = [
@@ -424,6 +438,27 @@ function updateHomePage() {
     document.getElementById('progressBarFill').style.width = mastery + '%';
     document.getElementById('progressText').textContent = 
         `已完成 ${trainingData.totalCount} / 2000 次训练（基础${trainingData.basicCount} + 职业${trainingData.proCount}）`;
+    
+    // 更新桌型显示
+    const tableTypeElement = document.getElementById('currentTableType');
+    if (tableTypeElement) {
+        tableTypeElement.textContent = currentTableType === '6max' ? '6人桌' : '8人桌';
+        tableTypeElement.style.color = currentTableType === '6max' ? '#00d4ff' : '#ff9d50';
+    }
+    
+    // 根据桌型切换训练模式卡片
+    const deepStackCard = document.getElementById('deepStackCard');
+    const fullRingCard = document.getElementById('fullRingCard');
+    
+    if (deepStackCard && fullRingCard) {
+        if (currentTableType === '6max') {
+            deepStackCard.style.display = 'block';
+            fullRingCard.style.display = 'none';
+        } else {
+            deepStackCard.style.display = 'none';
+            fullRingCard.style.display = 'block';
+        }
+    }
 }
 
 // ==================== 开始训练（V2.0升级） ====================
@@ -514,10 +549,21 @@ function startTraining(mode, trainingType = 'basic') {
                 });
             });
         });
+    } else if (trainingType === 'ring') {
+        // 8人桌训练
+        FULL_RING.forEach(category => {
+            category.questions.forEach(q => {
+                currentTraining.questions.push({
+                    phase: { id: 0, title: category.category, warning: false, level: "8人桌" },
+                    question: q.q,
+                    answer: q.a
+                });
+            });
+        });
     }
 
-    // 如果不是陷阱、GTO、all、data或deep训练，从phase中提取问题
-    if (trainingType !== 'traps' && trainingType !== 'gto' && trainingType !== 'all' && trainingType !== 'data' && trainingType !== 'deep') {
+    // 如果不是陷阱、GTO、all、data、deep或ring训练，从phase中提取问题
+    if (trainingType !== 'traps' && trainingType !== 'gto' && trainingType !== 'all' && trainingType !== 'data' && trainingType !== 'deep' && trainingType !== 'ring') {
         sourcePhases.forEach(phase => {
             phase.questions.forEach(q => {
                 currentTraining.questions.push({
@@ -809,6 +855,123 @@ function exitTraining() {
         switchPage('home');
     }
 }
+
+// ==================== 8人桌训练模块 (Full Ring) ====================
+const FULL_RING = [
+    {
+        category: "8人桌核心原则",
+        questions: [
+            { q: "8人桌vs 6人桌，最核心的差异是什么？", a: "位置更重要，范围更紧，价值下注>诈唬" },
+            { q: "8人桌平均入池人数是多少？", a: "2.5-3.5人（6人桌1.5-2.5人）" },
+            { q: "8人桌翻前加注频率应该是多少？", a: "12-18%（6人桌18-25%）" },
+            { q: "8人桌为什么要更紧？", a: "更多对手在后面，被3-bet/squeeze概率更高" },
+            { q: "8人桌位置价值有多重要？", a: "极其重要，EP/MP基本弃牌，LP才是主战场" },
+            { q: "8人桌对抗多人底池的核心策略？", a: "只用强成牌价值下注，放弃诈唬" },
+            { q: "8人桌偷盲成功率vs 6人桌？", a: "低30-40%（更多玩家防守）" },
+            { q: "8人桌什么时候应该更激进？", a: "LP位置对抗Limp或单个弱手" },
+            { q: "8人桌AA/KK应该如何打？", a: "必须加注，绝不Limp（多人底池易被追上）" },
+            { q: "8人桌小对子价值如何？", a: "价值极高（多人底池+高隐含赔率）" }
+        ]
+    },
+    {
+        category: "8人桌翻前位置策略",
+        questions: [
+            { q: "8人桌UTG（枪口）应该打多少牌？", a: "5-8%（仅AA-99, AK, AQs）" },
+            { q: "8人桌UTG+1（枪口+1）应该打多少牌？", a: "8-11%（增加88-77, AJs, KQs）" },
+            { q: "8人桌MP（中位）应该打多少牌？", a: "12-16%（增加66-22, ATs+, KJs+, QJs）" },
+            { q: "8人桌CO（关位）应该打多少牌？", a: "18-24%（增加同花连牌、弱Ax）" },
+            { q: "8人桌BTN（按钮）应该打多少牌？", a: "25-35%（可广泛偷盲）" },
+            { q: "8人桌SB（小盲）应该打多少牌？", a: "Limp 20-30%（位置最差），3-bet 8-12%" },
+            { q: "8人桌BB（大盲）防守频率vs 6人桌？", a: "降低10-15%（对手范围更强）" },
+            { q: "8人桌UTG Open后，MP应该如何应对？", a: "仅用QQ+/AK 3-bet，其他弃牌（除小对子set mining）" },
+            { q: "8人桌面对EP加注，什么时候Cold Call？", a: "小对子（22-TT）set mining，需15:1+隐含赔率" },
+            { q: "8人桌BTN面对MP Open，3-bet范围？", a: "8-12%（JJ+, AK, AQs, KQs，偶尔诈唬）" }
+        ]
+    },
+    {
+        category: "8人桌翻前尺寸调整",
+        questions: [
+            { q: "8人桌EP Open标准尺寸？", a: "2.5-3BB（比6人桌稍大，保护范围）" },
+            { q: "8人桌LP Open标准尺寸？", a: "2.2-2.5BB（偷盲时可更小）" },
+            { q: "8人桌对抗Limp的Iso-raise尺寸？", a: "4-5BB + 每个Limper +1BB" },
+            { q: "8人桌3-bet标准尺寸？", a: "3.5-4x原加注（比6人桌稍大）" },
+            { q: "8人桌为什么3-bet要稍大？", a: "保护范围，防止多人跟注形成多人底池" },
+            { q: "8人桌面对多个Limper应该如何？", a: "Iso-raise更大（5-7BB），或用强牌Limp behind" }
+        ]
+    },
+    {
+        category: "8人桌翻后核心调整",
+        questions: [
+            { q: "8人桌单挑底池vs多人底池比例？", a: "单挑40%，多人60%（6人桌相反）" },
+            { q: "8人桌多人底池C-bet频率？", a: "30-40%（仅强成牌，几乎不诈唬）" },
+            { q: "8人桌单挑底池C-bet频率？", a: "60-70%（比6人桌低10%）" },
+            { q: "8人桌多人底池拿顶对如何打？", a: "小额价值下注（30-50% pot），谨慎投入" },
+            { q: "8人桌多人底池拿暗三如何打？", a: "标准价值下注（60-75% pot），榨取价值" },
+            { q: "8人桌面对多人底池，什么时候诈唬？", a: "几乎不诈唬（至少2人跟注概率高）" },
+            { q: "8人桌转牌多人底池拿两对如何打？", a: "谨慎价值下注，警惕暗三/同花/顺子" },
+            { q: "8人桌河牌多人底池，对手下注意味着？", a: "极强牌力（诈唬极少），边缘牌应弃牌" },
+            { q: "8人桌什么时候应该Check-Raise？", a: "单挑底池拿暗三+，或湿润牌面半诈唬" },
+            { q: "8人桌同花听牌在多人底池如何打？", a: "Check-call为主（底池赔率好），少主动下注" }
+        ]
+    },
+    {
+        category: "8人桌价值下注策略",
+        questions: [
+            { q: "8人桌vs 6人桌，价值下注频率差异？", a: "提升20-30%（对手跟注范围更强）" },
+            { q: "8人桌多人底池什么牌应该价值下注？", a: "顶两对+（顶对需谨慎）" },
+            { q: "8人桌河牌拿坚果，多人底池如何下注？", a: "60-80% pot（榨取价值，避免吓跑对手）" },
+            { q: "8人桌薄价值下注（Thin Value）应该减少吗？", a: "是的，减少30-40%（对手跟注范围更强）" },
+            { q: "8人桌顶对好踢脚在单挑底池如何打？", a: "标准价值下注（50-60% pot），多街投入" },
+            { q: "8人桌暗三在干燥牌面如何打？", a: "小额慢打或标准下注（诱导追听牌或诈唬）" }
+        ]
+    },
+    {
+        category: "8人桌Limp策略",
+        questions: [
+            { q: "8人桌什么时候可以Limp？", a: "小对子（22-55）多人底池set mining" },
+            { q: "8人桌EP位置Limp AA/KK可行吗？", a: "不建议（易形成多人小底池，失去价值）" },
+            { q: "8人桌面对1-2个Limper，应该如何？", a: "Iso-raise强牌（JJ+, AK），Limp小对子" },
+            { q: "8人桌面对3+个Limper，应该如何？", a: "Limp小对子/同花连牌（隐含赔率极高）" },
+            { q: "8人桌BB位置面对多个Limper？", a: "Check看免费牌（已投入盲注，赔率好）" },
+            { q: "8人桌SB位置面对Limper应该如何？", a: "Complete小对子/同花连牌，弃弱牌" }
+        ]
+    },
+    {
+        category: "8人桌对抗Nit（紧手）",
+        questions: [
+            { q: "8人桌Nit通常在哪些位置？", a: "EP/MP（占比30-40%，远高于6人桌）" },
+            { q: "8人桌如何识别Nit？", a: "VPIP <12%, PFR <10%, 只玩EP/MP" },
+            { q: "8人桌Nit加注后，应该如何应对？", a: "仅用QQ+/AK对抗，其他弃牌" },
+            { q: "8人桌Nit Limp意味着什么？", a: "通常是中等对子（77-JJ）或AQ" },
+            { q: "8人桌Nit在LP加注后，应该如何？", a: "可正常应对（范围相对正常）" },
+            { q: "8人桌如何利用Nit？", a: "他们弃牌后，在LP位置广泛偷盲" }
+        ]
+    },
+    {
+        category: "8人桌常见错误",
+        questions: [
+            { q: "8人桌最常见的错误是什么？", a: "玩太多EP/MP牌，范围过宽" },
+            { q: "8人桌为什么不能用6人桌范围？", a: "会被频繁3-bet，或翻后被统治" },
+            { q: "8人桌EP用AJo Open的问题？", a: "易被3-bet或翻后被AK/AQ统治" },
+            { q: "8人桌多人底池过度诈唬的问题？", a: "成功率<30%，长期亏损" },
+            { q: "8人桌用小对子3-bet的问题？", a: "无位置难打，SPR不理想，易输大底池" },
+            { q: "8人桌LP偷盲频率过高的问题？", a: "被BB/SB 3-bet或看穿，反被剥削" },
+            { q: "8人桌顶对在多人底池多街投入的问题？", a: "极易被暗三/两对/同花统治" },
+            { q: "8人桌过度Limp的问题？", a: "被Iso-raise剥削，或形成小底池无利可图" }
+        ]
+    },
+    {
+        category: "8人桌高级概念",
+        questions: [
+            { q: "8人桌Squeeze Play（挤压打法）是什么？", a: "面对1个Open+1个Call，用强牌或空气3-bet孤立" },
+            { q: "8人桌Squeeze需要多少成功率？", a: "50-60%（比6人桌更容易成功）" },
+            { q: "8人桌什么是Isolation Raise（孤立加注）？", a: "对抗Limper大额加注，逼弃其他人，单挑弱手" },
+            { q: "8人桌Over-Limp（跟随Limp）策略？", a: "多人Limp后，用小对子/同花连牌跟进" },
+            { q: "8人桌如何利用多人底池的死钱？", a: "用强听牌半诈唬（底池赔率极好）" },
+            { q: "8人桌EP vs LP的范围对抗？", a: "EP极强（5-8%），LP对抗时需谨慎" }
+        ]
+    }
+];
 
 // ==================== 深筹码训练模块 (300BB+) ====================
 const DEEP_STACK = [

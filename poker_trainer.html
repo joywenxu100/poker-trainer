@@ -605,8 +605,15 @@
     <!-- 首页 -->
     <div class="page active" id="homePage">
         <div class="hero">
-            <h1>🎯 德州扑克训练师 V2.2</h1>
-            <p>基础巩固 + 职业级深化 + 必背数据 + 深筹码专精</p>
+            <h1>🎯 德州扑克训练师 V2.3</h1>
+            <p>基础巩固 + 职业级深化 + 必背数据 + 深筹码专精 + 桌型选择</p>
+            <p style="font-size: 16px; margin-top: 15px;">
+                当前模式：<span id="currentTableType" style="font-weight: bold; color: #00d4ff;">6人桌</span>
+            </p>
+            <div style="margin-top: 15px; display: flex; gap: 10px; justify-content: center;">
+                <button onclick="setTableType('6max')" style="padding: 10px 20px; background: #00d4ff; color: #0a0e27; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">6人桌</button>
+                <button onclick="setTableType('ring')" style="padding: 10px 20px; background: #ff9d50; color: #0a0e27; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">8人桌</button>
+            </div>
             <p style="font-size: 12px; color: #ffd700; margin-top: 10px;">⚠️ 更新后请强制刷新：下拉页面或按Ctrl+F5</p>
         </div>
 
@@ -697,12 +704,20 @@
                 <div class="mode-desc">职业牌手必须记住的核心数据，形成肌肉记忆</div>
             </div>
 
-            <div class="mode-card" style="border-color: #9d50ff; background: rgba(157, 80, 255, 0.1);" onclick="startTraining('practice', 'deep')">
+            <div class="mode-card" style="border-color: #9d50ff; background: rgba(157, 80, 255, 0.1);" onclick="startTraining('practice', 'deep')" id="deepStackCard">
                 <div class="mode-header">
                     <div class="mode-icon">💰</div>
                     <div class="mode-title">深筹码专精 (48个)</div>
                 </div>
                 <div class="mode-desc">300BB+深筹码策略，控制底池，提升盈率</div>
+            </div>
+
+            <div class="mode-card" style="border-color: #ff9d50; background: rgba(255, 157, 80, 0.1); display: none;" onclick="startTraining('practice', 'ring')" id="fullRingCard">
+                <div class="mode-header">
+                    <div class="mode-icon">🎰</div>
+                    <div class="mode-title">8人桌专精 (54个)</div>
+                </div>
+                <div class="mode-desc">8人桌独特策略，位置为王，价值至上</div>
             </div>
         </div>
     </div>
@@ -824,7 +839,7 @@
         </div>
     </div>
 
-    <script src="poker_trainer_v2.js?v=2.2.0"></script>
+    <script src="poker_trainer_v2.js?v=2.3.0"></script>
 </body>
 </html>
 
