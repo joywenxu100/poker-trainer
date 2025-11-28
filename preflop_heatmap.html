@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>8人桌翻前范围热力图 - 可视化范围表</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            color: #e0e0e0;
+            padding: 15px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #ff9d50;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #999;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #ff9d50;
+            color: #0a0e27;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .back-btn:hover {
+            background: #ffb366;
+        }
+
+        .position-selector {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .position-btn {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 157, 80, 0.3);
+            border-radius: 8px;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .position-btn:hover {
+            border-color: #ff9d50;
+            color: #ff9d50;
+        }
+
+        .position-btn.active {
+            background: #ff9d50;
+            color: #0a0e27;
+            border-color: #ff9d50;
+        }
+
+        .range-info {
+            background: rgba(255, 157, 80, 0.1);
+            border: 2px solid #ff9d50;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .range-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff9d50;
+            margin-bottom: 5px;
+        }
+
+        .range-percentage {
+            font-size: 24px;
+            color: #00d4ff;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .range-desc {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .heatmap-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .heatmap {
+            display: grid;
+            grid-template-columns: repeat(13, 1fr);
+            gap: 3px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .hand-cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 11px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .hand-cell:hover {
+            transform: scale(1.15);
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 颜色方案 - 按频率 */
+        .freq-0 { background: #f5f5f5; color: #999; } /* 0% - 白色 */
+        .freq-25 { background: #fff4e6; color: #e67700; } /* 25% - 浅橙 */
+        .freq-50 { background: #fff176; color: #f57f17; } /* 50% - 黄色 */
+        .freq-75 { background: #aed581; color: #33691e; } /* 75% - 浅绿 */
+        .freq-100 { background: #4caf50; color: #fff; } /* 100% - 深绿 */
+        
+        /* 特殊标记 */
+        .hand-cell.pair {
+            font-weight: 900;
+        }
+
+        .hand-cell.suited::after {
+            content: 's';
+            font-size: 8px;
+            position: absolute;
+            top: 2px;
+            right: 3px;
+            color: inherit;
+            opacity: 0.7;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        .legend-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .action-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            justify-content: center;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 157, 80, 0.3);
+            border-radius: 6px;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .action-btn:hover {
+            border-color: #ff9d50;
+            color: #ff9d50;
+        }
+
+        .action-btn.active {
+            background: #00d4ff;
+            color: #0a0e27;
+            border-color: #00d4ff;
+        }
+
+        .note {
+            background: rgba(255, 215, 0, 0.1);
+            border-left: 4px solid #ffd700;
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #ffd700;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .position-selector {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .hand-cell {
+                font-size: 10px;
+            }
+
+            .heatmap {
+                gap: 2px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="poker_trainer.html" class="back-btn">← 返回训练器</a>
+
+        <h1>🔥 8人桌翻前范围热力图</h1>
+        <p class="subtitle">可视化范围表 - 颜色越深，打牌频率越高</p>
+
+        <div class="position-selector">
+            <div class="position-btn active" onclick="loadPosition('UTG')">UTG<br><small>5-8%</small></div>
+            <div class="position-btn" onclick="loadPosition('UTG1')">UTG+1<br><small>8-11%</small></div>
+            <div class="position-btn" onclick="loadPosition('MP')">MP<br><small>12-16%</small></div>
+            <div class="position-btn" onclick="loadPosition('CO')">CO<br><small>18-24%</small></div>
+            <div class="position-btn" onclick="loadPosition('BTN')">BTN<br><small>25-35%</small></div>
+            <div class="position-btn" onclick="loadPosition('SB')">SB<br><small>25-35%</small></div>
+            <div class="position-btn" onclick="loadPosition('BB_UTG')">BB vs UTG<br><small>25-30%</small></div>
+            <div class="position-btn" onclick="loadPosition('BB_BTN')">BB vs BTN<br><small>45-55%</small></div>
+        </div>
+
+        <div class="action-selector">
+            <div class="action-btn active" onclick="setAction('open')">Open加注</div>
+            <div class="action-btn" onclick="setAction('3bet')">3-Bet</div>
+            <div class="action-btn" onclick="setAction('4bet')">4-Bet</div>
+            <div class="action-btn" onclick="setAction('call')">Call跟注</div>
+        </div>
+
+        <div class="range-info">
+            <div class="range-title" id="positionName">UTG Open范围</div>
+            <div class="range-percentage" id="rangePercentage">5-8%</div>
+            <div class="range-desc" id="rangeDesc">极紧范围，只打最强牌</div>
+        </div>
+
+        <div class="heatmap-container">
+            <div class="heatmap" id="heatmap"></div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color freq-100"></div>
+                <span>100% 必打</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color freq-75"></div>
+                <span>75% 常打</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color freq-50"></div>
+                <span>50% 选择性打</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color freq-25"></div>
+                <span>25% 偶尔打</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color freq-0"></div>
+                <span>0% 弃牌</span>
+            </div>
+        </div>
+
+        <div class="note">
+            💡 <strong>使用说明：</strong><br>
+            • 对角线（AA-22）= 对子牌<br>
+            • 对角线右上方（带s）= 同花牌（如AKs）<br>
+            • 对角线左下方（无s）= 杂色牌（如AKo）<br>
+            • 颜色越深 = 打牌频率越高<br>
+            • 点击上方按钮切换位置和动作
+        </div>
+    </div>
+
+    <script>
+        // 所有169种起手牌
+        const ranks = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
+        
+        let currentPosition = 'UTG';
+        let currentAction = 'open';
+
+        // 范围定义（频率：0=不打，25=偶尔，50=选择性，75=常打，100=必打）
+        const ranges = {
+            UTG: {
+                open: {
+                    'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 100, 'TT': 100, '99': 100,
+                    'AKs': 100, 'AKo': 100, 'AQs': 100, 'AQo': 75, 'AJs': 100,
+                    '88': 50, '77': 25
+                },
+                '3bet': {
+                    'AA': 100, 'KK': 100, 'AKs': 100
+                }
+            },
+            UTG1: {
+                open: {
+                    'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 100, 'TT': 100, '99': 100, '88': 75, '77': 75,
+                    'AKs': 100, 'AKo': 100, 'AQs': 100, 'AQo': 75, 'AJs': 100, 'KQs': 75
+                },
+                '3bet': {
+                    'AA': 100, 'KK': 100, 'AKs': 100
+                }
+            },
+            MP: {
+                open: {
+                    'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 100, 'TT': 100, '99': 100, '88': 100, '77': 100, '66': 75, '55': 75, '44': 50, '33': 50, '22': 50,
+                    'AKs': 100, 'AKo': 100, 'AQs': 100, 'AQo': 75, 'AJs': 100, 'ATs': 75,
+                    'KQs': 100, 'KJs': 75, 'QJs': 75, 'JTs': 75
+                },
+                '3bet': {
+                    'AA': 100, 'KK': 100, 'QQ': 100, 'AKs': 100
+                }
+            },
+            CO: {
+                open: {
+                    'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 100, 'TT': 100, '99': 100, '88': 100, '77': 100, '66': 100, '55': 100, '44': 100, '33': 100, '22': 100,
+                    'AKs': 100, 'AKo': 100, 'AQs': 100, 'AQo': 100, 'AJs': 100, 'AJo': 75, 'ATs': 100, 'A9s': 75, 'A8s': 75, 'A7s': 75, 'A6s': 75, 'A5s': 75, 'A4s': 75, 'A3s': 75, 'A2s': 75,
+                    'KQs': 100, 'KQo': 75, 'KJs': 100, 'KTs': 75, 'K9s': 50,
+                    'QJs': 100, 'QTs': 75, 'JTs': 100, 'J9s': 75, 'T9s': 75, '98s': 75, '87s': 50, '76s': 25
+                },
+                '3bet': {
+                    'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 100, 'AKs': 100, 'AKo': 100,
+                    'A5s': 50, 'A4s': 50, 'A3s': 50, 'A2s': 50, 'KQs': 50
+                }
+            },
+            BTN: {
+                open: {
+                    'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 100, 'TT': 100, '99': 100, '88': 100, '77': 100, '66': 100, '55': 100, '44': 100, '33': 100, '22': 100,
+                    'AKs': 100, 'AKo': 100, 'AQs': 100, 'AQo': 100, 'AJs': 100, 'AJo': 100, 'ATs': 100, 'ATo': 75, 'A9s': 100, 'A9o': 75, 'A8s': 100, 'A7s': 100, 'A6s': 100, 'A5s': 100, 'A4s': 100, 'A3s': 100, 'A2s': 100,
+                    'KQs': 100, 'KQo': 100, 'KJs': 100, 'KJo': 75, 'KTs': 100, 'KTo': 50, 'K9s': 100, 'K8s': 75, 'K7s': 75, 'K6s': 75, 'K5s': 75, 'K4s': 50, 'K3s': 50, 'K2s': 50,
+                    'QJs': 100, 'QJo': 100, 'QTs': 100, 'QTo': 75, 'Q9s': 100, 'Q8s': 75, 'Q7s': 50, 'Q6s': 50,
+                    'JTs': 100, 'JTo': 100, 'J9s': 100, 'J8s': 75, 'J7s': 50,
+                    'T9s': 100, 'T9o': 75, 'T8s': 100, 'T7s': 50,
+                    '98s': 100, '98o': 50, '97s': 75, '87s': 100, '86s': 50, '76s': 75, '65s': 50, '54s': 50
+                },
+                '3bet': {
+                    'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 100, 'TT': 75,
+                    'AKs': 100, 'AKo': 100, 'AQs': 100,
+                    'A5s': 75, 'A4s': 75, 'A3s': 75, 'A2s': 75,
+                    'KQs': 75, 'QJs': 50
+                }
+            },
+            SB: {
+                open: {
+                    'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 100, 'TT': 100, '99': 100, '88': 100, '77': 100, '66': 100, '55': 75, '44': 75, '33': 75, '22': 75,
+                    'AKs': 100, 'AKo': 100, 'AQs': 100, 'AQo': 100, 'AJs': 100, 'AJo': 100, 'ATs': 100, 'ATo': 75, 'A9s': 100, 'A8s': 100, 'A7s': 100, 'A6s': 100, 'A5s': 100, 'A4s': 75, 'A3s': 75, 'A2s': 75,
+                    'KQs': 100, 'KQo': 100, 'KJs': 100, 'KJo': 75, 'KTs': 100, 'K9s': 75,
+                    'QJs': 100, 'QJo': 75, 'QTs': 100, 'Q9s': 75,
+                    'JTs': 100, 'JTo': 75, 'J9s': 75, 'T9s': 100, 'T8s': 75, '98s': 100, '87s': 75, '76s': 50, '65s': 50
+                },
+                '3bet': {
+                    'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 100,
+                    'AKs': 100, 'AKo': 100, 'AQs': 100,
+                    'A5s': 75, 'A4s': 75, 'A3s': 75, 'A2s': 75,
+                    'KQs': 75
+                }
+            },
+            BB_UTG: {
+                call: {
+                    'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 100, 'TT': 100, '99': 100, '88': 100, '77': 75, '66': 75, '55': 75, '44': 50, '33': 50, '22': 50,
+                    'AKs': 100, 'AKo': 100, 'AQs': 100, 'AQo': 75, 'AJs': 100, 'ATs': 75, 'A9s': 50,
+                    'KQs': 75, 'KJs': 50, 'QJs': 50, 'JTs': 50, 'T9s': 25, '98s': 25
+                },
+                '3bet': {
+                    'AA': 100, 'KK': 100, 'QQ': 100, 'AKs': 100,
+                    'A5s': 25, 'A4s': 25
+                }
+            },
+            BB_BTN: {
+                call: {
+                    'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 100, 'TT': 100, '99': 100, '88': 100, '77': 100, '66': 100, '55': 100, '44': 100, '33': 100, '22': 100,
+                    'AKs': 100, 'AKo': 100, 'AQs': 100, 'AQo': 100, 'AJs': 100, 'AJo': 100, 'ATs': 100, 'ATo': 75, 'A9s': 100, 'A9o': 75, 'A8s': 100, 'A7s': 100, 'A6s': 100, 'A5s': 100, 'A4s': 100, 'A3s': 100, 'A2s': 100,
+                    'KQs': 100, 'KQo': 100, 'KJs': 100, 'KJo': 75, 'KTs': 100, 'K9s': 100, 'K8s': 75, 'K7s': 75, 'K6s': 75, 'K5s': 50,
+                    'QJs': 100, 'QJo': 100, 'QTs': 100, 'Q9s': 100, 'Q8s': 75,
+                    'JTs': 100, 'JTo': 100, 'J9s': 100, 'J8s': 75,
+                    'T9s': 100, 'T9o': 75, 'T8s': 100, 'T7s': 50,
+                    '98s': 100, '97s': 75, '87s': 100, '76s': 75, '65s': 75, '54s': 50
+                },
+                '3bet': {
+                    'AA': 100, 'KK': 100, 'QQ': 100, 'JJ': 75, 'TT': 75,
+                    'AKs': 100, 'AKo': 100, 'AQs': 100,
+                    'A5s': 75, 'A4s': 75, 'A3s': 75, 'A2s': 75,
+                    'KQs': 75, 'QJs': 50, 'JTs': 50
+                }
+            }
+        };
+
+        function generateHeatmap() {
+            const heatmap = document.getElementById('heatmap');
+            heatmap.innerHTML = '';
+
+            for (let i = 0; i < 13; i++) {
+                for (let j = 0; j < 13; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'hand-cell';
+
+                    let hand = '';
+                    let frequency = 0;
+
+                    if (i === j) {
+                        // 对角线 - 对子
+                        hand = ranks[i] + ranks[j];
+                        cell.classList.add('pair');
+                    } else if (i < j) {
+                        // 右上方 - 同花
+                        hand = ranks[i] + ranks[j] + 's';
+                        cell.classList.add('suited');
+                    } else {
+                        // 左下方 - 杂色
+                        hand = ranks[j] + ranks[i] + 'o';
+                    }
+
+                    // 获取当前位置和动作的频率
+                    const positionRange = ranges[currentPosition];
+                    const actionRange = positionRange ? positionRange[currentAction] : null;
+                    frequency = actionRange && actionRange[hand] ? actionRange[hand] : 0;
+
+                    // 设置颜色
+                    if (frequency >= 90) {
+                        cell.classList.add('freq-100');
+                    } else if (frequency >= 65) {
+                        cell.classList.add('freq-75');
+                    } else if (frequency >= 40) {
+                        cell.classList.add('freq-50');
+                    } else if (frequency >= 15) {
+                        cell.classList.add('freq-25');
+                    } else {
+                        cell.classList.add('freq-0');
+                    }
+
+                    cell.textContent = hand.replace('s', '').replace('o', '');
+                    cell.title = hand + ' - ' + frequency + '%';
+
+                    heatmap.appendChild(cell);
+                }
+            }
+        }
+
+        function loadPosition(position) {
+            currentPosition = position;
+
+            // 更新按钮状态
+            document.querySelectorAll('.position-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.position-btn').classList.add('active');
+
+            // 更新范围信息
+            updateRangeInfo();
+
+            // 重新生成热力图
+            generateHeatmap();
+        }
+
+        function setAction(action) {
+            currentAction = action;
+
+            // 更新按钮状态
+            document.querySelectorAll('.action-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // 更新范围信息
+            updateRangeInfo();
+
+            // 重新生成热力图
+            generateHeatmap();
+        }
+
+        function updateRangeInfo() {
+            const info = {
+                'UTG': { name: 'UTG Open范围', pct: '5-8%', desc: '极紧范围，只打最强牌' },
+                'UTG1': { name: 'UTG+1 Open范围', pct: '8-11%', desc: '轻微放宽，增加中小对子和同花牌' },
+                'MP': { name: 'MP Open范围', pct: '12-16%', desc: '开始增加投机牌（小对子、同花连牌）' },
+                'CO': { name: 'CO Open范围', pct: '18-24%', desc: '偷盲开始，范围明显放宽' },
+                'BTN': { name: 'BTN Open范围', pct: '25-35%', desc: '位置最佳，极宽偷盲范围' },
+                'SB': { name: 'SB Open范围', pct: '25-35%', desc: 'OOP位置差，尺寸需更大保护' },
+                'BB_UTG': { name: 'BB vs UTG 防守范围', pct: '25-30%', desc: 'UTG范围极强，防守需谨慎' },
+                'BB_BTN': { name: 'BB vs BTN 防守范围', pct: '45-55%', desc: 'BTN范围宽，底池赔率好，大幅放宽防守' }
+            };
+
+            if (currentAction === '3bet') {
+                info['UTG'].desc = '仅用AA-KK, AKs 3-bet（极紧）';
+                info['CO'].desc = '价值：AA-JJ, AK | 诈唬：A5s-A2s, KQs';
+                info['BTN'].desc = '价值：AA-TT, AK | 诈唬：A5s-A2s, KQs, QJs';
+                info['BB_UTG'].desc = '价值：AA-QQ, AKs | 诈唬：A5s-A4s偶尔';
+                info['BB_BTN'].desc = '价值+大量诈唬（12-18%）';
+            } else if (currentAction === '4bet') {
+                info['UTG'].desc = '仅AA-KK（极紧）';
+                info['CO'].desc = '价值：AA-KK, AKs | 诈唬：A5s-A3s偶尔';
+                info['BTN'].desc = '价值：AA-KK, AKs | 诈唬：A5s-A3s';
+            }
+
+            const currentInfo = info[currentPosition];
+            document.getElementById('positionName').textContent = currentInfo.name;
+            document.getElementById('rangePercentage').textContent = currentInfo.pct;
+            document.getElementById('rangeDesc').textContent = currentInfo.desc;
+        }
+
+        // 初始化
+        generateHeatmap();
+        updateRangeInfo();
+    </script>
+</body>
+</html>
+
