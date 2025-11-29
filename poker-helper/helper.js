@@ -1,190 +1,873 @@
-// Zero-Mistake Helper - Core Logic
-// Simple version for quick deployment
+// 实战行动指南 - 核心逻辑
+// 聚焦：告诉用户该做什么，而不是理论知识
 
 let gameState = {
-    street: 'preflop',
-    blind: '124',
-    position: 'Straddle',
-    stack: 300,
-    pot: 12,
-    players: '2',
-    opponentAction: '',
-    villain: 'unknown',
-    board: '',
-    texture: 'dry',
-    draw: 'none',
-    riverComplete: 'none'
+    street: 'turn',
+    hand: 'top-two',
+    opponentAction: 'check',
+    danger: 'dangerous'
 };
 
 document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('[data-street]').forEach(btn => {
+    document.querySelectorAll('[data-street], [data-hand], [data-action], [data-danger]').forEach(btn => {
         btn.addEventListener('click', function() {
-            selectButton(this, 'data-street');
-            gameState.street = this.dataset.street;
-            updateBoardVisibility();
-        });
-    });
-
-    document.querySelectorAll('[data-blind], [data-position], [data-players], [data-villain], [data-texture], [data-draw], [data-complete]').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const attr = btn.dataset.street ? 'data-street' : 
-                        btn.dataset.blind ? 'data-blind' :
-                        btn.dataset.position ? 'data-position' :
-                        btn.dataset.players ? 'data-players' :
-                        btn.dataset.villain ? 'data-villain' :
-                        btn.dataset.texture ? 'data-texture' :
-                        btn.dataset.draw ? 'data-draw' : 'data-complete';
-            selectButton(this, attr);
+            selectButton(this);
             
-            if(btn.dataset.blind) gameState.blind = btn.dataset.blind;
-            if(btn.dataset.position) gameState.position = btn.dataset.position;
-            if(btn.dataset.players) gameState.players = btn.dataset.players;
-            if(btn.dataset.villain) gameState.villain = btn.dataset.villain;
-            if(btn.dataset.texture) gameState.texture = btn.dataset.texture;
-            if(btn.dataset.draw) gameState.draw = btn.dataset.draw;
-            if(btn.dataset.complete) gameState.riverComplete = btn.dataset.complete;
+            if(btn.dataset.street) gameState.street = btn.dataset.street;
+            if(btn.dataset.hand) gameState.hand = btn.dataset.hand;
+            if(btn.dataset.action) gameState.opponentAction = btn.dataset.action;
+            if(btn.dataset.danger) gameState.danger = btn.dataset.danger;
         });
     });
 });
 
-function selectButton(btn, dataAttr) {
+function selectButton(btn) {
     const group = btn.closest('.btn-group');
     group.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
 }
 
-function updateBoardVisibility() {
-    const boardSection = document.getElementById('boardSection');
-    const drawSection = document.getElementById('drawSection');
-    const riverCompleteSection = document.getElementById('riverCompleteSection');
-    
-    if (gameState.street !== 'preflop') {
-        boardSection.style.display = 'block';
-        if (gameState.street === 'turn') {
-            drawSection.style.display = 'block';
-            riverCompleteSection.style.display = 'none';
-        } else if (gameState.street === 'river') {
-            drawSection.style.display = 'none';
-            riverCompleteSection.style.display = 'block';
-        } else {
-            drawSection.style.display = 'none';
-            riverCompleteSection.style.display = 'none';
-        }
-    } else {
-        boardSection.style.display = 'none';
-    }
-}
-
 function analyzeAndAlert() {
-    gameState.stack = parseFloat(document.getElementById('effectiveStack').value) || 300;
-    gameState.pot = parseFloat(document.getElementById('potSize').value) || 12;
-    gameState.opponentAction = document.getElementById('opponentAction').value || '';
-    gameState.board = document.getElementById('boardCards')?.value || '';
-
-    const spr = (gameState.stack / gameState.pot).toFixed(1);
-    const potOdds = ((gameState.pot * 0.5) / (gameState.pot * 2) * 100).toFixed(1);
-    const mdf = ((1 - (gameState.pot * 0.67) / (gameState.pot * 1.67)) * 100).toFixed(1);
-
-    const alerts = generateAlerts(spr, potOdds, mdf);
-    displayAlerts(alerts);
-    displayStats(spr, potOdds, mdf);
-
+    const pot = parseFloat(document.getElementById('potSize').value) || 50;
+    const recommendations = generateRecommendations(pot);
+    displayRecommendations(recommendations);
     document.getElementById('alertSection').classList.add('show');
     document.getElementById('alertSection').scrollIntoView({ behavior: 'smooth' });
 }
 
-function generateAlerts(spr, potOdds, mdf) {
-    const alerts = [];
-    const { street, position, players, stack, pot, villain, texture, draw, riverComplete } = gameState;
+function generateRecommendations(pot) {
+    const recs = [];
+    const { street, hand, opponentAction, danger } = gameState;
+    
+    // 计算具体下注金额
+    const betSizes = {
+        'third': Math.round(pot * 0.33),
+        'half': Math.round(pot * 0.5),
+        'twoThird': Math.round(pot * 0.67),
+        'pot': pot,
+        'overbet': Math.round(pot * 1.5)
+    };
 
-    if (street === 'turn' && draw === 'flush') {
-        alerts.push({
-            type: 'critical',
-            title: '🚨 Opponent Flush Draw Alert',
-            content: [
-                'You marked: Opponent may have flush draw',
-                '',
-                '💀 If 3rd/4th flush card hits river, you MUST be ready to fold!',
-                '',
-                '✅ Correct turn play:',
-                '  - Strong hand (two pair+) → Bet ≥2/3 pot, make draws pay',
-                '  - Marginal hand (top pair) → Check or small bet, prepare to fold river',
-                '',
-                '❌ Wrong turn play:',
-                '  - Check free card → River completes flush → Opponent bets → You fold big hand → Lose big pot',
-                '',
-                '🧠 River fold checklist when 4th flush hits:',
-                '  ❌ Three of a kind → Fold immediately',
-                '  ❌ Two pair → Fold immediately',
-                '  ❌ Top pair → Instant fold'
-            ]
-        });
+    // === 转牌圈 ===
+    if (street === 'turn') {
+        
+        // 坚果牌型
+        if (hand === 'nuts-flush' || hand === 'nuts-straight' || hand === 'fullhouse') {
+            recs.push({
+                type: 'success',
+                title: `🎯 推荐行动：下注 ${betSizes.twoThird}BB（2/3底池）`,
+                content: [
+                    `✅ 具体操作：下注 ${betSizes.twoThird}BB`,
+                    `  • 底池现在${pot}BB`,
+                    `  • 你下注后底池变成${pot + betSizes.twoThird}BB`,
+                    '',
+                    '✅ 为什么这个尺度：',
+                    '  • 2/3 pot = 标准价值下注尺寸',
+                    '  • 不会把对手吓跑，又能建立大底池',
+                    '',
+                    '⚠️ 如果对手加注：',
+                    '  • 直接全下！你有坚果',
+                    '',
+                    '🚨 绝不要犯的错误：',
+                    '  • ❌ 慢打（过牌）→ 给免费牌 → 河牌可能被超越',
+                    '  • ❌ 小额下注 < 1/2 pot → 浪费你的坚果价值'
+                ]
+            });
+            
+            recs.push({
+                type: 'info',
+                title: '💡 河牌计划',
+                content: [
+                    `如果对手跟注${betSizes.twoThird}BB：`,
+                    `  • 河牌底池 = ${pot + betSizes.twoThird * 2}BB`,
+                    `  • 河牌你再下注 ${Math.round((pot + betSizes.twoThird * 2) * 0.75)}BB（3/4 pot）`,
+                    '',
+                    '河牌对手动作：',
+                    '  • 对手check → 你下注 3/4 pot',
+                    '  • 对手下注 → 你加注或全下'
+                ]
+            });
+        }
+        
+        // 暗三
+        else if (hand === 'set') {
+            if (danger === 'dangerous' || danger === 'very-dangerous') {
+                recs.push({
+                    type: 'success',
+                    title: `🎯 推荐行动：下注 ${betSizes.twoThird}BB（2/3底池）`,
+                    content: [
+                        `✅ 具体操作：下注 ${betSizes.twoThird}BB`,
+                        `  • 底池现在${pot}BB`,
+                        `  • 必须保护手牌！`,
+                        '',
+                        '⚠️ 如果对手加注：',
+                        '  • 牌面有3张同花 → 谨慎跟注（对手可能同花）',
+                        '  • 牌面有4顺子 → 谨慎跟注（对手可能顺子）',
+                        '  • 牌面相对安全 → 全下！',
+                        '',
+                        '🚨 河牌必须注意的场景：',
+                        '  • 河牌完成同花，对手下注 ≥ 1/2 pot → 你要能弃掉暗三！',
+                        '  • 河牌完成顺子，对手下注 ≥ 1/2 pot → 你要能弃掉暗三！',
+                        '',
+                        '💡 昨天的教训：',
+                        '  • 转牌给免费牌 → 河牌对手中Nuts → 你输大底池',
+                        '  • 今天必须：转牌保护手牌 → 河牌危险牌能弃掉'
+                    ]
+                });
+            }
+        }
+        
+        // 顶两对
+        else if (hand === 'top-two') {
+            if (danger === 'dangerous' || danger === 'very-dangerous') {
+                recs.push({
+                    type: 'warning',
+                    title: `🎯 推荐行动：下注 ${betSizes.half}BB（1/2底池）`,
+                    content: [
+                        `✅ 具体操作：下注 ${betSizes.half}BB（控制底池）`,
+                        `  • 底池现在${pot}BB`,
+                        `  • 转牌后底池变成${pot + betSizes.half * 2}BB（如果对手跟注）`,
+                        '',
+                        '✅ 为什么这个尺度：',
+                        '  • 1/2 pot = 控制底池尺寸',
+                        '  • 有价值+保护，但不会投入太多',
+                        '  • 河牌出现危险牌可以轻松弃掉',
+                        '',
+                        '⚠️ 如果对手加注：',
+                        `  • 小加注（min-raise到${betSizes.half * 2}BB）→ 跟注`,
+                        `  • 大加注（≥${betSizes.pot}BB）→ 弃牌`,
+                        '',
+                        '🚨 绝不要犯的错误：',
+                        `  • ❌ 大额下注 ≥ ${betSizes.twoThird}BB → 投入太多 → 河牌弃不掉`,
+                        '  • ❌ 转牌跟注大额加注 → 河牌被动 → 容易输大底池',
+                        '',
+                        '💡 河牌危险牌必须弃牌：',
+                        '  • 河牌第4张同花 + 对手下注 → 你的两对秒弃',
+                        '  • 河牌完成顺子 + 对手下注 → 你的两对秒弃',
+                        '  • 河牌牌面配对 + 对手大额下注 → 你的两对秒弃'
+                    ]
+                });
+            } else {
+                recs.push({
+                    type: 'success',
+                    title: `🎯 推荐行动：下注 ${betSizes.twoThird}BB（2/3底池）`,
+                    content: [
+                        `✅ 具体操作：下注 ${betSizes.twoThird}BB`,
+                        `  • 底池现在${pot}BB`,
+                        '  • 牌面安全，价值最大化',
+                        '',
+                        '⚠️ 如果对手加注：',
+                        '  • 谨慎评估（对手可能有暗三）',
+                        '  • 如果对手一直被动 → 跟注',
+                        '  • 如果对手突然激进 → 小心陷阱'
+                    ]
+                });
+            }
+        }
+        
+        // 超对/顶对
+        else if (hand === 'overpair' || hand === 'top-pair') {
+            if (danger === 'dangerous' || danger === 'very-dangerous') {
+                recs.push({
+                    type: 'warning',
+                    title: `🎯 推荐行动：过牌 或 下注 ${betSizes.third}BB（1/3底池）`,
+                    content: [
+                        '✅ 选项A：过牌（最安全）',
+                        '  • 控制底池',
+                        '  • 看对手反应',
+                        '',
+                        `✅ 选项B：下注 ${betSizes.third}BB（探底）`,
+                        `  • 底池现在${pot}BB`,
+                        '  • 小额下注，不投入太多',
+                        '',
+                        '⚠️ 如果对手下注：',
+                        `  • 对手小额下注 < ${betSizes.third}BB → 可跟注`,
+                        `  • 对手下注 ≥ ${betSizes.half}BB → 直接弃牌`,
+                        '',
+                        '🚨 绝不要犯的错误：',
+                        `  • ❌ 大额下注 ≥ ${betSizes.half}BB（投入太多）`,
+                        '  • ❌ 对手加注还跟注（一对不值得这么打）',
+                        `  • ❌ 转牌投入超过${Math.round(pot * 0.75)}BB（> 3/4 pot）`,
+                        '',
+                        '💡 关键原则：',
+                        '  • 转牌一对牌 = 控制底池',
+                        '  • 河牌危险牌 = 轻松弃牌',
+                        '  • 转牌投入越少，河牌越好弃'
+                    ]
+                });
+            }
+        }
+        
+        // 抽坚果同花
+        else if (hand === 'nuts-draw') {
+            if (opponentAction === 'check') {
+                recs.push({
+                    type: 'success',
+                    title: `🎯 推荐行动：下注 ${betSizes.half}BB（1/2底池·半诈唬）`,
+                    content: [
+                        `✅ 具体操作：下注 ${betSizes.half}BB（半诈唬）`,
+                        `  • 底池现在${pot}BB`,
+                        '  • 对手弃牌 → 你直接赢',
+                        '  • 对手跟注 → 你还有9张outs（36%胜率）',
+                        '',
+                        '⚠️ 如果对手加注：',
+                        '  • 计算赔率！',
+                        `  • 对手加注到${betSizes.pot}BB → 你需要跟注${betSizes.pot - betSizes.half}BB`,
+                        `  • 赔率 = ${betSizes.pot - betSizes.half} / ${pot + betSizes.pot * 2} ≈ ${Math.round((betSizes.pot - betSizes.half) / (pot + betSizes.pot * 2) * 100)}%`,
+                        '  • 你的胜率36% > 赔率 → 跟注',
+                        '  • 你的胜率36% < 赔率 → 弃牌',
+                        '',
+                        '🚨 绝不要犯的错误：',
+                        '  • ❌ 不计算赔率就跟注（送钱）',
+                        '  • ❌ 对手大额加注还硬跟（赔率不够）',
+                        '',
+                        '💡 记住：',
+                        '  • 同花听牌（9 outs）= 36%胜率（转到河）',
+                        '  • 需要赔率至少3:1才能跟注'
+                    ]
+                });
+            } else if (opponentAction === 'bet-pot' || opponentAction === 'all-in') {
+                recs.push({
+                    type: 'critical',
+                    title: '🚨 推荐行动：弃牌',
+                    content: [
+                        '❌ 对手大额下注，赔率不够：',
+                        `  • 对手下注${betSizes.pot}BB`,
+                        `  • 你需要跟注${betSizes.pot}BB赢得${pot + betSizes.pot * 2}BB`,
+                        `  • 赔率 = ${Math.round(betSizes.pot / (pot + betSizes.pot * 2) * 100)}%`,
+                        '  • 你的胜率36%',
+                        `  • 胜率 < 赔率 → 弃牌`,
+                        '',
+                        '🚨 绝不要犯的错误：',
+                        '  • ❌ "我感觉河牌会中" → 情绪化跟注',
+                        '  • ❌ 不计算赔率就跟注',
+                        '',
+                        '💡 职业玩家永远不用错误赔率追听牌'
+                    ]
+                });
+            }
+        }
     }
 
-    if (street === 'river' && riverComplete === 'flush') {
-        alerts.push({
-            type: 'critical',
-            title: '🚨 River Completed Flush! Instant Fold Alert',
-            content: [
-                '💀💀💀 Board completed flush! Most dangerous river!',
-                '',
-                '🚨 Execute fold checklist immediately:',
-                '  ❌ Three of a kind vs any bet → Fold immediately',
-                '  ❌ Two pair vs any bet → Fold immediately',
-                '  ❌ Top pair vs any bet → Fold immediately',
-                '  ❌ Small flush vs big bet (≥pot) → Fold immediately',
-                '  ✅ Nut flush (A-high) → Can call/raise',
-                '',
-                '💡 Pro vs Amateur difference:',
-                '  - Amateur: Hold strong hand, can\'t fold → Lose big pot',
-                '  - Pro: Flush completes, instant fold → Save 50-200BB'
-            ]
-        });
-    }
-
-    alerts.push({
-        type: 'info',
-        title: '💡 Key Data Quick Reference',
-        content: [
-            `📍 Your position: ${position}`,
-            `💰 SPR: ${spr}`,
-            `  - SPR < 5 = Committed pot`,
-            `  - SPR 5-15 = Normal`,
-            `  - SPR > 30 = Deep stack`,
-            `🎯 Pot odds: ${potOdds}%`,
-            `🛡️ MDF: ${mdf}%`,
-            `👥 Players: ${players}`
-        ]
-    });
-
-    return alerts;
+    return recs;
 }
 
-function displayAlerts(alerts) {
+    // === 转牌圈 ===
+    if (street === 'turn') {
+        
+        // 坚果牌型
+        if (hand === 'nuts-flush' || hand === 'nuts-straight' || hand === 'fullhouse') {
+            recs.push({
+                type: 'success',
+                title: '🎯 推荐行动：下注 2/3 - Pot',
+                content: [
+                    '✅ 你有坚果！最大化价值：',
+                    '  • 下注 2/3 pot（标准尺寸）',
+                    '  • 如果对手跟注，河牌继续下注 Pot',
+                    '',
+                    '⚠️ 如果对手加注：',
+                    '  • 直接全下！',
+                    '  • 不要慢打，深筹码要激进拿价值',
+                    '',
+                    '💡 河牌策略：',
+                    '  • 对手check → 下注 Pot',
+                    '  • 对手下注 → 加注全下'
+                ]
+            });
+        }
+        
+        // 暗三
+        else if (hand === 'set') {
+            if (danger === 'dangerous' || danger === 'very-dangerous') {
+                recs.push({
+                    type: 'success',
+                    title: '🎯 推荐行动：下注 2/3 Pot',
+                    content: [
+                        '✅ 你有暗三，但牌面危险：',
+                        '  • 必须下注保护（不给听牌便宜抽牌）',
+                        '  • 下注 2/3 pot',
+                        '',
+                        '⚠️ 如果对手加注：',
+                        '  • 牌面有3张同花 → 谨慎（对手可能同花）',
+                        '  • 牌面有4顺子 → 谨慎（对手可能顺子）',
+                        '  • 牌面安全 → 全下！',
+                        '',
+                        '🚨 河牌警示：',
+                        '  • 如果河牌完成同花/顺子',
+                        '  • 对手下注Pot+ → 你要能弃掉暗三！',
+                        '  • 记住：暗三输给同花/顺子 = 常见'
+                    ]
+                });
+            } else {
+                recs.push({
+                    type: 'success',
+                    title: '🎯 推荐行动：下注 1/2 - 2/3 Pot',
+                    content: [
+                        '✅ 你有暗三，牌面安全：',
+                        '  • 价值最大化',
+                        '  • 下注 1/2 - 2/3 pot',
+                        '',
+                        '⚠️ 如果对手加注：',
+                        '  • 全下！（牌面安全，你很可能领先）'
+                    ]
+                });
+            }
+        }
+        
+        // 顶两对
+        else if (hand === 'top-two') {
+            if (danger === 'dangerous' || danger === 'very-dangerous') {
+                recs.push({
+                    type: 'warning',
+                    title: '🎯 推荐行动：下注 1/2 Pot 或 过牌',
+                    content: [
+                        '✅ 你有顶两对，但牌面危险：',
+                        '  • 选项A：下注 1/2 pot（保护+价值）',
+                        '  • 选项B：过牌（控制底池，准备河牌弃牌）',
+                        '',
+                        '❌ 绝不要做：',
+                        '  • 大额下注 ≥ 2/3 pot（投入太多，河牌弃不掉）',
+                        '',
+                        '⚠️ 如果对手加注：',
+                        '  • 对手小加注（min-raise）→ 跟注',
+                        '  • 对手大加注（≥pot）→ 弃牌',
+                        '',
+                        '🚨 河牌必须弃牌的场景：',
+                        '  • 河牌完成同花，对手下注 → 弃牌',
+                        '  • 河牌完成顺子，对手下注 → 弃牌',
+                        '  • 河牌牌面配对，对手大额下注 → 弃牌'
+                    ]
+                });
+            } else {
+                recs.push({
+                    type: 'success',
+                    title: '🎯 推荐行动：下注 2/3 Pot',
+                    content: [
+                        '✅ 你有顶两对，牌面安全：',
+                        '  • 价值最大化',
+                        '  • 下注 2/3 pot',
+                        '',
+                        '⚠️ 如果对手加注：',
+                        '  • 谨慎评估（对手可能有暗三）',
+                        '  • 如果对手一直被动 → 跟注',
+                        '  • 如果对手突然激进 → 谨慎'
+                    ]
+                });
+            }
+        }
+        
+        // 超对/顶对
+        else if (hand === 'overpair' || hand === 'top-pair') {
+            if (danger === 'dangerous' || danger === 'very-dangerous') {
+                recs.push({
+                    type: 'warning',
+                    title: '🎯 推荐行动：过牌 或 小额下注 1/3 Pot',
+                    content: [
+                        '✅ 你只有一对，牌面危险：',
+                        '  • 控制底池！',
+                        '  • 选项A：过牌（最安全）',
+                        '  • 选项B：小额下注 1/3 pot（探底）',
+                        '',
+                        '❌ 绝不要做：',
+                        '  • 大额下注 ≥ 1/2 pot',
+                        '  • 对手加注你还跟注',
+                        '',
+                        '⚠️ 如果对手下注：',
+                        '  • 对手小额下注 < 1/3 pot → 可跟注',
+                        '  • 对手下注 ≥ 1/2 pot → 直接弃牌',
+                        '',
+                        '🚨 河牌警示：',
+                        '  • 河牌完成任何听牌 → 你的一对直接弃（vs下注）',
+                        '  • 对手河牌下注 ≥ 1/2 pot → 你的一对直接弃',
+                        '',
+                        '💡 关键：转牌控制底池，河牌才能轻松弃牌'
+                    ]
+                });
+            } else {
+                recs.push({
+                    type: 'success',
+                    title: '🎯 推荐行动：下注 1/2 Pot',
+                    content: [
+                        '✅ 你有一对，牌面安全：',
+                        '  • 下注 1/2 pot（保护+价值）',
+                        '',
+                        '⚠️ 如果对手加注：',
+                        '  • 对手小加注 → 跟注',
+                        '  • 对手大加注 ≥ pot → 弃牌'
+                    ]
+                });
+            }
+        }
+        
+        // 抽坚果同花
+        else if (hand === 'nuts-draw') {
+            if (opponentAction === 'check') {
+                recs.push({
+                    type: 'success',
+                    title: '🎯 推荐行动：下注 1/2 Pot（半诈唬）',
+                    content: [
+                        '✅ 你在抽坚果同花：',
+                        '  • 下注 1/2 pot（半诈唬）',
+                        '  • 对手弃牌 → 你赢',
+                        '  • 对手跟注 → 你还有9张outs（约36%胜率）',
+                        '',
+                        '⚠️ 如果对手加注：',
+                        '  • 计算赔率',
+                        '  • 如果赔率合适（≥ 3:1）→ 跟注',
+                        '  • 如果赔率不够 → 弃牌',
+                        '',
+                        '💡 记住：抽听牌永远计算赔率！',
+                        '  • 同花听（9 outs）≈ 36% 胜率（转到河）',
+                        '  • 需要赔率：至少 3:1'
+                    ]
+                });
+            } else if (opponentAction === 'bet-pot' || opponentAction === 'all-in') {
+                recs.push({
+                    type: 'critical',
+                    title: '🎯 推荐行动：弃牌',
+                    content: [
+                        '❌ 对手大额下注，你在抽听牌：',
+                        '  • 你需要36%胜率',
+                        '  • 对手下注pot → 赔率只有2:1（33%）',
+                        '  • 赔率不够 → 弃牌',
+                        '',
+                        '💡 职业玩家永远不会用错误赔率追听牌'
+                    ]
+                });
+            } else {
+                recs.push({
+                    type: 'warning',
+                    title: '🎯 推荐行动：跟注',
+                    content: [
+                        '✅ 对手小额下注，你在抽听牌：',
+                        '  • 计算赔率',
+                        '  • 同花听需要至少3:1赔率',
+                        '  • 如果赔率够 → 跟注',
+                        '  • 如果赔率不够 → 弃牌'
+                    ]
+                });
+            }
+        }
+        
+        // 抽顺子
+        else if (hand === 'straight-draw') {
+            recs.push({
+                type: 'warning',
+                title: '🎯 推荐行动：谨慎追听',
+                content: [
+                    '⚠️ 你在抽顺子：',
+                    '  • 两头顺（8 outs）≈ 32% 胜率',
+                    '  • 卡顺（4 outs）≈ 16% 胜率',
+                    '',
+                    '✅ 如果对手check：',
+                    '  • 两头顺 → 可以下注 1/2 pot（半诈唬）',
+                    '  • 卡顺 → 过牌（免费看河牌）',
+                    '',
+                    '❌ 如果对手大额下注：',
+                    '  • 两头顺 → 计算赔率，需要至少3:1',
+                    '  • 卡顺 → 直接弃牌（赔率太差）',
+                    '',
+                    '💡 记住：顺子可能不是坚果',
+                    '  • 牌面有3张同花 → 你的顺子可能输给同花',
+                    '  • 牌面有对子 → 你的顺子可能输给葫芦'
+                ]
+            });
+        }
+        
+        // 弱牌
+        else if (hand === 'weak-pair' || hand === 'nothing') {
+            recs.push({
+                type: 'critical',
+                title: '🎯 推荐行动：过牌-弃牌',
+                content: [
+                    '❌ 你的牌太弱：',
+                    '  • 不要诈唬（转牌诈唬成功率低）',
+                    '  • 不要跟注对手下注',
+                    '  • 过牌，准备弃牌',
+                    '',
+                    '💡 及时止损 = 职业玩家标志'
+                ]
+            });
+        }
+    }
+
+    // === 河牌圈 ===
+    if (street === 'river') {
+        // 坚果牌型
+        if (hand === 'nuts-flush' || hand === 'nuts-straight' || hand === 'fullhouse') {
+            if (opponentAction === 'check') {
+                recs.push({
+                    type: 'success',
+                    title: '🎯 推荐行动：下注 Pot',
+                    content: [
+                        '✅ 你有坚果，对手过牌：',
+                        '  • 下注 Pot（最大化价值）',
+                        '  • 如果对手加注 → 全下！'
+                    ]
+                });
+            } else {
+                recs.push({
+                    type: 'success',
+                    title: '🎯 推荐行动：加注或全下',
+                    content: [
+                        '✅ 你有坚果，对手下注：',
+                        '  • 对手小额下注 → 加注 3x',
+                        '  • 对手大额下注 → 全下！'
+                    ]
+                });
+            }
+        }
+        
+        // 强牌但牌面危险
+        else if ((hand === 'set' || hand === 'top-two') && (danger === 'very-dangerous')) {
+            if (opponentAction === 'bet-pot' || opponentAction === 'all-in') {
+                recs.push({
+                    type: 'critical',
+                    title: '🚨 推荐行动：弃牌',
+                    content: [
+                        '💀 情况分析：',
+                        `  • 你有${hand === 'set' ? '暗三' : '顶两对'}`,
+                        '  • 牌面极度危险（完成同花/顺子/葫芦）',
+                        '  • 对手大额下注 ≥ pot',
+                        '',
+                        '❌ 必须弃牌！',
+                        '  • 对手99%有坚果',
+                        `  • 你的${hand === 'set' ? '暗三' : '顶两对'}已经不是好牌了`,
+                        '',
+                        '💡 这是职业玩家 vs 业余玩家的分水岭：',
+                        `  • 业余：舍不得弃${hand === 'set' ? '暗三' : '顶两对'} → 输50-200BB`,
+                        `  • 职业：看到完成听牌，${hand === 'set' ? '暗三' : '顶两对'}秒弃 → 省50-200BB`
+                    ]
+                });
+            }
+        }
+        
+        // 一对牌
+        else if (hand === 'overpair' || hand === 'top-pair' || hand === 'weak-pair') {
+            if (opponentAction === 'bet-pot' || opponentAction === 'all-in') {
+                recs.push({
+                    type: 'critical',
+                    title: '🚨 推荐行动：弃牌',
+                    content: [
+                        '❌ 河牌对手大额下注，你只有一对：',
+                        '  • 直接弃牌',
+                        '  • 不要Hero Call',
+                        '  • 不要想"他可能诈唬"',
+                        '',
+                        '💡 记住：',
+                        '  • 河牌对手大额下注 = 99%有牌',
+                        '  • 你的一对几乎打不赢任何价值牌'
+                    ]
+                });
+            } else if (opponentAction === 'check') {
+                if (hand === 'top-pair' || hand === 'overpair') {
+                    if (danger === 'safe' || danger === 'normal') {
+                        recs.push({
+                            type: 'success',
+                            title: '🎯 推荐行动：下注 1/2 Pot',
+                            content: [
+                                '✅ 对手过牌，牌面安全，你有顶对/超对：',
+                                '  • 薄价值下注 1/2 pot',
+                                '  • 如果对手加注 → 弃牌'
+                            ]
+                        });
+                    } else {
+                        recs.push({
+                            type: 'warning',
+                            title: '🎯 推荐行动：过牌（放弃价值）',
+                            content: [
+                                '✅ 对手过牌，但牌面危险：',
+                                '  • 你的一对不够强',
+                                '  • 过牌摊牌',
+                                '  • 下注可能被加注诈唬 → 损失更多'
+                            ]
+                        });
+                    }
+                } else {
+                    recs.push({
+                        type: 'info',
+                        title: '🎯 推荐行动：过牌（摊牌）',
+                        content: [
+                            '你的牌很弱，对手也过牌',
+                            '直接摊牌'
+                        ]
+                    });
+                }
+            }
+        }
+    }
+
+    // === 翻牌圈 ===
+    if (street === 'flop') {
+        if (hand === 'nuts-flush' || hand === 'nuts-straight' || hand === 'fullhouse' || hand === 'set') {
+            recs.push({
+                type: 'success',
+                title: '🎯 推荐行动：下注 1/2 - 2/3 Pot',
+                content: [
+                    '✅ 翻牌圈你有强牌：',
+                    '  • 下注 1/2 - 2/3 pot',
+                    '  • 建立底池，为转牌/河牌做准备'
+                ]
+            });
+        } else if (hand === 'nuts-draw' || hand === 'straight-draw') {
+            recs.push({
+                type: 'success',
+                title: '🎯 推荐行动：下注 1/2 Pot（半诈唬）或 过牌',
+                content: [
+                    '✅ 翻牌圈你有听牌：',
+                    '  • 选项A：下注 1/2 pot（半诈唬）',
+                    '  • 选项B：过牌（免费看转牌）',
+                    '',
+                    '💡 如果对手下注：',
+                    '  • 计算赔率决定跟不跟'
+                ]
+            });
+        }
+    }
+
+    return recs;
+}
+
+    // 核心逻辑：根据情况给出明确行动建议
+    
+    // === 转牌圈 ===
+    if (street === 'turn') {
+        if (danger === 'dangerous' || danger === 'very-dangerous') {
+            if (strength === 'strong' || strength === 'nuts') {
+                recs.push({
+                    type: 'success',
+                    title: '🎯 推荐行动：下注 2/3 底池',
+                    content: [
+                        '✅ 为什么下注：',
+                        '  • 牌面危险，对手可能有听牌',
+                        '  • 保护你的强牌，不给免费抽牌机会',
+                        '  • 让对手用错误赔率跟注',
+                        '',
+                        '❌ 绝不要做：',
+                        '  • 过牌（给免费牌 = 送钱）',
+                        '  • 小额下注 < 1/2 pot（给对手正确赔率）',
+                        '',
+                        '⚠️ 如果对手加注你：',
+                        '  • 你有坚果/暗三/葫芦 → 全下',
+                        '  • 你只有顶对/超对 → 谨慎（可能被听牌加注诈唬，也可能被两对+价值加注）'
+                    ]
+                });
+                
+                recs.push({
+                    type: 'critical',
+                    title: '🚨 河牌预警：准备弃牌场景',
+                    content: [
+                        '💀 河牌如果出现以下牌，你必须准备弃牌：',
+                        '',
+                        '❌ 第4张同花 → 你的两对/三条直接弃（vs下注）',
+                        '❌ 完成顺子 → 你的两对/三条直接弃（vs下注）',
+                        '❌ 牌面配对 → 你的顺子/同花谨慎（对手可能葫芦）',
+                        '',
+                        '💡 记住：转牌你下注了，河牌出现恐怖牌，对手下注pot+ = 99%有牌',
+                        '→ 这时候弃牌 = 正确决策（省钱）',
+                        '→ 这时候跟注 = 情绪化（送钱）'
+                    ]
+                });
+            } else if (strength === 'medium') {
+                recs.push({
+                    type: 'warning',
+                    title: '🎯 推荐行动：过牌 or 小额下注1/3pot',
+                    content: [
+                        '✅ 为什么控制底池：',
+                        '  • 你的牌不够强（中对/弱顶对）',
+                        '  • 牌面危险，对手可能有听牌或已经超过你',
+                        '  • 避免投入太多，河牌难弃',
+                        '',
+                        '❌ 绝不要做：',
+                        '  • 大额下注 ≥ 1/2 pot（投入太多，河牌弃不掉）',
+                        '',
+                        '⚠️ 如果对手下注：',
+                        '  • 对手小额下注 < 1/2 pot → 可以跟注',
+                        '  • 对手大额下注 ≥ 1/2 pot → 直接弃牌（你的牌不够强）',
+                        '',
+                        '💡 关键：转牌控制底池，河牌才能自由弃牌'
+                    ]
+                });
+            } else {
+                recs.push({
+                    type: 'critical',
+                    title: '🎯 推荐行动：过牌-弃牌',
+                    content: [
+                        '✅ 为什么弃牌：',
+                        '  • 你的牌很弱',
+                        '  • 牌面危险',
+                        '  • 继续投入 = 送钱',
+                        '',
+                        '❌ 绝不要做：',
+                        '  • 诈唬下注（牌面危险，对手不会弃牌）',
+                        '  • 跟注对手下注（你的牌太弱）',
+                        '',
+                        '💡 及时止损 = 职业玩家的标志'
+                    ]
+                });
+            }
+        } else {
+            // 牌面安全/一般
+            if (strength === 'strong' || strength === 'nuts') {
+                recs.push({
+                    type: 'success',
+                    title: '🎯 推荐行动：下注 1/2 - 2/3 底池',
+                    content: [
+                        '✅ 为什么下注：',
+                        '  • 你有强牌',
+                        '  • 牌面相对安全，对手难有听牌',
+                        '  • 价值最大化',
+                        '',
+                        '⚠️ 如果对手加注：',
+                        '  • 你有坚果 → 全下',
+                        '  • 你只有两对/三条 → 谨慎评估（对手可能有更强的牌）'
+                    ]
+                });
+            }
+        }
+    }
+
+    // === 河牌圈 ===
+    if (street === 'river') {
+        if (danger === 'very-dangerous') {
+            if (opponentAction === 'bet-pot' || opponentAction === 'all-in') {
+                recs.push({
+                    type: 'critical',
+                    title: '🚨 推荐行动：弃牌（除非你有坚果）',
+                    content: [
+                        '💀 情况分析：',
+                        '  • 牌面极度危险（完成同花/顺子/葫芦）',
+                        '  • 对手大额下注 ≥ pot',
+                        '  • 对手99%有坚果或极强牌',
+                        '',
+                        '❌ 绝不要跟注的牌：',
+                        '  • 三条（vs完成的同花/顺子）',
+                        '  • 两对（vs完成的同花/顺子）',
+                        '  • 顶对（vs任何下注）',
+                        '  • 小同花/小顺子（vs大额下注）',
+                        '',
+                        '✅ 可以跟注的牌：',
+                        '  • 坚果（绝对坚果）',
+                        '  • 第二坚果 + 对手是疯子 + 底池赔率极好',
+                        '',
+                        '💡 职业玩家 vs 业余玩家：',
+                        '  • 业余：用三条舍不得弃 → 输大底池',
+                        '  • 职业：河牌完成听牌，三条秒弃 → 省50-200BB'
+                    ]
+                });
+            } else if (opponentAction === 'check') {
+                if (strength === 'strong' || strength === 'nuts') {
+                    recs.push({
+                        type: 'success',
+                        title: '🎯 推荐行动：下注 2/3 底池',
+                        content: [
+                            '✅ 为什么下注：',
+                            '  • 对手过牌，显示弱势',
+                            '  • 你有强牌，价值最大化',
+                            '  • 牌面虽然危险，但对手没有',
+                            '',
+                            '⚠️ 如果对手加注：',
+                            '  • 你有坚果 → 全下',
+                            '  • 你只有两对/三条 → 谨慎（对手可能诈唬加注或慢打坚果）'
+                        ]
+                    });
+                } else if (strength === 'medium') {
+                    recs.push({
+                        type: 'warning',
+                        title: '🎯 推荐行动：过牌（放弃价值）',
+                        content: [
+                            '✅ 为什么过牌：',
+                            '  • 你的牌不够强（中对/弱顶对）',
+                            '  • 牌面危险，对手过牌可能陷阱',
+                            '  • 下注被加注 = 被迫弃牌 = 损失更多',
+                            '',
+                            '💡 有时候放弃价值 = 正确决策'
+                        ]
+                    });
+                } else {
+                    recs.push({
+                        type: 'info',
+                        title: '🎯 推荐行动：过牌（摊牌）',
+                        content: [
+                            '你的牌很弱，对手也过牌了',
+                            '直接摊牌，看运气'
+                        ]
+                    });
+                }
+            }
+        }
+    }
+
+    // === 翻牌圈 ===
+    if (street === 'flop') {
+        if (strength === 'strong' || strength === 'nuts') {
+            recs.push({
+                type: 'success',
+                title: '🎯 推荐行动：下注 1/2 - 2/3 底池',
+                content: [
+                    '✅ 翻牌圈持续下注（C-bet）',
+                    '',
+                    '下注尺寸：',
+                    '  • 干燥牌面（K72彩虹）→ 1/2 pot',
+                    '  • 湿润牌面（987两同花）→ 2/3 pot',
+                    '  • 对子牌面（QQ3）→ 1/3 pot',
+                    '',
+                    '⚠️ 如果对手加注：',
+                    '  • 你有坚果/暗三 → 全下或跟注',
+                    '  • 你只有顶对 → 跟注（看转牌）'
+                ]
+            });
+        }
+    }
+
+    // === 翻前 ===
+    if (street === 'preflop') {
+        recs.push({
+            type: 'info',
+            title: '💡 翻前快速指引',
+            content: [
+                '这个工具主要用于翻牌后决策',
+                '',
+                '翻前建议：',
+                '  • 使用训练器中的"翻前范围热力图"',
+                '  • 根据位置和范围入池',
+                '',
+                '翻前核心原则：',
+                '  • 前位紧（UTG/MP）',
+                '  • 后位宽（CO/BTN）',
+                '  • 深筹码避免边缘牌'
+            ]
+        });
+    }
+
+    return recs;
+}
+
+function displayRecommendations(recs) {
     const container = document.getElementById('alertContainer');
     container.innerHTML = '';
 
-    alerts.forEach(alert => {
+    recs.forEach(rec => {
         const card = document.createElement('div');
-        card.className = `alert-card alert-${alert.type}`;
+        card.className = `alert-card alert-${rec.type}`;
 
         const title = document.createElement('div');
         title.className = 'alert-title';
-        title.textContent = alert.title;
+        title.textContent = rec.title;
 
         const content = document.createElement('div');
         content.className = 'alert-content';
 
-        if (Array.isArray(alert.content)) {
+        if (Array.isArray(rec.content)) {
             const ul = document.createElement('ul');
-            alert.content.forEach(item => {
+            rec.content.forEach(item => {
                 const li = document.createElement('li');
                 li.textContent = item;
                 ul.appendChild(li);
             });
             content.appendChild(ul);
         } else {
-            content.textContent = alert.content;
+            content.textContent = rec.content;
         }
 
         card.appendChild(title);
@@ -193,60 +876,27 @@ function displayAlerts(alerts) {
     });
 }
 
-function displayStats(spr, potOdds, mdf) {
-    const statsGrid = document.getElementById('statsGrid');
-    statsGrid.innerHTML = `
-        <div class="stat-item">
-            <div class="stat-label">SPR</div>
-            <div class="stat-value">${spr}</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-label">Pot Odds</div>
-            <div class="stat-value">${potOdds}%</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-label">MDF</div>
-            <div class="stat-value">${mdf}%</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-label">Position</div>
-            <div class="stat-value">${gameState.position}</div>
-        </div>
-    `;
+function displayStats() {
+    // 移除数据堆砌，不显示统计数据
 }
 
 function resetHelper() {
-    document.getElementById('effectiveStack').value = '300';
-    document.getElementById('potSize').value = '12';
-    document.getElementById('opponentAction').value = '';
-    if (document.getElementById('boardCards')) {
-        document.getElementById('boardCards').value = '';
-    }
-
+    document.getElementById('potSize').value = '50';
+    
     document.querySelectorAll('.btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelector('[data-street="preflop"]').classList.add('active');
-    document.querySelector('[data-blind="124"]').classList.add('active');
-    document.querySelector('[data-position="Straddle"]').classList.add('active');
-    document.querySelector('[data-players="2"]').classList.add('active');
-    document.querySelector('[data-villain="unknown"]').classList.add('active');
+    document.querySelector('[data-street="turn"]').classList.add('active');
+    document.querySelector('[data-hand="top-two"]').classList.add('active');
+    document.querySelector('[data-action="check"]').classList.add('active');
+    document.querySelector('[data-danger="dangerous"]').classList.add('active');
 
     document.getElementById('alertSection').classList.remove('show');
 
     gameState = {
-        street: 'preflop',
-        blind: '124',
-        position: 'Straddle',
-        stack: 300,
-        pot: 12,
-        players: '2',
-        opponentAction: '',
-        villain: 'unknown',
-        board: '',
-        texture: 'dry',
-        draw: 'none',
-        riverComplete: 'none'
+        street: 'turn',
+        hand: 'top-two',
+        opponentAction: 'check',
+        danger: 'dangerous'
     };
 
-    updateBoardVisibility();
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }

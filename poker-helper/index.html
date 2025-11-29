@@ -261,134 +261,77 @@
 </head>
 <body>
     <div class="header">
-        <h1>🎯 Zero-Mistake Helper</h1>
-        <div class="subtitle">8-Max with Straddle | Bad Luck OK, Mistakes NO</div>
+        <h1>🎯 实战行动指南</h1>
+        <div class="subtitle">允许运气差·绝不允许犯错</div>
     </div>
 
     <div class="section">
-        <div class="section-title">📍 Basic Settings</div>
+        <div class="section-title">💰 底池信息</div>
         
         <div class="input-group">
-            <div class="input-label">Current Street</div>
-            <div class="btn-group">
-                <button class="btn active" data-street="preflop">Preflop</button>
-                <button class="btn" data-street="flop">Flop</button>
-                <button class="btn" data-street="turn">Turn</button>
-                <button class="btn" data-street="river">River</button>
-            </div>
-        </div>
-
-        <div class="input-group">
-            <div class="input-label">Blind Structure</div>
-            <div class="btn-group">
-                <button class="btn active" data-blind="124">1/2/4 (Anti1)</button>
-                <button class="btn" data-blind="248">2/4/8 (Anti2)</button>
-            </div>
-        </div>
-
-        <div class="input-group">
-            <div class="input-label">My Position</div>
-            <div class="btn-group">
-                <button class="btn" data-position="UTG">UTG</button>
-                <button class="btn" data-position="MP1">MP1</button>
-                <button class="btn" data-position="MP2">MP2</button>
-                <button class="btn" data-position="CO">CO</button>
-                <button class="btn" data-position="BTN">BTN</button>
-                <button class="btn" data-position="SB">SB</button>
-                <button class="btn" data-position="BB">BB</button>
-                <button class="btn active" data-position="Straddle">Straddle</button>
-            </div>
+            <div class="input-label">当前底池大小（BB）</div>
+            <input type="number" class="input-field" id="potSize" placeholder="例如: 50" value="50">
         </div>
     </div>
 
     <div class="section">
-        <div class="section-title">💰 Stack & Pot</div>
+        <div class="section-title">📍 当前情况</div>
         
         <div class="input-group">
-            <div class="input-label">Effective Stack (BB)</div>
-            <input type="number" class="input-field" id="effectiveStack" placeholder="e.g., 300" value="300">
+            <div class="input-label">当前街道</div>
+            <div class="btn-group">
+                <button class="btn" data-street="preflop">翻前</button>
+                <button class="btn" data-street="flop">翻牌圈</button>
+                <button class="btn active" data-street="turn">转牌圈</button>
+                <button class="btn" data-street="river">河牌圈</button>
+            </div>
         </div>
 
         <div class="input-group">
-            <div class="input-label">Current Pot (BB)</div>
-            <input type="number" class="input-field" id="potSize" placeholder="e.g., 12" value="12">
+            <div class="input-label">我的具体牌型</div>
+            <div class="btn-group">
+                <button class="btn" data-hand="nuts-flush">坚果同花</button>
+                <button class="btn" data-hand="nuts-straight">坚果顺子</button>
+                <button class="btn" data-hand="fullhouse">葫芦/四条</button>
+                <button class="btn" data-hand="set">暗三</button>
+                <button class="btn" data-hand="top-two">顶两对</button>
+                <button class="btn" data-hand="overpair">超对</button>
+                <button class="btn" data-hand="top-pair">顶对</button>
+                <button class="btn" data-hand="nuts-draw" style="background: rgba(255,215,0,0.1);">抽坚果同花</button>
+                <button class="btn" data-hand="straight-draw" style="background: rgba(255,215,0,0.1);">抽顺子</button>
+                <button class="btn" data-hand="weak-pair">中对/底对</button>
+                <button class="btn" data-hand="nothing">什么都没中</button>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <div class="input-label">对手刚才的动作</div>
+            <div class="btn-group">
+                <button class="btn active" data-action="check">过牌</button>
+                <button class="btn" data-action="bet-small">下注1/3pot</button>
+                <button class="btn" data-action="bet-half">下注1/2pot</button>
+                <button class="btn" data-action="bet-pot">下注pot</button>
+                <button class="btn" data-action="all-in">全下</button>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <div class="input-label">牌面危险程度</div>
+            <div class="btn-group">
+                <button class="btn" data-danger="safe">安全</button>
+                <button class="btn" data-danger="normal">一般</button>
+                <button class="btn active" data-danger="dangerous">危险</button>
+                <button class="btn" data-danger="very-dangerous">极度危险</button>
+            </div>
         </div>
     </div>
 
-    <div class="section">
-        <div class="section-title">👥 Opponent Info</div>
-        
-        <div class="input-group">
-            <div class="input-label">Players in Pot (including me)</div>
-            <div class="btn-group">
-                <button class="btn active" data-players="2">2P</button>
-                <button class="btn" data-players="3">3P</button>
-                <button class="btn" data-players="4">4P</button>
-                <button class="btn" data-players="5+">5P+</button>
-            </div>
-        </div>
-
-        <div class="input-group">
-            <div class="input-label">Opponent Action</div>
-            <input type="text" class="input-field" id="opponentAction" placeholder="e.g., CO raises 12BB -> BTN calls">
-        </div>
-
-        <div class="input-group">
-            <div class="input-label">Opponent Type</div>
-            <div class="btn-group">
-                <button class="btn active" data-villain="unknown">Unknown</button>
-                <button class="btn" data-villain="tight">TAG</button>
-                <button class="btn" data-villain="loose">LAG</button>
-                <button class="btn" data-villain="passive">Fish</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="section" id="boardSection" style="display: none;">
-        <div class="section-title">🃏 Board Cards</div>
-        
-        <div class="input-group">
-            <div class="input-label">Flop/Turn/River (space separated)</div>
-            <input type="text" class="input-field" id="boardCards" placeholder="e.g., As Kd 7c 3h 2s">
-            <div style="font-size: 11px; color: #888; margin-top: 5px;">
-                Example: As Kd 7c (Flop) | As Kd 7c 3h (Turn) | As Kd 7c 3h 2s (River)
-            </div>
-        </div>
-
-        <div class="input-group">
-            <div class="input-label">Board Texture</div>
-            <div class="btn-group">
-                <button class="btn active" data-texture="dry">Dry</button>
-                <button class="btn" data-texture="wet">Wet</button>
-                <button class="btn" data-texture="paired">Paired</button>
-                <button class="btn" data-texture="coordinated">Connected</button>
-            </div>
-        </div>
-
-        <div class="input-group" id="drawSection" style="display: none;">
-            <div class="input-label">⚠️ Opponent Possible Draws (Turn Only)</div>
-            <div class="btn-group">
-                <button class="btn" data-draw="flush">Flush Draw</button>
-                <button class="btn" data-draw="straight">Straight Draw</button>
-                <button class="btn" data-draw="set">Set Draw</button>
-                <button class="btn" data-draw="twopair">Two Pair Draw</button>
-                <button class="btn" data-draw="none">No Draw</button>
-            </div>
-        </div>
-
-        <div class="input-group" id="riverCompleteSection" style="display: none;">
-            <div class="input-label">🚨 Did River Complete a Draw?</div>
-            <div class="btn-group">
-                <button class="btn" data-complete="flush">Completed Flush</button>
-                <button class="btn" data-complete="straight">Completed Straight</button>
-                <button class="btn" data-complete="fullhouse">Completed Full House</button>
-                <button class="btn" data-complete="none">No Complete</button>
-            </div>
-        </div>
+    <div class="section" style="display: none;">
+        <!-- 暂时隐藏，简化输入 -->
     </div>
 
     <button class="analyze-btn" onclick="analyzeAndAlert()">
-        🔍 Generate Alerts
+        🎯 生成行动建议
     </button>
 
     <div class="alert-section" id="alertSection">
