@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0a0a1a">
+    <title>高阶训练师 - 世界顶级水准</title>
+    
+    <style>
+        :root {
+            --primary: #00d4ff;
+            --primary-dark: #00a8cc;
+            --secondary: #ff6b9d;
+            --accent: #ffd93d;
+            --success: #6bcb77;
+            --warning: #ffa41b;
+            --danger: #ff6b6b;
+            --dark: #0a0a1a;
+            --darker: #050510;
+            --card-bg: #12122a;
+            --text: #e8e8f0;
+            --text-muted: #8888a0;
+            --gradient-1: linear-gradient(135deg, #00d4ff 0%, #00a8cc 100%);
+            --gradient-2: linear-gradient(135deg, #ff6b9d 0%, #c850c0 100%);
+            --gradient-3: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-gold: linear-gradient(135deg, #f5af19 0%, #f12711 100%);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--darker);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 100px;
+        }
+        
+        /* 高级背景效果 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(0, 212, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(255, 107, 157, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(102, 126, 234, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        /* 头部 - 金色高级感 */
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            padding: 24px 16px;
+            text-align: center;
+            position: relative;
+            border-bottom: 2px solid rgba(245, 175, 25, 0.3);
+        }
+        
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 20%;
+            right: 20%;
+            height: 2px;
+            background: var(--gradient-gold);
+        }
+        
+        .header h1 {
+            font-size: 26px;
+            font-weight: 800;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+        
+        .header .subtitle {
+            font-size: 13px;
+            color: var(--accent);
+            opacity: 0.9;
+        }
+        
+        .header .level-badge {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 6px 16px;
+            background: rgba(245, 175, 25, 0.1);
+            border: 1px solid rgba(245, 175, 25, 0.3);
+            border-radius: 20px;
+            font-size: 12px;
+            color: var(--accent);
+        }
+        
+        /* 页面容器 */
+        .page {
+            display: none;
+            padding: 16px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* 模块选择卡片 */
+        .module-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .module-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+        
+        .module-card.mistakes::before { background: var(--danger); }
+        .module-card.math::before { background: var(--primary); }
+        .module-card.sizing::before { background: var(--secondary); }
+        .module-card.planning::before { background: var(--gradient-3); }
+        .module-card.tilt::before { background: var(--warning); }
+        .module-card.review::before { background: var(--success); }
+        
+        .module-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.2);
+        }
+        
+        .module-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .module-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+        
+        .module-card.mistakes .module-icon { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%); }
+        .module-card.math .module-icon { background: var(--gradient-1); }
+        .module-card.sizing .module-icon { background: var(--gradient-2); }
+        .module-card.planning .module-icon { background: var(--gradient-3); }
+        .module-card.tilt .module-icon { background: linear-gradient(135deg, #ffa41b 0%, #ff8c00 100%); }
+        .module-card.review .module-icon { background: linear-gradient(135deg, #6bcb77 0%, #4caf50 100%); }
+        
+        .module-info h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .module-info p {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        
+        .module-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .module-badge.critical {
+            background: rgba(255, 107, 107, 0.2);
+            color: var(--danger);
+        }
+        
+        .module-badge.important {
+            background: rgba(255, 164, 27, 0.2);
+            color: var(--warning);
+        }
+        
+        .module-badge.essential {
+            background: rgba(0, 212, 255, 0.2);
+            color: var(--primary);
+        }
+        
+        /* 训练页面 */
+        .train-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .back-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: var(--text);
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .progress-indicator {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        
+        /* 问题卡片 */
+        .question-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 2px solid rgba(0, 212, 255, 0.2);
+        }
+        
+        .question-category {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--primary);
+            margin-bottom: 16px;
+        }
+        
+        .question-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--accent);
+        }
+        
+        .question-text {
+            font-size: 16px;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            padding: 16px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            border-left: 3px solid var(--primary);
+        }
+        
+        .answer-section {
+            display: none;
+        }
+        
+        .answer-section.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .answer-block {
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .answer-block.wrong {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+        }
+        
+        .answer-block.correct {
+            background: rgba(107, 203, 119, 0.1);
+            border: 1px solid rgba(107, 203, 119, 0.3);
+        }
+        
+        .answer-label {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        
+        .answer-block.wrong .answer-label { color: var(--danger); }
+        .answer-block.correct .answer-label { color: var(--success); }
+        
+        .answer-content {
+            font-size: 15px;
+            font-weight: 600;
+        }
+        
+        .explanation {
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 16px;
+        }
+        
+        .explanation h4 {
+            color: var(--accent);
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+        
+        .explanation-text {
+            font-size: 14px;
+            line-height: 2;
+            white-space: pre-line;
+        }
+        
+        .frequency-tag {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 6px 12px;
+            background: rgba(255, 164, 27, 0.1);
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--warning);
+        }
+        
+        /* 按钮 */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 12px;
+        }
+        
+        .btn-primary {
+            background: var(--gradient-1);
+            color: white;
+        }
+        
+        .btn-gold {
+            background: var(--gradient-gold);
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        /* 数学训练特殊样式 */
+        .math-problem {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        
+        .math-question {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--primary);
+        }
+        
+        .math-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .math-option {
+            padding: 16px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .math-option:hover {
+            border-color: var(--primary);
+            background: rgba(0, 212, 255, 0.1);
+        }
+        
+        .math-option.selected {
+            border-color: var(--primary);
+            background: rgba(0, 212, 255, 0.2);
+        }
+        
+        .math-option.correct {
+            border-color: var(--success);
+            background: rgba(107, 203, 119, 0.2);
+        }
+        
+        .math-option.wrong {
+            border-color: var(--danger);
+            background: rgba(255, 107, 107, 0.2);
+        }
+        
+        .calculation-box {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.8;
+            white-space: pre-line;
+            margin-bottom: 16px;
+        }
+        
+        .tips-box {
+            background: rgba(255, 217, 61, 0.1);
+            border: 1px solid rgba(255, 217, 61, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+        }
+        
+        .tips-box h4 {
+            color: var(--accent);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .tips-box p {
+            font-size: 13px;
+            line-height: 1.8;
+            white-space: pre-line;
+        }
+        
+        /* Tilt检查表 */
+        .checklist {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+        }
+        
+        .checklist-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+        }
+        
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+        
+        .check-box {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--text-muted);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .checklist-item.checked .check-box {
+            background: var(--danger);
+            border-color: var(--danger);
+        }
+        
+        .check-box::after {
+            content: '✓';
+            color: white;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .checklist-item.checked .check-box::after {
+            opacity: 1;
+        }
+        
+        .check-text {
+            font-size: 14px;
+            flex: 1;
+        }
+        
+        .action-protocol {
+            margin-top: 24px;
+            padding: 20px;
+            background: rgba(255, 164, 27, 0.1);
+            border-radius: 12px;
+            border-left: 3px solid var(--warning);
+        }
+        
+        .action-protocol h4 {
+            color: var(--warning);
+            margin-bottom: 12px;
+        }
+        
+        .action-protocol p {
+            font-size: 13px;
+            line-height: 2;
+        }
+        
+        /* 复盘框架 */
+        .review-step {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .step-number {
+            width: 36px;
+            height: 36px;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        
+        .step-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .step-questions {
+            padding-left: 48px;
+        }
+        
+        .step-question {
+            font-size: 14px;
+            color: var(--text-muted);
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .step-question:last-child {
+            border-bottom: none;
+        }
+        
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--dark);
+            padding: 12px 0;
+            padding-bottom: calc(12px + env(safe-area-inset-bottom));
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+            background: rgba(0, 212, 255, 0.1);
+        }
+        
+        .nav-icon { font-size: 24px; }
+        .nav-label { font-size: 12px; }
+        
+        /* 响应式 */
+        @media (min-width: 768px) {
+            .page { max-width: 600px; margin: 0 auto; }
+            .module-grid { display: grid; grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <!-- 头部 -->
+    <header class="header">
+        <h1>🏆 高阶训练师</h1>
+        <div class="subtitle">为100万手牌以上玩家设计</div>
+        <div class="level-badge">🎯 目标：世界顶级水准</div>
+    </header>
+    
+    <!-- 首页 - 模块选择 -->
+    <div id="homePage" class="page active">
+        <div class="module-grid">
+            <div class="module-card mistakes" onclick="startModule('mistakes')">
+                <span class="module-badge critical">🔴 最关键</span>
+                <div class="module-header">
+                    <div class="module-icon">🚫</div>
+                    <div class="module-info">
+                        <h3>低级错误防范</h3>
+                        <p>针对经验玩家最常犯的执行错误，建立检查清单思维</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="module-card math" onclick="startModule('math')">
+                <span class="module-badge critical">🔴 最关键</span>
+                <div class="module-header">
+                    <div class="module-icon">🔢</div>
+                    <div class="module-info">
+                        <h3>数学计算训练</h3>
+                        <p>底池赔率、MDF、EV计算、组合计数</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="module-card sizing" onclick="startModule('sizing')">
+                <span class="module-badge critical">🔴 最关键</span>
+                <div class="module-header">
+                    <div class="module-icon">📏</div>
+                    <div class="module-info">
+                        <h3>Sizing决策训练</h3>
+                        <p>什么时候用什么尺寸，最大化EV</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="module-card planning" onclick="startModule('planning')">
+                <span class="module-badge important">🟠 重要</span>
+                <div class="module-header">
+                    <div class="module-icon">🗺️</div>
+                    <div class="module-info">
+                        <h3>多街规划训练</h3>
+                        <p>翻牌就规划转牌和河牌，系统性思维</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="module-card tilt" onclick="startModule('tilt')">
+                <span class="module-badge important">🟠 重要</span>
+                <div class="module-header">
+                    <div class="module-icon">🧠</div>
+                    <div class="module-info">
+                        <h3>Tilt管理</h3>
+                        <p>情绪识别、控制协议、session管理</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="module-card review" onclick="startModule('review')">
+                <span class="module-badge essential">🔵 基础</span>
+                <div class="module-header">
+                    <div class="module-icon">📝</div>
+                    <div class="module-info">
+                        <h3>复盘框架</h3>
+                        <p>系统化手牌分析，找到并修复漏洞</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 训练页面 -->
+    <div id="trainPage" class="page">
+        <div class="train-header">
+            <button class="back-btn" onclick="goHome()">← 返回</button>
+            <div class="progress-indicator" id="progressIndicator">1 / 10</div>
+        </div>
+        
+        <div id="trainingContent">
+            <!-- 动态内容 -->
+        </div>
+    </div>
+    
+    <!-- 底部导航 -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="switchPage('home')">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">模块</span>
+        </div>
+        <div class="nav-item" onclick="switchPage('stats')">
+            <span class="nav-icon">📊</span>
+            <span class="nav-label">进度</span>
+        </div>
+        <div class="nav-item" onclick="switchPage('settings')">
+            <span class="nav-icon">⚙️</span>
+            <span class="nav-label">设置</span>
+        </div>
+    </nav>
+    
+    <script src="advanced_trainer.js"></script>
+    <script>
+        // 当前训练状态
+        let currentModule = null;
+        let currentIndex = 0;
+        let currentItems = [];
+        let showingAnswer = false;
+        
+        // 开始模块
+        function startModule(moduleName) {
+            currentModule = moduleName;
+            currentIndex = 0;
+            showingAnswer = false;
+            
+            // 获取模块内容
+            switch(moduleName) {
+                case 'mistakes':
+                    currentItems = [];
+                    COMMON_MISTAKES.forEach(cat => {
+                        cat.mistakes.forEach(m => {
+                            currentItems.push({...m, category: cat.category, categoryIcon: cat.icon});
+                        });
+                    });
+                    break;
+                case 'math':
+                    currentItems = [];
+                    MATH_TRAINING.forEach(cat => {
+                        cat.problems.forEach(p => {
+                            currentItems.push({...p, category: cat.category, categoryIcon: cat.icon});
+                        });
+                    });
+                    break;
+                case 'sizing':
+                    currentItems = [];
+                    SIZING_TRAINING.forEach(cat => {
+                        cat.scenarios.forEach(s => {
+                            currentItems.push({...s, category: cat.category, categoryIcon: cat.icon});
+                        });
+                    });
+                    break;
+                case 'planning':
+                    currentItems = MULTISTREET_PLANNING.map(p => ({...p}));
+                    break;
+                case 'tilt':
+                    showTiltModule();
+                    return;
+                case 'review':
+                    showReviewModule();
+                    return;
+            }
+            
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('trainPage').classList.add('active');
+            
+            renderQuestion();
+        }
+        
+        // 渲染问题
+        function renderQuestion() {
+            if (currentIndex >= currentItems.length) {
+                finishModule();
+                return;
+            }
+            
+            const item = currentItems[currentIndex];
+            document.getElementById('progressIndicator').textContent = 
+                `${currentIndex + 1} / ${currentItems.length}`;
+            
+            let html = '';
+            
+            if (currentModule === 'mistakes') {
+                html = renderMistakeQuestion(item);
+            } else if (currentModule === 'math') {
+                html = renderMathQuestion(item);
+            } else if (currentModule === 'sizing') {
+                html = renderSizingQuestion(item);
+            } else if (currentModule === 'planning') {
+                html = renderPlanningQuestion(item);
+            }
+            
+            document.getElementById('trainingContent').innerHTML = html;
+        }
+        
+        // 渲染错误防范问题
+        function renderMistakeQuestion(item) {
+            return `
+                <div class="question-card">
+                    <div class="question-category">${item.categoryIcon} ${item.category}</div>
+                    <div class="question-text">${item.q}</div>
+                    
+                    <div class="answer-section" id="answerSection">
+                        <div class="answer-block wrong">
+                            <div class="answer-label">❌ 常见错误答案</div>
+                            <div class="answer-content">${item.wrong}</div>
+                        </div>
+                        <div class="answer-block correct">
+                            <div class="answer-label">✅ 正确答案</div>
+                            <div class="answer-content">${item.correct}</div>
+                        </div>
+                        <div class="explanation">
+                            <h4>💡 详细解析</h4>
+                            <div class="explanation-text">${item.why}</div>
+                        </div>
+                        <div class="frequency-tag">📊 ${item.frequency}</div>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="actionBtn" onclick="toggleAnswer()">
+                        显示答案
+                    </button>
+                </div>
+            `;
+        }
+        
+        // 渲染数学问题
+        function renderMathQuestion(item) {
+            return `
+                <div class="math-problem">
+                    <div class="question-category">${item.categoryIcon} ${item.category}</div>
+                    <div class="math-question">${item.q}</div>
+                    
+                    <div class="answer-section" id="answerSection">
+                        <div class="answer-block correct">
+                            <div class="answer-label">✅ 正确答案</div>
+                            <div class="answer-content" style="font-size:24px;text-align:center;">${item.a}</div>
+                        </div>
+                        <div class="calculation-box">${item.calculation}</div>
+                        <div class="tips-box">
+                            <h4>💡 记忆技巧</h4>
+                            <p>${item.tips}</p>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="actionBtn" onclick="toggleAnswer()">
+                        显示答案与计算过程
+                    </button>
+                </div>
+            `;
+        }
+        
+        // 渲染Sizing问题
+        function renderSizingQuestion(item) {
+            let optionsHtml = item.sizing_options.map(opt => 
+                `<div class="math-option" onclick="selectSizing(this, '${opt}', '${item.correct}')">${opt}</div>`
+            ).join('');
+            
+            return `
+                <div class="question-card">
+                    <div class="question-category">${item.categoryIcon} ${item.category}</div>
+                    ${item.board ? `<div class="question-title">Board: ${item.board}</div>` : ''}
+                    <div class="question-text">${item.situation}</div>
+                    
+                    <div class="math-options" id="sizingOptions">
+                        ${optionsHtml}
+                    </div>
+                    
+                    <div class="answer-section" id="answerSection">
+                        <div class="explanation">
+                            <h4>💡 为什么选择 ${item.correct}？</h4>
+                            <div class="explanation-text">${item.why}</div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-outline" id="nextBtn" onclick="nextQuestion()" style="display:none;">
+                        下一题 →
+                    </button>
+                </div>
+            `;
+        }
+        
+        // 渲染多街规划
+        function renderPlanningQuestion(item) {
+            let plansHtml = item.scenario.plans.map(plan => `
+                <div class="review-step">
+                    <div class="step-header">
+                        <div class="step-number">🃏</div>
+                        <div class="step-title">转牌：${plan.turn_card}</div>
+                    </div>
+                    <div class="step-questions">
+                        <div class="step-question"><strong>计划：</strong>${plan.your_plan}</div>
+                        <div class="step-question"><strong>尺寸：</strong>${plan.sizing}</div>
+                        <div class="step-question"><strong>原因：</strong>${plan.reasoning}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            return `
+                <div class="question-card">
+                    <div class="question-category">${item.icon} ${item.title}</div>
+                    <div class="question-text">${item.scenario.setup}</div>
+                    
+                    <div class="answer-section" id="answerSection">
+                        <h3 style="margin-bottom:16px;color:var(--accent);">📋 不同转牌的计划</h3>
+                        ${plansHtml}
+                    </div>
+                    
+                    <button class="btn btn-primary" id="actionBtn" onclick="toggleAnswer()">
+                        显示多街计划
+                    </button>
+                </div>
+            `;
+        }
+        
+        // Tilt模块
+        function showTiltModule() {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('trainPage').classList.add('active');
+            document.getElementById('progressIndicator').textContent = 'Tilt检查';
+            
+            const tiltData = TILT_MANAGEMENT[0];
+            const signsHtml = tiltData.warning_signs.map(sign => `
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="check-box"></div>
+                    <div class="check-text">${sign}</div>
+                </div>
+            `).join('');
+            
+            const protocolHtml = tiltData.action_protocol.map(p => p).join('<br>');
+            
+            document.getElementById('trainingContent').innerHTML = `
+                <div class="checklist">
+                    <div class="checklist-title">${tiltData.icon} ${tiltData.title}</div>
+                    <p style="color:var(--text-muted);margin-bottom:20px;font-size:14px;">
+                        点击你当前有的症状：
+                    </p>
+                    ${signsHtml}
+                    
+                    <div class="action-protocol">
+                        <h4>🚨 行动协议</h4>
+                        <p>${protocolHtml}</p>
+                    </div>
+                </div>
+                
+                <div class="checklist" style="margin-top:20px;">
+                    <div class="checklist-title">⏱️ ${TILT_MANAGEMENT[1].title}</div>
+                    ${TILT_MANAGEMENT[1].protocol.map(p => `<div class="step-question">${p}</div>`).join('')}
+                    
+                    <h4 style="color:var(--accent);margin-top:20px;">💭 心理咒语</h4>
+                    ${TILT_MANAGEMENT[1].mantras.map(m => `<div class="step-question">${m}</div>`).join('')}
+                </div>
+                
+                <button class="btn btn-gold" onclick="goHome()">完成检查 ✓</button>
+            `;
+        }
+        
+        // 复盘模块
+        function showReviewModule() {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('trainPage').classList.add('active');
+            document.getElementById('progressIndicator').textContent = '复盘框架';
+            
+            const framework = REVIEW_FRAMEWORK[0];
+            const stepsHtml = framework.steps.map(step => `
+                <div class="review-step">
+                    <div class="step-header">
+                        <div class="step-number">${step.step}</div>
+                        <div class="step-title">${step.title}</div>
+                    </div>
+                    <div class="step-questions">
+                        ${step.questions.map(q => `<div class="step-question">• ${q}</div>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('trainingContent').innerHTML = `
+                <div class="question-card">
+                    <div class="question-title">${framework.icon} ${framework.title}</div>
+                    <p style="color:var(--text-muted);margin-bottom:20px;">
+                        每次复盘手牌时，按照这5个步骤系统分析
+                    </p>
+                </div>
+                ${stepsHtml}
+                <button class="btn btn-gold" onclick="goHome()">记住框架 ✓</button>
+            `;
+        }
+        
+        // 切换答案显示
+        function toggleAnswer() {
+            const answerSection = document.getElementById('answerSection');
+            const actionBtn = document.getElementById('actionBtn');
+            
+            if (!showingAnswer) {
+                answerSection.classList.add('show');
+                actionBtn.textContent = '下一题 →';
+                actionBtn.onclick = nextQuestion;
+                showingAnswer = true;
+            }
+        }
+        
+        // 选择Sizing
+        function selectSizing(element, selected, correct) {
+            const options = document.querySelectorAll('.math-option');
+            options.forEach(opt => {
+                opt.style.pointerEvents = 'none';
+                if (opt.textContent === correct) {
+                    opt.classList.add('correct');
+                } else if (opt === element && selected !== correct) {
+                    opt.classList.add('wrong');
+                }
+            });
+            
+            document.getElementById('answerSection').classList.add('show');
+            document.getElementById('nextBtn').style.display = 'block';
+        }
+        
+        // 下一题
+        function nextQuestion() {
+            currentIndex++;
+            showingAnswer = false;
+            renderQuestion();
+        }
+        
+        // 完成模块
+        function finishModule() {
+            document.getElementById('trainingContent').innerHTML = `
+                <div class="question-card" style="text-align:center;">
+                    <div style="font-size:60px;margin-bottom:20px;">🏆</div>
+                    <h2 style="color:var(--accent);margin-bottom:12px;">模块完成！</h2>
+                    <p style="color:var(--text-muted);margin-bottom:24px;">
+                        你已完成本模块的所有训练
+                    </p>
+                    <button class="btn btn-gold" onclick="goHome()">返回首页</button>
+                </div>
+            `;
+        }
+        
+        // 返回首页
+        function goHome() {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('homePage').classList.add('active');
+            
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.querySelector('.nav-item').classList.add('active');
+        }
+        
+        // 切换检查项
+        function toggleCheck(element) {
+            element.classList.toggle('checked');
+            
+            // 统计已选中的项目
+            const checked = document.querySelectorAll('.checklist-item.checked');
+            const redChecked = Array.from(checked).filter(el => 
+                el.querySelector('.check-text').textContent.includes('🔴')
+            ).length;
+            
+            if (redChecked > 0) {
+                alert(`⚠️ 检测到${redChecked}个红色警告信号！\n\n建议：立即休息15分钟，或考虑结束今天的session。`);
+            }
+        }
+        
+        // 页面切换
+        function switchPage(pageName) {
+            if (pageName === 'home') {
+                goHome();
+            }
+            // stats和settings页面可以后续添加
+        }
+    </script>
+</body>
+</html>
+
