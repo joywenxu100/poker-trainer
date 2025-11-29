@@ -892,8 +892,11 @@
         
         // 渲染Sizing问题
         function renderSizingQuestion(item) {
-            let optionsHtml = item.sizing_options.map(opt => 
-                `<div class="math-option" onclick="selectSizing(this, '${opt}', '${item.correct}')">${opt}</div>`
+            // 保存当前item到全局变量供selectSizing使用
+            window.currentSizingItem = item;
+            
+            let optionsHtml = item.sizing_options.map((opt, idx) => 
+                `<div class="math-option" data-index="${idx}" onclick="selectSizing(this, ${idx})">${opt}</div>`
             ).join('');
             
             return `
@@ -1040,13 +1043,19 @@
         }
         
         // 选择Sizing
-        function selectSizing(element, selected, correct) {
+        function selectSizing(element, selectedIdx) {
+            const item = window.currentSizingItem;
+            const selectedText = item.sizing_options[selectedIdx];
+            const correctText = item.correct;
+            
             const options = document.querySelectorAll('.math-option');
             options.forEach(opt => {
                 opt.style.pointerEvents = 'none';
-                if (opt.textContent === correct) {
+                const optText = opt.textContent.trim();
+                // 检查是否包含正确答案（因为有些答案如"100-150% pot"可能有变体）
+                if (optText === correctText || correctText.includes(optText) || optText.includes(correctText)) {
                     opt.classList.add('correct');
-                } else if (opt === element && selected !== correct) {
+                } else if (opt === element && selectedText !== correctText) {
                     opt.classList.add('wrong');
                 }
             });
@@ -1086,18 +1095,94 @@
         }
         
         // 切换检查项
+        let lastRedCount = 0;  // 记录上次红色数量，避免重复弹窗
+        
         function toggleCheck(element) {
+            const wasChecked = element.classList.contains('checked');
             element.classList.toggle('checked');
             
-            // 统计已选中的项目
+            // 只在新选中红色项时提醒（取消选中不提醒）
+            if (!wasChecked) {
+                const isRed = element.querySelector('.check-text').textContent.includes('🔴');
+                
+                if (isRed) {
+                    // 统计当前红色数量
+                    const checked = document.querySelectorAll('.checklist-item.checked');
+                    const redChecked = Array.from(checked).filter(el => 
+                        el.querySelector('.check-text').textContent.includes('🔴')
+                    ).length;
+                    
+                    // 只在红色数量增加且达到特定阈值时提醒
+                    if (redChecked === 1) {
+                        showTiltWarning('⚠️ 检测到1个红色警告信号！', '建议：注意自己的状态，考虑休息5-10分钟。');
+                    } else if (redChecked === 3 && lastRedCount < 3) {
+                        showTiltWarning('🚨 检测到3个红色警告信号！', '强烈建议：立即休息15分钟，或考虑结束今天的session。');
+                    }
+                    lastRedCount = redChecked;
+                }
+            } else {
+                // 取消选中时更新计数
+                const checked = document.querySelectorAll('.checklist-item.checked');
+                lastRedCount = Array.from(checked).filter(el => 
+                    el.querySelector('.check-text').textContent.includes('🔴')
+                ).length;
+            }
+            
+            // 更新底部统计显示
+            updateTiltSummary();
+        }
+        
+        // 显示Tilt警告（使用更友好的方式而不是alert）
+        function showTiltWarning(title, message) {
+            const warningDiv = document.createElement('div');
+            warningDiv.className = 'tilt-warning-popup';
+            warningDiv.innerHTML = `
+                <div style="background:rgba(255,107,107,0.95);color:white;padding:20px;border-radius:16px;text-align:center;max-width:300px;box-shadow:0 10px 40px rgba(0,0,0,0.5);">
+                    <div style="font-size:40px;margin-bottom:12px;">🚨</div>
+                    <div style="font-size:18px;font-weight:700;margin-bottom:8px;">${title}</div>
+                    <div style="font-size:14px;opacity:0.9;margin-bottom:16px;">${message}</div>
+                    <button onclick="this.parentElement.parentElement.remove()" style="padding:10px 30px;background:white;color:#ff6b6b;border:none;border-radius:20px;font-weight:600;cursor:pointer;">我知道了</button>
+                </div>
+            `;
+            warningDiv.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.7);z-index:9999;animation:fadeIn 0.3s ease;';
+            document.body.appendChild(warningDiv);
+        }
+        
+        // 更新Tilt统计摘要
+        function updateTiltSummary() {
             const checked = document.querySelectorAll('.checklist-item.checked');
-            const redChecked = Array.from(checked).filter(el => 
+            const redCount = Array.from(checked).filter(el => 
                 el.querySelector('.check-text').textContent.includes('🔴')
             ).length;
+            const yellowCount = Array.from(checked).filter(el => 
+                el.querySelector('.check-text').textContent.includes('🟡')
+            ).length;
             
-            if (redChecked > 0) {
-                alert(`⚠️ 检测到${redChecked}个红色警告信号！\n\n建议：立即休息15分钟，或考虑结束今天的session。`);
+            let summaryEl = document.getElementById('tiltSummary');
+            if (!summaryEl) {
+                summaryEl = document.createElement('div');
+                summaryEl.id = 'tiltSummary';
+                summaryEl.style.cssText = 'margin-top:16px;padding:16px;background:rgba(0,0,0,0.2);border-radius:12px;text-align:center;';
+                document.querySelector('.checklist').appendChild(summaryEl);
             }
+            
+            let statusColor = '#6bcb77';  // 绿色
+            let statusText = '✅ 状态良好';
+            if (redCount >= 3) {
+                statusColor = '#ff6b6b';
+                statusText = '🚨 强烈建议停止';
+            } else if (redCount >= 1) {
+                statusColor = '#ffa41b';
+                statusText = '⚠️ 需要注意';
+            } else if (yellowCount >= 2) {
+                statusColor = '#ffd93d';
+                statusText = '🟡 轻微疲劳';
+            }
+            
+            summaryEl.innerHTML = `
+                <div style="font-size:24px;font-weight:700;color:${statusColor};margin-bottom:8px;">${statusText}</div>
+                <div style="font-size:13px;color:var(--text-muted);">🔴 红色: ${redCount} | 🟡 黄色: ${yellowCount}</div>
+            `;
         }
         
         // 页面切换

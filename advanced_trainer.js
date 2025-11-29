@@ -179,10 +179,10 @@ const MATH_TRAINING = [
         icon: "💵",
         problems: [
             {
-                q: "底池100，你有50%胜率。你下注50，对手会call 60%。这个bet的EV是多少？",
-                a: "+5",
-                calculation: "情况1：对手fold（40%）\nEV = 0.4 × 100 = +40\n\n情况2：对手call（60%）\n赢：0.6 × 0.5 × 150 = +45\n输：0.6 × 0.5 × (-50) = -15\n\n总EV = 40 + 45 - 15 = +70...wait\n\n正确计算：\n对手fold：0.4 × 100 = +40\n对手call且赢：0.6 × 0.5 × 150 = +45\n对手call且输：0.6 × 0.5 × (-50) = -15\n\nTotal EV of bet = 40 + 45 - 15 = +70\n\nvs Check的EV = 0.5 × 100 + 0.5 × 0 = +50\n\nBet EV - Check EV = 70 - 50 = +20\n\n等等，让我重新算...\n\nBet的EV：\n• Fold: 40% × (+100) = +40\n• Call & Win: 60% × 50% × (+100+50) = +45\n• Call & Lose: 60% × 50% × (-50) = -15\nBet EV = 40 + 45 - 15 = +70 这是你赢的期望\n\n但这不对，应该是增量EV...\n\n简化版：\nCheck EV = 50% × 100 = +50（你赢底池的期望）\nBet EV 需要算增量",
-                tips: "💡 EV计算框架：\n\n1️⃣ 列出所有可能结果\n2️⃣ 计算每个结果的概率\n3️⃣ 计算每个结果的收益/损失\n4️⃣ 概率 × 结果，求和\n\n简化技巧：\n• 比较Bet vs Check\n• 比较Call vs Fold\n• 只算增量EV"
+                q: "底池100，你有50%胜率。你下注50，对手会call 60%、fold 40%。Bet的EV比Check多多少？",
+                a: "+20",
+                calculation: "📊 Check的EV：\n• 50%赢100 + 50%赢0 = +50\n\n📊 Bet 50的EV：\n• 对手Fold (40%): 赢100 → 0.4 × 100 = +40\n• 对手Call且你赢 (60% × 50% = 30%): 赢150 → 0.3 × 150 = +45\n• 对手Call且你输 (60% × 50% = 30%): 输50 → 0.3 × (-50) = -15\n\nBet EV = 40 + 45 - 15 = +70\n\n📊 增量EV = Bet EV - Check EV = 70 - 50 = +20\n\n✅ 结论：下注比过牌多赢20",
+                tips: "💡 EV计算框架：\n\n1️⃣ 分别计算每个选项的EV\n2️⃣ Check EV = 胜率 × 底池\n3️⃣ Bet EV = Σ(概率 × 结果)\n4️⃣ 比较哪个EV更高\n\n⚠️ 常见错误：\n• 忘记算fold的价值\n• 把概率搞混\n• 不算增量EV"
             }
         ]
     },
@@ -199,10 +199,10 @@ const MATH_TRAINING = [
                 tips: "常用组合记忆：\n• 每个对子：6 combos\n• 同花非对子：4 combos\n• 非同花非对子：12 combos\n• 总非对子：16 combos\n\n💡 应用：\n• Board有一张A → AA只剩3 combos\n• 你拿着一张A → AK只剩12 combos\n• Blocker效应很重要！"
             },
             {
-                q: "翻牌是A♠K♥7♣，你拿着7♠7♦。set的概率和AK的概率分别是多少？",
-                a: "Set: 1 combo, AK: 9 combos",
-                calculation: "Set (77)：\n• 剩余7只有7♥7♣\n• 你拿着7♠7♦\n• 只有1个combo: 7♥7♣\n\nAK：\n• Board有A♠K♥\n• AKs: A♥K♣, A♣K♠, A♦K♣ = 3 combos\n• AKo: 3 × 3 - 3 = 6 combos\n• 总共9 combos\n\n💡 你的set vs AK = 1:9\n但77会100% 3bet吗？可能只有50%\n实际比例可能是0.5:9 = 1:18",
-                tips: "Combo分析用于：\n• 判断对手range构成\n• 计算你领先/落后的比例\n• 评估是否应该fold强牌\n\n⚠️ 记住：不是所有combos都在对手range里"
+                q: "翻牌是A♠K♥7♣，对手3bet范围是QQ+/AK。他有多少combos能打败你的77 set？",
+                a: "AA: 3, KK: 3, AK: 9 = 共15个危险combos",
+                calculation: "🎴 你的77 set输给：\n\nAA (set over set)：\n• Board有A♠，剩余A: A♥A♦A♣\n• AA combos = 3C2 = 3 combos\n\nKK (set over set)：\n• Board有K♥，剩余K: K♠K♦K♣\n• KK combos = 3C2 = 3 combos\n\nAK (两对)：\n• Board有A♠K♥\n• 剩余A: 3张，剩余K: 3张\n• AK combos = 3 × 3 = 9 combos\n\n📊 总危险combos = 3 + 3 + 9 = 15\n\n💡 QQ不危险（你的set赢）",
+                tips: "Combo分析用于：\n• 判断对手range中有多少combos打败你\n• Board上的牌会减少对手的combos（Blocker效应）\n• 例：A在board上，AA只剩3 combos而不是6\n\n⚠️ 关键：永远算board已用掉的牌"
             }
         ]
     }
@@ -248,8 +248,8 @@ const SIZING_TRAINING = [
             {
                 situation: "你有nuts，对手是跟注站",
                 sizing_options: ["50% pot", "75% pot", "100% pot", "150%+ pot"],
-                correct: "100-150% pot",
-                why: "🧠 vs 跟注站策略：\n\n• 他们不根据size调整\n• 他们call/fold是二元的\n• 最大化单次value\n\n💡 典型sizing：\n• 有nuts → 尽量大\n• 顶对 → 大（他们用second pair call）\n• 中等牌 → 可能check（他们不会fold）"
+                correct: "150%+ pot",
+                why: "🧠 vs 跟注站策略：\n\n• 他们不根据size调整\n• 他们call/fold是二元的\n• 最大化单次value\n\n💡 典型sizing：\n• 有nuts → 尽量大（150%+）\n• 顶对 → 大（他们用second pair call）\n• 中等牌 → 可能check（他们不会fold）"
             },
             {
                 situation: "你有strong hand，对手是TAG",
@@ -283,10 +283,10 @@ const MULTISTREET_PLANNING = [
                     reasoning: "顶对顶kicker，三条街value大部分情况"
                 },
                 {
-                    turn_card: "同花第二张（7♣变成♥♥）",
-                    your_plan: "Bet-Check-决定",
+                    turn_card: "同花第三张出现（如4♠）",
+                    your_plan: "Bet-Check-根据河牌决定",
                     sizing: "翻牌bet后，转牌check控池",
-                    reasoning: "Board变危险，check保护且控制底池"
+                    reasoning: "同花可能完成，顶对变成bluff catcher，check控制底池"
                 },
                 {
                     turn_card: "A来了（A♦）",
@@ -305,19 +305,22 @@ const MULTISTREET_PLANNING = [
             setup: "你在CO 3bet，BTN call。Pot: 20BB\n你拿到: A♥5♥\nFlop: K♠8♦3♣\nBTN check",
             plans: [
                 {
-                    line: "Check翻牌，转牌bomb",
-                    when: "转牌来A或5或同花听牌时",
-                    why: "翻牌没有equity，等待好牌再进攻"
+                    turn_card: "转牌来A或5（击中）",
+                    your_plan: "翻牌Check → 转牌大bet",
+                    sizing: "翻牌check，转牌70-80% pot",
+                    reasoning: "翻牌没equity先保留，击中后变value bet"
                 },
                 {
-                    line: "C-bet翻牌，放弃转牌",
-                    when: "标准play，翻牌test对手",
-                    why: "用Ace blocker bluff，被call就放弃"
+                    turn_card: "转牌空白牌",
+                    your_plan: "翻牌小C-bet → 转牌放弃",
+                    sizing: "翻牌33% pot作为probe",
+                    reasoning: "用Ace blocker试探，被call说明他有牌，放弃"
                 },
                 {
-                    line: "Check翻牌，check转牌，河牌bluff",
-                    when: "如果对手也check两条街",
-                    why: "他的range变弱，可以河牌攻击"
+                    turn_card: "对手两条街都check",
+                    your_plan: "河牌bluff",
+                    sizing: "河牌60-75% pot",
+                    reasoning: "他两条街check说明range很弱，河牌攻击"
                 }
             ]
         }
