@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎯 德州扑克全面漏洞诊断 - 55题深度评估</title>
+    <link rel="manifest" href="assessment_manifest.json">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #0d0d1a;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #16213e;
+            --text-primary: #e8e8e8;
+            --text-secondary: #a0a0a0;
+            --accent-red: #e74c3c;
+            --accent-green: #2ecc71;
+            --accent-blue: #3498db;
+            --accent-gold: #f39c12;
+            --accent-purple: #9b59b6;
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-success: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --gradient-danger: linear-gradient(135deg, #f12711 0%, #f5af19 100%);
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* 顶部导航 */
+        .header {
+            background: var(--bg-secondary);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--accent-purple);
+        }
+        
+        .header h1 {
+            font-size: 1.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header .subtitle {
+            color: var(--text-secondary);
+            margin-top: 5px;
+            font-size: 0.9rem;
+        }
+        
+        /* 进度条区域 */
+        .progress-section {
+            background: var(--bg-secondary);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 12px;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background: var(--bg-card);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+        
+        .category-indicator {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        
+        .category-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            background: var(--bg-card);
+            color: var(--text-secondary);
+        }
+        
+        .category-badge.active {
+            background: var(--gradient-primary);
+            color: white;
+        }
+        
+        .category-badge.complete {
+            background: var(--gradient-success);
+            color: white;
+        }
+        
+        /* 开始页面 */
+        .welcome-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .welcome-screen h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .assessment-info {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .info-item {
+            background: var(--bg-card);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .info-item .value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-gold);
+        }
+        
+        .info-item .label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+        
+        .dimensions-list {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .dimensions-list h4 {
+            color: var(--accent-blue);
+            margin-bottom: 10px;
+        }
+        
+        .dimension-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--bg-secondary);
+        }
+        
+        .dimension-row:last-child {
+            border-bottom: none;
+        }
+        
+        .dimension-count {
+            color: var(--accent-gold);
+            font-weight: bold;
+        }
+        
+        .start-btn {
+            background: var(--gradient-primary);
+            border: none;
+            color: white;
+            padding: 18px 50px;
+            font-size: 1.2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        /* 问题卡片 */
+        .question-screen {
+            display: none;
+        }
+        
+        .question-card {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .question-meta {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .meta-badge {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+        
+        .meta-badge.category {
+            background: var(--gradient-primary);
+            color: white;
+        }
+        
+        .meta-badge.subcategory {
+            background: var(--bg-card);
+            color: var(--accent-blue);
+        }
+        
+        .scenario {
+            background: var(--bg-card);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid var(--accent-purple);
+        }
+        
+        .scenario-label {
+            color: var(--accent-purple);
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .question-text {
+            font-size: 1.1rem;
+            color: var(--accent-gold);
+            margin: 15px 0;
+            font-weight: 500;
+        }
+        
+        .options-grid {
+            display: grid;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .option-btn {
+            background: var(--bg-card);
+            border: 2px solid transparent;
+            padding: 15px 20px;
+            border-radius: 10px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+        
+        .option-btn:hover {
+            border-color: var(--accent-blue);
+            transform: translateX(5px);
+        }
+        
+        .option-btn.selected {
+            border-color: var(--accent-blue);
+            background: rgba(52, 152, 219, 0.2);
+        }
+        
+        .option-btn.correct {
+            border-color: var(--accent-green);
+            background: rgba(46, 204, 113, 0.2);
+        }
+        
+        .option-btn.wrong {
+            border-color: var(--accent-red);
+            background: rgba(231, 76, 60, 0.2);
+        }
+        
+        .option-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+        
+        /* 解释区域 */
+        .explanation-area {
+            display: none;
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid var(--accent-green);
+        }
+        
+        .explanation-area.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .explanation-area h4 {
+            color: var(--accent-green);
+            margin-bottom: 15px;
+        }
+        
+        .explanation-area pre {
+            white-space: pre-wrap;
+            font-family: inherit;
+            line-height: 1.6;
+        }
+        
+        .leak-warning {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid var(--accent-red);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 15px;
+        }
+        
+        .leak-warning h5 {
+            color: var(--accent-red);
+            margin-bottom: 5px;
+        }
+        
+        /* 导航按钮 */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 15px;
+        }
+        
+        .nav-btn {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .nav-btn.prev {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+        
+        .nav-btn.next {
+            background: var(--gradient-primary);
+            color: white;
+        }
+        
+        .nav-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* 结果页面 */
+        .result-screen {
+            display: none;
+            padding: 20px 0;
+        }
+        
+        .result-header {
+            text-align: center;
+            padding: 30px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        
+        .score-circle.excellent {
+            background: var(--gradient-success);
+        }
+        
+        .score-circle.good {
+            background: var(--gradient-primary);
+        }
+        
+        .score-circle.average {
+            background: linear-gradient(135deg, #f39c12, #e74c3c);
+        }
+        
+        .score-circle.poor {
+            background: var(--gradient-danger);
+        }
+        
+        .score-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .result-grade {
+            font-size: 1.3rem;
+            margin-top: 15px;
+        }
+        
+        /* 分类成绩 */
+        .category-results {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .category-results h3 {
+            color: var(--accent-blue);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--bg-card);
+        }
+        
+        .category-score-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--bg-card);
+        }
+        
+        .category-score-row:last-child {
+            border-bottom: none;
+        }
+        
+        .category-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .category-icon {
+            font-size: 1.2rem;
+        }
+        
+        .category-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--bg-card);
+            border-radius: 4px;
+            margin: 0 15px;
+            overflow: hidden;
+        }
+        
+        .category-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .category-percent {
+            font-weight: bold;
+            min-width: 50px;
+            text-align: right;
+        }
+        
+        /* 漏洞分析 */
+        .leak-analysis {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .leak-analysis h3 {
+            color: var(--accent-red);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .leak-group {
+            margin-bottom: 20px;
+        }
+        
+        .leak-group h4 {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .leak-group.severe h4 {
+            background: rgba(231, 76, 60, 0.3);
+            color: var(--accent-red);
+        }
+        
+        .leak-group.high h4 {
+            background: rgba(243, 156, 18, 0.3);
+            color: var(--accent-gold);
+        }
+        
+        .leak-group.medium h4 {
+            background: rgba(52, 152, 219, 0.3);
+            color: var(--accent-blue);
+        }
+        
+        .leak-item {
+            background: var(--bg-card);
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .leak-item .leak-name {
+            flex: 1;
+        }
+        
+        .leak-item .train-btn {
+            background: var(--gradient-primary);
+            border: none;
+            color: white;
+            padding: 6px 15px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+        
+        /* 建议区域 */
+        .recommendations {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .recommendations h3 {
+            color: var(--accent-green);
+            margin-bottom: 15px;
+        }
+        
+        .rec-item {
+            background: var(--bg-card);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 3px solid var(--accent-green);
+        }
+        
+        .rec-item .priority {
+            font-size: 0.8rem;
+            color: var(--accent-gold);
+            margin-bottom: 5px;
+        }
+        
+        /* 操作按钮 */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .action-btn.primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+        
+        .action-btn.secondary {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* 动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        /* 响应式 */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .question-card {
+                padding: 15px;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .category-score-row {
+                flex-wrap: wrap;
+            }
+            
+            .category-bar {
+                width: 100%;
+                margin: 10px 0;
+            }
+        }
+        
+        /* 隐藏类 */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎯 德州扑克全面漏洞诊断</h1>
+        <div class="subtitle">55题深度评估 | 8大维度 | 世界级标准</div>
+    </div>
+    
+    <div class="container">
+        <!-- 开始页面 -->
+        <div id="welcomeScreen" class="welcome-screen">
+            <h2>🔍 全方位漏洞诊断</h2>
+            
+            <div class="assessment-info">
+                <p>这是一套专为高阶玩家设计的深度评估系统。通过55道精心设计的诊断题，全面检测你在德州扑克8大核心维度的漏洞。</p>
+                
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="value">55</div>
+                        <div class="label">诊断题目</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="value">8</div>
+                        <div class="label">核心维度</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="value">~30</div>
+                        <div class="label">预计分钟</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="value">100万+</div>
+                        <div class="label">适用手数</div>
+                    </div>
+                </div>
+                
+                <div class="dimensions-list">
+                    <h4>📊 评估维度</h4>
+                    <div class="dimension-row">
+                        <span>🃏 翻前决策</span>
+                        <span class="dimension-count">10题</span>
+                    </div>
+                    <div class="dimension-row">
+                        <span>🎴 翻牌决策</span>
+                        <span class="dimension-count">10题</span>
+                    </div>
+                    <div class="dimension-row">
+                        <span>🔄 转牌决策</span>
+                        <span class="dimension-count">8题</span>
+                    </div>
+                    <div class="dimension-row">
+                        <span>🏁 河牌决策</span>
+                        <span class="dimension-count">8题</span>
+                    </div>
+                    <div class="dimension-row">
+                        <span>📐 数学计算</span>
+                        <span class="dimension-count">6题</span>
+                    </div>
+                    <div class="dimension-row">
+                        <span>🎯 对手分析与剥削</span>
+                        <span class="dimension-count">8题</span>
+                    </div>
+                    <div class="dimension-row">
+                        <span>🧠 心态与Session管理</span>
+                        <span class="dimension-count">5题</span>
+                    </div>
+                    <div class="dimension-row">
+                        <span>🎓 高级概念</span>
+                        <span class="dimension-count">5题</span>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="start-btn" onclick="startAssessment()">
+                🚀 开始诊断
+            </button>
+        </div>
+        
+        <!-- 进度区域 -->
+        <div id="progressSection" class="progress-section hidden">
+            <div class="progress-header">
+                <span id="progressText">0 / 55</span>
+                <span id="correctCount">正确: 0</span>
+            </div>
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+            </div>
+            <div class="category-indicator" id="categoryIndicator"></div>
+        </div>
+        
+        <!-- 问题页面 -->
+        <div id="questionScreen" class="question-screen">
+            <div class="question-card">
+                <div class="question-meta">
+                    <span id="categoryBadge" class="meta-badge category"></span>
+                    <span id="subcategoryBadge" class="meta-badge subcategory"></span>
+                </div>
+                
+                <div class="scenario">
+                    <div class="scenario-label">📋 场景描述</div>
+                    <div id="scenarioText"></div>
+                </div>
+                
+                <div id="questionText" class="question-text"></div>
+                
+                <div id="optionsGrid" class="options-grid"></div>
+                
+                <div id="explanationArea" class="explanation-area">
+                    <h4>💡 正确答案与解析</h4>
+                    <pre id="explanationText"></pre>
+                    <div id="leakWarning" class="leak-warning hidden">
+                        <h5>⚠️ 检测到漏洞</h5>
+                        <p id="leakDesc"></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button id="prevBtn" class="nav-btn prev" onclick="prevQuestion()">
+                    ← 上一题
+                </button>
+                <button id="nextBtn" class="nav-btn next" onclick="nextQuestion()">
+                    下一题 →
+                </button>
+            </div>
+        </div>
+        
+        <!-- 结果页面 -->
+        <div id="resultScreen" class="result-screen">
+            <div class="result-header">
+                <div id="scoreCircle" class="score-circle">
+                    <span id="scoreValue">0%</span>
+                    <span class="score-label">总分</span>
+                </div>
+                <div id="resultGrade" class="result-grade"></div>
+            </div>
+            
+            <div class="category-results">
+                <h3>📊 各维度成绩</h3>
+                <div id="categoryScores"></div>
+            </div>
+            
+            <div id="leakAnalysis" class="leak-analysis">
+                <h3>🚨 漏洞分析</h3>
+                <div id="leakGroups"></div>
+            </div>
+            
+            <div class="recommendations">
+                <h3>💡 训练建议</h3>
+                <div id="recList"></div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="action-btn primary" onclick="restartAssessment()">
+                    🔄 重新诊断
+                </button>
+                <button class="action-btn secondary" onclick="exportResults()">
+                    📤 导出报告
+                </button>
+                <button class="action-btn secondary" onclick="goToTraining()">
+                    📚 开始训练
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="assessment_full.js"></script>
+    <script>
+        // 全局状态
+        let currentQuestionIndex = 0;
+        let answers = {};
+        let leaksDetected = [];
+        let allQuestions = [];
+        let categoryStats = {};
+        
+        // 类别配置
+        const CATEGORY_CONFIG = {
+            preflop: { name: '翻前决策', icon: '🃏', color: '#e74c3c' },
+            flop: { name: '翻牌决策', icon: '🎴', color: '#f39c12' },
+            turn: { name: '转牌决策', icon: '🔄', color: '#2ecc71' },
+            river: { name: '河牌决策', icon: '🏁', color: '#3498db' },
+            math: { name: '数学计算', icon: '📐', color: '#9b59b6' },
+            exploit: { name: '对手分析', icon: '🎯', color: '#1abc9c' },
+            mental: { name: '心态管理', icon: '🧠', color: '#e91e63' },
+            advanced: { name: '高级概念', icon: '🎓', color: '#ff9800' }
+        };
+        
+        // 初始化所有问题
+        function initQuestions() {
+            allQuestions = [];
+            categoryStats = {};
+            
+            for (const [category, questions] of Object.entries(FULL_ASSESSMENT)) {
+                categoryStats[category] = {
+                    total: questions.length,
+                    correct: 0
+                };
+                questions.forEach(q => {
+                    allQuestions.push({
+                        ...q,
+                        categoryKey: category
+                    });
+                });
+            }
+        }
+        
+        // 开始评估
+        function startAssessment() {
+            initQuestions();
+            currentQuestionIndex = 0;
+            answers = {};
+            leaksDetected = [];
+            
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            document.getElementById('progressSection').classList.remove('hidden');
+            document.getElementById('questionScreen').style.display = 'block';
+            document.getElementById('resultScreen').style.display = 'none';
+            
+            renderCategoryIndicator();
+            renderQuestion();
+        }
+        
+        // 渲染类别指示器
+        function renderCategoryIndicator() {
+            const container = document.getElementById('categoryIndicator');
+            container.innerHTML = '';
+            
+            let currentIndex = 0;
+            for (const [key, config] of Object.entries(CATEGORY_CONFIG)) {
+                const count = FULL_ASSESSMENT[key].length;
+                const badge = document.createElement('span');
+                badge.className = 'category-badge';
+                badge.id = `cat-badge-${key}`;
+                badge.textContent = `${config.icon} ${config.name}`;
+                
+                // 检查是否是当前类别
+                if (currentQuestionIndex >= currentIndex && currentQuestionIndex < currentIndex + count) {
+                    badge.classList.add('active');
+                }
+                // 检查是否已完成
+                else if (currentQuestionIndex >= currentIndex + count) {
+                    badge.classList.add('complete');
+                }
+                
+                container.appendChild(badge);
+                currentIndex += count;
+            }
+        }
+        
+        // 渲染当前问题
+        function renderQuestion() {
+            const q = allQuestions[currentQuestionIndex];
+            const config = CATEGORY_CONFIG[q.categoryKey];
+            
+            document.getElementById('categoryBadge').textContent = `${config.icon} ${config.name}`;
+            document.getElementById('subcategoryBadge').textContent = q.subcategory;
+            document.getElementById('scenarioText').textContent = q.scenario;
+            document.getElementById('questionText').textContent = q.question;
+            
+            // 渲染选项
+            const optionsGrid = document.getElementById('optionsGrid');
+            optionsGrid.innerHTML = '';
+            
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = `${String.fromCharCode(65 + idx)}. ${opt}`;
+                btn.onclick = () => selectOption(idx);
+                
+                // 如果已经回答过
+                if (answers[q.id] !== undefined) {
+                    btn.disabled = true;
+                    if (idx === q.correctIndex) {
+                        btn.classList.add('correct');
+                    } else if (idx === answers[q.id]) {
+                        btn.classList.add('wrong');
+                    }
+                }
+                
+                optionsGrid.appendChild(btn);
+            });
+            
+            // 显示/隐藏解释
+            const explanationArea = document.getElementById('explanationArea');
+            const leakWarning = document.getElementById('leakWarning');
+            
+            if (answers[q.id] !== undefined) {
+                explanationArea.classList.add('show');
+                document.getElementById('explanationText').textContent = q.explanation;
+                
+                // 如果答错了，显示漏洞
+                if (answers[q.id] !== q.correctIndex) {
+                    leakWarning.classList.remove('hidden');
+                    document.getElementById('leakDesc').textContent = q.leakDesc;
+                } else {
+                    leakWarning.classList.add('hidden');
+                }
+            } else {
+                explanationArea.classList.remove('show');
+            }
+            
+            // 更新进度
+            updateProgress();
+            updateNavButtons();
+            renderCategoryIndicator();
+        }
+        
+        // 选择答案
+        function selectOption(idx) {
+            const q = allQuestions[currentQuestionIndex];
+            
+            // 如果已经回答过，不处理
+            if (answers[q.id] !== undefined) return;
+            
+            answers[q.id] = idx;
+            
+            // 更新统计
+            if (idx === q.correctIndex) {
+                categoryStats[q.categoryKey].correct++;
+            } else {
+                // 记录漏洞
+                leaksDetected.push({
+                    tag: q.leakTag,
+                    desc: q.leakDesc,
+                    category: q.category,
+                    question: q.question
+                });
+            }
+            
+            // 重新渲染
+            renderQuestion();
+        }
+        
+        // 更新进度
+        function updateProgress() {
+            const answered = Object.keys(answers).length;
+            const total = allQuestions.length;
+            const correct = Object.values(categoryStats).reduce((sum, cat) => sum + cat.correct, 0);
+            
+            document.getElementById('progressText').textContent = `${answered} / ${total}`;
+            document.getElementById('correctCount').textContent = `正确: ${correct}`;
+            document.getElementById('progressFill').style.width = `${(answered / total) * 100}%`;
+        }
+        
+        // 更新导航按钮
+        function updateNavButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.disabled = currentQuestionIndex === 0;
+            
+            const isLastQuestion = currentQuestionIndex === allQuestions.length - 1;
+            const isAnswered = answers[allQuestions[currentQuestionIndex].id] !== undefined;
+            
+            if (isLastQuestion && isAnswered) {
+                nextBtn.textContent = '📊 查看结果';
+            } else {
+                nextBtn.textContent = '下一题 →';
+            }
+            
+            nextBtn.disabled = !isAnswered;
+        }
+        
+        // 上一题
+        function prevQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        }
+        
+        // 下一题
+        function nextQuestion() {
+            if (currentQuestionIndex < allQuestions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        }
+        
+        // 显示结果
+        function showResults() {
+            document.getElementById('questionScreen').style.display = 'none';
+            document.getElementById('resultScreen').style.display = 'block';
+            
+            // 计算总分
+            const totalCorrect = Object.values(categoryStats).reduce((sum, cat) => sum + cat.correct, 0);
+            const totalQuestions = allQuestions.length;
+            const percentage = Math.round((totalCorrect / totalQuestions) * 100);
+            
+            // 设置分数显示
+            const scoreCircle = document.getElementById('scoreCircle');
+            document.getElementById('scoreValue').textContent = `${percentage}%`;
+            
+            // 根据分数设置等级
+            let grade, gradeClass;
+            if (percentage >= 90) {
+                grade = '🏆 世界级水准';
+                gradeClass = 'excellent';
+            } else if (percentage >= 75) {
+                grade = '⭐ 高阶玩家';
+                gradeClass = 'good';
+            } else if (percentage >= 60) {
+                grade = '📈 中级玩家';
+                gradeClass = 'average';
+            } else {
+                grade = '🎯 需要提升';
+                gradeClass = 'poor';
+            }
+            
+            scoreCircle.className = `score-circle ${gradeClass}`;
+            document.getElementById('resultGrade').textContent = grade;
+            
+            // 渲染各类别分数
+            renderCategoryScores();
+            
+            // 渲染漏洞分析
+            renderLeakAnalysis();
+            
+            // 渲染建议
+            renderRecommendations();
+        }
+        
+        // 渲染类别分数
+        function renderCategoryScores() {
+            const container = document.getElementById('categoryScores');
+            container.innerHTML = '';
+            
+            for (const [key, stats] of Object.entries(categoryStats)) {
+                const config = CATEGORY_CONFIG[key];
+                const percent = Math.round((stats.correct / stats.total) * 100);
+                
+                let fillColor;
+                if (percent >= 80) fillColor = 'var(--accent-green)';
+                else if (percent >= 60) fillColor = 'var(--accent-gold)';
+                else fillColor = 'var(--accent-red)';
+                
+                const row = document.createElement('div');
+                row.className = 'category-score-row';
+                row.innerHTML = `
+                    <div class="category-name">
+                        <span class="category-icon">${config.icon}</span>
+                        <span>${config.name}</span>
+                    </div>
+                    <div class="category-bar">
+                        <div class="category-fill" style="width: ${percent}%; background: ${fillColor}"></div>
+                    </div>
+                    <span class="category-percent" style="color: ${fillColor}">${percent}%</span>
+                `;
+                container.appendChild(row);
+            }
+        }
+        
+        // 渲染漏洞分析
+        function renderLeakAnalysis() {
+            const container = document.getElementById('leakGroups');
+            container.innerHTML = '';
+            
+            if (leaksDetected.length === 0) {
+                container.innerHTML = '<p style="color: var(--accent-green); text-align: center;">🎉 恭喜！未检测到明显漏洞！</p>';
+                return;
+            }
+            
+            // 按严重程度分组
+            const grouped = {
+                '严重': [],
+                '高': [],
+                '中': []
+            };
+            
+            leaksDetected.forEach(leak => {
+                const severity = LEAK_SEVERITY[leak.tag]?.severity || '中';
+                grouped[severity].push(leak);
+            });
+            
+            // 渲染每个组
+            for (const [severity, leaks] of Object.entries(grouped)) {
+                if (leaks.length === 0) continue;
+                
+                const severityClass = severity === '严重' ? 'severe' : (severity === '高' ? 'high' : 'medium');
+                
+                const group = document.createElement('div');
+                group.className = `leak-group ${severityClass}`;
+                
+                group.innerHTML = `
+                    <h4>${severity === '严重' ? '🚨' : (severity === '高' ? '⚠️' : '📝')} ${severity}漏洞 (${leaks.length}个)</h4>
+                `;
+                
+                leaks.forEach(leak => {
+                    const item = document.createElement('div');
+                    item.className = 'leak-item';
+                    item.innerHTML = `
+                        <span class="leak-name">${leak.desc}</span>
+                        <button class="train-btn" onclick="trainLeak('${leak.tag}')">训练</button>
+                    `;
+                    group.appendChild(item);
+                });
+                
+                container.appendChild(group);
+            }
+        }
+        
+        // 渲染建议
+        function renderRecommendations() {
+            const container = document.getElementById('recList');
+            container.innerHTML = '';
+            
+            // 找出最弱的类别
+            const sortedCategories = Object.entries(categoryStats)
+                .map(([key, stats]) => ({
+                    key,
+                    name: CATEGORY_CONFIG[key].name,
+                    percent: (stats.correct / stats.total) * 100
+                }))
+                .sort((a, b) => a.percent - b.percent);
+            
+            // 生成建议
+            const recs = [];
+            
+            // 最弱的3个维度
+            sortedCategories.slice(0, 3).forEach((cat, idx) => {
+                if (cat.percent < 80) {
+                    recs.push({
+                        priority: idx === 0 ? '优先级1' : (idx === 1 ? '优先级2' : '优先级3'),
+                        text: `加强【${cat.name}】训练，当前正确率${Math.round(cat.percent)}%`
+                    });
+                }
+            });
+            
+            // 严重漏洞建议
+            const severeLeaks = leaksDetected.filter(l => LEAK_SEVERITY[l.tag]?.severity === '严重');
+            if (severeLeaks.length > 0) {
+                recs.unshift({
+                    priority: '紧急',
+                    text: `发现${severeLeaks.length}个严重漏洞，必须立即修复！`
+                });
+            }
+            
+            // 如果表现很好
+            if (recs.length === 0) {
+                recs.push({
+                    priority: '保持',
+                    text: '你的表现非常出色！保持学习和复习，持续提升。'
+                });
+            }
+            
+            // 渲染
+            recs.forEach(rec => {
+                const item = document.createElement('div');
+                item.className = 'rec-item';
+                item.innerHTML = `
+                    <div class="priority">${rec.priority}</div>
+                    <div>${rec.text}</div>
+                `;
+                container.appendChild(item);
+            });
+        }
+        
+        // 训练特定漏洞
+        function trainLeak(leakTag) {
+            const info = LEAK_SEVERITY[leakTag];
+            if (info) {
+                const trainerUrl = `advanced_trainer.html?module=${info.training}`;
+                window.open(trainerUrl, '_blank');
+            }
+        }
+        
+        // 重新开始
+        function restartAssessment() {
+            document.getElementById('welcomeScreen').classList.remove('hidden');
+            document.getElementById('progressSection').classList.add('hidden');
+            document.getElementById('questionScreen').style.display = 'none';
+            document.getElementById('resultScreen').style.display = 'none';
+        }
+        
+        // 导出结果
+        function exportResults() {
+            const totalCorrect = Object.values(categoryStats).reduce((sum, cat) => sum + cat.correct, 0);
+            const percentage = Math.round((totalCorrect / allQuestions.length) * 100);
+            
+            let report = `====== 德州扑克漏洞诊断报告 ======\n`;
+            report += `评估日期: ${new Date().toLocaleString()}\n`;
+            report += `总分: ${percentage}%\n\n`;
+            
+            report += `=== 各维度成绩 ===\n`;
+            for (const [key, stats] of Object.entries(categoryStats)) {
+                const config = CATEGORY_CONFIG[key];
+                const percent = Math.round((stats.correct / stats.total) * 100);
+                report += `${config.name}: ${stats.correct}/${stats.total} (${percent}%)\n`;
+            }
+            
+            report += `\n=== 检测到的漏洞 ===\n`;
+            if (leaksDetected.length === 0) {
+                report += `未检测到明显漏洞\n`;
+            } else {
+                leaksDetected.forEach(leak => {
+                    const severity = LEAK_SEVERITY[leak.tag]?.severity || '中';
+                    report += `[${severity}] ${leak.desc}\n`;
+                });
+            }
+            
+            // 下载
+            const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `poker_assessment_${new Date().toISOString().slice(0,10)}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // 跳转到训练
+        function goToTraining() {
+            window.location.href = 'advanced_trainer.html';
+        }
+    </script>
+</body>
+</html>
+
