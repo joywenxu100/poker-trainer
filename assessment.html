@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0d0d1a">
+    <title>漏洞评估系统 - 精准定位你的问题</title>
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --secondary: #ec4899;
+            --accent: #fbbf24;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0d0d1a;
+            --darker: #070710;
+            --card-bg: #1a1a2e;
+            --card-border: rgba(99, 102, 241, 0.2);
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--darker);
+            color: var(--text);
+            min-height: 100vh;
+            padding-bottom: 20px;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.1) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        /* 头部 */
+        .header {
+            background: linear-gradient(135deg, var(--card-bg) 0%, #16162e 100%);
+            padding: 24px 16px;
+            text-align: center;
+            border-bottom: 2px solid var(--card-border);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+        
+        .header .subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        
+        /* 页面容器 */
+        .page {
+            display: none;
+            padding: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* 开始页面 */
+        .start-card {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 20px;
+            padding: 32px 24px;
+            text-align: center;
+        }
+        
+        .start-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        .start-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+        
+        .start-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+        
+        .start-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .info-item {
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 12px;
+            padding: 16px 8px;
+        }
+        
+        .info-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-light);
+        }
+        
+        .info-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        
+        /* 问题卡片 */
+        .question-card {
+            background: var(--card-bg);
+            border: 2px solid var(--card-border);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+        
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .question-category {
+            display: inline-block;
+            padding: 4px 12px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .question-progress {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        
+        .question-scenario {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            line-height: 1.8;
+            border-left: 3px solid var(--primary);
+            white-space: pre-line;
+        }
+        
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+        
+        /* 选项 */
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .option {
+            background: rgba(255,255,255,0.03);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 15px;
+        }
+        
+        .option:hover:not(.disabled) {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+        
+        .option.selected {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.2);
+        }
+        
+        .option.correct {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.2);
+        }
+        
+        .option.wrong {
+            border-color: var(--danger);
+            background: rgba(239, 68, 68, 0.2);
+        }
+        
+        .option.disabled {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        
+        /* 解释区域 */
+        .explanation-box {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .explanation-box.show {
+            display: block;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .explanation-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .explanation-icon {
+            font-size: 24px;
+        }
+        
+        .explanation-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .explanation-title.correct { color: var(--success); }
+        .explanation-title.wrong { color: var(--danger); }
+        
+        .explanation-content {
+            font-size: 14px;
+            line-height: 2;
+            white-space: pre-line;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        /* 进度条 */
+        .progress-bar {
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        /* 按钮 */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(99, 102, 241, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* 报告页面 */
+        .report-header {
+            text-align: center;
+            padding: 24px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            margin-bottom: 20px;
+            border: 2px solid var(--card-border);
+        }
+        
+        .report-score {
+            font-size: 64px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        
+        .report-level {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .report-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+        
+        /* 维度得分 */
+        .category-scores {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid var(--card-border);
+        }
+        
+        .category-scores h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .category-item {
+            margin-bottom: 16px;
+        }
+        
+        .category-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .category-name {
+            font-size: 14px;
+        }
+        
+        .category-score-value {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .category-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .category-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        /* 漏洞列表 */
+        .leaks-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid rgba(239, 68, 68, 0.3);
+        }
+        
+        .leaks-section h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: var(--danger);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .leak-item {
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .leak-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .leak-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .leak-name {
+            font-size: 15px;
+            font-weight: 600;
+        }
+        
+        .leak-severity {
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .leak-severity.severe {
+            background: rgba(239, 68, 68, 0.3);
+            color: var(--danger);
+        }
+        
+        .leak-severity.high {
+            background: rgba(245, 158, 11, 0.3);
+            color: var(--warning);
+        }
+        
+        .leak-severity.medium {
+            background: rgba(99, 102, 241, 0.3);
+            color: var(--primary-light);
+        }
+        
+        .leak-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        
+        .leak-category {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+        
+        /* 训练建议 */
+        .training-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid rgba(16, 185, 129, 0.3);
+        }
+        
+        .training-section h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .training-item {
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .training-item:hover {
+            background: rgba(16, 185, 129, 0.2);
+            transform: translateX(4px);
+        }
+        
+        .training-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .training-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .training-name {
+            font-size: 15px;
+            font-weight: 600;
+        }
+        
+        .training-urgency {
+            padding: 2px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        
+        .training-urgency.urgent {
+            background: rgba(239, 68, 68, 0.3);
+            color: var(--danger);
+        }
+        
+        .training-urgency.important {
+            background: rgba(245, 158, 11, 0.3);
+            color: var(--warning);
+        }
+        
+        .training-urgency.suggested {
+            background: rgba(16, 185, 129, 0.3);
+            color: var(--success);
+        }
+        
+        .training-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        
+        .training-leaks {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        
+        /* 无漏洞 */
+        .no-leaks {
+            text-align: center;
+            padding: 32px;
+        }
+        
+        .no-leaks-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        .no-leaks-text {
+            font-size: 16px;
+            color: var(--success);
+        }
+        
+        /* 返回按钮 */
+        .back-btn {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: var(--text);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <!-- 头部 -->
+    <header class="header">
+        <h1>🎯 漏洞评估系统</h1>
+        <div class="subtitle">精准定位你的问题，实现0失误</div>
+    </header>
+    
+    <!-- 开始页面 -->
+    <div id="startPage" class="page active">
+        <div class="start-card">
+            <div class="start-icon">🔍</div>
+            <div class="start-title">发现你的漏洞</div>
+            <div class="start-desc">
+                通过20道精心设计的问题，<br>
+                全面评估你的翻前、翻后、数学、读牌、心态5大维度，<br>
+                精准定位每一个漏洞，并给出针对性训练方案。
+            </div>
+            
+            <div class="start-info">
+                <div class="info-item">
+                    <div class="info-value">20</div>
+                    <div class="info-label">道题目</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-value">5</div>
+                    <div class="info-label">大维度</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-value">~10</div>
+                    <div class="info-label">分钟</div>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="startTest()">开始评估</button>
+        </div>
+    </div>
+    
+    <!-- 问题页面 -->
+    <div id="questionPage" class="page">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+        
+        <div class="question-card">
+            <div class="question-header">
+                <span class="question-category" id="questionCategory">翻前决策</span>
+                <span class="question-progress" id="questionProgress">1 / 20</span>
+            </div>
+            
+            <div class="question-scenario" id="questionScenario">
+                场景描述
+            </div>
+            
+            <div class="question-text" id="questionText">
+                问题
+            </div>
+            
+            <div class="options" id="optionsContainer">
+                <!-- 选项动态生成 -->
+            </div>
+            
+            <div class="explanation-box" id="explanationBox">
+                <div class="explanation-header">
+                    <span class="explanation-icon" id="explanationIcon">✅</span>
+                    <span class="explanation-title" id="explanationTitle">正确！</span>
+                </div>
+                <div class="explanation-content" id="explanationContent">
+                    解释内容
+                </div>
+            </div>
+        </div>
+        
+        <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" style="display:none">
+            下一题 →
+        </button>
+    </div>
+    
+    <!-- 报告页面 -->
+    <div id="reportPage" class="page">
+        <div class="report-header">
+            <div class="report-score" id="reportScore">85%</div>
+            <div class="report-level" id="reportLevel">💎 职业水准</div>
+            <div class="report-desc" id="reportDesc">漏洞较少，针对性修补即可</div>
+        </div>
+        
+        <div class="category-scores">
+            <h3>📊 各维度得分</h3>
+            <div id="categoryScoresContainer">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+        
+        <div class="leaks-section" id="leaksSection">
+            <h3>🚨 发现的漏洞</h3>
+            <div id="leaksContainer">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+        
+        <div class="training-section">
+            <h3>💪 针对性训练建议</h3>
+            <div id="trainingContainer">
+                <!-- 动态生成 -->
+            </div>
+        </div>
+        
+        <button class="btn btn-primary" onclick="restartTest()">重新评估</button>
+        <button class="btn btn-success" style="margin-top:12px" onclick="goToTraining()">开始针对性训练 →</button>
+    </div>
+    
+    <script src="assessment_system.js"></script>
+    <script>
+        let currentQuestionIndex = 0;
+        let answered = false;
+        
+        function startTest() {
+            startAssessment();
+            currentQuestionIndex = 0;
+            answered = false;
+            
+            document.getElementById('startPage').classList.remove('active');
+            document.getElementById('questionPage').classList.add('active');
+            
+            showQuestion(ASSESSMENT_QUESTIONS[0]);
+        }
+        
+        function showQuestion(question) {
+            answered = false;
+            
+            // 更新进度
+            const progress = ((currentQuestionIndex + 1) / ASSESSMENT_QUESTIONS.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('questionProgress').textContent = 
+                `${currentQuestionIndex + 1} / ${ASSESSMENT_QUESTIONS.length}`;
+            
+            // 更新问题内容
+            document.getElementById('questionCategory').textContent = question.category;
+            document.getElementById('questionScenario').textContent = question.scenario;
+            document.getElementById('questionText').textContent = question.question;
+            
+            // 生成选项
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = '';
+            question.options.forEach((opt, idx) => {
+                const div = document.createElement('div');
+                div.className = 'option';
+                div.textContent = opt.text;
+                div.onclick = () => selectOption(idx, question);
+                container.appendChild(div);
+            });
+            
+            // 隐藏解释和下一题按钮
+            document.getElementById('explanationBox').classList.remove('show');
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+        
+        function selectOption(selectedIdx, question) {
+            if (answered) return;
+            answered = true;
+            
+            const result = submitAnswer(question.id, selectedIdx);
+            
+            // 标记选项
+            const options = document.querySelectorAll('.option');
+            options.forEach((opt, idx) => {
+                opt.classList.add('disabled');
+                if (idx === question.correctIndex) {
+                    opt.classList.add('correct');
+                } else if (idx === selectedIdx && selectedIdx !== question.correctIndex) {
+                    opt.classList.add('wrong');
+                }
+            });
+            
+            // 显示解释
+            const explanationBox = document.getElementById('explanationBox');
+            const icon = document.getElementById('explanationIcon');
+            const title = document.getElementById('explanationTitle');
+            const content = document.getElementById('explanationContent');
+            
+            if (result.isCorrect) {
+                icon.textContent = '✅';
+                title.textContent = '正确！';
+                title.className = 'explanation-title correct';
+            } else {
+                icon.textContent = '❌';
+                title.textContent = '错误';
+                title.className = 'explanation-title wrong';
+            }
+            
+            content.textContent = question.explanation;
+            explanationBox.classList.add('show');
+            
+            // 显示下一题按钮
+            const nextBtn = document.getElementById('nextBtn');
+            if (result.finished) {
+                nextBtn.textContent = '查看评估报告 →';
+                nextBtn.onclick = () => showReport(result.result);
+            } else {
+                nextBtn.textContent = '下一题 →';
+                nextBtn.onclick = () => {
+                    currentQuestionIndex++;
+                    showQuestion(ASSESSMENT_QUESTIONS[currentQuestionIndex]);
+                };
+            }
+            nextBtn.style.display = 'block';
+            
+            // 滚动到解释区域
+            setTimeout(() => {
+                explanationBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
+        
+        function nextQuestion() {
+            // 由动态设置的onclick处理
+        }
+        
+        function showReport(report) {
+            document.getElementById('questionPage').classList.remove('active');
+            document.getElementById('reportPage').classList.add('active');
+            
+            // 总分和等级
+            document.getElementById('reportScore').textContent = report.score + '%';
+            document.getElementById('reportScore').style.color = report.level.color;
+            document.getElementById('reportLevel').textContent = report.level.level;
+            document.getElementById('reportLevel').style.color = report.level.color;
+            document.getElementById('reportDesc').textContent = report.level.desc;
+            
+            // 各维度得分
+            const categoryContainer = document.getElementById('categoryScoresContainer');
+            categoryContainer.innerHTML = '';
+            
+            Object.entries(report.categoryScores).forEach(([cat, data]) => {
+                let barColor = '#10b981';
+                if (data.score < 60) barColor = '#ef4444';
+                else if (data.score < 80) barColor = '#f59e0b';
+                
+                categoryContainer.innerHTML += `
+                    <div class="category-item">
+                        <div class="category-header">
+                            <span class="category-name">${cat}</span>
+                            <span class="category-score-value" style="color:${barColor}">${data.correct}/${data.total} (${data.score}%)</span>
+                        </div>
+                        <div class="category-bar">
+                            <div class="category-bar-fill" style="width:${data.score}%;background:${barColor}"></div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // 漏洞列表
+            const leaksContainer = document.getElementById('leaksContainer');
+            const leaksSection = document.getElementById('leaksSection');
+            
+            if (report.leaksList.length === 0) {
+                leaksSection.style.display = 'none';
+            } else {
+                leaksSection.style.display = 'block';
+                leaksContainer.innerHTML = '';
+                
+                report.leaksList.forEach(leak => {
+                    let severityClass = 'medium';
+                    if (leak.severity === '严重') severityClass = 'severe';
+                    else if (leak.severity === '高') severityClass = 'high';
+                    
+                    leaksContainer.innerHTML += `
+                        <div class="leak-item">
+                            <div class="leak-header">
+                                <span class="leak-name">${leak.name}</span>
+                                <span class="leak-severity ${severityClass}">${leak.severity}</span>
+                            </div>
+                            <div class="leak-desc">${leak.desc}</div>
+                            <div class="leak-category">📁 ${leak.categoryName} | 出现 ${leak.count} 次</div>
+                        </div>
+                    `;
+                });
+            }
+            
+            // 训练建议
+            const trainingContainer = document.getElementById('trainingContainer');
+            
+            if (report.trainingRecommendations.length === 0) {
+                trainingContainer.innerHTML = `
+                    <div class="no-leaks">
+                        <div class="no-leaks-icon">🏆</div>
+                        <div class="no-leaks-text">太棒了！没有发现明显漏洞，继续保持！</div>
+                    </div>
+                `;
+            } else {
+                trainingContainer.innerHTML = '';
+                
+                report.trainingRecommendations.forEach(rec => {
+                    let urgencyClass = 'suggested';
+                    let urgencyText = '建议';
+                    if (rec.urgency === '紧急') {
+                        urgencyClass = 'urgent';
+                        urgencyText = '紧急';
+                    } else if (rec.urgency === '重要') {
+                        urgencyClass = 'important';
+                        urgencyText = '重要';
+                    }
+                    
+                    const leakNames = rec.leaks.map(l => l.name).join('、');
+                    
+                    trainingContainer.innerHTML += `
+                        <div class="training-item" onclick="goToModule('${rec.module}')">
+                            <div class="training-header">
+                                <span class="training-name">${getModuleName(rec.module)}</span>
+                                <span class="training-urgency ${urgencyClass}">${urgencyText}</span>
+                            </div>
+                            <div class="training-desc">${rec.description}</div>
+                            <div class="training-leaks">🎯 针对：${leakNames}</div>
+                        </div>
+                    `;
+                });
+            }
+            
+            // 保存评估结果
+            saveAssessmentResult(report);
+        }
+        
+        function getModuleName(module) {
+            const names = {
+                mistakes: '🚫 低级错误防范',
+                math: '🔢 数学计算训练',
+                sizing: '📏 Sizing决策训练',
+                planning: '🗺️ 多街规划训练',
+                tilt: '🧠 Tilt管理',
+                review: '📝 复盘框架'
+            };
+            return names[module] || module;
+        }
+        
+        function goToModule(module) {
+            // 跳转到对应训练模块
+            window.location.href = 'advanced.html?module=' + module;
+        }
+        
+        function goToTraining() {
+            window.location.href = 'advanced.html';
+        }
+        
+        function restartTest() {
+            document.getElementById('reportPage').classList.remove('active');
+            document.getElementById('startPage').classList.add('active');
+        }
+        
+        function saveAssessmentResult(report) {
+            // 保存到localStorage
+            const history = JSON.parse(localStorage.getItem('assessmentHistory') || '[]');
+            history.push({
+                date: new Date().toISOString(),
+                score: report.score,
+                level: report.level.level,
+                leaksCount: report.leaksList.length
+            });
+            // 只保留最近10次
+            if (history.length > 10) history.shift();
+            localStorage.setItem('assessmentHistory', JSON.stringify(history));
+        }
+    </script>
+</body>
+</html>
+
