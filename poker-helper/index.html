@@ -4,346 +4,187 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#0a0e27">
-    <meta name="description" content="Texas Holdem Zero-Mistake Helper - 8-Max with Straddle">
-    <title>Zero-Mistake Helper | Poker</title>
-    <link rel="manifest" href="manifest.json">
+    <title>实战行动指南 | 100%不犯错</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
             color: #e0e0e0;
             min-height: 100vh;
-            padding: 15px;
-            padding-bottom: 80px;
-        }
-
-        .header {
-            text-align: center;
-            padding: 20px 0;
-            border-bottom: 2px solid rgba(255, 157, 80, 0.2);
-            margin-bottom: 20px;
-        }
-
-        .header h1 {
-            font-size: 22px;
-            color: #00d4ff;
-            margin-bottom: 5px;
-        }
-
-        .header .subtitle {
-            font-size: 13px;
-            color: #ff9d50;
-            font-weight: 500;
-        }
-
-        .section {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .section-title {
-            font-size: 15px;
-            color: #00d4ff;
-            margin-bottom: 12px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .input-group {
-            margin-bottom: 12px;
-        }
-
-        .input-label {
-            display: block;
-            font-size: 13px;
-            color: #b0b0b0;
-            margin-bottom: 6px;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            color: #fff;
-            font-size: 14px;
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: #00d4ff;
-            background: rgba(0, 212, 255, 0.1);
-        }
-
-        .btn-group {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-            gap: 8px;
-            margin-bottom: 12px;
-        }
-
-        .btn {
-            padding: 10px 12px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(255, 157, 80, 0.3);
-            border-radius: 8px;
-            color: #ff9d50;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .btn:hover {
-            border-color: #ff9d50;
-            background: rgba(255, 157, 80, 0.1);
-        }
-
-        .btn.active {
-            background: #00d4ff;
-            color: #0a0e27;
-            border-color: #00d4ff;
-            font-weight: 600;
-        }
-
-        .analyze-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #00d4ff 0%, #00a8cc 100%);
-            border: none;
-            border-radius: 10px;
-            color: #0a0e27;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: transform 0.2s;
-        }
-
-        .analyze-btn:active {
-            transform: scale(0.98);
-        }
-
-        .alert-section {
-            display: none;
-            margin-top: 20px;
-        }
-
-        .alert-section.show {
-            display: block;
-        }
-
-        .alert-card {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 12px;
-            border-left: 4px solid;
-        }
-
-        .alert-critical {
-            border-left-color: #ff4444;
-            background: rgba(255, 68, 68, 0.1);
-        }
-
-        .alert-warning {
-            border-left-color: #ffaa00;
-            background: rgba(255, 170, 0, 0.1);
-        }
-
-        .alert-success {
-            border-left-color: #00d084;
-            background: rgba(0, 208, 132, 0.1);
-        }
-
-        .alert-info {
-            border-left-color: #00d4ff;
-            background: rgba(0, 212, 255, 0.1);
-        }
-
-        .alert-title {
-            font-size: 15px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .alert-critical .alert-title {
-            color: #ff6666;
-        }
-
-        .alert-warning .alert-title {
-            color: #ffcc44;
-        }
-
-        .alert-success .alert-title {
-            color: #44ff88;
-        }
-
-        .alert-info .alert-title {
-            color: #44ddff;
-        }
-
-        .alert-content {
-            font-size: 13px;
-            line-height: 1.6;
-            color: #e0e0e0;
-        }
-
-        .alert-content ul {
-            margin-left: 20px;
-            margin-top: 8px;
-        }
-
-        .alert-content li {
-            margin-bottom: 5px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .stat-item {
-            background: rgba(0, 212, 255, 0.1);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            border-radius: 8px;
-            padding: 10px;
-            text-align: center;
-        }
-
-        .stat-label {
-            font-size: 11px;
-            color: #b0b0b0;
-            margin-bottom: 5px;
-        }
-
-        .stat-value {
-            font-size: 18px;
-            font-weight: 700;
-            color: #00d4ff;
-        }
-
-        .reset-btn {
-            width: 100%;
             padding: 12px;
-            background: rgba(255, 68, 68, 0.2);
-            border: 2px solid rgba(255, 68, 68, 0.4);
-            border-radius: 8px;
-            color: #ff6666;
-            font-size: 14px;
-            cursor: pointer;
-            margin-top: 15px;
+            padding-bottom: 100px;
         }
-
-        @media (max-width: 480px) {
-            .btn-group {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
+        .header { text-align: center; padding: 15px 0; border-bottom: 2px solid rgba(255,157,80,0.3); margin-bottom: 15px; }
+        .header h1 { font-size: 20px; color: #00d4ff; margin-bottom: 5px; }
+        .header .subtitle { font-size: 12px; color: #ff9d50; }
+        .quick-mode { background: linear-gradient(135deg, rgba(255,157,80,0.15), rgba(255,100,100,0.1)); border: 2px solid rgba(255,157,80,0.4); border-radius: 12px; padding: 12px; margin-bottom: 15px; }
+        .quick-title { font-size: 14px; color: #ff9d50; margin-bottom: 10px; font-weight: 600; }
+        .quick-btn { width: 100%; padding: 12px; margin-bottom: 8px; background: rgba(0,0,0,0.3); border: 2px solid rgba(255,157,80,0.3); border-radius: 8px; color: #fff; font-size: 14px; cursor: pointer; text-align: left; }
+        .quick-btn:active { background: rgba(255,157,80,0.2); }
+        .toggle-custom { text-align: center; padding: 10px; color: #00d4ff; font-size: 13px; cursor: pointer; }
+        .custom-mode { display: none; }
+        .custom-mode.show { display: block; }
+        .section { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 12px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1); }
+        .section-title { font-size: 13px; color: #00d4ff; margin-bottom: 10px; font-weight: 600; }
+        .input-row { display: flex; align-items: center; margin-bottom: 8px; }
+        .input-label { width: 70px; font-size: 12px; color: #b0b0b0; }
+        .input-field { flex: 1; padding: 8px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 6px; color: #fff; font-size: 14px; width: 80px; }
+        .btn-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+        .btn-grid-3 { grid-template-columns: repeat(3, 1fr); }
+        .btn-grid-2 { grid-template-columns: repeat(2, 1fr); }
+        .btn { padding: 10px 6px; background: rgba(255,255,255,0.05); border: 2px solid rgba(100,100,100,0.3); border-radius: 6px; color: #aaa; font-size: 11px; cursor: pointer; text-align: center; }
+        .btn.active { background: #00d4ff; color: #0a0e27; border-color: #00d4ff; font-weight: 600; }
+        .btn.danger-btn.active { background: #ff4444; border-color: #ff4444; color: #fff; }
+        .mistakes-section { background: rgba(255,68,68,0.1); border: 1px solid rgba(255,68,68,0.3); border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+        .mistake-item { display: flex; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .mistake-item:last-child { border-bottom: none; }
+        .mistake-checkbox { width: 20px; height: 20px; margin-right: 10px; accent-color: #ff4444; }
+        .mistake-text { font-size: 12px; color: #ffaaaa; }
+        .analyze-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #00d4ff, #00a8cc); border: none; border-radius: 10px; color: #0a0e27; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 15px; }
+        .result-section { display: none; margin-top: 20px; }
+        .result-section.show { display: block; }
+        .fullscreen-warning { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #ff0000, #cc0000); z-index: 9999; padding: 30px 20px; text-align: center; animation: pulse 0.5s ease-in-out infinite alternate; }
+        .fullscreen-warning.show { display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        @keyframes pulse { from { opacity: 1; } to { opacity: 0.9; } }
+        .warning-icon { font-size: 80px; margin-bottom: 20px; }
+        .warning-title { font-size: 28px; font-weight: 900; color: #fff; margin-bottom: 15px; }
+        .warning-text { font-size: 18px; color: #fff; margin-bottom: 10px; line-height: 1.6; }
+        .warning-action { font-size: 32px; font-weight: 900; color: #ffff00; margin: 20px 0; }
+        .warning-dont { font-size: 16px; color: #ffcccc; margin-top: 20px; }
+        .warning-buttons { margin-top: 30px; display: flex; gap: 15px; }
+        .warning-btn { padding: 15px 30px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; border: none; }
+        .btn-confirm { background: #00ff00; color: #000; }
+        .btn-think { background: rgba(255,255,255,0.2); color: #fff; border: 2px solid #fff; }
+        .result-card { background: rgba(255,255,255,0.08); border-radius: 10px; padding: 15px; margin-bottom: 12px; border-left: 4px solid; }
+        .result-success { border-left-color: #00d084; background: rgba(0,208,132,0.1); }
+        .result-warning { border-left-color: #ffaa00; background: rgba(255,170,0,0.1); }
+        .result-critical { border-left-color: #ff4444; background: rgba(255,68,68,0.15); }
+        .result-info { border-left-color: #00d4ff; background: rgba(0,212,255,0.1); }
+        .result-title { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+        .result-success .result-title { color: #44ff88; }
+        .result-warning .result-title { color: #ffcc44; }
+        .result-critical .result-title { color: #ff6666; }
+        .result-info .result-title { color: #44ddff; }
+        .result-content { font-size: 13px; line-height: 1.8; color: #e0e0e0; white-space: pre-line; }
+        .personal-warning { background: linear-gradient(135deg, rgba(255,0,0,0.2), rgba(255,100,0,0.2)); border: 2px solid #ff4444; border-radius: 10px; padding: 15px; margin-bottom: 12px; animation: shake 0.5s; }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .personal-warning-title { font-size: 14px; color: #ff6666; font-weight: 700; margin-bottom: 8px; }
+        .personal-warning-text { font-size: 13px; color: #ffaaaa; }
+        .continue-mode { background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); border-radius: 8px; padding: 10px; margin-bottom: 12px; font-size: 12px; color: #00d4ff; }
+        .reset-btn { width: 100%; padding: 12px; background: rgba(255,68,68,0.2); border: 2px solid rgba(255,68,68,0.4); border-radius: 8px; color: #ff6666; font-size: 14px; cursor: pointer; margin-top: 15px; }
+        .settings-toggle { text-align: center; padding: 8px; color: #666; font-size: 11px; cursor: pointer; }
+        .settings-panel { display: none; }
+        .settings-panel.show { display: block; }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>🎯 实战行动指南</h1>
-        <div class="subtitle">允许运气差·绝不允许犯错</div>
+        <div class="subtitle">允许运气差 · 绝不允许犯错</div>
     </div>
-
-    <div class="section">
-        <div class="section-title">💰 底池信息</div>
-        
-        <div class="input-group">
-            <div class="input-label">当前底池大小（BB）</div>
-            <input type="number" class="input-field" id="potSize" placeholder="例如: 50" value="50">
+    <div class="quick-mode">
+        <div class="quick-title">⚡ 快速场景（一键选择）</div>
+        <button class="quick-btn" onclick="quickScenario('strong-check')"><span>💪</span> 我有强牌，对手过牌</button>
+        <button class="quick-btn" onclick="quickScenario('strong-danger')"><span>😰</span> 我有强牌，但牌面危险</button>
+        <button class="quick-btn" onclick="quickScenario('river-nuts-bet')"><span>🚨</span> 河牌完成听牌，对手大额下注</button>
+        <button class="quick-btn" onclick="quickScenario('drawing')"><span>🎯</span> 我在抽听牌，对手下注</button>
+    </div>
+    <div class="toggle-custom" onclick="toggleCustomMode()">▼ 自定义输入（详细设置）</div>
+    <div class="custom-mode" id="customMode">
+        <div class="section">
+            <div class="section-title">💰 基本信息</div>
+            <div class="input-row">
+                <div class="input-label">底池(BB)</div>
+                <input type="number" class="input-field" id="potSize" value="50">
+            </div>
+            <div style="margin-top: 10px;">
+                <div class="input-label" style="width:100%; margin-bottom:6px;">我的位置</div>
+                <div class="btn-grid btn-grid-2">
+                    <button class="btn active" data-position="ip">有位置(IP)</button>
+                    <button class="btn" data-position="oop">没位置(OOP)</button>
+                </div>
+            </div>
         </div>
-    </div>
-
-    <div class="section">
-        <div class="section-title">📍 当前情况</div>
-        
-        <div class="input-group">
-            <div class="input-label">当前街道</div>
-            <div class="btn-group">
-                <button class="btn" data-street="preflop">翻前</button>
+        <div class="section">
+            <div class="section-title">📍 当前街道</div>
+            <div class="btn-grid btn-grid-3">
                 <button class="btn" data-street="flop">翻牌圈</button>
                 <button class="btn active" data-street="turn">转牌圈</button>
                 <button class="btn" data-street="river">河牌圈</button>
             </div>
         </div>
-
-        <div class="input-group">
-            <div class="input-label">我的具体牌型</div>
-            <div class="btn-group">
-                <button class="btn" data-hand="nuts-flush">坚果同花</button>
-                <button class="btn" data-hand="nuts-straight">坚果顺子</button>
-                <button class="btn" data-hand="fullhouse">葫芦/四条</button>
+        <div class="section">
+            <div class="section-title">🃏 我的牌型</div>
+            <div class="btn-grid btn-grid-3">
+                <button class="btn" data-hand="nuts">坚果</button>
                 <button class="btn" data-hand="set">暗三</button>
-                <button class="btn" data-hand="top-two">顶两对</button>
+                <button class="btn active" data-hand="top-two">顶两对</button>
                 <button class="btn" data-hand="overpair">超对</button>
                 <button class="btn" data-hand="top-pair">顶对</button>
-                <button class="btn" data-hand="nuts-draw" style="background: rgba(255,215,0,0.1);">抽坚果同花</button>
-                <button class="btn" data-hand="straight-draw" style="background: rgba(255,215,0,0.1);">抽顺子</button>
-                <button class="btn" data-hand="weak-pair">中对/底对</button>
-                <button class="btn" data-hand="nothing">什么都没中</button>
+                <button class="btn" data-hand="mid-pair">中对</button>
+                <button class="btn" data-hand="nuts-draw">Nuts听牌</button>
+                <button class="btn" data-hand="draw">普通听牌</button>
+                <button class="btn" data-hand="nothing">空气</button>
             </div>
         </div>
-
-        <div class="input-group">
-            <div class="input-label">对手刚才的动作</div>
-            <div class="btn-group">
+        <div class="section">
+            <div class="section-title">👤 对手动作</div>
+            <div class="btn-grid">
                 <button class="btn active" data-action="check">过牌</button>
-                <button class="btn" data-action="bet-small">下注1/3pot</button>
-                <button class="btn" data-action="bet-half">下注1/2pot</button>
-                <button class="btn" data-action="bet-pot">下注pot</button>
+                <button class="btn" data-action="bet-small">小注1/3</button>
+                <button class="btn" data-action="bet-big">大注2/3+</button>
                 <button class="btn" data-action="all-in">全下</button>
             </div>
         </div>
-
-        <div class="input-group">
-            <div class="input-label">牌面危险程度</div>
-            <div class="btn-group">
+        <div class="section">
+            <div class="section-title">🎭 对手类型</div>
+            <div class="btn-grid">
+                <button class="btn active" data-villain="unknown">未知</button>
+                <button class="btn" data-villain="tag">紧凶TAG</button>
+                <button class="btn" data-villain="lag">松凶LAG</button>
+                <button class="btn" data-villain="fish">被动鱼</button>
+            </div>
+        </div>
+        <div class="section">
+            <div class="section-title">⚠️ 牌面危险度</div>
+            <div class="btn-grid">
                 <button class="btn" data-danger="safe">安全</button>
                 <button class="btn" data-danger="normal">一般</button>
                 <button class="btn active" data-danger="dangerous">危险</button>
-                <button class="btn" data-danger="very-dangerous">极度危险</button>
+                <button class="btn danger-btn" data-danger="completed">完成听牌</button>
             </div>
         </div>
+        <div class="settings-toggle" onclick="toggleSettings()">⚙️ 我的常犯错误设置</div>
+        <div class="settings-panel" id="settingsPanel">
+            <div class="mistakes-section">
+                <div class="section-title" style="color:#ff6666;">🚨 我容易犯的错误</div>
+                <div class="mistake-item"><input type="checkbox" class="mistake-checkbox" id="m1" checked><label class="mistake-text" for="m1">转牌顶对/两对跟注大额加注</label></div>
+                <div class="mistake-item"><input type="checkbox" class="mistake-checkbox" id="m2" checked><label class="mistake-text" for="m2">河牌完成听牌舍不得弃暗三</label></div>
+                <div class="mistake-item"><input type="checkbox" class="mistake-checkbox" id="m3" checked><label class="mistake-text" for="m3">被动鱼大额下注还跟注</label></div>
+                <div class="mistake-item"><input type="checkbox" class="mistake-checkbox" id="m4"><label class="mistake-text" for="m4">转牌给听牌免费抽牌机会</label></div>
+                <div class="mistake-item"><input type="checkbox" class="mistake-checkbox" id="m5"><label class="mistake-text" for="m5">不计算赔率就追听牌</label></div>
+            </div>
+        </div>
+        <button class="analyze-btn" onclick="analyze()">🎯 生成行动建议</button>
     </div>
-
-    <div class="section" style="display: none;">
-        <!-- 暂时隐藏，简化输入 -->
+    <div class="result-section" id="resultSection">
+        <div id="personalWarning"></div>
+        <div id="resultContainer"></div>
+        <div class="continue-mode" id="continueMode" style="display:none;">💡 河牌出来后，只需更新"牌面危险度"和"对手动作"</div>
+        <button class="reset-btn" onclick="resetAll()">🔄 重新开始</button>
     </div>
-
-    <button class="analyze-btn" onclick="analyzeAndAlert()">
-        🎯 生成行动建议
-    </button>
-
-    <div class="alert-section" id="alertSection">
-        <div id="alertContainer"></div>
-        
-        <div class="stats-grid" id="statsGrid"></div>
-        
-        <button class="reset-btn" onclick="resetHelper()">
-            🔄 Reset All
-        </button>
+    <div class="fullscreen-warning" id="fullscreenWarning">
+        <div class="warning-icon">🚨</div>
+        <div class="warning-title" id="warningTitle">停！</div>
+        <div class="warning-text" id="warningText"></div>
+        <div class="warning-action" id="warningAction">【弃牌】</div>
+        <div class="warning-dont" id="warningDont"></div>
+        <div class="warning-buttons">
+            <button class="warning-btn btn-confirm" onclick="confirmFold()">✓ 我确认弃牌</button>
+            <button class="warning-btn btn-think" onclick="closeWarning()">再想想</button>
+        </div>
     </div>
-
     <script src="helper.js"></script>
 </body>
 </html>
