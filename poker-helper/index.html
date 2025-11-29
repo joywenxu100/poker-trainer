@@ -18,13 +18,111 @@
         .header { text-align: center; padding: 15px 0; border-bottom: 2px solid rgba(255,157,80,0.3); margin-bottom: 15px; }
         .header h1 { font-size: 20px; color: #00d4ff; margin-bottom: 5px; }
         .header .subtitle { font-size: 12px; color: #ff9d50; }
-        .quick-mode { background: linear-gradient(135deg, rgba(255,157,80,0.15), rgba(255,100,100,0.1)); border: 2px solid rgba(255,157,80,0.4); border-radius: 12px; padding: 12px; margin-bottom: 15px; }
-        .quick-title { font-size: 14px; color: #ff9d50; margin-bottom: 10px; font-weight: 600; }
-        .quick-btn { width: 100%; padding: 12px; margin-bottom: 8px; background: rgba(0,0,0,0.3); border: 2px solid rgba(255,157,80,0.3); border-radius: 8px; color: #fff; font-size: 14px; cursor: pointer; text-align: left; }
-        .quick-btn:active { background: rgba(255,157,80,0.2); }
-        .toggle-custom { text-align: center; padding: 10px; color: #00d4ff; font-size: 13px; cursor: pointer; }
+        
+        /* 街道选项卡 */
+        .street-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 15px;
+            background: rgba(0,0,0,0.3);
+            padding: 6px;
+            border-radius: 10px;
+        }
+        .street-tab {
+            flex: 1;
+            padding: 10px 8px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            color: #888;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .street-tab.active {
+            background: linear-gradient(135deg, #00d4ff, #00a8cc);
+            color: #0a0e27;
+            font-weight: 700;
+        }
+        
+        /* 场景面板 */
+        .scenario-panel {
+            display: none;
+        }
+        .scenario-panel.active {
+            display: block;
+        }
+        
+        /* 场景分组 */
+        .scenario-group {
+            margin-bottom: 15px;
+        }
+        .group-title {
+            font-size: 13px;
+            color: #ff9d50;
+            margin-bottom: 8px;
+            padding-left: 5px;
+            font-weight: 600;
+        }
+        
+        /* 场景按钮 */
+        .scenario-btn {
+            width: 100%;
+            padding: 14px 12px;
+            margin-bottom: 8px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,157,80,0.25);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+        .scenario-btn:active {
+            background: rgba(255,157,80,0.2);
+            transform: scale(0.98);
+        }
+        .scenario-btn .icon {
+            font-size: 18px;
+            width: 28px;
+            text-align: center;
+        }
+        .scenario-btn .text {
+            flex: 1;
+        }
+        .scenario-btn.danger {
+            border-color: rgba(255,68,68,0.4);
+            background: rgba(255,68,68,0.1);
+        }
+        .scenario-btn.warning {
+            border-color: rgba(255,170,0,0.4);
+            background: rgba(255,170,0,0.1);
+        }
+        
+        /* 自定义模式入口 */
+        .custom-entry {
+            text-align: center;
+            padding: 15px;
+            margin-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .custom-entry-btn {
+            padding: 12px 30px;
+            background: rgba(0,212,255,0.15);
+            border: 2px solid rgba(0,212,255,0.4);
+            border-radius: 8px;
+            color: #00d4ff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        /* 自定义模式（保持原有） */
         .custom-mode { display: none; }
-        .custom-mode.show { display: block; }
+        .custom-mode.show { display: block; margin-top: 20px; }
         .section { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 12px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1); }
         .section-title { font-size: 13px; color: #00d4ff; margin-bottom: 10px; font-weight: 600; }
         .input-row { display: flex; align-items: center; margin-bottom: 8px; }
@@ -42,20 +140,13 @@
         .mistake-checkbox { width: 20px; height: 20px; margin-right: 10px; accent-color: #ff4444; }
         .mistake-text { font-size: 12px; color: #ffaaaa; }
         .analyze-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, #00d4ff, #00a8cc); border: none; border-radius: 10px; color: #0a0e27; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 15px; }
+        .settings-toggle { text-align: center; padding: 8px; color: #666; font-size: 11px; cursor: pointer; }
+        .settings-panel { display: none; }
+        .settings-panel.show { display: block; }
+        
+        /* 结果区域 */
         .result-section { display: none; margin-top: 20px; }
         .result-section.show { display: block; }
-        .fullscreen-warning { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #ff0000, #cc0000); z-index: 9999; padding: 30px 20px; text-align: center; animation: pulse 0.5s ease-in-out infinite alternate; }
-        .fullscreen-warning.show { display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        @keyframes pulse { from { opacity: 1; } to { opacity: 0.9; } }
-        .warning-icon { font-size: 80px; margin-bottom: 20px; }
-        .warning-title { font-size: 28px; font-weight: 900; color: #fff; margin-bottom: 15px; }
-        .warning-text { font-size: 18px; color: #fff; margin-bottom: 10px; line-height: 1.6; }
-        .warning-action { font-size: 32px; font-weight: 900; color: #ffff00; margin: 20px 0; }
-        .warning-dont { font-size: 16px; color: #ffcccc; margin-top: 20px; }
-        .warning-buttons { margin-top: 30px; display: flex; gap: 15px; }
-        .warning-btn { padding: 15px 30px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; border: none; }
-        .btn-confirm { background: #00ff00; color: #000; }
-        .btn-think { background: rgba(255,255,255,0.2); color: #fff; border: 2px solid #fff; }
         .result-card { background: rgba(255,255,255,0.08); border-radius: 10px; padding: 15px; margin-bottom: 12px; border-left: 4px solid; }
         .result-success { border-left-color: #00d084; background: rgba(0,208,132,0.1); }
         .result-warning { border-left-color: #ffaa00; background: rgba(255,170,0,0.1); }
@@ -73,9 +164,21 @@
         .personal-warning-text { font-size: 13px; color: #ffaaaa; }
         .continue-mode { background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.3); border-radius: 8px; padding: 10px; margin-bottom: 12px; font-size: 12px; color: #00d4ff; }
         .reset-btn { width: 100%; padding: 12px; background: rgba(255,68,68,0.2); border: 2px solid rgba(255,68,68,0.4); border-radius: 8px; color: #ff6666; font-size: 14px; cursor: pointer; margin-top: 15px; }
-        .settings-toggle { text-align: center; padding: 8px; color: #666; font-size: 11px; cursor: pointer; }
-        .settings-panel { display: none; }
-        .settings-panel.show { display: block; }
+        .back-btn { width: 100%; padding: 12px; background: rgba(100,100,100,0.2); border: 2px solid rgba(100,100,100,0.4); border-radius: 8px; color: #aaa; font-size: 14px; cursor: pointer; margin-top: 10px; }
+        
+        /* 全屏警告 */
+        .fullscreen-warning { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, #ff0000, #cc0000); z-index: 9999; padding: 30px 20px; text-align: center; animation: pulse 0.5s ease-in-out infinite alternate; }
+        .fullscreen-warning.show { display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        @keyframes pulse { from { opacity: 1; } to { opacity: 0.9; } }
+        .warning-icon { font-size: 80px; margin-bottom: 20px; }
+        .warning-title { font-size: 28px; font-weight: 900; color: #fff; margin-bottom: 15px; }
+        .warning-text { font-size: 18px; color: #fff; margin-bottom: 10px; line-height: 1.6; white-space: pre-line; }
+        .warning-action { font-size: 32px; font-weight: 900; color: #ffff00; margin: 20px 0; }
+        .warning-dont { font-size: 16px; color: #ffcccc; margin-top: 20px; white-space: pre-line; }
+        .warning-buttons { margin-top: 30px; display: flex; gap: 15px; }
+        .warning-btn { padding: 15px 30px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; border: none; }
+        .btn-confirm { background: #00ff00; color: #000; }
+        .btn-think { background: rgba(255,255,255,0.2); color: #fff; border: 2px solid #fff; }
     </style>
 </head>
 <body>
@@ -83,14 +186,200 @@
         <h1>🎯 实战行动指南</h1>
         <div class="subtitle">允许运气差 · 绝不允许犯错</div>
     </div>
-    <div class="quick-mode">
-        <div class="quick-title">⚡ 快速场景（一键选择）</div>
-        <button class="quick-btn" onclick="quickScenario('strong-check')"><span>💪</span> 我有强牌，对手过牌</button>
-        <button class="quick-btn" onclick="quickScenario('strong-danger')"><span>😰</span> 我有强牌，但牌面危险</button>
-        <button class="quick-btn" onclick="quickScenario('river-nuts-bet')"><span>🚨</span> 河牌完成听牌，对手大额下注</button>
-        <button class="quick-btn" onclick="quickScenario('drawing')"><span>🎯</span> 我在抽听牌，对手下注</button>
+    
+    <!-- 街道选项卡 -->
+    <div class="street-tabs">
+        <button class="street-tab active" onclick="switchStreet('preflop')">翻前</button>
+        <button class="street-tab" onclick="switchStreet('flop')">翻牌</button>
+        <button class="street-tab" onclick="switchStreet('turn')">转牌</button>
+        <button class="street-tab" onclick="switchStreet('river')">河牌</button>
     </div>
-    <div class="toggle-custom" onclick="toggleCustomMode()">▼ 自定义输入（详细设置）</div>
+    
+    <!-- 翻前场景 -->
+    <div class="scenario-panel active" id="panel-preflop">
+        <div class="scenario-group">
+            <div class="group-title">💎 超强牌</div>
+            <button class="scenario-btn" onclick="quickScenario('preflop-aa-raise')">
+                <span class="icon">🚀</span>
+                <span class="text">我有AA/KK，前面有人加注</span>
+            </button>
+            <button class="scenario-btn" onclick="quickScenario('preflop-aa-3bet')">
+                <span class="icon">💥</span>
+                <span class="text">我加注，被3-bet了</span>
+            </button>
+        </div>
+        <div class="scenario-group">
+            <div class="group-title">🎯 常见决策</div>
+            <button class="scenario-btn" onclick="quickScenario('preflop-btn-open')">
+                <span class="icon">🎰</span>
+                <span class="text">我在BTN/CO，前面都弃牌</span>
+            </button>
+            <button class="scenario-btn" onclick="quickScenario('preflop-defend-bb')">
+                <span class="icon">🛡️</span>
+                <span class="text">我在大盲，面对加注</span>
+            </button>
+            <button class="scenario-btn" onclick="quickScenario('preflop-squeeze')">
+                <span class="icon">🔥</span>
+                <span class="text">有人加注+跟注，我该Squeeze吗</span>
+            </button>
+        </div>
+        <div class="scenario-group">
+            <div class="group-title">⚠️ 容易犯错</div>
+            <button class="scenario-btn warning" onclick="quickScenario('preflop-marginal')">
+                <span class="icon">😬</span>
+                <span class="text">边缘牌要不要玩（KJo/QTs等）</span>
+            </button>
+            <button class="scenario-btn warning" onclick="quickScenario('preflop-deep')">
+                <span class="icon">💰</span>
+                <span class="text">深筹码应该打紧还是打松</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- 翻牌场景 -->
+    <div class="scenario-panel" id="panel-flop">
+        <div class="scenario-group">
+            <div class="group-title">💪 我有强牌</div>
+            <button class="scenario-btn" onclick="quickScenario('flop-set-wet')">
+                <span class="icon">🎯</span>
+                <span class="text">我中了暗三，牌面很湿</span>
+            </button>
+            <button class="scenario-btn" onclick="quickScenario('flop-toptwo')">
+                <span class="icon">✌️</span>
+                <span class="text">我中了顶两对</span>
+            </button>
+            <button class="scenario-btn" onclick="quickScenario('flop-overpair')">
+                <span class="icon">👑</span>
+                <span class="text">我有超对（AA/KK翻牌后）</span>
+            </button>
+        </div>
+        <div class="scenario-group">
+            <div class="group-title">🃏 我有听牌</div>
+            <button class="scenario-btn" onclick="quickScenario('flop-flushdraw')">
+                <span class="icon">♠️</span>
+                <span class="text">我有同花听牌</span>
+            </button>
+            <button class="scenario-btn" onclick="quickScenario('flop-oesd')">
+                <span class="icon">🔢</span>
+                <span class="text">我有两头顺听牌</span>
+            </button>
+        </div>
+        <div class="scenario-group">
+            <div class="group-title">⚠️ 危险决策</div>
+            <button class="scenario-btn warning" onclick="quickScenario('flop-cbet-miss')">
+                <span class="icon">🎭</span>
+                <span class="text">我是加注者但翻牌没中</span>
+            </button>
+            <button class="scenario-btn warning" onclick="quickScenario('flop-checkraise')">
+                <span class="icon">🚨</span>
+                <span class="text">我下注被过牌加注了</span>
+            </button>
+            <button class="scenario-btn warning" onclick="quickScenario('flop-donk')">
+                <span class="icon">❓</span>
+                <span class="text">对手翻牌直接领先下注</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- 转牌场景 -->
+    <div class="scenario-panel" id="panel-turn">
+        <div class="scenario-group">
+            <div class="group-title">💪 我有强牌</div>
+            <button class="scenario-btn" onclick="quickScenario('turn-strong-safe')">
+                <span class="icon">💪</span>
+                <span class="text">我有强牌，牌面安全</span>
+            </button>
+            <button class="scenario-btn" onclick="quickScenario('turn-strong-danger')">
+                <span class="icon">😰</span>
+                <span class="text">我有强牌，但牌面变危险了</span>
+            </button>
+        </div>
+        <div class="scenario-group">
+            <div class="group-title">🚨 危险场景</div>
+            <button class="scenario-btn danger" onclick="quickScenario('turn-raised')">
+                <span class="icon">💀</span>
+                <span class="text">我下注被加注了</span>
+            </button>
+            <button class="scenario-btn danger" onclick="quickScenario('turn-big-bet')">
+                <span class="icon">💣</span>
+                <span class="text">对手转牌突然大额下注</span>
+            </button>
+        </div>
+        <div class="scenario-group">
+            <div class="group-title">🎯 听牌决策</div>
+            <button class="scenario-btn" onclick="quickScenario('turn-draw-check')">
+                <span class="icon">🎯</span>
+                <span class="text">我有听牌，对手过牌</span>
+            </button>
+            <button class="scenario-btn warning" onclick="quickScenario('turn-draw-bet')">
+                <span class="icon">📊</span>
+                <span class="text">我有听牌，对手下注</span>
+            </button>
+        </div>
+        <div class="scenario-group">
+            <div class="group-title">💡 控制底池</div>
+            <button class="scenario-btn" onclick="quickScenario('turn-onepair')">
+                <span class="icon">1️⃣</span>
+                <span class="text">我只有一对，该怎么打</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- 河牌场景 -->
+    <div class="scenario-panel" id="panel-river">
+        <div class="scenario-group">
+            <div class="group-title">🚨 最危险的场景</div>
+            <button class="scenario-btn danger" onclick="quickScenario('river-completed-bigbet')">
+                <span class="icon">💀</span>
+                <span class="text">河牌完成听牌，对手大额下注</span>
+            </button>
+            <button class="scenario-btn danger" onclick="quickScenario('river-allin')">
+                <span class="icon">☠️</span>
+                <span class="text">对手河牌全下</span>
+            </button>
+            <button class="scenario-btn danger" onclick="quickScenario('river-fish-bigbet')">
+                <span class="icon">🐟</span>
+                <span class="text">被动鱼河牌大额下注</span>
+            </button>
+        </div>
+        <div class="scenario-group">
+            <div class="group-title">💰 价值最大化</div>
+            <button class="scenario-btn" onclick="quickScenario('river-nuts-check')">
+                <span class="icon">🏆</span>
+                <span class="text">我有坚果，对手过牌</span>
+            </button>
+            <button class="scenario-btn" onclick="quickScenario('river-nuts-bet')">
+                <span class="icon">💎</span>
+                <span class="text">我有坚果，对手下注</span>
+            </button>
+            <button class="scenario-btn" onclick="quickScenario('river-strong-check')">
+                <span class="icon">💪</span>
+                <span class="text">我有强牌（非坚果），对手过牌</span>
+            </button>
+        </div>
+        <div class="scenario-group">
+            <div class="group-title">🤔 艰难决策</div>
+            <button class="scenario-btn warning" onclick="quickScenario('river-bluffcatch')">
+                <span class="icon">🎭</span>
+                <span class="text">对手下注，我只有Bluff Catcher</span>
+            </button>
+            <button class="scenario-btn" onclick="quickScenario('river-missed-check')">
+                <span class="icon">💨</span>
+                <span class="text">听牌没中，对手过牌</span>
+            </button>
+            <button class="scenario-btn warning" onclick="quickScenario('river-missed-bet')">
+                <span class="icon">🙈</span>
+                <span class="text">听牌没中，对手下注</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- 自定义输入入口 -->
+    <div class="custom-entry">
+        <button class="custom-entry-btn" onclick="toggleCustomMode()">⚙️ 自定义详细输入</button>
+    </div>
+    
+    <!-- 自定义模式 -->
     <div class="custom-mode" id="customMode">
         <div class="section">
             <div class="section-title">💰 基本信息</div>
@@ -168,12 +457,17 @@
         </div>
         <button class="analyze-btn" onclick="analyze()">🎯 生成行动建议</button>
     </div>
+    
+    <!-- 结果区域 -->
     <div class="result-section" id="resultSection">
         <div id="personalWarning"></div>
         <div id="resultContainer"></div>
         <div class="continue-mode" id="continueMode" style="display:none;">💡 河牌出来后，只需更新"牌面危险度"和"对手动作"</div>
+        <button class="back-btn" onclick="goBack()">← 返回场景列表</button>
         <button class="reset-btn" onclick="resetAll()">🔄 重新开始</button>
     </div>
+    
+    <!-- 全屏警告 -->
     <div class="fullscreen-warning" id="fullscreenWarning">
         <div class="warning-icon">🚨</div>
         <div class="warning-title" id="warningTitle">停！</div>
@@ -185,6 +479,7 @@
             <button class="warning-btn btn-think" onclick="closeWarning()">再想想</button>
         </div>
     </div>
+    
     <script src="helper.js"></script>
 </body>
 </html>
