@@ -221,6 +221,7 @@ const SIZING_TRAINING = [
                 situation: "你在CO open，BB call",
                 sizing_options: ["25-33% pot", "50% pot", "75% pot", "Check"],
                 correct: "25-33% pot",
+                correctIndex: 0,
                 why: "🧠 Dry Board策略：\n\n• Board干燥 = 没有听牌\n• 对手range大部分错过\n• 小bet就能达到目的\n• 让对手用worse hands call\n\n💡 小bet的好处：\n• 风险小，收益相同\n• 让对手犯错（用weak call）\n• 保持平衡（bluff便宜）"
             },
             {
@@ -228,6 +229,7 @@ const SIZING_TRAINING = [
                 situation: "你在BTN open，BB call",
                 sizing_options: ["25-33% pot", "50% pot", "75-100% pot", "Check"],
                 correct: "75-100% pot",
+                correctIndex: 2,
                 why: "🧠 Wet Board策略：\n\n• Board潮湿 = 很多听牌\n• 你需要让听牌付费\n• 你需要保护你的range\n• 对手错过的话不会call anyway\n\n💡 大bet的好处：\n• 让听牌付出最大代价\n• 建立更大的底池（如果你有牌）\n• 减少对手实现equity的机会"
             },
             {
@@ -235,6 +237,7 @@ const SIZING_TRAINING = [
                 situation: "你在CO 3bet，BTN call",
                 sizing_options: ["25-33% pot", "50% pot", "75% pot", "Check more"],
                 correct: "Check more",
+                correctIndex: 3,
                 why: "🧠 对手有利Board：\n\n• 这个board对caller有利\n• Caller的range有更多KQ, KJ, QJ\n• 你的3bet range虽然有AA, KK\n• 但AA不想在这build pot\n\n💡 Check的好处：\n• 控制底池大小\n• 保护你的check range\n• 让对手bluff\n• 避免被check-raise尴尬"
             }
         ]
@@ -249,19 +252,22 @@ const SIZING_TRAINING = [
                 situation: "你有nuts，对手是跟注站",
                 sizing_options: ["50% pot", "75% pot", "100% pot", "150%+ pot"],
                 correct: "150%+ pot",
+                correctIndex: 3,
                 why: "🧠 vs 跟注站策略：\n\n• 他们不根据size调整\n• 他们call/fold是二元的\n• 最大化单次value\n\n💡 典型sizing：\n• 有nuts → 尽量大（150%+）\n• 顶对 → 大（他们用second pair call）\n• 中等牌 → 可能check（他们不会fold）"
             },
             {
                 situation: "你有strong hand，对手是TAG",
                 sizing_options: ["50% pot", "66% pot", "100% pot", "Check-raise"],
                 correct: "66% pot",
+                correctIndex: 1,
                 why: "🧠 vs TAG策略：\n\n• TAG会根据size思考\n• 太大他们会fold\n• 太小损失value\n• 需要找平衡点\n\n💡 思考方式：\n• 他会用什么牌call？\n• 什么size让他觉得可以call？\n• 不要吓跑他的bluff catching range"
             },
             {
-                situation: "河牌你有bluff，对手check",
+                situation: "河牌你有bluff，想让对手fold made hand（如中对），对手check",
                 sizing_options: ["33% pot", "66% pot", "100% pot", "150%+ pot"],
-                correct: "取决于你需要他fold什么",
-                why: "🧠 Bluff Sizing逻辑：\n\n小bluff (33-50%)：\n• 让他fold空气\n• 风险小\n• 适合对手会hero fold的人\n\n大bluff (100%+)：\n• 让他fold made hands\n• 风险大但逼迫他做艰难决定\n• 适合对手较紧的人\n\n💡 核心问题：\n他的call range是什么？\n什么size能击穿这个range？"
+                correct: "100% pot",
+                correctIndex: 2,
+                why: "🧠 Bluff Sizing逻辑：\n\n小bluff (33-50%)：\n• 只能让他fold空气和弱听牌\n• 风险小但fold equity也小\n• 适合对手会hero fold的人\n\n大bluff (100%+)：✅ 正确选择\n• 能让他fold made hands（如中对、弱顶对）\n• 风险大但逼迫他做艰难决定\n• 让对手觉得你在polarized（要么nuts要么bluff）\n\n💡 核心原则：\n想让对手fold什么，就下能让他fold那个range的size"
             }
         ]
     }

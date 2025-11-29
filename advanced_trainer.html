@@ -345,6 +345,22 @@
             font-size: 14px;
             line-height: 2;
             white-space: pre-line;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .explanation-text::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .explanation-text::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 3px;
+        }
+        
+        .explanation-text::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 3px;
         }
         
         .frequency-tag {
@@ -1039,29 +1055,38 @@
                 actionBtn.textContent = '下一题 →';
                 actionBtn.onclick = nextQuestion;
                 showingAnswer = true;
+                
+                // 滚动到答案区域
+                setTimeout(() => {
+                    answerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
             }
         }
         
         // 选择Sizing
         function selectSizing(element, selectedIdx) {
             const item = window.currentSizingItem;
-            const selectedText = item.sizing_options[selectedIdx];
-            const correctText = item.correct;
+            const correctIdx = item.correctIndex !== undefined ? item.correctIndex : -1;
             
             const options = document.querySelectorAll('.math-option');
-            options.forEach(opt => {
+            options.forEach((opt, idx) => {
                 opt.style.pointerEvents = 'none';
-                const optText = opt.textContent.trim();
-                // 检查是否包含正确答案（因为有些答案如"100-150% pot"可能有变体）
-                if (optText === correctText || correctText.includes(optText) || optText.includes(correctText)) {
+                
+                // 使用correctIndex精确匹配
+                if (idx === correctIdx) {
                     opt.classList.add('correct');
-                } else if (opt === element && selectedText !== correctText) {
+                } else if (opt === element && selectedIdx !== correctIdx) {
                     opt.classList.add('wrong');
                 }
             });
             
             document.getElementById('answerSection').classList.add('show');
             document.getElementById('nextBtn').style.display = 'block';
+            
+            // 滚动到答案区域
+            setTimeout(() => {
+                document.getElementById('answerSection').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
         }
         
         // 下一题
