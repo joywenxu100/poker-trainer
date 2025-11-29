@@ -15,8 +15,12 @@ function switchStreet(street) {
     document.querySelectorAll('.street-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.scenario-panel').forEach(p => p.classList.remove('active'));
     
-    document.querySelector(`.street-tab[onclick="switchStreet('${street}')"]`).classList.add('active');
-    document.getElementById(`panel-${street}`).classList.add('active');
+    // 使用data-tab属性选择，更稳定
+    const tab = document.querySelector(`.street-tab[data-tab="${street}"]`);
+    if (tab) tab.classList.add('active');
+    
+    const panel = document.getElementById(`panel-${street}`);
+    if (panel) panel.classList.add('active');
     
     // 隐藏结果和自定义模式
     document.getElementById('resultSection').classList.remove('show');
@@ -917,6 +921,15 @@ Donk bet通常表示中等牌力
 • 诈唬加注 = 高风险低收益
 
 接受现实，保留筹码打下一手`
+        }];
+    }
+    
+    // 默认处理：如果场景未匹配
+    else {
+        result.cards = [{
+            type: 'info',
+            title: '💡 请选择具体场景',
+            content: `请从上方选择一个具体的场景，或使用"自定义详细输入"功能。`
         }];
     }
     
