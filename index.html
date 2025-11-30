@@ -2,180 +2,602 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>快速体验 - 德州扑克训练师</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎰 德州扑克训练中心</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0d0d1a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #0a0a14;
+            --bg-secondary: #12121f;
+            --bg-card: #1a1a2e;
+            --text-primary: #e8e8e8;
+            --text-secondary: #8a8a9a;
+            --accent-gold: #d4af37;
+            --accent-red: #c0392b;
+            --accent-green: #27ae60;
+            --accent-blue: #2980b9;
+            --accent-purple: #8e44ad;
+            --accent-cyan: #00d9ff;
+            --gradient-gold: linear-gradient(135deg, #d4af37 0%, #f5d56a 50%, #d4af37 100%);
+            --gradient-red: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+            --gradient-green: linear-gradient(135deg, #1e8449 0%, #27ae60 100%);
+            --gradient-blue: linear-gradient(135deg, #1a5276 0%, #2980b9 100%);
+            --gradient-purple: linear-gradient(135deg, #6c3483 0%, #8e44ad 100%);
+            --gradient-cyber: linear-gradient(135deg, #00d9ff 0%, #0066ff 100%);
+        }
+        
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
-            color: #e0e0e0;
+            font-family: 'Noto Sans SC', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
+            overflow-x: hidden;
         }
         
+        /* 背景动画 */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 217, 255, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(142, 68, 173, 0.06) 0%, transparent 50%);
+            animation: bgRotate 60s linear infinite;
+        }
+        
+        @keyframes bgRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 顶部Header */
+        .header {
+            text-align: center;
+            padding: 40px 20px 30px;
+            position: relative;
+        }
+        
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+            letter-spacing: 3px;
+        }
+        
+        .tagline {
+            color: var(--text-secondary);
+            margin-top: 10px;
+            font-size: 1rem;
+            letter-spacing: 2px;
+        }
+        
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--accent-cyan);
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        
+        /* 主容器 */
         .container {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 40px;
-            backdrop-filter: blur(10px);
-        }
-        
-        h1 {
-            color: #00d4ff;
-            text-align: center;
-            font-size: 36px;
-            margin-bottom: 30px;
-        }
-        
-        .feature {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 15px;
+            max-width: 1200px;
+            margin: 0 auto;
             padding: 20px;
-            margin-bottom: 20px;
-            border-left: 4px solid #00ff88;
         }
         
-        .feature h3 {
-            color: #00ff88;
-            margin-bottom: 10px;
+        /* 分类标题 */
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 40px 0 20px;
+            padding-left: 10px;
         }
         
-        .feature ul {
-            margin-left: 20px;
-            line-height: 1.8;
+        .section-title h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: var(--accent-gold);
+            letter-spacing: 2px;
         }
         
-        .btn {
-            display: block;
-            background: linear-gradient(135deg, #00d4ff, #0099cc);
-            color: white;
-            text-align: center;
-            padding: 20px;
-            border-radius: 15px;
+        .section-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--accent-gold), transparent);
+        }
+        
+        /* 项目网格 */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        /* 项目卡片 */
+        .project-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            cursor: pointer;
             text-decoration: none;
-            font-size: 24px;
-            font-weight: bold;
+            color: inherit;
+            display: block;
+        }
+        
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--card-accent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        .project-card:hover::before {
+            opacity: 1;
+        }
+        
+        .card-header {
+            padding: 20px 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: var(--card-gradient);
+        }
+        
+        .card-badge {
+            margin-left: auto;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .badge-core { background: var(--gradient-gold); color: #000; }
+        .badge-advanced { background: var(--gradient-purple); color: #fff; }
+        .badge-new { background: var(--gradient-cyan); color: #000; }
+        .badge-tool { background: var(--gradient-blue); color: #fff; }
+        
+        .card-content {
+            padding: 15px 20px 20px;
+        }
+        
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .card-desc {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        
+        .card-footer {
+            padding: 15px 20px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .card-tag {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .card-tag span {
+            color: var(--accent-cyan);
+        }
+        
+        /* 不同类型卡片的颜色 */
+        .card-gto { --card-accent: var(--accent-gold); --card-gradient: var(--gradient-gold); }
+        .card-exploit { --card-accent: var(--accent-red); --card-gradient: var(--gradient-red); }
+        .card-advanced { --card-accent: var(--accent-purple); --card-gradient: var(--gradient-purple); }
+        .card-assessment { --card-accent: var(--accent-cyan); --card-gradient: var(--gradient-cyber); }
+        .card-tool { --card-accent: var(--accent-blue); --card-gradient: var(--gradient-blue); }
+        .card-range { --card-accent: var(--accent-green); --card-gradient: var(--gradient-green); }
+        
+        /* 快速入口 */
+        .quick-access {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
             margin: 30px 0;
-            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
-            transition: transform 0.3s;
         }
         
-        .btn:hover {
-            transform: translateY(-3px);
+        .quick-btn {
+            background: var(--bg-secondary);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            color: var(--accent-gold);
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
-        .steps {
-            background: rgba(255, 215, 0, 0.1);
-            border: 2px solid #ffd700;
-            border-radius: 15px;
-            padding: 25px;
-            margin: 30px 0;
+        .quick-btn:hover {
+            background: var(--accent-gold);
+            color: #000;
+            transform: scale(1.05);
         }
         
-        .steps h3 {
-            color: #ffd700;
-            margin-bottom: 15px;
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
         }
         
-        .steps ol {
-            margin-left: 25px;
-            line-height: 2;
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
         }
         
-        .note {
-            background: rgba(255, 107, 107, 0.1);
-            border: 2px solid #ff6b6b;
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
+        .footer-links a {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            transition: color 0.3s;
         }
         
-        .note h4 {
-            color: #ff6b6b;
-            margin-bottom: 10px;
+        .footer-links a:hover {
+            color: var(--accent-gold);
         }
+        
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 1.8rem;
+            }
+            
+            .stats-bar {
+                gap: 20px;
+            }
+            
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-access {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .quick-btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+        
+        /* 动画 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .project-card {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+        
+        .project-card:nth-child(1) { animation-delay: 0.1s; }
+        .project-card:nth-child(2) { animation-delay: 0.15s; }
+        .project-card:nth-child(3) { animation-delay: 0.2s; }
+        .project-card:nth-child(4) { animation-delay: 0.25s; }
+        .project-card:nth-child(5) { animation-delay: 0.3s; }
+        .project-card:nth-child(6) { animation-delay: 0.35s; }
     </style>
 </head>
 <body>
+    <div class="bg-animation"></div>
+    
+    <header class="header">
+        <h1 class="logo">POKER MASTER</h1>
+        <p class="tagline">德州扑克训练中心 · 世界级水准</p>
+        
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value">8</div>
+                <div class="stat-label">训练模块</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">60+</div>
+                <div class="stat-label">诊断题目</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">300BB</div>
+                <div class="stat-label">深筹码专用</div>
+            </div>
+        </div>
+    </header>
+    
     <div class="container">
-        <h1>🎯 德州扑克训练师 V2.0</h1>
-        <p style="text-align: center; color: #ffd700; font-size: 18px; margin-bottom: 20px;">
-            从1000+次基础训练 → 职业级决策深度
-        </p>
-        
-        <div class="feature">
-            <h3>✨ V2.0 全新升级</h3>
-            <ul>
-                <li>📚 基础训练：7个阶段26个问题（已掌握✅）</li>
-                <li>💎 职业级深度：每阶段新增6个PRO问题（42个深度问题）</li>
-                <li>⚠️ 实战陷阱：30个职业玩家常犯错误识别</li>
-                <li>🧠 GTO概念：20个核心理论深度解析</li>
-                <li>📊 进度追踪：目标2000次训练达到职业级</li>
-                <li>🏆 成就系统：解锁8个不同成就</li>
-                <li>📱 PWA支持：添加到主屏幕像原生APP</li>
-                <li>🔌 离线可用：无网络也能训练</li>
-            </ul>
+        <!-- 快速入口 -->
+        <div class="quick-access">
+            <a href="assessment_full.html" class="quick-btn">
+                🎯 开始诊断
+            </a>
+            <a href="poker_trainer.html" class="quick-btn">
+                📚 GTO训练
+            </a>
+            <a href="exploit_trainer.html" class="quick-btn">
+                🔥 剥削训练
+            </a>
         </div>
         
-        <a href="poker_trainer.html" class="btn">🚀 立即开始训练</a>
-        
-        <div class="steps">
-            <h3>📱 如何添加到手机主屏幕？</h3>
-            <ol>
-                <li><strong>iPhone用户</strong>：Safari浏览器打开 → 点击分享 → 添加到主屏幕</li>
-                <li><strong>Android用户</strong>：Chrome/Edge打开 → 右上角菜单 → 添加到主屏幕</li>
-                <li>完成后，桌面会出现APP图标，点击使用！</li>
-            </ol>
+        <!-- 核心训练 -->
+        <div class="section-title">
+            <h2>🎓 核心训练</h2>
+            <div class="section-line"></div>
         </div>
         
-        <div class="feature">
-            <h3>🎯 训练目标</h3>
-            <ul>
-                <li><strong>1-2周</strong>：完成100次训练，掌握7个阶段</li>
-                <li><strong>1-3月</strong>：完成500次训练，形成习惯</li>
-                <li><strong>3-6月</strong>：完成1000次训练，达到条件反射</li>
-            </ul>
+        <div class="projects-grid">
+            <a href="poker_trainer.html" class="project-card card-gto">
+                <div class="card-header">
+                    <div class="card-icon">🃏</div>
+                    <span class="card-badge badge-core">核心</span>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">GTO基础训练</h3>
+                    <p class="card-desc">掌握GTO（博弈论最优）策略基础，建立无懈可击的baseline打法</p>
+                </div>
+                <div class="card-footer">
+                    <span class="card-tag">📊 <span>7阶段</span></span>
+                    <span class="card-tag">⏱️ <span>~30分钟</span></span>
+                </div>
+            </a>
+            
+            <a href="exploit_trainer.html" class="project-card card-exploit">
+                <div class="card-header">
+                    <div class="card-icon">🔥</div>
+                    <span class="card-badge badge-advanced">进阶</span>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">剥削打法训练</h3>
+                    <p class="card-desc">针对不同对手类型的剥削策略，最大化你的win rate</p>
+                </div>
+                <div class="card-footer">
+                    <span class="card-tag">🎯 <span>6阶段</span></span>
+                    <span class="card-tag">🐟 <span>对手分类</span></span>
+                </div>
+            </a>
+            
+            <a href="advanced_trainer.html" class="project-card card-advanced">
+                <div class="card-header">
+                    <div class="card-icon">👑</div>
+                    <span class="card-badge badge-advanced">高阶</span>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">高阶训练模块</h3>
+                    <p class="card-desc">深度数学计算、多街规划、Tilt管理、手牌复盘框架</p>
+                </div>
+                <div class="card-footer">
+                    <span class="card-tag">📐 <span>数学精算</span></span>
+                    <span class="card-tag">🧠 <span>心态管理</span></span>
+                </div>
+            </a>
         </div>
         
-        <div class="feature">
-            <h3>💡 使用建议</h3>
-            <ul>
-                <li>每天训练5-10次，每次2-3分钟</li>
-                <li>利用碎片时间（等车、排队、休息）</li>
-                <li>实战前快速复习一遍</li>
-                <li>重点关注⚠️阶段5（情绪自检）</li>
-            </ul>
+        <!-- 漏洞诊断 -->
+        <div class="section-title">
+            <h2>🔍 漏洞诊断</h2>
+            <div class="section-line"></div>
         </div>
         
-        <div class="feature">
-            <h3>🆕 V2.0 新增内容</h3>
-            <ul>
-                <li><strong>基础训练 (26问)</strong>：原有7阶段基础问题，已掌握内容持续巩固</li>
-                <li><strong>职业级训练 (42问)</strong>：每阶段6个深度问题，提升决策深度</li>
-                <li><strong>陷阱识别 (30个)</strong>：职业玩家常犯错误，翻前/翻牌/转牌/河牌/心理</li>
-                <li><strong>GTO概念 (20个)</strong>：MDF、Blocker、Range Advantage等核心理论</li>
-                <li><strong>灵活选择</strong>：根据需要选择训练内容，无次数限制</li>
-            </ul>
+        <div class="projects-grid">
+            <a href="assessment_full.html" class="project-card card-assessment">
+                <div class="card-header">
+                    <div class="card-icon">🎯</div>
+                    <span class="card-badge badge-new">推荐</span>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">全方位漏洞诊断</h3>
+                    <p class="card-desc">60题深度评估，专为200-300BB深筹码+Straddle+Ante设计</p>
+                </div>
+                <div class="card-footer">
+                    <span class="card-tag">📝 <span>60题</span></span>
+                    <span class="card-tag">💰 <span>深筹码</span></span>
+                    <span class="card-tag">📊 <span>8维度</span></span>
+                </div>
+            </a>
+            
+            <a href="assessment.html" class="project-card card-tool">
+                <div class="card-header">
+                    <div class="card-icon">📋</div>
+                    <span class="card-badge badge-tool">工具</span>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">快速漏洞评估</h3>
+                    <p class="card-desc">20题快速诊断，精准定位主要问题并生成训练方案</p>
+                </div>
+                <div class="card-footer">
+                    <span class="card-tag">⚡ <span>快速</span></span>
+                    <span class="card-tag">📝 <span>20题</span></span>
+                </div>
+            </a>
         </div>
         
-        <div class="note">
-            <h4>⚠️ 重要提示</h4>
-            <ul>
-                <li>首次打开需要联网，之后离线也能用</li>
-                <li>数据保存在本地，清除浏览器数据会丢失</li>
-                <li>建议基础内容熟练后再训练职业级内容</li>
-                <li>微信/QQ内置浏览器功能受限，建议用系统浏览器</li>
-            </ul>
+        <!-- 范围工具 -->
+        <div class="section-title">
+            <h2>📊 范围工具</h2>
+            <div class="section-line"></div>
         </div>
         
-        <div style="text-align: center; margin-top: 40px; color: #999;">
-            <p>保持纪律 · 理性决策 · 长期盈利</p>
-            <p style="margin-top: 10px;">🏆♠️♥️♣️♦️</p>
+        <div class="projects-grid">
+            <a href="preflop_ranges.html" class="project-card card-range">
+                <div class="card-header">
+                    <div class="card-icon">📈</div>
+                    <span class="card-badge badge-tool">工具</span>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">翻前范围表</h3>
+                    <p class="card-desc">完整的8人桌翻前范围，覆盖各位置Open/3bet/4bet</p>
+                </div>
+                <div class="card-footer">
+                    <span class="card-tag">📍 <span>全位置</span></span>
+                    <span class="card-tag">📊 <span>深度调整</span></span>
+                </div>
+            </a>
+            
+            <a href="preflop_heatmap_pro.html" class="project-card card-range">
+                <div class="card-header">
+                    <div class="card-icon">🌡️</div>
+                    <span class="card-badge badge-tool">工具</span>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">翻前热力图Pro</h3>
+                    <p class="card-desc">可视化手牌范围，直观了解每个位置的打法频率</p>
+                </div>
+                <div class="card-footer">
+                    <span class="card-tag">🎨 <span>可视化</span></span>
+                    <span class="card-tag">💡 <span>直观易懂</span></span>
+                </div>
+            </a>
+            
+            <a href="poker_checklist.html" class="project-card card-tool">
+                <div class="card-header">
+                    <div class="card-icon">✅</div>
+                    <span class="card-badge badge-tool">工具</span>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">决策检查清单</h3>
+                    <p class="card-desc">每手牌的决策要点清单，避免低级错误</p>
+                </div>
+                <div class="card-footer">
+                    <span class="card-tag">📝 <span>清单式</span></span>
+                    <span class="card-tag">🚫 <span>防错误</span></span>
+                </div>
+            </a>
+        </div>
+        
+        <!-- 辅助工具 -->
+        <div class="section-title">
+            <h2>🛠️ 辅助工具</h2>
+            <div class="section-line"></div>
+        </div>
+        
+        <div class="projects-grid">
+            <a href="poker-helper/index.html" class="project-card card-tool">
+                <div class="card-header">
+                    <div class="card-icon">🤖</div>
+                    <span class="card-badge badge-tool">工具</span>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">扑克助手</h3>
+                    <p class="card-desc">实时计算工具，底池赔率、胜率、EV等快速计算</p>
+                </div>
+                <div class="card-footer">
+                    <span class="card-tag">🔢 <span>计算器</span></span>
+                    <span class="card-tag">⚡ <span>实时</span></span>
+                </div>
+            </a>
         </div>
     </div>
+    
+    <footer class="footer">
+        <p>🎰 POKER MASTER · 德州扑克训练中心</p>
+        <p style="margin-top: 5px;">专为高阶玩家打造 · 深筹码+Straddle+Ante专用</p>
+        <div class="footer-links">
+            <a href="https://github.com/joywenxu100/poker-trainer" target="_blank">📦 GitHub</a>
+            <a href="TRAINER_GUIDE.md" target="_blank">📖 使用指南</a>
+        </div>
+    </footer>
+    
+    <script>
+        // 统计数据动态更新
+        document.addEventListener('DOMContentLoaded', function() {
+            // 可以添加一些动态效果
+            console.log('🎰 Poker Master 训练中心已加载');
+        });
+    </script>
 </body>
 </html>
-
-
