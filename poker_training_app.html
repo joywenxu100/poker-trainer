@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0f2027">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="德扑训练">
+    <link rel="manifest" href="manifest.json">
+    <title>德州扑克决策训练 - 肌肉记忆养成</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        .app-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+
+        /* 顶部导航栏 */
+        .top-bar {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .install-btn {
+            padding: 8px 15px;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            display: none;
+            cursor: pointer;
+        }
+
+        /* 首页统计卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .stat-card.highlight {
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #00ff88;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .stat-sublabel {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* 进度条 */
+        .progress-section {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .progress-title {
+            font-size: 16px;
+            color: #00d4ff;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .progress-bar-container {
+            background: rgba(255, 255, 255, 0.1);
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* 成就徽章 */
+        .achievements {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+
+        .achievement {
+            min-width: 80px;
+            text-align: center;
+            padding: 15px 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 2px solid #333;
+        }
+
+        .achievement.unlocked {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .achievement-icon {
+            font-size: 32px;
+            margin-bottom: 5px;
+            filter: grayscale(100%);
+        }
+
+        .achievement.unlocked .achievement-icon {
+            filter: grayscale(0%);
+        }
+
+        .achievement-label {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .achievement.unlocked .achievement-label {
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        /* 训练模式按钮 */
+        .mode-buttons {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .mode-btn {
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid #00d4ff;
+            border-radius: 15px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .mode-btn:active {
+            transform: scale(0.98);
+        }
+
+        .mode-btn .icon {
+            font-size: 32px;
+        }
+
+        .mode-btn .content {
+            flex: 1;
+        }
+
+        .mode-btn .title {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .mode-btn .desc {
+            font-size: 14px;
+            color: #999;
+            font-weight: normal;
+        }
+
+        /* 训练页面 */
+        .training-page {
+            display: none;
+        }
+
+        .training-page.active {
+            display: block;
+        }
+
+        .training-header {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .phase-indicator {
+            font-size: 16px;
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
+
+        .training-progress {
+            font-size: 14px;
+            color: #999;
+        }
+
+        /* 卡片式训练 */
+        .card-container {
+            perspective: 1000px;
+            margin-bottom: 20px;
+        }
+
+        .training-card {
+            background: rgba(255, 255, 255, 0.1);
+            min-height: 400px;
+            border-radius: 20px;
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .training-card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            backface-visibility: hidden;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 30px;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+        }
+
+        .card-phase {
+            font-size: 18px;
+            color: #00d4ff;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .card-content {
+            font-size: 24px;
+            line-height: 1.6;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        .card-hint {
+            font-size: 14px;
+            color: #666;
+            margin-top: 20px;
+        }
+
+        /* 训练控制按钮 */
+        .training-controls {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .control-btn {
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-remember {
+            background: linear-gradient(135deg, #00ff88, #00cc6a);
+            color: white;
+        }
+
+        .btn-forgot {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: white;
+        }
+
+        .btn-back {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* 完成页面 */
+        .completion-page {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .completion-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .completion-title {
+            font-size: 28px;
+            color: #00ff88;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .completion-stats {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .completion-stat {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+
+        /* 底部导航 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            color: #666;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-item.active {
+            color: #00d4ff;
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 3px;
+        }
+
+        /* 统计页面 */
+        .stats-page {
+            display: none;
+        }
+
+        .stats-page.active {
+            display: block;
+        }
+
+        .phase-stats {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .phase-stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .phase-stat-title {
+            font-size: 16px;
+            color: #00d4ff;
+            font-weight: bold;
+        }
+
+        .phase-stat-score {
+            font-size: 20px;
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        .phase-progress-bar {
+            background: rgba(255, 255, 255, 0.1);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .phase-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            transition: width 0.5s;
+        }
+
+        /* 设置页面 */
+        .settings-page {
+            display: none;
+        }
+
+        .settings-page.active {
+            display: block;
+        }
+
+        .settings-group {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .settings-title {
+            font-size: 16px;
+            color: #00d4ff;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-label {
+            font-size: 15px;
+        }
+
+        .setting-value {
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        .danger-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        /* 动画效果 */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        /* 测试模式 */
+        .test-options {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .test-option {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .test-option:active {
+            transform: scale(0.98);
+        }
+
+        .test-option.correct {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.2);
+        }
+
+        .test-option.wrong {
+            border-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.2);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 首页 -->
+        <div id="homePage" class="page">
+            <div class="top-bar">
+                <div class="app-title">🎯 德扑决策训练</div>
+                <button class="install-btn" id="installBtn">📲 安装</button>
+            </div>
+
+            <!-- 统计卡片 -->
+            <div class="stats-grid">
+                <div class="stat-card highlight">
+                    <div class="stat-value" id="totalCount">0</div>
+                    <div class="stat-label">总训练次数</div>
+                    <div class="stat-sublabel">目标: 1000次</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="todayCount">0</div>
+                    <div class="stat-label">今日训练</div>
+                    <div class="stat-sublabel" id="streak">连续打卡: 0天</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avgScore">0</div>
+                    <div class="stat-label">熟练度</div>
+                    <div class="stat-sublabel">满分100</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="nextMilestone">10</div>
+                    <div class="stat-label">下个成就</div>
+                    <div class="stat-sublabel">还需训练次数</div>
+                </div>
+            </div>
+
+            <!-- 进度条 -->
+            <div class="progress-section">
+                <div class="progress-title">肌肉记忆养成进度</div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="mainProgress" style="width: 0%">0%</div>
+                </div>
+            </div>
+
+            <!-- 成就徽章 -->
+            <div class="achievements" id="achievements">
+                <div class="achievement" data-milestone="10">
+                    <div class="achievement-icon">🌱</div>
+                    <div class="achievement-label">入门<br>10次</div>
+                </div>
+                <div class="achievement" data-milestone="50">
+                    <div class="achievement-icon">🔥</div>
+                    <div class="achievement-label">坚持<br>50次</div>
+                </div>
+                <div class="achievement" data-milestone="100">
+                    <div class="achievement-icon">💪</div>
+                    <div class="achievement-label">熟练<br>100次</div>
+                </div>
+                <div class="achievement" data-milestone="300">
+                    <div class="achievement-icon">⭐</div>
+                    <div class="achievement-label">精通<br>300次</div>
+                </div>
+                <div class="achievement" data-milestone="500">
+                    <div class="achievement-icon">🏆</div>
+                    <div class="achievement-label">大师<br>500次</div>
+                </div>
+                <div class="achievement" data-milestone="1000">
+                    <div class="achievement-icon">👑</div>
+                    <div class="achievement-label">传奇<br>1000次</div>
+                </div>
+            </div>
+
+            <!-- 训练模式按钮 -->
+            <div class="mode-buttons">
+                <button class="mode-btn" onclick="startTraining('full')">
+                    <div class="icon">📚</div>
+                    <div class="content">
+                        <div class="title">完整训练</div>
+                        <div class="desc">逐步学习7个阶段，每条都要记住</div>
+                    </div>
+                </button>
+
+                <button class="mode-btn" onclick="startTraining('quick')">
+                    <div class="icon">⚡</div>
+                    <div class="content">
+                        <div class="title">快速复习</div>
+                        <div class="desc">快速过一遍所有要点，巩固记忆</div>
+                    </div>
+                </button>
+
+                <button class="mode-btn" onclick="startTraining('test')">
+                    <div class="icon">🎯</div>
+                    <div class="content">
+                        <div class="title">随机测试</div>
+                        <div class="desc">随机抽查，测试你的记忆效果</div>
+                    </div>
+                </button>
+
+                <button class="mode-btn" onclick="startTraining('focus')">
+                    <div class="icon">🎴</div>
+                    <div class="content">
+                        <div class="title">翻卡片学习</div>
+                        <div class="desc">正面问题，背面答案，强化记忆</div>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- 训练页面 -->
+        <div id="trainingPage" class="training-page">
+            <div class="training-header">
+                <div class="phase-indicator" id="phaseIndicator">阶段1: 信息收集</div>
+                <div class="training-progress" id="trainingProgress">1 / 28</div>
+            </div>
+
+            <div class="card-container">
+                <div class="training-card" id="trainingCard" onclick="flipCard()">
+                    <div class="card-front">
+                        <div class="card-phase" id="cardPhase">阶段1: 信息收集</div>
+                        <div class="card-content" id="cardContent">我的位置是什么？</div>
+                        <div class="card-hint">💡 点击卡片查看提示</div>
+                    </div>
+                    <div class="card-back">
+                        <div class="card-phase">提示</div>
+                        <div class="card-content" id="cardHint">BTN/CO/MP/EP/SB/BB<br>位置决定策略</div>
+                        <div class="card-hint">再次点击返回</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="training-controls" id="trainingControls">
+                <button class="control-btn btn-forgot" onclick="markAnswer(false)">
+                    😔 忘记了
+                </button>
+                <button class="control-btn btn-remember" onclick="markAnswer(true)">
+                    ✅ 记住了
+                </button>
+            </div>
+
+            <!-- 测试模式选项 -->
+            <div class="test-options hidden" id="testOptions">
+                <!-- 动态生成 -->
+            </div>
+
+            <div class="training-controls">
+                <button class="control-btn btn-back" onclick="goHome()">
+                    ⬅️ 返回
+                </button>
+                <button class="control-btn btn-next" onclick="nextCard()">
+                    下一个 ➡️
+                </button>
+            </div>
+        </div>
+
+        <!-- 完成页面 -->
+        <div id="completionPage" class="completion-page hidden">
+            <div class="completion-icon">🎉</div>
+            <div class="completion-title">太棒了！完成训练！</div>
+            <div class="completion-stats">
+                <div class="completion-stat">
+                    ⏱️ 用时: <span id="completionTime">0</span> 秒
+                </div>
+                <div class="completion-stat">
+                    ✅ 记住: <span id="rememberedCount">0</span> 条
+                </div>
+                <div class="completion-stat">
+                    😔 忘记: <span id="forgotCount">0</span> 条
+                </div>
+                <div class="completion-stat">
+                    📈 熟练度: <span id="completionScore">0</span> 分
+                </div>
+            </div>
+            <button class="control-btn btn-next" onclick="goHome()" style="width: 100%">
+                回到首页
+            </button>
+        </div>
+
+        <!-- 统计页面 -->
+        <div id="statsPage" class="stats-page">
+            <div class="top-bar">
+                <div class="app-title">📊 详细统计</div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="statTotalTime">0</div>
+                    <div class="stat-label">累计训练时间</div>
+                    <div class="stat-sublabel">分钟</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statAvgTime">0</div>
+                    <div class="stat-label">平均每次用时</div>
+                    <div class="stat-sublabel">秒</div>
+                </div>
+            </div>
+
+            <div class="progress-section">
+                <div class="progress-title">各阶段熟练度</div>
+                <div id="phaseStatsContainer"></div>
+            </div>
+        </div>
+
+        <!-- 设置页面 -->
+        <div id="settingsPage" class="settings-page">
+            <div class="top-bar">
+                <div class="app-title">⚙️ 设置</div>
+            </div>
+
+            <div class="settings-group">
+                <div class="settings-title">训练目标</div>
+                <div class="setting-item">
+                    <span class="setting-label">总目标次数</span>
+                    <span class="setting-value">1000次</span>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">每日目标</span>
+                    <span class="setting-value">5次</span>
+                </div>
+            </div>
+
+            <div class="settings-group">
+                <div class="settings-title">数据管理</div>
+                <div class="setting-item">
+                    <span class="setting-label">数据存储</span>
+                    <span class="setting-value">本地</span>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">占用空间</span>
+                    <span class="setting-value" id="storageSize">< 1KB</span>
+                </div>
+                <button class="danger-btn" onclick="confirmReset()">
+                    🗑️ 清除所有数据
+                </button>
+            </div>
+
+            <div class="settings-group">
+                <div class="settings-title">关于</div>
+                <div class="setting-item">
+                    <span class="setting-label">版本</span>
+                    <span class="setting-value">1.0.0</span>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">更新日期</span>
+                    <span class="setting-value">2024-11-23</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchPage('home')">
+            <div class="nav-icon">🏠</div>
+            <div>首页</div>
+        </div>
+        <div class="nav-item" onclick="switchPage('stats')">
+            <div class="nav-icon">📊</div>
+            <div>统计</div>
+        </div>
+        <div class="nav-item" onclick="switchPage('settings')">
+            <div class="nav-icon">⚙️</div>
+            <div>设置</div>
+        </div>
+    </div>
+
+    <script src="poker_training_app.js"></script>
+</body>
+</html>
+

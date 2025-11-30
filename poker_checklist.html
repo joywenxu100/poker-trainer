@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>德州扑克决策检查清单</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            padding: 15px;
+            min-height: 100vh;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #00d4ff;
+            margin-bottom: 8px;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        .timer {
+            font-size: 18px;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00ff88;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #999;
+            margin-top: 3px;
+        }
+
+        .mode-switch {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .mode-btn {
+            padding: 10px 20px;
+            margin: 0 5px;
+            border: 2px solid #00d4ff;
+            background: transparent;
+            color: #00d4ff;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .mode-btn.active {
+            background: #00d4ff;
+            color: #1a1a2e;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+        }
+
+        .phase {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 4px solid #00d4ff;
+            transition: all 0.3s;
+        }
+
+        .phase.completed {
+            background: rgba(0, 255, 136, 0.1);
+            border-left-color: #00ff88;
+        }
+
+        .phase.warning {
+            border-left-color: #ff6b6b;
+        }
+
+        .phase-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .phase-icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .checklist-item:active {
+            transform: scale(0.98);
+        }
+
+        .checklist-item.checked {
+            background: rgba(0, 255, 136, 0.15);
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #00d4ff;
+            border-radius: 6px;
+            margin-right: 12px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .checklist-item.checked .checkbox {
+            background: #00ff88;
+            border-color: #00ff88;
+        }
+
+        .checkbox::after {
+            content: "✓";
+            color: #1a1a2e;
+            font-size: 18px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .checklist-item.checked .checkbox::after {
+            display: block;
+        }
+
+        .item-text {
+            flex: 1;
+            font-size: 15px;
+            line-height: 1.5;
+            color: #e0e0e0;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-reset {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-reset:active {
+            transform: scale(0.95);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .warning-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .warning-modal.show {
+            display: flex;
+        }
+
+        .warning-content {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 90%;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+            20%, 40%, 60%, 80% { transform: translateX(10px); }
+        }
+
+        .warning-content h2 {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        .warning-content p {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .warning-btn {
+            padding: 12px 30px;
+            background: white;
+            color: #ff6b6b;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .simplified .phase:not(.essential) {
+            display: none;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            transition: width 0.3s;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 德州扑克决策清单</h1>
+            <div class="timer" id="timer">00:00</div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="handsToday">0</div>
+                <div class="stat-label">今日手数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="completionRate">0%</div>
+                <div class="stat-label">完成率</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="avgTime">0s</div>
+                <div class="stat-label">平均用时</div>
+            </div>
+        </div>
+
+        <div class="mode-switch">
+            <button class="mode-btn" onclick="setMode('simplified')">精简模式</button>
+            <button class="mode-btn active" onclick="setMode('full')">完整模式</button>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+
+        <div id="checklist" class="full">
+            <!-- 阶段1 -->
+            <div class="phase essential" data-phase="1">
+                <div class="phase-header">
+                    <span class="phase-icon">📍</span>
+                    <span>阶段1: 信息收集</span>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">我的位置是什么？(BTN/CO/MP/EP/SB/BB)</div>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">我的有效筹码是多少BB？</div>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">当前底池大小是多少？</div>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">对手是谁？(紧/松/激进/被动)</div>
+                </div>
+            </div>
+
+            <!-- 阶段2 -->
+            <div class="phase essential" data-phase="2">
+                <div class="phase-header">
+                    <span class="phase-icon">🎴</span>
+                    <span>阶段2: 牌力评估</span>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">我的绝对牌力如何？</div>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">相对于对手范围的强度？</div>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">我有多少改进潜力(outs)？</div>
+                </div>
+            </div>
+
+            <!-- 阶段3 -->
+            <div class="phase" data-phase="3">
+                <div class="phase-header">
+                    <span class="phase-icon">🎯</span>
+                    <span>阶段3: 对手范围分析</span>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">对手之前的行动表示什么范围？</div>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">对手会不会在这里诈唬？</div>
+                </div>
+            </div>
+
+            <!-- 阶段4 -->
+            <div class="phase essential" data-phase="4">
+                <div class="phase-header">
+                    <span class="phase-icon">🧮</span>
+                    <span>阶段4: 赔率计算</span>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">底池赔率是多少？</div>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">我需要多少胜率才能call？</div>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">我的实际胜率/equity是多少？</div>
+                </div>
+            </div>
+
+            <!-- 阶段5 -->
+            <div class="phase warning essential" data-phase="5">
+                <div class="phase-header">
+                    <span class="phase-icon">⚠️</span>
+                    <span>阶段5: 情绪自检 (必检！)</span>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">我现在是否冷静？</div>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">刚才的结果是否影响我？</div>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">我是基于逻辑还是情绪做决策？</div>
+                </div>
+            </div>
+
+            <!-- 阶段6 -->
+            <div class="phase essential" data-phase="6">
+                <div class="phase-header">
+                    <span class="phase-icon">✅</span>
+                    <span>阶段6: 行动决策</span>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">Fold/Call/Raise？我的理由是什么？</div>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">我的bet/raise大小合理吗？</div>
+                </div>
+            </div>
+
+            <!-- 阶段7 -->
+            <div class="phase essential" data-phase="7">
+                <div class="phase-header">
+                    <span class="phase-icon">🔍</span>
+                    <span>阶段7: 二次确认</span>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">这个决策符合我的整体策略吗？</div>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">长期来看是+EV的吗？</div>
+                </div>
+                <div class="checklist-item" onclick="toggleCheck(this)">
+                    <div class="checkbox"></div>
+                    <div class="item-text">我有没有漏掉关键信息？</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-reset" onclick="resetChecklist()">🔄 重置 / 下一手</button>
+        </div>
+
+        <div class="footer">
+            保持纪律 · 理性决策 · 长期盈利
+        </div>
+    </div>
+
+    <!-- 警告弹窗 -->
+    <div class="warning-modal" id="warningModal">
+        <div class="warning-content">
+            <h2>⚠️ 纪律警告！</h2>
+            <p id="warningText">检测到可能的冲动决策</p>
+            <button class="warning-btn" onclick="closeWarning()">我知道了</button>
+        </div>
+    </div>
+
+    <script>
+        let startTime = Date.now();
+        let timerInterval;
+        let currentMode = 'full';
+        let stats = {
+            handsToday: 0,
+            totalTime: 0,
+            completedHands: 0
+        };
+
+        // 从本地存储加载统计数据
+        function loadStats() {
+            const saved = localStorage.getItem('pokerStats');
+            if (saved) {
+                const data = JSON.parse(saved);
+                const today = new Date().toDateString();
+                if (data.date === today) {
+                    stats = data.stats;
+                } else {
+                    // 新的一天，重置统计
+                    stats = { handsToday: 0, totalTime: 0, completedHands: 0 };
+                    saveStats();
+                }
+            }
+            updateStatsDisplay();
+        }
+
+        // 保存统计数据
+        function saveStats() {
+            const today = new Date().toDateString();
+            localStorage.setItem('pokerStats', JSON.stringify({
+                date: today,
+                stats: stats
+            }));
+        }
+
+        // 更新统计显示
+        function updateStatsDisplay() {
+            document.getElementById('handsToday').textContent = stats.handsToday;
+            const rate = stats.handsToday > 0 ? Math.round((stats.completedHands / stats.handsToday) * 100) : 0;
+            document.getElementById('completionRate').textContent = rate + '%';
+            const avgTime = stats.completedHands > 0 ? Math.round(stats.totalTime / stats.completedHands) : 0;
+            document.getElementById('avgTime').textContent = avgTime + 's';
+        }
+
+        // 启动计时器
+        function startTimer() {
+            startTime = Date.now();
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        // 更新计时器显示
+        function updateTimer() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            document.getElementById('timer').textContent = 
+                String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+            
+            // 如果决策时间过快（<5秒）或过慢（>60秒），显示警告
+            if (elapsed === 3) {
+                // 检查是否有足够的勾选
+                const checked = document.querySelectorAll('.checklist-item.checked').length;
+                if (checked < 3) {
+                    showWarning('决策过快！请确保完成必要的思考步骤。');
+                }
+            }
+        }
+
+        // 切换勾选状态
+        function toggleCheck(element) {
+            element.classList.toggle('checked');
+            updateProgress();
+            checkPhaseCompletion();
+        }
+
+        // 更新进度条
+        function updateProgress() {
+            const items = document.querySelectorAll('.checklist-item:not(.phase:not(.essential) .checklist-item)');
+            const visibleItems = currentMode === 'simplified' 
+                ? document.querySelectorAll('.phase.essential .checklist-item')
+                : items;
+            const checked = Array.from(visibleItems).filter(item => item.classList.contains('checked')).length;
+            const progress = (checked / visibleItems.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        // 检查阶段完成情况
+        function checkPhaseCompletion() {
+            const phases = document.querySelectorAll('.phase');
+            phases.forEach(phase => {
+                const items = phase.querySelectorAll('.checklist-item');
+                const checked = phase.querySelectorAll('.checklist-item.checked');
+                if (items.length === checked.length) {
+                    phase.classList.add('completed');
+                } else {
+                    phase.classList.remove('completed');
+                }
+            });
+        }
+
+        // 重置检查清单
+        function resetChecklist() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const items = document.querySelectorAll('.checklist-item');
+            const checked = document.querySelectorAll('.checklist-item.checked').length;
+            const total = currentMode === 'simplified' 
+                ? document.querySelectorAll('.phase.essential .checklist-item').length
+                : items.length;
+            
+            // 更新统计
+            stats.handsToday++;
+            if (checked >= total * 0.7) { // 完成率超过70%算完成
+                stats.completedHands++;
+                stats.totalTime += elapsed;
+            }
+            saveStats();
+            updateStatsDisplay();
+            
+            // 重置所有勾选
+            items.forEach(item => {
+                item.classList.remove('checked');
+            });
+            
+            // 重置阶段状态
+            const phases = document.querySelectorAll('.phase');
+            phases.forEach(phase => phase.classList.remove('completed'));
+            
+            // 重置进度条
+            document.getElementById('progressBar').style.width = '0%';
+            
+            // 重置计时器
+            startTimer();
+        }
+
+        // 显示警告
+        function showWarning(text) {
+            document.getElementById('warningText').textContent = text;
+            document.getElementById('warningModal').classList.add('show');
+        }
+
+        // 关闭警告
+        function closeWarning() {
+            document.getElementById('warningModal').classList.remove('show');
+        }
+
+        // 切换模式
+        function setMode(mode) {
+            currentMode = mode;
+            const checklist = document.getElementById('checklist');
+            const buttons = document.querySelectorAll('.mode-btn');
+            
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            if (mode === 'simplified') {
+                checklist.className = 'simplified';
+            } else {
+                checklist.className = 'full';
+            }
+            
+            updateProgress();
+        }
+
+        // 页面加载完成
+        window.onload = function() {
+            loadStats();
+            startTimer();
+        };
+
+        // 防止意外关闭
+        window.addEventListener('beforeunload', function(e) {
+            const checked = document.querySelectorAll('.checklist-item.checked').length;
+            if (checked > 0) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+    </script>
+</body>
+</html>
+
