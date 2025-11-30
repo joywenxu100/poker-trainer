@@ -1,12 +1,19 @@
 // Service Worker for PWA offline support
-const CACHE_NAME = 'poker-trainer-v2.6.0';
+const CACHE_NAME = 'poker-trainer-v3.0.0';
 const urlsToCache = [
+  'index.html',
   'poker_trainer.html',
   'poker_trainer.js',
   'poker_trainer_v2.js',
   'poker_trainer_pro.js',
-  'manifest.json',
-  'index.html'
+  'exploit_trainer.html',
+  'exploit_trainer.js',
+  'advanced_trainer.html',
+  'advanced_trainer.js',
+  'assessment_full.html',
+  'assessment_full.js',
+  'straddle_exploit_master.html',
+  'manifest.json'
 ];
 
 // 安装Service Worker
