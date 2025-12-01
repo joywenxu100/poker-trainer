@@ -192,6 +192,31 @@
             display: none;
         }
 
+        .clear-btn {
+            display: none;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 8px 16px;
+            font-size: 12px;
+            color: var(--text-primary);
+            background: rgba(255, 71, 87, 0.9);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .clear-btn:hover {
+            background: var(--accent-red);
+            transform: scale(1.05);
+        }
+
+        .upload-card.has-image .clear-btn {
+            display: block;
+        }
+
         /* 设置区域 */
         .settings-section {
             background: var(--bg-secondary);
@@ -397,6 +422,34 @@
             color: var(--accent-blue);
         }
 
+        .result-text pre {
+            background: var(--bg-card);
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .result-text pre code {
+            background: transparent;
+            padding: 0;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .result-text hr {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 20px 0;
+        }
+
+        .result-text em {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
         .result-text ul, .result-text ol {
             margin: 10px 0;
             padding-left: 25px;
@@ -572,25 +625,27 @@
             <!-- 上传区域 -->
             <div class="upload-section">
                 <!-- 手牌截图 -->
-                <div class="upload-card" id="handCard" onclick="document.getElementById('handInput').click()">
+                <div class="upload-card" id="handCard" onclick="triggerUpload('hand', event)">
                     <input type="file" id="handInput" accept="image/*" onchange="handleImageUpload(this, 'hand')">
                     <div class="upload-placeholder">
                         <div class="upload-icon">🎴</div>
                         <div class="upload-title">上传手牌截图</div>
                         <div class="upload-desc">牌局回顾界面，包含公共牌和玩家手牌</div>
                     </div>
-                    <img class="upload-preview" id="handPreview" alt="手牌预览">
+                    <img class="upload-preview" id="handPreview" alt="手牌预览" onclick="event.stopPropagation()">
+                    <button class="clear-btn" id="handClearBtn" onclick="clearImage('hand'); event.stopPropagation();">✕ 重新上传</button>
                 </div>
 
                 <!-- 对手数据截图 -->
-                <div class="upload-card" id="opponentCard" onclick="document.getElementById('opponentInput').click()">
+                <div class="upload-card" id="opponentCard" onclick="triggerUpload('opponent', event)">
                     <input type="file" id="opponentInput" accept="image/*" onchange="handleImageUpload(this, 'opponent')">
                     <div class="upload-placeholder">
                         <div class="upload-icon">👤</div>
                         <div class="upload-title">上传对手数据</div>
                         <div class="upload-desc">对手面板，包含入局率、胜率等统计</div>
                     </div>
-                    <img class="upload-preview" id="opponentPreview" alt="对手数据预览">
+                    <img class="upload-preview" id="opponentPreview" alt="对手数据预览" onclick="event.stopPropagation()">
+                    <button class="clear-btn" id="opponentClearBtn" onclick="clearImage('opponent'); event.stopPropagation();">✕ 重新上传</button>
                 </div>
             </div>
 
@@ -679,25 +734,111 @@
         };
 
         // ==================== 图片上传处理 ====================
+        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+        const MAX_IMAGE_DIMENSION = 2048; // 最大尺寸
+
         function handleImageUpload(input, type) {
             const file = input.files[0];
             if (!file) return;
 
+            // 检查文件大小
+            if (file.size > MAX_FILE_SIZE) {
+                showError(`图片太大！最大允许 ${MAX_FILE_SIZE / 1024 / 1024}MB`);
+                addLog(`❌ 图片超过大小限制`, 'error');
+                input.value = '';
+                return;
+            }
+
+            // 检查文件类型
+            if (!file.type.startsWith('image/')) {
+                showError('请上传图片文件');
+                addLog(`❌ 文件类型不正确`, 'error');
+                input.value = '';
+                return;
+            }
+
+            addLog(`📷 正在处理${type === 'hand' ? '手牌' : '对手数据'}图片...`, 'info');
+
             const reader = new FileReader();
             reader.onload = function(e) {
-                const base64Data = e.target.result;
-                uploadedImages[type] = base64Data;
+                // 压缩大图片
+                compressImage(e.target.result, function(compressedData) {
+                    uploadedImages[type] = compressedData;
 
-                // 显示预览
-                const previewId = type === 'hand' ? 'handPreview' : 'opponentPreview';
-                const cardId = type === 'hand' ? 'handCard' : 'opponentCard';
-                
-                document.getElementById(previewId).src = base64Data;
-                document.getElementById(cardId).classList.add('has-image');
+                    // 显示预览
+                    const previewId = type === 'hand' ? 'handPreview' : 'opponentPreview';
+                    const cardId = type === 'hand' ? 'handCard' : 'opponentCard';
+                    
+                    document.getElementById(previewId).src = compressedData;
+                    document.getElementById(cardId).classList.add('has-image');
 
-                addLog(`✅ ${type === 'hand' ? '手牌截图' : '对手数据截图'}上传成功`, 'success');
+                    const typeName = type === 'hand' ? '手牌截图' : '对手数据截图';
+                    addLog(`✅ ${typeName}上传成功`, 'success');
+                });
+            };
+            reader.onerror = function() {
+                showError('图片读取失败');
+                addLog(`❌ 图片读取失败`, 'error');
             };
             reader.readAsDataURL(file);
+        }
+
+        // 压缩图片
+        function compressImage(dataUrl, callback) {
+            const img = new Image();
+            img.onload = function() {
+                let width = img.width;
+                let height = img.height;
+                
+                // 如果图片太大，按比例缩小
+                if (width > MAX_IMAGE_DIMENSION || height > MAX_IMAGE_DIMENSION) {
+                    const ratio = Math.min(MAX_IMAGE_DIMENSION / width, MAX_IMAGE_DIMENSION / height);
+                    width = Math.round(width * ratio);
+                    height = Math.round(height * ratio);
+                    
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // 使用较高质量的JPEG
+                    callback(canvas.toDataURL('image/jpeg', 0.9));
+                    addLog(`📐 图片已压缩: ${img.width}x${img.height} → ${width}x${height}`, 'info');
+                } else {
+                    callback(dataUrl);
+                }
+            };
+            img.onerror = function() {
+                callback(dataUrl); // 失败时使用原图
+            };
+            img.src = dataUrl;
+        }
+
+        // 清除图片
+        function clearImage(type) {
+            uploadedImages[type] = null;
+            
+            const previewId = type === 'hand' ? 'handPreview' : 'opponentPreview';
+            const cardId = type === 'hand' ? 'handCard' : 'opponentCard';
+            const inputId = type === 'hand' ? 'handInput' : 'opponentInput';
+            
+            document.getElementById(previewId).src = '';
+            document.getElementById(cardId).classList.remove('has-image');
+            document.getElementById(inputId).value = '';
+            
+            addLog(`🗑️ ${type === 'hand' ? '手牌截图' : '对手数据截图'}已清除`, 'info');
+        }
+
+        // 触发文件上传（避免已有图片时的误触发）
+        function triggerUpload(type, event) {
+            // 如果点击的是清除按钮或预览图，不触发上传
+            if (event.target.classList.contains('clear-btn') || 
+                event.target.classList.contains('upload-preview')) {
+                return;
+            }
+            const inputId = type === 'hand' ? 'handInput' : 'opponentInput';
+            document.getElementById(inputId).click();
         }
 
         // 短码选项切换
@@ -749,8 +890,13 @@
                 const opponentStack = document.getElementById('opponentStack').value;
 
                 addLog('📤 发送请求到本地服务器...', 'info');
+                addLog('⏳ AI正在分析中，请稍候（约30-60秒）...', 'info');
+
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 180000); // 3分钟超时
 
                 const response = await fetch(CONFIG.API_URL, {
+                    signal: controller.signal,
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -765,6 +911,7 @@
                     })
                 });
 
+                clearTimeout(timeoutId);
                 const data = await response.json();
                 
                 if (!data.success) {
@@ -779,13 +926,23 @@
 
             } catch (error) {
                 console.error('分析错误:', error);
-                if (error.message.includes('Failed to fetch')) {
-                    showError('无法连接本地服务器，请确保 quick_review_server.py 正在运行');
-                    addLog('❌ 无法连接服务器，请先运行: python quick_review_server.py', 'error');
-                } else {
-                    showError(`分析失败: ${error.message}`);
-                    addLog(`❌ 错误: ${error.message}`, 'error');
+                
+                let errorMsg = error.message;
+                let logMsg = error.message;
+                
+                if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                    errorMsg = '无法连接本地服务器';
+                    logMsg = '❌ 无法连接服务器，请先运行: python quick_review_server.py';
+                } else if (error.message.includes('timeout') || error.name === 'AbortError') {
+                    errorMsg = '请求超时，请重试';
+                    logMsg = '❌ 请求超时，可能是网络问题或图片太大';
+                } else if (error.message.includes('代理')) {
+                    errorMsg = '代理连接失败，请检查VPN是否开启';
+                    logMsg = '❌ 代理连接失败';
                 }
+                
+                showError(errorMsg);
+                addLog(logMsg, 'error');
             } finally {
                 btn.disabled = false;
                 btn.classList.remove('loading');
@@ -797,23 +954,41 @@
             const resultSection = document.getElementById('resultSection');
             const resultText = document.getElementById('resultText');
             
-            // 简单的 Markdown 渲染
+            // 改进的 Markdown 渲染
             let html = text
-                // 标题
+                // 代码块（先处理，避免被其他规则影响）
+                .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+                // 标题（按顺序从大到小）
                 .replace(/^### (.*$)/gim, '<h3>$1</h3>')
                 .replace(/^## (.*$)/gim, '<h2>$1</h2>')
                 .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-                // 粗体
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                // 斜体
-                .replace(/\*(.*?)\*/g, '<em>$1</em>')
-                // 代码
-                .replace(/`(.*?)`/g, '<code>$1</code>')
-                // 列表
-                .replace(/^\- (.*$)/gim, '<li>$1</li>')
-                .replace(/^\d+\. (.*$)/gim, '<li>$1</li>')
-                // 换行
-                .replace(/\n/g, '<br>');
+                // 粗体（先处理，避免和斜体冲突）
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                // 斜体（排除已处理的粗体）
+                .replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>')
+                // 行内代码
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                // 水平线
+                .replace(/^---$/gim, '<hr>')
+                // 处理列表（包装在ul中）
+                .replace(/^[\-\*] (.*)$/gim, '<li>$1</li>')
+                .replace(/(<li>.*<\/li>)(?:\s*<br>)?/g, '$1')
+                // 数字列表
+                .replace(/^\d+\. (.*)$/gim, '<li>$1</li>');
+            
+            // 将连续的li包装在ul中
+            html = html.replace(/(<li>[\s\S]*?<\/li>)(\s*<br>\s*)?(<li>)/g, '$1$3');
+            html = html.replace(/(<li>[\s\S]*?<\/li>)+/g, '<ul>$&</ul>');
+            
+            // 换行处理（排除已有HTML标签后的换行）
+            html = html.replace(/\n(?!<)/g, '<br>\n');
+            
+            // 清理多余的br
+            html = html.replace(/<br>\s*<br>/g, '<br>');
+            html = html.replace(/<\/h([123])><br>/g, '</h$1>');
+            html = html.replace(/<\/li><br>/g, '</li>');
+            html = html.replace(/<\/ul><br>/g, '</ul>');
+            html = html.replace(/<hr><br>/g, '<hr>');
 
             resultText.innerHTML = html;
             resultSection.classList.add('visible');
@@ -833,8 +1008,9 @@
         }
 
         // ==================== 初始化 ====================
-        addLog('🎮 德州扑克快速复盘工具 v1.0', 'info');
-        addLog('📌 请上传手牌截图和对手数据截图开始分析', 'info');
+        addLog('🎮 德州扑克快速复盘工具 v2.0', 'info');
+        addLog('📌 请上传两张截图：手牌回顾 + 对手数据面板', 'info');
+        addLog('💡 提示：点击已上传的图片可重新上传', 'info');
     </script>
 </body>
 </html>

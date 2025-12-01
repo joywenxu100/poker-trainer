@@ -2,6 +2,9 @@
 """
 德州扑克快速复盘 - 本地服务器
 通过代理调用 Gemini API
+
+版本: 2.0
+修复: 端口占用、错误处理、代理配置
 """
 import http.server
 import socketserver
@@ -14,6 +17,7 @@ import webbrowser
 from urllib.parse import urlparse, parse_qs
 import threading
 import time
+import socket
 
 # 设置输出编码
 if sys.platform == 'win32':
@@ -23,96 +27,189 @@ if sys.platform == 'win32':
 PORT = 8899
 API_KEY = 'AIzaSyCGLHoZLcXU7oQiKXT9929PZwal1UenRjY'
 API_URL = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={API_KEY}'
-PROXY = 'http://127.0.0.1:10809'  # V2Ray HTTP 代理
 
-# ==================== 提示词模板 ====================
+# 代理配置 - 自动检测
+PROXY_CANDIDATES = [
+    'http://127.0.0.1:10809',  # V2Ray HTTP
+    'http://127.0.0.1:7890',   # Clash
+    'http://127.0.0.1:1080',   # 通用
+]
+
+# 最大请求大小 (20MB)
+MAX_CONTENT_LENGTH = 20 * 1024 * 1024
+
+def find_working_proxy():
+    """自动检测可用的代理"""
+    for proxy in PROXY_CANDIDATES:
+        try:
+            # 尝试通过代理连接Google
+            response = requests.get(
+                'https://www.google.com',
+                proxies={'http': proxy, 'https': proxy},
+                timeout=5
+            )
+            if response.status_code == 200:
+                return proxy
+        except:
+            continue
+    # 默认返回第一个
+    return PROXY_CANDIDATES[0]
+
+# 自动检测代理
+PROXY = find_working_proxy()
+
+# ==================== 提示词模板 (优化版) ====================
 def build_prompt(username='luckywm', stack_depth='200-300', is_short_stack=False, opponent_stack=''):
-    """构建专业的德州扑克复盘提示词"""
+    """构建专业的德州扑克复盘提示词 - 优化版"""
     
     stack_info = f"有效筹码深度约为 {stack_depth} BB"
     if is_short_stack and opponent_stack:
         stack_info += f"，对手是短码玩家，有效筹码约 {opponent_stack} BB"
 
-    return f'''你是一位世界顶级的德州扑克职业选手和教练，拥有20年以上的高级别现金局和锦标赛经验。你的任务是帮助玩家复盘和分析他们的手牌，找出决策中的问题并提供改进建议。
+    return f'''你是一位世界顶级的德州扑克职业选手和教练，拥有20年以上的高级别现金局经验，擅长深筹码博弈(200BB+)和漏洞利用打法。你的任务是帮助玩家复盘和分析他们的手牌，找出决策中的问题并提供专业的改进建议。
 
 ## 基本信息
-- **目标玩家昵称**: {username}（请在截图中找到这个玩家，分析他的决策）
+- **目标玩家昵称**: {username}（请在截图中找到这个玩家，分析他的所有决策）
 - **筹码深度信息**: {stack_info}
-- **游戏类型**: 这是一局有 Straddle 的现金局（盲注结构通常是 小盲/大盲/Straddle）
+- **游戏类型**: 这是一局有 Straddle 的中国线上现金局（盲注结构通常是 小盲/大盲/Straddle，如2/4/8）
 
-## 分析要求
+## ⚠️ 重要：图片识别说明
 
-请仔细查看提供的两张截图：
-1. **第一张图片**：牌局回顾界面，包含：
-   - 牌局ID和时间
-   - 盲注结构（如 2/4/8 表示小盲2、大盲4、Straddle 8）
-   - 底池大小和保险信息
-   - 所有玩家的手牌（如果有显示）
-   - 公共牌（翻牌、转牌、河牌）
-   - 每个玩家的行动和盈亏结果
+你将看到两张**中文界面**的截图，请仔细识别：
 
-2. **第二张图片**：对手数据面板，包含：
-   - 对手昵称和ID
-   - 本级别手数
-   - 胜率
-   - 入局率（VPIP）
-   - 摊牌率
+### 第一张图片 - 牌局回顾界面（牌局回顾/Hand History）
+需要识别的信息：
+- 顶部显示 **牌局ID** 和 **日期时间**
+- **盲注结构**: 格式如 "2/4/8(2)" 表示 小盲2/大盲4/Straddle8
+- **底池**: 显示为 "底池: xxx"
+- **保险**: 显示为 "保险 xx.x"（绿色数字）
+- **玩家列表**: 每行一个玩家，包含：
+  - 头像和昵称
+  - 手牌（两张牌，可能是彩色牌面或红色背面表示弃牌）
+  - 行动描述（如"弃牌"、"加注xxx"、"Allin xxx"等）
+  - 投保额/赔付额/保险盈利（如果有）
+  - 盈亏数字（绿色正数表示赢，红色负数表示输）
+- **公共牌**: 5张公共牌显示在中间区域
+- **底部**: 有翻页控制，显示 "x/x" 表示当前手牌编号
 
-## 分析框架
+### 第二张图片 - 对手数据面板
+需要识别的信息：
+- **昵称** 和 **ID号**
+- **本级别手数**: 数字（手数越多数据越可靠）
+- **胜率**: 百分比
+- **入局率**: 百分比（VPIP，>40%为松手玩家）
+- **摊牌率**: 百分比（低表示弃牌多）
 
-请按以下结构进行详细分析：
+## 🎯 分析要求
 
-### 1️⃣ 牌局信息提取
-- 准确识别并列出：盲注结构、底池大小、参与玩家、每个玩家的手牌、公共牌
-- 识别目标玩家 {username} 的位置和手牌
+**请先确认你识别到的信息，然后再进行分析。**
 
-### 2️⃣ 对手画像分析
-- 根据对手的统计数据（入局率、胜率、摊牌率）判断对手类型
-- 入局率 > 40% 通常是松手玩家
-- 摊牌率低说明对手弃牌频率高
-- 结合手数判断数据的可靠性
+### 步骤1️⃣ 信息确认（必须完成）
 
-### 3️⃣ 翻前分析 (Preflop)
-- {username} 的起手牌强度如何？
-- 在当前位置，这手牌应该如何行动？（加注、跟注、弃牌）
-- 如果有加注，加注量是否合理？
-- 考虑到对手类型，翻前策略是否需要调整？
+请先列出你从截图中识别到的所有关键信息：
+```
+【牌局基本信息】
+- 牌局ID: [识别到的ID]
+- 盲注结构: [小盲/大盲/Straddle]
+- 底池大小: [数值]
+- 保险金额: [数值，如有]
 
-### 4️⃣ 翻牌分析 (Flop)
-- 翻牌结构如何？（干燥/湿润、有无听牌、高/低牌面）
-- {username} 在翻牌上的牌力如何？
-- 翻牌上的行动是否正确？（下注尺寸、是否应该持续下注、check-raise等）
-- 如果有犯错，应该如何改进？
+【{username}的信息】
+- 位置: [根据玩家列表顺序判断：SB/BB/Straddle/UTG/MP/CO/BTN]
+- 手牌: [两张牌]
+- 行动: [所有行动]
+- 最终盈亏: [数值]
 
-### 5️⃣ 转牌分析 (Turn)
-- 转牌对双方牌力的影响
-- 行动是否合理？
-- 底池控制 vs 价值下注的权衡
+【对手信息】
+- 主要对手昵称: [昵称]
+- 手牌: [两张牌]
+- 统计数据: 手数[x] / 入局率[x%] / 胜率[x%] / 摊牌率[x%]
 
-### 6️⃣ 河牌分析 (River)
-- 河牌对最终牌力的影响
-- 最终行动是否正确？
-- 如果是诈唬，诈唬故事是否可信？
-- 如果是价值下注，下注尺寸是否最优？
+【公共牌】
+- 翻牌(Flop): [三张牌]
+- 转牌(Turn): [一张牌]  
+- 河牌(River): [一张牌]
+```
 
-### 7️⃣ 关键决策点评估
-- 指出本手牌中最关键的决策点
-- 评估每个决策点的 EV（期望值）
-- 如果有明显错误，计算大约损失了多少 EV
+### 步骤2️⃣ 对手类型判断
 
-### 8️⃣ 总结与建议
-- 本手牌打得如何？（优秀/良好/一般/需改进）
-- 主要问题在哪里？
-- 具体的改进建议
-- 类似情况下的最优打法
+根据对手数据判断类型：
+- **松凶(LAG)**: 入局率>35%, 摊牌率<20%
+- **松被动(LP)**: 入局率>40%, 高摊牌率
+- **紧凶(TAG)**: 入局率<25%, 低摊牌率
+- **紧被动(TP)**: 入局率<25%, 高摊牌率
+- **鱼(Fish)**: 入局率>45%, 各种非常规数据
+
+手数参考：
+- <100手：数据参考价值低
+- 100-500手：可以初步参考
+- >500手：数据较为可靠
+
+### 步骤3️⃣ 逐街详细分析
+
+**翻前 (Preflop)**
+- {username}的起手牌在当前位置的强度（参考GTO范围）
+- 翻前行动是否正确？加注尺寸是否合理？
+- 面对对手的行动（3bet/cold call等）如何应对？
+- 考虑到对手类型，是否需要调整？
+
+**翻牌 (Flop)**
+- 牌面结构分析（干燥/湿润/连接/彩虹）
+- {username}在这个牌面的范围优势/劣势
+- 下注/过牌/加注的选择是否正确？
+- 下注尺寸是否合理？（1/3pot, 1/2pot, 2/3pot, pot+）
+
+**转牌 (Turn)**
+- 转牌对双方范围的影响
+- SPR（筹码底池比）分析
+- 是继续价值下注还是底池控制？
+- 行动线是否合理？
+
+**河牌 (River)**
+- 河牌完成了哪些听牌？
+- 价值下注 vs 诈唬 vs 过牌的选择
+- 下注尺寸的考量
+- 面对对手行动的应对
+
+### 步骤4️⃣ 关键决策点 EV 分析
+
+找出本手牌1-2个最关键的决策点：
+- 指出当时的情况
+- 分析{username}的选择
+- 给出GTO/剥削性打法的建议
+- 估算EV损失（如有）
+
+### 步骤5️⃣ 保险决策分析（如适用）
+
+如果涉及保险：
+- 买保险的时机是否正确？
+- 保险的期望值分析
+- 建议是否购买
+
+### 步骤6️⃣ 总结与评分
+
+**整体评价**: [优秀/良好/一般/需改进]
+
+**主要问题**:
+1. [问题1]
+2. [问题2]
+
+**改进建议**:
+1. [建议1]
+2. [建议2]
+
+**最终评分**: X/10
+
+**一句话总结**: [简洁的总结这手牌的核心问题或亮点]
+
+---
 
 ## 输出格式要求
-- 使用清晰的层级结构
+- 使用清晰的层级结构和emoji标记
 - 重要信息用 **粗体** 标注
 - 数字和金额用精确数值
-- 对错决策要明确给出判断
-- 语言简洁但分析要深入
-- 最后给出一个简短的结论和评分（1-10分）
+- 明确给出"正确"或"错误"的判断
+- 如果信息不完整或无法识别，请明确说明
 
 请开始分析：'''
 
@@ -135,11 +232,50 @@ class QuickReviewHandler(http.server.SimpleHTTPRequestHandler):
         else:
             self.send_error(404, 'Not Found')
     
+    def send_json_response(self, status_code, data):
+        """统一的JSON响应发送方法"""
+        self.send_response(status_code)
+        self.send_header('Content-Type', 'application/json; charset=utf-8')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.end_headers()
+        self.wfile.write(json.dumps(data, ensure_ascii=False).encode('utf-8'))
+    
+    def parse_image_data(self, image_str):
+        """安全解析图片数据"""
+        try:
+            if not image_str:
+                return None, None
+            
+            if ',' in image_str and ';base64,' in image_str:
+                # 标准 data URL 格式
+                header, data = image_str.split(',', 1)
+                mime_type = header.split(':')[1].split(';')[0]
+                return mime_type, data
+            elif ',' in image_str:
+                # 简化格式
+                parts = image_str.split(',', 1)
+                if len(parts) == 2:
+                    return 'image/jpeg', parts[1]
+            
+            # 假设是纯base64
+            return 'image/jpeg', image_str
+        except Exception as e:
+            print(f"⚠️ 图片解析警告: {e}")
+            return 'image/jpeg', image_str
+    
     def handle_analyze(self):
         """处理手牌分析请求"""
         try:
+            # 检查请求大小
+            content_length = int(self.headers.get('Content-Length', 0))
+            if content_length > MAX_CONTENT_LENGTH:
+                self.send_json_response(413, {
+                    "success": False,
+                    "error": f"请求太大，最大允许 {MAX_CONTENT_LENGTH // 1024 // 1024}MB"
+                })
+                return
+            
             # 读取请求体
-            content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
             data = json.loads(post_data.decode('utf-8'))
             
@@ -151,9 +287,19 @@ class QuickReviewHandler(http.server.SimpleHTTPRequestHandler):
             is_short_stack = data.get('isShortStack', False)
             opponent_stack = data.get('opponentStack', '')
             
-            print(f"\n📥 收到分析请求")
+            print(f"\n{'='*50}")
+            print(f"📥 收到分析请求")
             print(f"   用户: {username}")
             print(f"   筹码: {stack_depth} BB")
+            print(f"   短码对手: {'是 (' + opponent_stack + 'BB)' if is_short_stack else '否'}")
+            
+            # 验证图片
+            if not hand_image or not opponent_image:
+                self.send_json_response(400, {
+                    "success": False,
+                    "error": "请上传两张截图（手牌截图和对手数据截图）"
+                })
+                return
             
             # 构建提示词
             prompt = build_prompt(username, stack_depth, is_short_stack, opponent_stack)
@@ -162,42 +308,29 @@ class QuickReviewHandler(http.server.SimpleHTTPRequestHandler):
             parts = [{"text": prompt}]
             
             # 添加手牌图片
-            if hand_image:
-                # 去除data URL前缀
-                if ',' in hand_image:
-                    mime_type = hand_image.split(';')[0].split(':')[1]
-                    image_data = hand_image.split(',')[1]
-                else:
-                    mime_type = 'image/jpeg'
-                    image_data = hand_image
-                
+            mime_type, image_data = self.parse_image_data(hand_image)
+            if image_data:
                 parts.append({
                     "inline_data": {
                         "mime_type": mime_type,
                         "data": image_data
                     }
                 })
-                print("   ✅ 手牌图片已添加")
+                print(f"   ✅ 手牌图片已添加 ({mime_type})")
             
             # 添加对手数据图片
-            if opponent_image:
-                if ',' in opponent_image:
-                    mime_type = opponent_image.split(';')[0].split(':')[1]
-                    image_data = opponent_image.split(',')[1]
-                else:
-                    mime_type = 'image/jpeg'
-                    image_data = opponent_image
-                
+            mime_type, image_data = self.parse_image_data(opponent_image)
+            if image_data:
                 parts.append({
                     "inline_data": {
                         "mime_type": mime_type,
                         "data": image_data
                     }
                 })
-                print("   ✅ 对手数据图片已添加")
+                print(f"   ✅ 对手数据图片已添加 ({mime_type})")
             
             # 调用Gemini API
-            print("\n🚀 调用 Gemini API...")
+            print(f"\n🚀 调用 Gemini API (代理: {PROXY})...")
             
             payload = {
                 "contents": [{"parts": parts}],
@@ -217,79 +350,124 @@ class QuickReviewHandler(http.server.SimpleHTTPRequestHandler):
             
             proxies = {"http": PROXY, "https": PROXY}
             
-            response = requests.post(
-                API_URL,
-                headers={'Content-Type': 'application/json'},
-                json=payload,
-                proxies=proxies,
-                timeout=120
-            )
+            try:
+                response = requests.post(
+                    API_URL,
+                    headers={'Content-Type': 'application/json'},
+                    json=payload,
+                    proxies=proxies,
+                    timeout=120
+                )
+            except requests.exceptions.Timeout:
+                print("❌ API请求超时")
+                self.send_json_response(504, {
+                    "success": False,
+                    "error": "API请求超时，请重试"
+                })
+                return
+            except requests.exceptions.ProxyError:
+                print("❌ 代理连接失败")
+                self.send_json_response(502, {
+                    "success": False,
+                    "error": "代理连接失败，请检查VPN/代理是否开启"
+                })
+                return
             
             if response.status_code == 200:
-                result = response.json()
-                text = result.get('candidates', [{}])[0].get('content', {}).get('parts', [{}])[0].get('text', '')
-                print("✅ 分析完成!")
-                
-                # 返回成功响应
-                self.send_response(200)
-                self.send_header('Content-Type', 'application/json')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                
-                response_data = {
-                    "success": True,
-                    "result": text
-                }
-                self.wfile.write(json.dumps(response_data, ensure_ascii=False).encode('utf-8'))
+                try:
+                    result = response.json()
+                    text = result.get('candidates', [{}])[0].get('content', {}).get('parts', [{}])[0].get('text', '')
+                    
+                    if not text:
+                        # 检查是否被安全过滤
+                        block_reason = result.get('candidates', [{}])[0].get('finishReason', '')
+                        if block_reason == 'SAFETY':
+                            text = "⚠️ 内容被安全过滤，请尝试重新提交。"
+                        else:
+                            text = "⚠️ 未能获取分析结果，请重试。"
+                    
+                    print("✅ 分析完成!")
+                    print(f"   响应长度: {len(text)} 字符")
+                    
+                    self.send_json_response(200, {
+                        "success": True,
+                        "result": text
+                    })
+                except json.JSONDecodeError:
+                    print(f"❌ API返回非JSON格式: {response.text[:200]}")
+                    self.send_json_response(500, {
+                        "success": False,
+                        "error": "API返回格式错误"
+                    })
             else:
-                error_msg = response.json().get('error', {}).get('message', response.text)
-                print(f"❌ API错误: {error_msg}")
+                try:
+                    error_data = response.json()
+                    error_msg = error_data.get('error', {}).get('message', str(error_data))
+                except:
+                    error_msg = response.text[:500]
                 
-                self.send_response(500)
-                self.send_header('Content-Type', 'application/json')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                
-                response_data = {
+                print(f"❌ API错误 ({response.status_code}): {error_msg}")
+                self.send_json_response(response.status_code, {
                     "success": False,
                     "error": error_msg
-                }
-                self.wfile.write(json.dumps(response_data, ensure_ascii=False).encode('utf-8'))
+                })
                 
+        except json.JSONDecodeError as e:
+            print(f"❌ JSON解析错误: {e}")
+            self.send_json_response(400, {
+                "success": False,
+                "error": "请求数据格式错误"
+            })
         except Exception as e:
             print(f"❌ 处理错误: {e}")
             import traceback
             traceback.print_exc()
             
-            self.send_response(500)
-            self.send_header('Content-Type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            
-            response_data = {
+            self.send_json_response(500, {
                 "success": False,
-                "error": str(e)
-            }
-            self.wfile.write(json.dumps(response_data, ensure_ascii=False).encode('utf-8'))
+                "error": f"服务器内部错误: {str(e)}"
+            })
     
     def log_message(self, format, *args):
         """自定义日志格式"""
-        if '/api/' in args[0]:
+        if '/api/' in str(args[0]):
             return  # API请求已经有自定义日志
         print(f"📄 {args[0]}")
 
 
+class ReusableTCPServer(socketserver.TCPServer):
+    """可重用端口的TCP服务器"""
+    allow_reuse_address = True
+
+
+def is_port_in_use(port):
+    """检查端口是否被占用"""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex(('localhost', port)) == 0
+
+
 def open_browser():
     """延迟打开浏览器"""
-    time.sleep(1)
+    time.sleep(1.5)
     webbrowser.open(f'http://localhost:{PORT}/quick_review.html')
 
 
 def main():
     """主函数"""
     print("\n" + "=" * 60)
-    print("🃏 德州扑克快速复盘工具 - 本地服务器")
+    print("🃏 德州扑克快速复盘工具 - 本地服务器 v2.0")
     print("=" * 60)
+    
+    # 检查端口
+    if is_port_in_use(PORT):
+        print(f"\n⚠️ 端口 {PORT} 已被占用!")
+        print(f"   可能服务器已在运行，请访问: http://localhost:{PORT}/quick_review.html")
+        print(f"   或者关闭占用端口的程序后重试")
+        
+        # 尝试打开浏览器
+        webbrowser.open(f'http://localhost:{PORT}/quick_review.html')
+        return
+    
     print(f"\n📍 服务地址: http://localhost:{PORT}")
     print(f"🌐 代理地址: {PROXY}")
     print(f"🔑 API: Gemini 2.5 Flash")
@@ -307,18 +485,21 @@ def main():
     # 启动浏览器（在新线程中延迟打开）
     threading.Thread(target=open_browser, daemon=True).start()
     
-    # 启动HTTP服务器
-    with socketserver.TCPServer(("", PORT), QuickReviewHandler) as httpd:
-        print(f"✅ 服务器已启动: http://localhost:{PORT}")
-        print("📱 浏览器将自动打开...")
-        print("\n按 Ctrl+C 停止服务器\n")
-        
-        try:
-            httpd.serve_forever()
-        except KeyboardInterrupt:
-            print("\n\n👋 服务器已停止")
+    # 启动HTTP服务器（使用可重用端口）
+    try:
+        with ReusableTCPServer(("", PORT), QuickReviewHandler) as httpd:
+            print(f"✅ 服务器已启动: http://localhost:{PORT}")
+            print("📱 浏览器将自动打开...")
+            print("\n按 Ctrl+C 停止服务器\n")
+            
+            try:
+                httpd.serve_forever()
+            except KeyboardInterrupt:
+                print("\n\n👋 服务器已停止")
+    except OSError as e:
+        print(f"\n❌ 服务器启动失败: {e}")
+        print("   请检查端口是否被占用")
 
 
 if __name__ == "__main__":
     main()
-
