@@ -1344,13 +1344,24 @@
             try {
                 const prompt = buildAnalysisPrompt(data);
                 
-                addLog('⏳ AI分析中，预计30-60秒...', 'info');
+                addLog('⏳ AI分析中，预计30-90秒...', 'info');
 
                 let result;
-                if (selectedAI === 'gemini') {
-                    result = await callGemini(prompt);
-                } else {
-                    result = await callDeepSeek(prompt);
+                try {
+                    if (selectedAI === 'gemini') {
+                        result = await callGemini(prompt);
+                    } else {
+                        result = await callDeepSeek(prompt);
+                    }
+                } catch (apiError) {
+                    // 如果第一次失败，自动重试一次
+                    addLog('⚠️ 首次请求失败，正在重试...', 'warning');
+                    await new Promise(r => setTimeout(r, 2000)); // 等待2秒
+                    if (selectedAI === 'gemini') {
+                        result = await callGemini(prompt);
+                    } else {
+                        result = await callDeepSeek(prompt);
+                    }
                 }
 
                 addLog('✅ 分析完成！', 'success');
@@ -1376,7 +1387,11 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: { temperature: 0.7, maxOutputTokens: 8192 }
+                    generationConfig: { 
+                        temperature: 0.7, 
+                        maxOutputTokens: 8192,
+                        topP: 0.95
+                    }
                 })
             });
 
@@ -1387,20 +1402,63 @@
                     msg = err.error?.message || msg;
                     if (msg.includes('location') || msg.includes('supported')) {
                         msg = '请开启VPN后重试';
+                    } else if (msg.includes('quota') || msg.includes('limit')) {
+                        msg = 'API配额已用完，请稍后重试';
                     }
                 } catch (e) {}
                 throw new Error(msg);
             }
 
             const data = await response.json();
-            const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            
+            // 【修复】详细的响应解析和错误处理
+            console.log('Gemini response:', JSON.stringify(data, null, 2));
+            
+            // 检查是否有候选结果
+            if (!data.candidates || data.candidates.length === 0) {
+                // 检查是否被阻止
+                if (data.promptFeedback?.blockReason) {
+                    const reason = data.promptFeedback.blockReason;
+                    addLog(`⚠️ 请求被阻止: ${reason}`, 'warning');
+                    throw new Error(`内容被安全策略阻止: ${reason}`);
+                }
+                throw new Error('Gemini未返回任何结果，请重试');
+            }
+            
+            const candidate = data.candidates[0];
+            const finishReason = candidate.finishReason;
+            
+            // 处理各种完成原因
+            if (finishReason === 'SAFETY') {
+                const safetyRatings = candidate.safetyRatings?.map(r => `${r.category}: ${r.probability}`).join(', ');
+                addLog(`⚠️ 内容安全过滤: ${safetyRatings || 'unknown'}`, 'warning');
+                throw new Error('内容被安全过滤，请修改手牌描述后重试');
+            }
+            
+            if (finishReason === 'RECITATION') {
+                throw new Error('检测到重复内容，请重试');
+            }
+            
+            if (finishReason === 'MAX_TOKENS') {
+                addLog('⚠️ 输出被截断（达到最大长度）', 'warning');
+                // 继续处理，因为可能还有部分结果
+            }
+            
+            // 提取文本
+            const text = candidate.content?.parts?.[0]?.text;
             
             if (!text) {
-                const reason = data.candidates?.[0]?.finishReason;
-                if (reason === 'SAFETY') {
-                    throw new Error('内容被安全过滤，请修改后重试');
+                // 记录详细信息用于调试
+                addLog(`⚠️ 响应结构异常: finishReason=${finishReason}`, 'warning');
+                console.error('Unexpected response structure:', candidate);
+                
+                // 尝试从其他位置获取文本
+                const altText = candidate.content?.parts?.find(p => p.text)?.text;
+                if (altText) {
+                    return { text: altText, thinking: null };
                 }
-                throw new Error('未获取到分析结果');
+                
+                throw new Error(`Gemini返回空结果 (${finishReason || 'unknown'})，请重试`);
             }
             
             return { text, thinking: null };
@@ -1621,9 +1679,9 @@
         }
 
         // ==================== 初始化 ====================
-        addLog('🎮 德州扑克快速复盘 v4.1', 'info');
+        addLog('🎮 德州扑克快速复盘 v4.2', 'info');
         addLog('📌 流程：上传截图 → OCR识别 → 确认/修正 → AI分析', 'info');
-        addLog('✅ 已修复所有已知bug，可放心使用', 'success');
+        addLog('✅ 已修复分析失败问题，自动重试机制', 'success');
     </script>
 </body>
 </html>
