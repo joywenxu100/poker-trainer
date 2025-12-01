@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎯 锦标赛漏洞诊断 - WSOP训练</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-dark: #0a0612;
+            --bg-card: #150d1f;
+            --bg-panel: #1e1430;
+            --gold: #ffd700;
+            --cyan: #00d9ff;
+            --red: #e74c3c;
+            --green: #2ecc71;
+            --purple: #9b59b6;
+            --text: #f0f0f0;
+            --text-dim: #8a8a9a;
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 15px;
+            padding-bottom: 100px;
+        }
+        .back-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: rgba(0, 217, 255, 0.2);
+            border: 1px solid rgba(0, 217, 255, 0.5);
+            color: var(--cyan);
+            padding: 10px 18px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+        }
+        .container { max-width: 900px; margin: 0 auto; padding-top: 50px; }
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-panel));
+            border-radius: 20px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(0, 217, 255, 0.3);
+        }
+        .header h1 { font-size: 1.8rem; color: var(--cyan); margin-bottom: 10px; }
+        .header p { color: var(--text-dim); }
+
+        .progress-bar {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        .progress-header { display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .progress-text { color: var(--cyan); font-weight: 600; }
+        .progress-track { height: 10px; background: var(--bg-panel); border-radius: 5px; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--cyan), var(--purple)); border-radius: 5px; transition: width 0.5s; }
+
+        .question-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(0, 217, 255, 0.1);
+        }
+        .category-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 15px;
+            background: var(--purple);
+            color: #fff;
+        }
+        .question-text {
+            font-size: 1.15rem;
+            line-height: 1.7;
+            margin-bottom: 25px;
+        }
+        .options { display: flex; flex-direction: column; gap: 12px; }
+        .option-btn {
+            background: var(--bg-panel);
+            border: 2px solid transparent;
+            border-radius: 15px;
+            padding: 18px 25px;
+            color: var(--text);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+        .option-btn:hover { border-color: var(--cyan); }
+        .option-btn.selected { border-color: var(--cyan); background: rgba(0, 217, 255, 0.1); }
+        .option-btn.correct { border-color: var(--green); background: rgba(46, 204, 113, 0.2); }
+        .option-btn.wrong { border-color: var(--red); background: rgba(231, 76, 60, 0.2); }
+
+        .explanation {
+            background: var(--bg-panel);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 25px;
+            display: none;
+            border-left: 4px solid var(--green);
+        }
+        .explanation.show { display: block; }
+        .explanation h4 { color: var(--gold); margin-bottom: 15px; }
+        .explanation p { line-height: 1.8; }
+
+        .next-btn {
+            display: none;
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            border: none;
+            border-radius: 15px;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .next-btn.show { display: block; }
+
+        .result-card {
+            display: none;
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            border: 2px solid var(--cyan);
+        }
+        .result-card.show { display: block; }
+        .result-icon { font-size: 4rem; margin-bottom: 20px; }
+        .result-title { font-size: 1.8rem; color: var(--cyan); margin-bottom: 20px; }
+        .result-score { font-size: 3rem; color: var(--text); font-weight: 700; margin-bottom: 30px; }
+
+        .skill-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        .skill-item {
+            background: var(--bg-panel);
+            padding: 15px;
+            border-radius: 12px;
+        }
+        .skill-name { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 8px; }
+        .skill-bar { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
+        .skill-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+        .skill-fill.high { background: var(--green); }
+        .skill-fill.medium { background: var(--gold); }
+        .skill-fill.low { background: var(--red); }
+        .skill-score { font-size: 0.9rem; color: var(--text); margin-top: 5px; }
+
+        .weakness-list {
+            background: var(--bg-panel);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .weakness-list h4 { color: var(--red); margin-bottom: 15px; }
+        .weakness-list ul { padding-left: 20px; }
+        .weakness-list li { margin: 10px 0; color: var(--text-dim); }
+
+        .restart-btn {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            border: none;
+            border-radius: 30px;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .question-text { font-size: 1rem; }
+            .skill-breakdown { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <a href="wsop_tournament_hub.html?v=6" class="back-btn">← 返回锦标赛中心</a>
+
+    <div class="container">
+        <div class="header">
+            <h1>🎯 锦标赛漏洞诊断</h1>
+            <p>30题全方位评估你的锦标赛技能，精准定位薄弱环节</p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-header">
+                <span class="progress-text">诊断进度</span>
+                <span class="progress-text" id="progress-count">0 / 30</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="question-card" id="question-card">
+            <span class="category-badge" id="category-badge">ICM基础</span>
+            <div class="question-text" id="question-text">加载中...</div>
+            <div class="options" id="options"></div>
+            <div class="explanation" id="explanation">
+                <h4>📚 解析</h4>
+                <p id="explanation-content"></p>
+            </div>
+            <button class="next-btn" id="next-btn" onclick="nextQuestion()">下一题 →</button>
+        </div>
+
+        <div class="result-card" id="result-card">
+            <div class="result-icon">🎯</div>
+            <div class="result-title">诊断完成！</div>
+            <div class="result-score" id="result-score">0%</div>
+            
+            <div class="skill-breakdown" id="skill-breakdown"></div>
+            
+            <div class="weakness-list" id="weakness-list">
+                <h4>⚠️ 需要加强的领域</h4>
+                <ul id="weakness-items"></ul>
+            </div>
+            
+            <button class="restart-btn" onclick="restartAssessment()">重新诊断</button>
+        </div>
+    </div>
+
+    <script>
+        const CATEGORIES = {
+            icm: { name: "ICM基础", color: "#e74c3c" },
+            bubble: { name: "泡沫期策略", color: "#f39c12" },
+            finalTable: { name: "决赛桌", color: "#ffd700" },
+            pushFold: { name: "推挤弃牌", color: "#9b59b6" },
+            stackManagement: { name: "筹码管理", color: "#3498db" },
+            mental: { name: "心态控制", color: "#2ecc71" }
+        };
+
+        const ASSESSMENT_QUESTIONS = [
+            // ICM基础 (5题)
+            {
+                category: "icm",
+                question: "在锦标赛中，ICM(独立筹码模型)的核心概念是什么？",
+                options: [
+                    "A. 筹码越多越好，线性增长",
+                    "B. 筹码的边际价值递减，赢的价值<输的代价",
+                    "C. 只关注筹码数量，不考虑奖金结构",
+                    "D. 筹码价值与现金局相同"
+                ],
+                correctIndex: 1,
+                explanation: "ICM的核心是筹码边际价值递减。在锦标赛中，你赢得的筹码增加的股权，小于你输掉相同筹码减少的股权。这意味着风险/回报不对称。"
+            },
+            {
+                category: "icm",
+                question: "决赛桌5人，你是筹码领先者(40BB)。短筹码(10BB)全押，你拿到AKs。大盲是另一个大筹码(35BB)。最佳策略是？",
+                options: [
+                    "A. 快速跟注，AKs太强了",
+                    "B. 弃牌，让大盲去对抗",
+                    "C. 超额全押隔离",
+                    "D. 只跟注10BB"
+                ],
+                correctIndex: 1,
+                explanation: "作为筹码领先者，让其他大筹码去淘汰短筹码对你最有利。AKs虽强，但冒险不值得。每次有人出局，你的ICM股权都会增加。"
+            },
+            {
+                category: "icm",
+                question: "什么情况下ICM压力最大？",
+                options: [
+                    "A. 锦标赛刚开始时",
+                    "B. 泡沫期，距离钱圈还差几人",
+                    "C. 已经进入钱圈后",
+                    "D. 单挑决赛时"
+                ],
+                correctIndex: 1,
+                explanation: "泡沫期ICM压力最大！因为下一个出局的人一分钱都拿不到，而进入钱圈的人至少有最低奖金。这个跳跃点造成巨大的ICM压力。"
+            },
+            {
+                category: "icm",
+                question: "在ICM计算中，以下哪个说法是正确的？",
+                options: [
+                    "A. 筹码第一名的ICM股权等于其筹码占比",
+                    "B. 筹码第一名的ICM股权大于其筹码占比",
+                    "C. 筹码第一名的ICM股权小于其筹码占比",
+                    "D. ICM股权与筹码占比无关"
+                ],
+                correctIndex: 2,
+                explanation: "由于筹码边际价值递减，筹码领先者的ICM股权通常小于其筹码占比。例如，拥有50%筹码的玩家，ICM股权可能只有35-40%。"
+            },
+            {
+                category: "icm",
+                question: "面对ICM压力，大筹码玩家应该？",
+                options: [
+                    "A. 更保守，保护筹码领先",
+                    "B. 更激进，利用ICM压力攻击中小筹码",
+                    "C. 和其他大筹码对抗，争取更多筹码",
+                    "D. 等待短筹码自己出局"
+                ],
+                correctIndex: 1,
+                explanation: "大筹码应该利用ICM压力积极攻击中小筹码！他们不敢轻易和你对抗，因为出局对他们的代价更大。但要避免和其他大筹码正面对抗。"
+            },
+            // 泡沫期策略 (5题)
+            {
+                category: "bubble",
+                question: "泡沫期，你是中等筹码(25BB)。大筹码(50BB)在CO加注，你在按钮位拿到AJo。最佳策略？",
+                options: [
+                    "A. 3-Bet到7BB",
+                    "B. 跟注",
+                    "C. 弃牌",
+                    "D. 全押"
+                ],
+                correctIndex: 2,
+                explanation: "泡沫期中筹码要极度谨慎！AJo面对大筹码的加注不够强。你不想在泡沫期和大筹码建大底池。弃牌等待更好的机会。"
+            },
+            {
+                category: "bubble",
+                question: "泡沫期，你是短筹码(8BB)在按钮位。前面全弃到你，盲注是大筹码。你拿到Q♠T♠。应该？",
+                options: [
+                    "A. 弃牌等更好的牌",
+                    "B. 加注到2BB",
+                    "C. 全押8BB",
+                    "D. Limp"
+                ],
+                correctIndex: 2,
+                explanation: "短筹码在泡沫期要利用ICM压力反击！大筹码不想和你全押对抗。QTs是很好的推挤牌，8BB有足够的弃牌股权。"
+            },
+            {
+                category: "bubble",
+                question: "泡沫期最后1人，剩101人进钱圈100人。短筹码全押，你在MP拿到JJ。后面还有5人。应该？",
+                options: [
+                    "A. 快速跟注",
+                    "B. 弃牌让别人去",
+                    "C. 超额全押",
+                    "D. 只跟注"
+                ],
+                correctIndex: 1,
+                explanation: "钱圈边缘ICM压力达到顶峰！即使JJ是好牌，让别人去淘汰短筹码对你更有利。等1个人出局后再激进。"
+            },
+            {
+                category: "bubble",
+                question: "泡沫期，你是筹码领先者(60BB)在按钮位。拿到K♥8♣，前面全弃。大盲是20BB中筹码。应该？",
+                options: [
+                    "A. 弃牌",
+                    "B. 加注到2.2BB",
+                    "C. 加注到4BB",
+                    "D. Limp"
+                ],
+                correctIndex: 1,
+                explanation: "大筹码在泡沫期要积极利用ICM压力偷盲！K8o足够开池，小额加注(2.2BB)给对手最大压力。被3-Bet可以轻松弃牌。"
+            },
+            {
+                category: "bubble",
+                question: "泡沫期刚破，进入钱圈。你的策略应该？",
+                options: [
+                    "A. 继续保守，慢慢晋级",
+                    "B. 可以更激进，ICM压力释放",
+                    "C. 和泡沫期完全一样",
+                    "D. 全押每一手"
+                ],
+                correctIndex: 1,
+                explanation: "泡沫刚破后ICM压力暂时释放！这是积累筹码的好时机，可以更激进地争取筹码，为后面的奖金跳跃做准备。"
+            },
+            // 决赛桌 (5题)
+            {
+                category: "finalTable",
+                question: "决赛桌9人刚开始，你是中等筹码。最佳策略是？",
+                options: [
+                    "A. 非常激进，争取筹码领先",
+                    "B. 保守为主，等待机会",
+                    "C. 和平时一样打",
+                    "D. 只玩AA/KK"
+                ],
+                correctIndex: 1,
+                explanation: "决赛桌刚开始，9人还在，ICM压力很大。保守为主，等待短筹码出局。每次有人出局，你的奖金都会增加。"
+            },
+            {
+                category: "finalTable",
+                question: "决赛桌4人，你是筹码第二(35BB)。筹码领先者(50BB)在CO加注，你在按钮位拿到QQ。应该？",
+                options: [
+                    "A. 弃牌保护名次",
+                    "B. 跟注控制底池",
+                    "C. 3-Bet到8BB",
+                    "D. 全押"
+                ],
+                correctIndex: 2,
+                explanation: "QQ是顶级牌！4人桌ICM影响减弱，QQ值得3-Bet争取价值。3-Bet到8BB给对手压力，如果他4-Bet全押再重新评估。"
+            },
+            {
+                category: "finalTable",
+                question: "单挑决赛，你在按钮位(小盲)拿到9♠6♠。应该？",
+                options: [
+                    "A. 弃牌",
+                    "B. Limp",
+                    "C. 加注到2.5BB",
+                    "D. 全押"
+                ],
+                correctIndex: 2,
+                explanation: "单挑时96s是完全可以开池的牌！按钮位要非常激进，加注80%+的手牌。96s有很好的可玩性，可以击中顺子或同花。"
+            },
+            {
+                category: "finalTable",
+                question: "决赛桌3人，短筹码(10BB)全押。你在小盲拿到AQs，大盲是另一个大筹码。应该？",
+                options: [
+                    "A. 弃牌让大盲去打",
+                    "B. 跟注10BB",
+                    "C. 超额全押",
+                    "D. 加注到20BB"
+                ],
+                correctIndex: 0,
+                explanation: "3人桌让大盲去淘汰短筹码对你最有利！即使AQs很强，让别人承担风险。如果大盲淘汰他，你直接进入单挑！"
+            },
+            {
+                category: "finalTable",
+                question: "单挑决赛，对手非常激进。你在大盲拿到K♠J♣，对手加注到3BB。应该？",
+                options: [
+                    "A. 弃牌",
+                    "B. 跟注",
+                    "C. 3-Bet到9BB",
+                    "D. 全押"
+                ],
+                correctIndex: 2,
+                explanation: "面对激进对手要反击！KJo在单挑是很好的牌。对手范围很宽，你的KJ是领先的。3-Bet给他压力！"
+            },
+            // 推挤弃牌 (5题)
+            {
+                category: "pushFold",
+                question: "15BB在按钮位，前面全弃。你拿到A♥7♥。应该？",
+                options: [
+                    "A. 弃牌",
+                    "B. 加注到2.5BB",
+                    "C. 全押15BB",
+                    "D. Limp"
+                ],
+                correctIndex: 2,
+                explanation: "15BB是推挤区间！A7s在按钮位是明确的推挤牌。不要小额加注(被3-Bet很尴尬)，要么全押要么弃牌。"
+            },
+            {
+                category: "pushFold",
+                question: "8BB在CO位，前面全弃。你拿到K♦J♦。应该？",
+                options: [
+                    "A. 弃牌等更好的牌",
+                    "B. 全押8BB",
+                    "C. 加注到2BB",
+                    "D. Limp"
+                ],
+                correctIndex: 1,
+                explanation: "8BB必须推挤！KJs是很好的推挤牌，有阻隔效应和不错的胜率。再等下去筹码会被盲注吃光。"
+            },
+            {
+                category: "pushFold",
+                question: "10BB在UTG，9人桌。你拿到A♠K♠。应该？",
+                options: [
+                    "A. 加注到2.5BB",
+                    "B. 全押10BB",
+                    "C. Limp然后全押",
+                    "D. 弃牌等更好位置"
+                ],
+                correctIndex: 1,
+                explanation: "AKs在任何位置都是推挤牌！10BB太短，不适合小额加注。全押有弃牌股权，被跟注也有很好的胜率。"
+            },
+            {
+                category: "pushFold",
+                question: "6BB在小盲位，大盲是大筹码。你拿到Q♠9♠。应该？",
+                options: [
+                    "A. 弃牌",
+                    "B. 完成小盲",
+                    "C. 全押6BB",
+                    "D. 加注到3BB"
+                ],
+                correctIndex: 2,
+                explanation: "6BB在小盲位Q9s是必须推挤的牌！大筹码不想和你对抗(ICM压力)。6BB再不行动就要被盲注吃光。"
+            },
+            {
+                category: "pushFold",
+                question: "12BB在按钮位，CO加注到2.5BB。你拿到T♠T♣。应该？",
+                options: [
+                    "A. 弃牌",
+                    "B. 跟注",
+                    "C. 3-Bet全押12BB",
+                    "D. 3-Bet到7BB"
+                ],
+                correctIndex: 2,
+                explanation: "TT面对加注是3-Bet全押的牌！12BB太短，不适合小3-Bet。全押有弃牌股权，被跟注TT也有很好的胜率。"
+            },
+            // 筹码管理 (5题)
+            {
+                category: "stackManagement",
+                question: "锦标赛中期，你有40BB，平均筹码30BB。你的策略应该？",
+                options: [
+                    "A. 保守等待，保护筹码",
+                    "B. 适度激进，利用筹码优势",
+                    "C. 非常激进，争取更多",
+                    "D. 和短筹码一样打"
+                ],
+                correctIndex: 1,
+                explanation: "40BB是健康筹码，可以适度激进。利用对中小筹码的压力偷盲，但不要过度冒险。保持筹码优势。"
+            },
+            {
+                category: "stackManagement",
+                question: "你有25BB，盲注即将从1k/2k涨到1.5k/3k。你应该？",
+                options: [
+                    "A. 等盲注涨后再行动",
+                    "B. 盲注涨前积极寻找推挤机会",
+                    "C. 无所谓，继续正常打",
+                    "D. 更保守，等好牌"
+                ],
+                correctIndex: 1,
+                explanation: "盲注上涨前要积极行动！涨后你只有约17BB，推挤力量大减。现在25BB还有很好的弃牌股权。"
+            },
+            {
+                category: "stackManagement",
+                question: "刚刚输了一个大底池，从50BB变成20BB。你应该？",
+                options: [
+                    "A. 更激进，快速恢复",
+                    "B. 调整策略，适应新筹码量",
+                    "C. 更保守，等好牌",
+                    "D. Tilt，全押下一手"
+                ],
+                correctIndex: 1,
+                explanation: "筹码量变化后要调整策略！20BB和50BB的打法完全不同。冷静下来，按照20BB的策略打，不要Tilt。"
+            },
+            {
+                category: "stackManagement",
+                question: "你有100BB深筹码，面对15BB短筹码的全押。你拿到66。应该？",
+                options: [
+                    "A. 快速跟注",
+                    "B. 弃牌",
+                    "C. 根据位置和对手范围决定",
+                    "D. 超额全押"
+                ],
+                correctIndex: 2,
+                explanation: "深筹码面对短筹码全押要根据情况决定。66对抗宽范围有足够胜率，但要考虑位置、对手范围和ICM因素。"
+            },
+            {
+                category: "stackManagement",
+                question: "锦标赛后期，你有60BB是全场第二。筹码领先者有80BB。你应该？",
+                options: [
+                    "A. 攻击筹码领先者，争取第一",
+                    "B. 攻击中小筹码，避免和CL对抗",
+                    "C. 保守等待，保护名次",
+                    "D. 和CL结盟"
+                ],
+                correctIndex: 1,
+                explanation: "避免和CL正面对抗！攻击中小筹码更安全，他们的ICM压力更大。让CL和其他人对抗，你坐收渔利。"
+            },
+            // 心态控制 (5题)
+            {
+                category: "mental",
+                question: "刚刚被Bad Beat，AA输给了22全押。你应该？",
+                options: [
+                    "A. 下一手全押报复",
+                    "B. 深呼吸，冷静几分钟再继续",
+                    "C. 抱怨运气不好",
+                    "D. 立刻更激进地打"
+                ],
+                correctIndex: 1,
+                explanation: "Bad Beat后最重要的是冷静！深呼吸，让情绪平复。Tilt是锦标赛最大的敌人。记住：你做了正确的决定，这才是重要的。"
+            },
+            {
+                category: "mental",
+                question: "决赛桌，你感到非常紧张。最佳应对方式？",
+                options: [
+                    "A. 喝酒放松",
+                    "B. 专注于决策过程，不要想结果",
+                    "C. 想着奖金数字",
+                    "D. 更快速地做决定"
+                ],
+                correctIndex: 1,
+                explanation: "专注于决策过程而不是结果！每一手牌只关注做出正确的决定。结果不可控，但决策质量可控。"
+            },
+            {
+                category: "mental",
+                question: "连续几手牌都拿到垃圾牌，你应该？",
+                options: [
+                    "A. 用垃圾牌诈唬，打破僵局",
+                    "B. 保持耐心，等待好牌",
+                    "C. 抱怨发牌员",
+                    "D. 更紧地打"
+                ],
+                correctIndex: 1,
+                explanation: "锦标赛需要耐心！牌运会平衡，不要因为急躁而犯错。保持专注，等待好的机会。"
+            },
+            {
+                category: "mental",
+                question: "你发现自己开始疲劳，注意力下降。应该？",
+                options: [
+                    "A. 继续打，不能示弱",
+                    "B. 利用休息时间恢复，补充能量",
+                    "C. 喝更多咖啡",
+                    "D. 更激进地打，快速结束"
+                ],
+                correctIndex: 1,
+                explanation: "疲劳会严重影响决策质量！利用休息时间站起来走动，补充水分和食物。保持最佳状态很重要。"
+            },
+            {
+                category: "mental",
+                question: "对手一直在挑衅你，试图让你Tilt。你应该？",
+                options: [
+                    "A. 回击挑衅",
+                    "B. 忽略他，专注于自己的决策",
+                    "C. 向裁判投诉",
+                    "D. 针对他更激进地打"
+                ],
+                correctIndex: 1,
+                explanation: "不要被对手影响！忽略挑衅，专注于做出正确的决策。让他的策略失败。保持冷静是最好的回应。"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let correctCount = 0;
+        let answered = false;
+        let categoryScores = {};
+
+        Object.keys(CATEGORIES).forEach(cat => {
+            categoryScores[cat] = { correct: 0, total: 0 };
+        });
+
+        function loadQuestion() {
+            if (currentQuestion >= ASSESSMENT_QUESTIONS.length) {
+                showResult();
+                return;
+            }
+
+            const q = ASSESSMENT_QUESTIONS[currentQuestion];
+            answered = false;
+
+            document.getElementById('progress-count').textContent = `${currentQuestion + 1} / ${ASSESSMENT_QUESTIONS.length}`;
+            document.getElementById('progress-fill').style.width = `${((currentQuestion + 1) / ASSESSMENT_QUESTIONS.length) * 100}%`;
+
+            document.getElementById('category-badge').textContent = CATEGORIES[q.category].name;
+            document.getElementById('category-badge').style.background = CATEGORIES[q.category].color;
+            document.getElementById('question-text').textContent = q.question;
+
+            document.getElementById('options').innerHTML = q.options.map((opt, i) => `
+                <button class="option-btn" onclick="selectOption(${i})">${opt}</button>
+            `).join('');
+
+            document.getElementById('explanation').classList.remove('show');
+            document.getElementById('next-btn').classList.remove('show');
+        }
+
+        function selectOption(index) {
+            if (answered) return;
+            answered = true;
+
+            const q = ASSESSMENT_QUESTIONS[currentQuestion];
+            const buttons = document.querySelectorAll('.option-btn');
+
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === q.correctIndex) {
+                    btn.classList.add('correct');
+                } else if (i === index && index !== q.correctIndex) {
+                    btn.classList.add('wrong');
+                }
+            });
+
+            categoryScores[q.category].total++;
+            if (index === q.correctIndex) {
+                correctCount++;
+                categoryScores[q.category].correct++;
+            }
+
+            document.getElementById('explanation-content').textContent = q.explanation;
+            document.getElementById('explanation').classList.add('show');
+            document.getElementById('next-btn').classList.add('show');
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            loadQuestion();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showResult() {
+            document.getElementById('question-card').style.display = 'none';
+            document.getElementById('result-card').classList.add('show');
+
+            const percentage = Math.round((correctCount / ASSESSMENT_QUESTIONS.length) * 100);
+            document.getElementById('result-score').textContent = `${percentage}%`;
+
+            // 显示各维度得分
+            const breakdownHtml = Object.entries(CATEGORIES).map(([key, cat]) => {
+                const score = categoryScores[key];
+                const pct = score.total > 0 ? Math.round((score.correct / score.total) * 100) : 0;
+                const level = pct >= 80 ? 'high' : pct >= 50 ? 'medium' : 'low';
+                return `
+                    <div class="skill-item">
+                        <div class="skill-name">${cat.name}</div>
+                        <div class="skill-bar">
+                            <div class="skill-fill ${level}" style="width: ${pct}%"></div>
+                        </div>
+                        <div class="skill-score">${pct}%</div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('skill-breakdown').innerHTML = breakdownHtml;
+
+            // 找出薄弱环节
+            const weaknesses = Object.entries(categoryScores)
+                .filter(([_, score]) => score.total > 0 && (score.correct / score.total) < 0.6)
+                .map(([key, _]) => CATEGORIES[key].name);
+
+            if (weaknesses.length > 0) {
+                document.getElementById('weakness-items').innerHTML = weaknesses.map(w => `<li>${w} - 建议重点练习</li>`).join('');
+            } else {
+                document.getElementById('weakness-list').innerHTML = '<h4 style="color: var(--green);">✅ 各项技能均衡，继续保持！</h4>';
+            }
+        }
+
+        function restartAssessment() {
+            currentQuestion = 0;
+            correctCount = 0;
+            Object.keys(categoryScores).forEach(cat => {
+                categoryScores[cat] = { correct: 0, total: 0 };
+            });
+            document.getElementById('question-card').style.display = 'block';
+            document.getElementById('result-card').classList.remove('show');
+            loadQuestion();
+        }
+
+        document.addEventListener('DOMContentLoaded', loadQuestion);
+    </script>
+</body>
+</html>
+

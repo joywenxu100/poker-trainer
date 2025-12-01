@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>💵 奖金结构分析 - WSOP锦标赛工具</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-dark: #0a0612;
+            --bg-card: #150d1f;
+            --bg-panel: #1e1430;
+            --gold: #ffd700;
+            --red: #e74c3c;
+            --green: #2ecc71;
+            --cyan: #00d9ff;
+            --text: #f0f0f0;
+            --text-dim: #8a8a9a;
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 15px;
+            padding-bottom: 100px;
+        }
+        .back-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            color: var(--gold);
+            padding: 10px 18px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+        }
+        .container { max-width: 1000px; margin: 0 auto; padding-top: 50px; }
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-panel));
+            border-radius: 20px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        .header h1 { font-size: 1.8rem; color: var(--gold); margin-bottom: 10px; }
+        .header p { color: var(--text-dim); }
+
+        .structure-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .structure-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 25px;
+            border-top: 4px solid var(--card-color);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .structure-card:hover { transform: translateY(-5px); }
+        .structure-card.active { border: 2px solid var(--card-color); }
+        .structure-card h3 { color: var(--card-color); margin-bottom: 15px; }
+        .structure-card p { color: var(--text-dim); margin-bottom: 15px; line-height: 1.6; }
+        .structure-stats { display: flex; gap: 20px; flex-wrap: wrap; }
+        .stat { text-align: center; }
+        .stat-value { font-size: 1.3rem; color: var(--gold); font-weight: 700; }
+        .stat-label { font-size: 0.8rem; color: var(--text-dim); }
+
+        .card-steep { --card-color: #e74c3c; }
+        .card-flat { --card-color: #2ecc71; }
+        .card-standard { --card-color: #f39c12; }
+
+        .analysis-section {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+        .section-title { color: var(--gold); font-size: 1.2rem; margin-bottom: 20px; }
+
+        .payout-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .payout-table th, .payout-table td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .payout-table th { background: var(--bg-panel); color: var(--gold); }
+        .payout-table .jump { color: var(--green); font-weight: 600; }
+        .payout-table .critical { background: rgba(231, 76, 60, 0.2); }
+
+        .strategy-box {
+            background: var(--bg-panel);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+        .strategy-box h4 { color: var(--cyan); margin-bottom: 15px; }
+        .strategy-box ul { padding-left: 20px; }
+        .strategy-box li { color: var(--text-dim); margin: 10px 0; line-height: 1.7; }
+        .highlight { color: var(--gold); font-weight: 600; }
+        .danger { color: var(--red); }
+        .success { color: var(--green); }
+
+        .chart-container {
+            height: 200px;
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            padding: 20px;
+            background: var(--bg-panel);
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(to top, var(--gold), #ff8c00);
+            border-radius: 5px 5px 0 0;
+            position: relative;
+            min-height: 20px;
+            transition: height 0.5s;
+        }
+        .chart-bar .label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+        .chart-bar .value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            color: var(--gold);
+            white-space: nowrap;
+        }
+
+        @media (max-width: 768px) {
+            .structure-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <a href="wsop_tournament_hub.html?v=6" class="back-btn">← 返回锦标赛中心</a>
+
+    <div class="container">
+        <div class="header">
+            <h1>💵 奖金结构分析</h1>
+            <p>分析不同奖金结构对策略的影响 · 优化你的风险回报决策</p>
+        </div>
+
+        <h3 style="color: var(--gold); margin-bottom: 15px;">📊 选择奖金结构类型</h3>
+        <div class="structure-grid">
+            <div class="structure-card card-steep active" onclick="selectStructure('steep')">
+                <h3>🔺 陡峭结构</h3>
+                <p>冠军奖金占比很高，名次之间差距大。常见于大型锦标赛主赛事。</p>
+                <div class="structure-stats">
+                    <div class="stat">
+                        <div class="stat-value">50%+</div>
+                        <div class="stat-label">冠军占比</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">高</div>
+                        <div class="stat-label">波动性</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="structure-card card-standard" onclick="selectStructure('standard')">
+                <h3>📊 标准结构</h3>
+                <p>平衡的奖金分配，冠军和亚军差距适中。最常见的结构。</p>
+                <div class="structure-stats">
+                    <div class="stat">
+                        <div class="stat-value">30-40%</div>
+                        <div class="stat-label">冠军占比</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">中</div>
+                        <div class="stat-label">波动性</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="structure-card card-flat" onclick="selectStructure('flat')">
+                <h3>➖ 扁平结构</h3>
+                <p>奖金分配较为平均，名次之间差距小。常见于小型赛事。</p>
+                <div class="structure-stats">
+                    <div class="stat">
+                        <div class="stat-value">20-30%</div>
+                        <div class="stat-label">冠军占比</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">低</div>
+                        <div class="stat-label">波动性</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="analysis-section" id="analysis-section">
+            <h3 class="section-title">📈 奖金分布可视化</h3>
+            <div class="chart-container" id="chart-container"></div>
+
+            <table class="payout-table" id="payout-table">
+                <thead>
+                    <tr>
+                        <th>名次</th>
+                        <th>奖金</th>
+                        <th>占比</th>
+                        <th>跳跃</th>
+                        <th>策略影响</th>
+                    </tr>
+                </thead>
+                <tbody id="payout-body"></tbody>
+            </table>
+
+            <div class="strategy-box" id="strategy-box">
+                <h4>🎯 策略建议</h4>
+                <ul id="strategy-list"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STRUCTURES = {
+            steep: {
+                name: "陡峭结构",
+                payouts: [
+                    { place: 1, amount: 1000000, pct: 50 },
+                    { place: 2, amount: 500000, pct: 25 },
+                    { place: 3, amount: 250000, pct: 12.5 },
+                    { place: 4, amount: 150000, pct: 7.5 },
+                    { place: 5, amount: 100000, pct: 5 }
+                ],
+                strategies: [
+                    "<span class='highlight'>冠军导向</span> - 值得冒更大风险争取冠军",
+                    "<span class='danger'>ICM影响减弱</span> - 因为冠军奖金太高，争取第一更重要",
+                    "决赛桌可以更激进 - 不要满足于晋级",
+                    "<span class='success'>大筹码优势更大</span> - 可以施加更多压力",
+                    "单挑时要全力争取 - 冠亚军差距巨大"
+                ]
+            },
+            standard: {
+                name: "标准结构",
+                payouts: [
+                    { place: 1, amount: 400000, pct: 35 },
+                    { place: 2, amount: 250000, pct: 22 },
+                    { place: 3, amount: 175000, pct: 15 },
+                    { place: 4, amount: 125000, pct: 11 },
+                    { place: 5, amount: 100000, pct: 9 },
+                    { place: 6, amount: 90000, pct: 8 }
+                ],
+                strategies: [
+                    "<span class='highlight'>平衡策略</span> - 既要争取晋级，也要争取冠军",
+                    "ICM影响正常 - 按标准ICM策略打",
+                    "<span class='success'>关注关键跳跃点</span> - 进决赛桌、进前3等",
+                    "中等筹码要谨慎 - 不要过早冒险",
+                    "泡沫期ICM压力大 - 标准收紧策略"
+                ]
+            },
+            flat: {
+                name: "扁平结构",
+                payouts: [
+                    { place: 1, amount: 250000, pct: 25 },
+                    { place: 2, amount: 200000, pct: 20 },
+                    { place: 3, amount: 150000, pct: 15 },
+                    { place: 4, amount: 125000, pct: 12.5 },
+                    { place: 5, amount: 100000, pct: 10 },
+                    { place: 6, amount: 90000, pct: 9 },
+                    { place: 7, amount: 85000, pct: 8.5 }
+                ],
+                strategies: [
+                    "<span class='highlight'>生存导向</span> - 每次晋级都有价值",
+                    "<span class='danger'>ICM影响最大</span> - 要非常谨慎",
+                    "避免边缘情况 - 不值得冒险",
+                    "<span class='success'>保护名次</span> - 晋级比争取冠军更重要",
+                    "短筹码生存价值高 - 不要轻易和他们对抗"
+                ]
+            }
+        };
+
+        let currentStructure = 'steep';
+
+        function selectStructure(type) {
+            currentStructure = type;
+            document.querySelectorAll('.structure-card').forEach(card => card.classList.remove('active'));
+            document.querySelector(`.card-${type}`).classList.add('active');
+            updateAnalysis();
+        }
+
+        function updateAnalysis() {
+            const structure = STRUCTURES[currentStructure];
+            const payouts = structure.payouts;
+            const maxPayout = Math.max(...payouts.map(p => p.amount));
+
+            // 更新图表
+            const chartContainer = document.getElementById('chart-container');
+            chartContainer.innerHTML = payouts.map(p => {
+                const height = (p.amount / maxPayout * 150) + 20;
+                return `
+                    <div class="chart-bar" style="height: ${height}px;">
+                        <span class="value">$${(p.amount / 1000).toFixed(0)}K</span>
+                        <span class="label">#${p.place}</span>
+                    </div>
+                `;
+            }).join('');
+
+            // 更新表格
+            const tbody = document.getElementById('payout-body');
+            tbody.innerHTML = payouts.map((p, idx) => {
+                const jump = idx > 0 ? payouts[idx - 1].amount - p.amount : 0;
+                const jumpPct = idx > 0 ? ((jump / p.amount) * 100).toFixed(0) : '-';
+                const isCritical = jumpPct > 50;
+                
+                let impact = '';
+                if (idx === 0) impact = '🏆 冠军目标';
+                else if (isCritical) impact = '⚠️ 关键跳跃点';
+                else impact = '标准';
+
+                return `
+                    <tr class="${isCritical ? 'critical' : ''}">
+                        <td>第${p.place}名</td>
+                        <td>$${p.amount.toLocaleString()}</td>
+                        <td>${p.pct}%</td>
+                        <td class="jump">${idx > 0 ? '+$' + jump.toLocaleString() : '-'}</td>
+                        <td>${impact}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            // 更新策略建议
+            const strategyList = document.getElementById('strategy-list');
+            strategyList.innerHTML = structure.strategies.map(s => `<li>${s}</li>`).join('');
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', updateAnalysis);
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🏆 决赛桌制霸 - WSOP锦标赛训练</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-dark: #0a0612;
+            --bg-card: #150d1f;
+            --bg-panel: #1e1430;
+            --gold: #ffd700;
+            --gold-dark: #b8860b;
+            --red: #e74c3c;
+            --green: #2ecc71;
+            --purple: #9b59b6;
+            --text: #f0f0f0;
+            --text-dim: #8a8a9a;
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 15px;
+            padding-bottom: 100px;
+        }
+        .back-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            color: var(--gold);
+            padding: 10px 18px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+        }
+        .container { max-width: 1000px; margin: 0 auto; padding-top: 50px; }
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-panel));
+            border-radius: 20px;
+            margin-bottom: 25px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+        }
+        .header h1 { font-size: 1.8rem; color: var(--gold); margin-bottom: 10px; }
+        .header p { color: var(--text-dim); }
+
+        .mode-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .mode-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 20px;
+            background: var(--bg-card);
+            border: 2px solid transparent;
+            border-radius: 15px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .mode-btn:hover { border-color: var(--gold); }
+        .mode-btn.active { border-color: var(--gold); background: rgba(255, 215, 0, 0.1); }
+        .mode-icon { font-size: 2rem; margin-bottom: 10px; }
+        .mode-title { color: var(--gold); font-weight: 700; }
+
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+
+        .knowledge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .knowledge-card {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 25px;
+            border-left: 4px solid var(--gold);
+        }
+        .knowledge-card h3 { color: var(--gold); margin-bottom: 15px; }
+        .knowledge-card ul { padding-left: 20px; }
+        .knowledge-card li { color: var(--text-dim); margin: 8px 0; line-height: 1.6; }
+        .highlight { color: var(--gold); font-weight: 600; }
+        .danger { color: var(--red); }
+        .success { color: var(--green); }
+
+        .scenario-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+        .scenario-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .scenario-badge {
+            background: var(--gold);
+            color: #000;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .scenario-title { color: var(--gold); font-size: 1.2rem; }
+        .scenario-content {
+            background: var(--bg-panel);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+        .stack-display {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .stack-chip {
+            background: rgba(255, 215, 0, 0.1);
+            padding: 10px 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stack-chip .label { font-size: 0.75rem; color: var(--text-dim); }
+        .stack-chip .value { font-size: 1.1rem; color: var(--gold); font-weight: 700; }
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .option-btn {
+            background: var(--bg-panel);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 15px;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+        .option-btn:hover { border-color: var(--gold); }
+        .option-btn.correct { border-color: var(--green); background: rgba(46, 204, 113, 0.2); }
+        .option-btn.wrong { border-color: var(--red); background: rgba(231, 76, 60, 0.2); }
+        .explanation-box {
+            display: none;
+            background: var(--bg-panel);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid var(--green);
+        }
+        .explanation-box.show { display: block; }
+        .explanation-box h4 { color: var(--gold); margin-bottom: 15px; }
+        .next-btn {
+            display: none;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--gold), #ff8c00);
+            border: none;
+            border-radius: 12px;
+            color: #000;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        .next-btn.show { display: block; }
+
+        .progress-bar {
+            background: var(--bg-card);
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+        }
+        .progress-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .progress-track { height: 8px; background: var(--bg-panel); border-radius: 4px; }
+        .progress-fill { height: 100%; background: var(--gold); border-radius: 4px; transition: width 0.3s; }
+
+        .strategy-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .strategy-table th, .strategy-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+        }
+        .strategy-table th { color: var(--gold); background: var(--bg-panel); }
+
+        @media (max-width: 768px) {
+            .mode-selector { flex-direction: column; }
+            .options-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <a href="wsop_tournament_hub.html?v=6" class="back-btn">← 返回锦标赛中心</a>
+
+    <div class="container">
+        <div class="header">
+            <h1>🏆 决赛桌制霸</h1>
+            <p>决赛桌是夺冠的最后战场 · 短桌策略 · 单挑技巧 · 奖金阶梯利用</p>
+        </div>
+
+        <div class="mode-selector">
+            <div class="mode-btn active" onclick="switchMode('learn', event)">
+                <div class="mode-icon">📚</div>
+                <div class="mode-title">核心知识</div>
+            </div>
+            <div class="mode-btn" onclick="switchMode('train', event)">
+                <div class="mode-icon">🎯</div>
+                <div class="mode-title">场景训练</div>
+            </div>
+            <div class="mode-btn" onclick="switchMode('headsup', event)">
+                <div class="mode-icon">🥊</div>
+                <div class="mode-title">单挑策略</div>
+            </div>
+        </div>
+
+        <!-- 核心知识 -->
+        <div class="content-section active" id="learn-section">
+            <div class="knowledge-grid">
+                <div class="knowledge-card">
+                    <h3>🏆 决赛桌的特殊性</h3>
+                    <ul>
+                        <li><span class="highlight">奖金跳跃巨大</span> - 每淘汰一人，奖金大幅增加</li>
+                        <li><span class="highlight">ICM压力最大</span> - 短筹码生存价值极高</li>
+                        <li><span class="highlight">桌型变化快</span> - 从9人到单挑，策略需不断调整</li>
+                        <li><span class="highlight">心理压力</span> - 聚光灯下的表演，需要强大心态</li>
+                    </ul>
+                </div>
+
+                <div class="knowledge-card">
+                    <h3>📊 不同人数的策略调整</h3>
+                    <ul>
+                        <li><span class="success">9人桌</span> - 保守为主，等待机会</li>
+                        <li><span class="success">6人桌</span> - 开始扩大范围</li>
+                        <li><span class="highlight">4人桌</span> - 积极争取筹码领先</li>
+                        <li><span class="danger">3人桌</span> - 关键阶段，ICM影响减弱</li>
+                        <li><span class="danger">单挑</span> - 最激进，几乎所有牌都可以玩</li>
+                    </ul>
+                </div>
+
+                <div class="knowledge-card">
+                    <h3>💰 筹码领先者策略</h3>
+                    <ul>
+                        <li><span class="highlight">施加压力</span> - 利用ICM压力攻击中小筹码</li>
+                        <li><span class="success">避免大筹码互斗</span> - 不和其他大筹码正面对抗</li>
+                        <li>小额加注偷盲 - 风险小，收益稳定</li>
+                        <li>等待短筹码出局 - 每次有人出局你都受益</li>
+                        <li><span class="danger">不要浪费优势</span> - 保持压力但不冒险</li>
+                    </ul>
+                </div>
+
+                <div class="knowledge-card">
+                    <h3>🎯 中等筹码策略</h3>
+                    <ul>
+                        <li><span class="highlight">最尴尬的位置</span> - 不能太激进也不能太保守</li>
+                        <li>寻找好的推挤机会 - 对抗大筹码的偷盲</li>
+                        <li>避免和大筹码正面对抗</li>
+                        <li><span class="success">攻击短筹码</span> - 他们的ICM压力更大</li>
+                        <li>等待晋级机会 - 每次有人出局都是好消息</li>
+                    </ul>
+                </div>
+
+                <div class="knowledge-card">
+                    <h3>⚡ 短筹码生存策略</h3>
+                    <ul>
+                        <li><span class="danger">时间紧迫</span> - 必须尽快行动</li>
+                        <li><span class="highlight">利用ICM压力</span> - 大筹码不想和你对抗</li>
+                        <li>选择好的推挤时机 - 位置和手牌都要考虑</li>
+                        <li>不要等到太短 - 10BB以上还有弃牌股权</li>
+                        <li><span class="success">翻倍后改变策略</span> - 筹码增加后调整打法</li>
+                    </ul>
+                </div>
+
+                <div class="knowledge-card">
+                    <h3>🥊 单挑决赛技巧</h3>
+                    <ul>
+                        <li><span class="highlight">范围大幅扩大</span> - 几乎所有牌都可以玩</li>
+                        <li><span class="success">按钮位优势巨大</span> - 要非常激进</li>
+                        <li>调整对手 - 观察对手的tendencies</li>
+                        <li><span class="danger">不要被动</span> - 主动权很重要</li>
+                        <li>利用位置 - 位置是单挑的核心</li>
+                    </ul>
+                </div>
+
+                <div class="knowledge-card">
+                    <h3>🎭 心理战术</h3>
+                    <ul>
+                        <li><span class="highlight">保持冷静</span> - 不要被压力影响</li>
+                        <li>观察对手 - 他们可能比你更紧张</li>
+                        <li><span class="success">利用形象</span> - 你的桌面形象是武器</li>
+                        <li>控制节奏 - 不要被对手带节奏</li>
+                        <li><span class="danger">避免Tilt</span> - Bad Beat后保持理性</li>
+                    </ul>
+                </div>
+
+                <div class="knowledge-card">
+                    <h3>📈 奖金阶梯利用</h3>
+                    <ul>
+                        <li><span class="highlight">了解奖金结构</span> - 知道每个名次的价值</li>
+                        <li>计算ICM - 知道你的真实股权</li>
+                        <li><span class="success">利用跳跃点</span> - 在关键位置更谨慎</li>
+                        <li>考虑Deal - 在合适时机考虑分奖金</li>
+                        <li><span class="danger">不要只看冠军</span> - 每次晋级都有价值</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 场景训练 -->
+        <div class="content-section" id="train-section">
+            <div class="progress-bar">
+                <div class="progress-header">
+                    <span style="color: var(--gold);">训练进度</span>
+                    <span id="train-progress">0 / 12</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="train-fill" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="scenario-card" id="scenario-card">
+                <div class="scenario-header">
+                    <span class="scenario-title" id="scenario-title">场景 1</span>
+                    <span class="scenario-badge" id="scenario-badge">决赛桌</span>
+                </div>
+                <div class="scenario-content" id="scenario-content">加载中...</div>
+                <div class="stack-display" id="stack-display"></div>
+                <div style="margin: 20px 0;">
+                    <p id="question-text" style="font-size: 1.1rem;">加载中...</p>
+                </div>
+                <div class="options-grid" id="options-grid"></div>
+                <div class="explanation-box" id="explanation-box">
+                    <h4>📚 策略分析</h4>
+                    <p id="explanation-text"></p>
+                </div>
+                <button class="next-btn" id="next-btn" onclick="nextScenario()">下一个场景 →</button>
+            </div>
+
+            <div id="result-card" style="display: none; text-align: center; padding: 40px; background: var(--bg-card); border-radius: 20px;">
+                <div style="font-size: 4rem; margin-bottom: 20px;">🏆</div>
+                <h2 style="color: var(--gold); margin-bottom: 15px;">训练完成！</h2>
+                <p id="result-score" style="font-size: 2rem; margin-bottom: 20px;">0%</p>
+                <p id="result-desc" style="color: var(--text-dim); margin-bottom: 30px;"></p>
+                <button onclick="restartTraining()" style="padding: 15px 40px; background: var(--gold); border: none; border-radius: 30px; color: #000; font-weight: 700; cursor: pointer;">重新训练</button>
+            </div>
+        </div>
+
+        <!-- 单挑策略 -->
+        <div class="content-section" id="headsup-section">
+            <div class="knowledge-card" style="margin-bottom: 20px;">
+                <h3>🥊 单挑决赛策略速查</h3>
+                <table class="strategy-table">
+                    <thead>
+                        <tr>
+                            <th>位置</th>
+                            <th>筹码量</th>
+                            <th>开池范围</th>
+                            <th>3-Bet范围</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="color: var(--green);">按钮位(SB)</td>
+                            <td>30BB+</td>
+                            <td>80%+ 的手牌</td>
+                            <td>顶级15%</td>
+                        </tr>
+                        <tr>
+                            <td style="color: var(--green);">按钮位(SB)</td>
+                            <td>15-30BB</td>
+                            <td>70%+ 的手牌</td>
+                            <td>全押或弃牌</td>
+                        </tr>
+                        <tr>
+                            <td style="color: var(--gold);">大盲位</td>
+                            <td>30BB+</td>
+                            <td>防守60%+</td>
+                            <td>顶级10% 3-Bet</td>
+                        </tr>
+                        <tr>
+                            <td style="color: var(--gold);">大盲位</td>
+                            <td>15-30BB</td>
+                            <td>防守50%+</td>
+                            <td>全押顶级15%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="knowledge-grid">
+                <div class="knowledge-card">
+                    <h3>🎯 按钮位(SB)策略</h3>
+                    <ul>
+                        <li><span class="highlight">极度激进</span> - 加注80%+的手牌</li>
+                        <li>小额加注 - 2-2.5BB足够</li>
+                        <li><span class="success">利用位置</span> - 翻后有绝对优势</li>
+                        <li>面对3-Bet - 根据筹码深度决定</li>
+                        <li>Limp策略 - 偶尔可以limp陷阱</li>
+                    </ul>
+                </div>
+
+                <div class="knowledge-card">
+                    <h3>🛡️ 大盲位防守</h3>
+                    <ul>
+                        <li><span class="highlight">宽防守</span> - 防守60%+的手牌</li>
+                        <li>3-Bet价值牌 - AA-TT, AK-AJ</li>
+                        <li><span class="success">3-Bet诈唬</span> - 适量加入诈唬</li>
+                        <li>跟注范围 - 大部分边缘牌</li>
+                        <li><span class="danger">不要过度弃牌</span> - 会被剥削</li>
+                    </ul>
+                </div>
+
+                <div class="knowledge-card">
+                    <h3>⚡ 短筹码单挑</h3>
+                    <ul>
+                        <li><span class="danger">15BB以下</span> - 推挤或弃牌</li>
+                        <li>按钮位推挤范围 - 前50%手牌</li>
+                        <li>大盲跟注范围 - 前35%手牌</li>
+                        <li><span class="highlight">不要慢玩</span> - 筹码太浅</li>
+                        <li>利用弃牌股权 - 推挤有价值</li>
+                    </ul>
+                </div>
+
+                <div class="knowledge-card">
+                    <h3>🧠 读牌与调整</h3>
+                    <ul>
+                        <li><span class="highlight">观察对手</span> - 他是激进还是保守？</li>
+                        <li>调整范围 - 对手紧则更激进</li>
+                        <li><span class="success">利用形象</span> - 你的形象影响对手决策</li>
+                        <li>变化打法 - 不要太可预测</li>
+                        <li>控制情绪 - 单挑波动大，保持冷静</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const FINAL_TABLE_SCENARIOS = [
+            {
+                title: "9人决赛桌开局",
+                badge: "决赛桌 · 9人",
+                content: "WSOP主赛事决赛桌，刚开始9人。奖金从$1M(第9名)到$10M(冠军)。",
+                stacks: [
+                    { label: "你", value: "35BB" },
+                    { label: "CL", value: "65BB" },
+                    { label: "短筹码", value: "12BB" }
+                ],
+                question: "你在CO位拿到A♠J♠。UTG(65BB筹码领先)加注到2.5BB。你应该怎么做？",
+                options: ["3-Bet到7BB", "跟注", "弃牌", "全押"],
+                correctIndex: 2,
+                explanation: "决赛桌刚开始，9人还在，ICM压力巨大！AJs虽然是好牌，但面对筹码领先者的加注，你不想在这里建大底池。有12BB短筹码可能随时出局，让他先走对你更有利。弃牌保护你的筹码，等待更好的机会。"
+            },
+            {
+                title: "6人桌大筹码施压",
+                badge: "决赛桌 · 6人",
+                content: "决赛桌6人，你是筹码第二多的玩家。",
+                stacks: [
+                    { label: "你", value: "55BB" },
+                    { label: "CL", value: "70BB" },
+                    { label: "短筹码", value: "8BB" }
+                ],
+                question: "你在按钮位拿到K♥Q♥。前面全弃到你。小盲是8BB短筹码，大盲是70BB筹码领先。你应该怎么做？",
+                options: ["弃牌", "加注到2.2BB", "加注到3BB", "Limp"],
+                correctIndex: 1,
+                explanation: "KQs是很好的偷盲牌！小额加注(2.2BB)给短筹码最大压力。8BB短筹码的ICM压力很大，他不敢轻易推挤。大筹码也不想在这里和你打大底池。即使被3-Bet，你可以轻松弃牌。"
+            },
+            {
+                title: "4人桌关键决策",
+                badge: "决赛桌 · 4人",
+                content: "决赛桌4人，奖金跳跃巨大。第4名$2M，第3名$3M，第2名$5M，冠军$10M。",
+                stacks: [
+                    { label: "你", value: "40BB" },
+                    { label: "对手1", value: "45BB" },
+                    { label: "对手2", value: "35BB" },
+                    { label: "短筹码", value: "10BB" }
+                ],
+                question: "10BB短筹码在按钮位全押。你在小盲拿到J♠J♥。大盲是45BB。你应该怎么做？",
+                options: ["弃牌", "跟注10BB", "超额全押40BB", "加注到25BB"],
+                correctIndex: 2,
+                explanation: "JJ是很强的牌！超额全押隔离短筹码，防止大盲参与。淘汰短筹码让你从第4名跳到前3，奖金增加$1M！大盲45BB不会轻易用边缘牌跟注你的全押。JJ对抗短筹码10BB范围有很好的胜率。"
+            },
+            {
+                title: "3人桌ICM决策",
+                badge: "决赛桌 · 3人",
+                content: "决赛桌3人，你是中等筹码。",
+                stacks: [
+                    { label: "你", value: "35BB" },
+                    { label: "CL", value: "50BB" },
+                    { label: "短筹码", value: "15BB" }
+                ],
+                question: "筹码领先者在按钮位加注到2.5BB。你在小盲拿到A♦K♦。短筹码在大盲。你应该怎么做？",
+                options: ["3-Bet到8BB", "跟注", "弃牌", "全押"],
+                correctIndex: 1,
+                explanation: "3人桌ICM影响减弱，但仍要谨慎！AKs是顶级牌，但和CL打大底池对你没好处。跟注控制底池，翻后利用位置优势（虽然OOP但有短筹码在后面）。如果短筹码squeeze，你可以重新评估。"
+            },
+            {
+                title: "单挑决赛",
+                badge: "单挑 · 冠军争夺",
+                content: "单挑决赛！冠军$10M，亚军$5M。你们筹码接近。",
+                stacks: [
+                    { label: "你", value: "55BB" },
+                    { label: "对手", value: "45BB" }
+                ],
+                question: "你在按钮位(小盲)拿到9♠7♠。你应该怎么做？",
+                options: ["弃牌", "Limp", "加注到2.5BB", "加注到3BB"],
+                correctIndex: 2,
+                explanation: "单挑时97s是完全可以开池的牌！按钮位要非常激进，加注80%+的手牌。2.5BB是标准加注大小，给对手压力同时控制底池。97s有很好的可玩性，可以击中顺子、同花或两对。"
+            },
+            {
+                title: "短筹码生存",
+                badge: "决赛桌 · 生存",
+                content: "决赛桌5人，你是短筹码，盲注即将上涨。",
+                stacks: [
+                    { label: "你", value: "8BB" },
+                    { label: "CL", value: "60BB" },
+                    { label: "其他", value: "25-35BB" }
+                ],
+                question: "你在CO位拿到A♥5♥。前面全弃到你。你应该怎么做？",
+                options: ["弃牌等更好的牌", "加注到2BB", "全押8BB", "Limp"],
+                correctIndex: 2,
+                explanation: "8BB必须行动！A5s是很好的推挤牌，有A的阻隔效应和同花潜力。大筹码们不想和你对抗(ICM压力)，弃牌股权很高。等下去筹码会被盲注吃光，现在推挤是最佳时机！"
+            },
+            {
+                title: "面对激进对手",
+                badge: "单挑 · 调整",
+                content: "单挑决赛，对手非常激进，每手牌都加注。",
+                stacks: [
+                    { label: "你", value: "40BB" },
+                    { label: "对手", value: "60BB" }
+                ],
+                question: "对手在按钮位又加注到3BB。你在大盲拿到K♠T♣。你应该怎么做？",
+                options: ["弃牌", "跟注", "3-Bet到9BB", "全押"],
+                correctIndex: 2,
+                explanation: "面对激进对手要反击！KTo在单挑是很好的牌。对手每手都加注说明范围很宽，你的KTo是领先的。3-Bet到9BB给他压力，他要么弃牌要么用边缘牌继续。不能一直被他欺负！"
+            },
+            {
+                title: "筹码领先保护",
+                badge: "决赛桌 · 领先",
+                content: "决赛桌4人，你是筹码领先者。",
+                stacks: [
+                    { label: "你", value: "55BB" },
+                    { label: "对手1", value: "30BB" },
+                    { label: "对手2", value: "25BB" },
+                    { label: "短筹码", value: "10BB" }
+                ],
+                question: "30BB玩家在CO加注到2.5BB。你在按钮位拿到Q♠Q♥。你应该怎么做？",
+                options: ["跟注控制底池", "3-Bet到7BB", "弃牌保护筹码", "全押"],
+                correctIndex: 1,
+                explanation: "QQ是顶级牌，但作为CL要控制风险！3-Bet到7BB是最佳选择，给对手压力同时不过度膨胀底池。如果对手4-Bet全押，你可以根据情况决定。不需要全押冒险，保持筹码领先优势更重要。"
+            },
+            {
+                title: "奖金跳跃点",
+                badge: "决赛桌 · 关键",
+                content: "决赛桌3人，下一个出局的人只拿$3M，前两名分别是$5M和$10M。",
+                stacks: [
+                    { label: "你", value: "30BB" },
+                    { label: "CL", value: "55BB" },
+                    { label: "短筹码", value: "15BB" }
+                ],
+                question: "短筹码在按钮位全押15BB。你在小盲拿到A♣Q♣。CL在大盲。你应该怎么做？",
+                options: ["弃牌让CL去打", "跟注15BB", "超额全押30BB", "加注到25BB"],
+                correctIndex: 0,
+                explanation: "这是关键的奖金跳跃点！让CL去淘汰短筹码对你最有利。如果CL跟注并淘汰他，你直接从$3M跳到至少$5M。AQs虽好，但冒险不值得。弃牌是ICM最优决策！"
+            },
+            {
+                title: "单挑短筹码",
+                badge: "单挑 · 短筹码",
+                content: "单挑决赛，你是短筹码，需要翻盘。",
+                stacks: [
+                    { label: "你", value: "15BB" },
+                    { label: "对手", value: "85BB" }
+                ],
+                question: "你在按钮位(小盲)拿到K♦8♦。你应该怎么做？",
+                options: ["弃牌", "Limp", "加注到2.5BB", "全押15BB"],
+                correctIndex: 3,
+                explanation: "15BB在单挑是推挤区间！K8s在按钮位是完全可以推挤的牌。对手85BB不会轻易用边缘牌跟注(他不需要冒险)。推挤有很好的弃牌股权，即使被跟注K8s也有35%+胜率。"
+            },
+            {
+                title: "深筹码单挑",
+                badge: "单挑 · 深筹码",
+                content: "单挑决赛刚开始，双方筹码都很深。",
+                stacks: [
+                    { label: "你", value: "75BB" },
+                    { label: "对手", value: "75BB" }
+                ],
+                question: "对手在按钮位加注到2.5BB。你在大盲拿到5♥5♣。你应该怎么做？",
+                options: ["弃牌", "跟注", "3-Bet到8BB", "全押"],
+                correctIndex: 1,
+                explanation: "深筹码单挑55可以跟注set mining！75BB深度，击中set可以赢大底池。3-Bet没有意义(55不是好的3-Bet牌)，弃牌太紧。跟注后翻牌没击中就放弃，击中就争取价值。"
+            },
+            {
+                title: "最后一手",
+                badge: "单挑 · 决胜",
+                content: "单挑决赛，你刚刚赢了一个大底池，现在筹码领先。",
+                stacks: [
+                    { label: "你", value: "85BB" },
+                    { label: "对手", value: "15BB" }
+                ],
+                question: "对手在按钮位全押15BB。你在大盲拿到J♦9♦。你应该怎么做？",
+                options: ["弃牌等更好的牌", "跟注", "—", "—"],
+                correctIndex: 1,
+                explanation: "J9s对抗15BB全押范围有足够的胜率！对手短筹码会用很宽的范围推挤，J9s对抗这个范围有40%+胜率。底池赔率也很好(需要跟注15BB赢30BB+)。跟注结束比赛！"
+            }
+        ];
+
+        let currentScenario = 0;
+        let correctCount = 0;
+        let answered = false;
+
+        function switchMode(mode, event) {
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
+            
+            if (event && event.target) {
+                event.target.closest('.mode-btn').classList.add('active');
+            }
+            document.getElementById(mode + '-section').classList.add('active');
+
+            if (mode === 'train') {
+                loadScenario();
+            }
+        }
+
+        function loadScenario() {
+            if (currentScenario >= FINAL_TABLE_SCENARIOS.length) {
+                showResult();
+                return;
+            }
+
+            const s = FINAL_TABLE_SCENARIOS[currentScenario];
+            answered = false;
+
+            document.getElementById('train-progress').textContent = `${currentScenario + 1} / ${FINAL_TABLE_SCENARIOS.length}`;
+            document.getElementById('train-fill').style.width = `${((currentScenario + 1) / FINAL_TABLE_SCENARIOS.length) * 100}%`;
+
+            document.getElementById('scenario-title').textContent = `场景 ${currentScenario + 1}: ${s.title}`;
+            document.getElementById('scenario-badge').textContent = s.badge;
+            document.getElementById('scenario-content').textContent = s.content;
+
+            document.getElementById('stack-display').innerHTML = s.stacks.map(st => `
+                <div class="stack-chip">
+                    <div class="label">${st.label}</div>
+                    <div class="value">${st.value}</div>
+                </div>
+            `).join('');
+
+            document.getElementById('question-text').textContent = s.question;
+
+            const validOptions = s.options.filter(opt => opt !== "—");
+            document.getElementById('options-grid').innerHTML = validOptions.map((opt, i) => `
+                <button class="option-btn" onclick="selectOption(${i})">${opt}</button>
+            `).join('');
+
+            document.getElementById('explanation-box').classList.remove('show');
+            document.getElementById('next-btn').classList.remove('show');
+            document.getElementById('scenario-card').style.display = 'block';
+            document.getElementById('result-card').style.display = 'none';
+        }
+
+        function selectOption(index) {
+            if (answered) return;
+            answered = true;
+
+            const s = FINAL_TABLE_SCENARIOS[currentScenario];
+            const buttons = document.querySelectorAll('.option-btn');
+
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === s.correctIndex) {
+                    btn.classList.add('correct');
+                } else if (i === index && index !== s.correctIndex) {
+                    btn.classList.add('wrong');
+                }
+            });
+
+            if (index === s.correctIndex) correctCount++;
+
+            document.getElementById('explanation-text').textContent = s.explanation;
+            document.getElementById('explanation-box').classList.add('show');
+            document.getElementById('next-btn').classList.add('show');
+        }
+
+        function nextScenario() {
+            currentScenario++;
+            loadScenario();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showResult() {
+            document.getElementById('scenario-card').style.display = 'none';
+            document.getElementById('result-card').style.display = 'block';
+
+            const pct = Math.round((correctCount / FINAL_TABLE_SCENARIOS.length) * 100);
+            document.getElementById('result-score').textContent = pct + '%';
+
+            let desc = pct >= 80 ? '🏆 决赛桌大师！' : pct >= 60 ? '👍 不错，继续练习！' : '📚 需要更多练习！';
+            document.getElementById('result-desc').textContent = desc;
+        }
+
+        function restartTraining() {
+            currentScenario = 0;
+            correctCount = 0;
+            loadScenario();
+        }
+    </script>
+</body>
+</html>
+

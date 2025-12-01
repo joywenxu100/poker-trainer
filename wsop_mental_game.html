@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🧠 锦标赛心态管理 - WSOP训练</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-dark: #0a0612;
+            --bg-card: #150d1f;
+            --bg-panel: #1e1430;
+            --gold: #ffd700;
+            --green: #2ecc71;
+            --red: #e74c3c;
+            --purple: #9b59b6;
+            --cyan: #00d9ff;
+            --text: #f0f0f0;
+            --text-dim: #8a8a9a;
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 15px;
+            padding-bottom: 100px;
+        }
+        .back-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: rgba(46, 204, 113, 0.2);
+            border: 1px solid rgba(46, 204, 113, 0.5);
+            color: var(--green);
+            padding: 10px 18px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+        }
+        .container { max-width: 1000px; margin: 0 auto; padding-top: 50px; }
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-panel));
+            border-radius: 20px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+        }
+        .header h1 { font-size: 1.8rem; color: var(--green); margin-bottom: 10px; }
+        .header p { color: var(--text-dim); }
+
+        .section-title {
+            color: var(--gold);
+            font-size: 1.4rem;
+            margin: 30px 0 20px;
+            padding-left: 15px;
+            border-left: 4px solid var(--gold);
+        }
+
+        .mental-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .mental-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 25px;
+            border-top: 4px solid var(--card-color);
+        }
+        .mental-card h3 {
+            color: var(--card-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .mental-card ul { padding-left: 20px; }
+        .mental-card li { color: var(--text-dim); margin: 12px 0; line-height: 1.7; }
+        .highlight { color: var(--gold); font-weight: 600; }
+        .danger { color: var(--red); }
+        .success { color: var(--green); }
+
+        .card-tilt { --card-color: #e74c3c; }
+        .card-focus { --card-color: #3498db; }
+        .card-pressure { --card-color: #f39c12; }
+        .card-energy { --card-color: #2ecc71; }
+        .card-confidence { --card-color: #9b59b6; }
+        .card-patience { --card-color: #00d9ff; }
+
+        .exercise-box {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+        .exercise-box h3 { color: var(--green); margin-bottom: 20px; }
+        .exercise-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .exercise-step {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+        .step-number {
+            width: 35px;
+            height: 35px;
+            background: var(--green);
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .step-content { color: var(--text-dim); line-height: 1.7; }
+
+        .quote-box {
+            background: linear-gradient(135deg, var(--bg-panel), var(--bg-card));
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 4px solid var(--gold);
+            font-style: italic;
+            color: var(--text);
+        }
+        .quote-author { color: var(--gold); margin-top: 10px; font-style: normal; }
+
+        @media (max-width: 768px) {
+            .mental-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <a href="wsop_tournament_hub.html?v=6" class="back-btn">← 返回锦标赛中心</a>
+
+    <div class="container">
+        <div class="header">
+            <h1>🧠 锦标赛心态管理</h1>
+            <p>长时间比赛的心理素质训练 · 控制情绪 · 保持专注 · 应对逆境</p>
+        </div>
+
+        <div class="quote-box">
+            "扑克是一场马拉松，不是短跑。你不需要赢每一手牌，你需要在关键时刻做出正确的决定。"
+            <div class="quote-author">— Phil Hellmuth</div>
+        </div>
+
+        <h2 class="section-title">🎯 核心心态技能</h2>
+        <div class="mental-grid">
+            <div class="mental-card card-tilt">
+                <h3>😤 Tilt管理</h3>
+                <ul>
+                    <li><span class="danger">Tilt是锦标赛最大的敌人</span></li>
+                    <li>识别Tilt的早期信号 - 心跳加速、呼吸急促</li>
+                    <li><span class="highlight">Bad Beat后深呼吸</span>，数到10再行动</li>
+                    <li>记住：你做了正确的决定，结果不重要</li>
+                    <li>如果无法控制，利用休息时间冷静</li>
+                    <li>不要追回损失 - 每手牌都是独立的</li>
+                </ul>
+            </div>
+
+            <div class="mental-card card-focus">
+                <h3>🎯 专注力</h3>
+                <ul>
+                    <li><span class="highlight">专注于决策过程</span>，不是结果</li>
+                    <li>每手牌都是新的开始</li>
+                    <li>观察对手 - 即使不在手牌中</li>
+                    <li>避免分心 - 手机、聊天等</li>
+                    <li>设定短期目标 - 一个小时、一个级别</li>
+                    <li><span class="success">活在当下</span>，不要想过去或未来</li>
+                </ul>
+            </div>
+
+            <div class="mental-card card-pressure">
+                <h3>💪 压力管理</h3>
+                <ul>
+                    <li><span class="highlight">压力是正常的</span> - 接受它</li>
+                    <li>把压力转化为动力</li>
+                    <li>决赛桌紧张？对手可能更紧张</li>
+                    <li>专注于你能控制的事情</li>
+                    <li>不要想奖金数字 - 专注于打好每手牌</li>
+                    <li>深呼吸技巧 - 4秒吸气，4秒呼气</li>
+                </ul>
+            </div>
+
+            <div class="mental-card card-energy">
+                <h3>⚡ 能量管理</h3>
+                <ul>
+                    <li><span class="highlight">锦标赛是马拉松</span>，不是短跑</li>
+                    <li>保持水分 - 脱水影响决策</li>
+                    <li>健康饮食 - 避免血糖波动</li>
+                    <li>利用休息时间 - 站起来走动</li>
+                    <li><span class="success">充足睡眠</span> - 比赛前晚尤其重要</li>
+                    <li>识别疲劳信号 - 及时调整</li>
+                </ul>
+            </div>
+
+            <div class="mental-card card-confidence">
+                <h3>🌟 自信心</h3>
+                <ul>
+                    <li><span class="highlight">相信你的训练</span></li>
+                    <li>你有权利坐在这张桌子上</li>
+                    <li>不要被对手的形象吓倒</li>
+                    <li>每个人都会犯错 - 包括职业选手</li>
+                    <li>回顾你的成功经历</li>
+                    <li><span class="success">积极的自我对话</span></li>
+                </ul>
+            </div>
+
+            <div class="mental-card card-patience">
+                <h3>🧘 耐心</h3>
+                <ul>
+                    <li><span class="highlight">牌运会平衡</span> - 不要急躁</li>
+                    <li>等待好的机会</li>
+                    <li>不要因为无聊而玩垃圾牌</li>
+                    <li>短期波动是正常的</li>
+                    <li>专注于做出正确的决定</li>
+                    <li><span class="success">耐心是锦标赛的核心技能</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <h2 class="section-title">🧘 实用心态练习</h2>
+        
+        <div class="exercise-box">
+            <h3>🌬️ 4-7-8呼吸法（应对紧张）</h3>
+            <div class="exercise-steps">
+                <div class="exercise-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">用鼻子吸气<span class="highlight">4秒</span>，让腹部膨胀</div>
+                </div>
+                <div class="exercise-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">屏住呼吸<span class="highlight">7秒</span></div>
+                </div>
+                <div class="exercise-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">用嘴慢慢呼气<span class="highlight">8秒</span>，完全排空</div>
+                </div>
+                <div class="exercise-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">重复<span class="highlight">3-4次</span>，感受身体放松</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="exercise-box">
+            <h3>🔄 Bad Beat恢复流程</h3>
+            <div class="exercise-steps">
+                <div class="exercise-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content"><span class="highlight">接受</span> - 承认这手牌已经结束，结果无法改变</div>
+                </div>
+                <div class="exercise-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content"><span class="highlight">评估</span> - 问自己：我的决定正确吗？如果正确，那就没问题</div>
+                </div>
+                <div class="exercise-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content"><span class="highlight">释放</span> - 深呼吸，让负面情绪流走</div>
+                </div>
+                <div class="exercise-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content"><span class="highlight">重置</span> - 告诉自己"下一手牌是新的开始"</div>
+                </div>
+                <div class="exercise-step">
+                    <div class="step-number">5</div>
+                    <div class="step-content"><span class="highlight">专注</span> - 把注意力放回当前的比赛</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="exercise-box">
+            <h3>🎯 决赛桌心态准备</h3>
+            <div class="exercise-steps">
+                <div class="exercise-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content"><span class="highlight">可视化</span> - 想象自己在决赛桌上冷静、自信地做决策</div>
+                </div>
+                <div class="exercise-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content"><span class="highlight">设定目标</span> - 不是"我要赢"，而是"我要做出最好的决定"</div>
+                </div>
+                <div class="exercise-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content"><span class="highlight">接受结果</span> - 无论结果如何，你已经做到了最好</div>
+                </div>
+                <div class="exercise-step">
+                    <div class="step-number">4</div>
+                    <div class="step-content"><span class="highlight">享受过程</span> - 这是你努力的成果，享受这个时刻</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="quote-box">
+            "你无法控制发到什么牌，但你可以控制如何打这些牌。专注于你能控制的事情。"
+            <div class="quote-author">— Daniel Negreanu</div>
+        </div>
+
+        <h2 class="section-title">⚠️ 常见心态陷阱</h2>
+        <div class="mental-grid">
+            <div class="mental-card card-tilt">
+                <h3>🚫 避免这些想法</h3>
+                <ul>
+                    <li><span class="danger">"我运气太差了"</span> - 每个人都会遇到坏运气</li>
+                    <li><span class="danger">"我必须赢回来"</span> - 这会导致冒险决策</li>
+                    <li><span class="danger">"他不配赢"</span> - 专注于自己，不是对手</li>
+                    <li><span class="danger">"我不可能输给他"</span> - 任何人都可能输给任何人</li>
+                    <li><span class="danger">"这是我最后的机会"</span> - 还会有更多机会</li>
+                </ul>
+            </div>
+
+            <div class="mental-card card-confidence">
+                <h3>✅ 培养这些想法</h3>
+                <ul>
+                    <li><span class="success">"我做了正确的决定"</span></li>
+                    <li><span class="success">"牌运会平衡"</span></li>
+                    <li><span class="success">"每手牌都是新的机会"</span></li>
+                    <li><span class="success">"我专注于过程，不是结果"</span></li>
+                    <li><span class="success">"我相信我的训练"</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

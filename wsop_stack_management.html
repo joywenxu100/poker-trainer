@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>📈 筹码管理大师 - WSOP锦标赛训练</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-dark: #0a0612;
+            --bg-card: #150d1f;
+            --bg-panel: #1e1430;
+            --gold: #ffd700;
+            --cyan: #00d9ff;
+            --red: #e74c3c;
+            --green: #2ecc71;
+            --purple: #9b59b6;
+            --text: #f0f0f0;
+            --text-dim: #8a8a9a;
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 15px;
+            padding-bottom: 100px;
+        }
+        .back-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: rgba(0, 217, 255, 0.2);
+            border: 1px solid rgba(0, 217, 255, 0.5);
+            color: var(--cyan);
+            padding: 10px 18px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+        }
+        .container { max-width: 1100px; margin: 0 auto; padding-top: 50px; }
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-panel));
+            border-radius: 20px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(0, 217, 255, 0.3);
+        }
+        .header h1 { font-size: 1.8rem; color: var(--cyan); margin-bottom: 10px; }
+        .header p { color: var(--text-dim); }
+
+        .stack-zones {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .zone-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 25px;
+            border-left: 5px solid var(--zone-color);
+            transition: transform 0.3s;
+        }
+        .zone-card:hover { transform: translateY(-5px); }
+        .zone-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .zone-icon { font-size: 2.5rem; }
+        .zone-title { color: var(--zone-color); font-size: 1.3rem; font-weight: 700; }
+        .zone-range { color: var(--text-dim); font-size: 0.9rem; }
+        .zone-content ul { padding-left: 20px; }
+        .zone-content li { color: var(--text-dim); margin: 10px 0; line-height: 1.6; }
+        .highlight { color: var(--gold); font-weight: 600; }
+        .danger { color: var(--red); }
+        .success { color: var(--green); }
+
+        .zone-deep { --zone-color: #2ecc71; }
+        .zone-medium { --zone-color: #f39c12; }
+        .zone-short { --zone-color: #e74c3c; }
+        .zone-critical { --zone-color: #9b59b6; }
+
+        .strategy-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: var(--bg-card);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        .strategy-table th, .strategy-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .strategy-table th {
+            background: var(--bg-panel);
+            color: var(--gold);
+            font-weight: 600;
+        }
+        .strategy-table tr:hover { background: rgba(255, 255, 255, 0.02); }
+
+        .tips-section {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+        .tips-section h3 { color: var(--gold); margin-bottom: 20px; font-size: 1.3rem; }
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .tip-card {
+            background: var(--bg-panel);
+            border-radius: 15px;
+            padding: 20px;
+        }
+        .tip-card h4 { color: var(--cyan); margin-bottom: 12px; }
+        .tip-card p { color: var(--text-dim); line-height: 1.7; }
+
+        @media (max-width: 768px) {
+            .stack-zones { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <a href="wsop_tournament_hub.html?v=6" class="back-btn">← 返回锦标赛中心</a>
+
+    <div class="container">
+        <div class="header">
+            <h1>📈 筹码管理大师</h1>
+            <p>不同筹码量的最优策略 · 从深筹码到短筹码的完整指南</p>
+        </div>
+
+        <div class="stack-zones">
+            <div class="zone-card zone-deep">
+                <div class="zone-header">
+                    <span class="zone-icon">💰</span>
+                    <div>
+                        <div class="zone-title">深筹码区</div>
+                        <div class="zone-range">50BB+</div>
+                    </div>
+                </div>
+                <div class="zone-content">
+                    <ul>
+                        <li><span class="success">舒适区</span> - 有足够的操作空间</li>
+                        <li><span class="highlight">可以玩投机牌</span> - 小对子、同花连张</li>
+                        <li>利用位置优势 - 翻后有很多选择</li>
+                        <li>施压中小筹码 - 利用ICM压力</li>
+                        <li><span class="danger">避免</span>和其他深筹码正面对抗</li>
+                        <li>目标：保持优势，稳步积累</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="zone-card zone-medium">
+                <div class="zone-header">
+                    <span class="zone-icon">⚖️</span>
+                    <div>
+                        <div class="zone-title">中等筹码区</div>
+                        <div class="zone-range">25-50BB</div>
+                    </div>
+                </div>
+                <div class="zone-content">
+                    <ul>
+                        <li><span class="highlight">最尴尬的区间</span> - 不上不下</li>
+                        <li>收紧开池范围 - 减少边缘情况</li>
+                        <li><span class="success">寻找好的3-Bet机会</span></li>
+                        <li>避免和大筹码建大底池</li>
+                        <li>攻击短筹码的盲注</li>
+                        <li>目标：寻找机会晋升到深筹码区</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="zone-card zone-short">
+                <div class="zone-header">
+                    <span class="zone-icon">⚡</span>
+                    <div>
+                        <div class="zone-title">短筹码区</div>
+                        <div class="zone-range">15-25BB</div>
+                    </div>
+                </div>
+                <div class="zone-content">
+                    <ul>
+                        <li><span class="danger">推挤或弃牌区间</span></li>
+                        <li>不要小额加注 - 被3-Bet很尴尬</li>
+                        <li><span class="highlight">利用弃牌股权</span> - 推挤有价值</li>
+                        <li>寻找好的推挤时机</li>
+                        <li>位置很重要 - 后位更宽</li>
+                        <li>目标：翻倍回到中等筹码区</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="zone-card zone-critical">
+                <div class="zone-header">
+                    <span class="zone-icon">🚨</span>
+                    <div>
+                        <div class="zone-title">危险区</div>
+                        <div class="zone-range">&lt;15BB</div>
+                    </div>
+                </div>
+                <div class="zone-content">
+                    <ul>
+                        <li><span class="danger">紧急状态</span> - 必须立即行动</li>
+                        <li>推挤范围大幅扩大</li>
+                        <li><span class="highlight">任何合理位置都要考虑推</span></li>
+                        <li>不能再等 - 盲注会吃光筹码</li>
+                        <li>利用ICM压力 - 大筹码不想和你对抗</li>
+                        <li>目标：生存，寻找翻倍机会</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <table class="strategy-table">
+            <thead>
+                <tr>
+                    <th>筹码量</th>
+                    <th>开池策略</th>
+                    <th>面对加注</th>
+                    <th>3-Bet策略</th>
+                    <th>关键要点</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="color: var(--green);">60BB+</td>
+                    <td>标准范围，可玩投机牌</td>
+                    <td>根据位置和对手调整</td>
+                    <td>价值+诈唬平衡</td>
+                    <td>利用深度优势</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--green);">40-60BB</td>
+                    <td>略收紧，减少边缘牌</td>
+                    <td>谨慎跟注，避免大底池</td>
+                    <td>偏价值，减少诈唬</td>
+                    <td>保护筹码，寻找机会</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--gold);">25-40BB</td>
+                    <td>收紧范围</td>
+                    <td>只用强牌继续</td>
+                    <td>主要价值牌</td>
+                    <td>避免边缘情况</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--red);">15-25BB</td>
+                    <td>推挤或弃牌</td>
+                    <td>全押或弃牌</td>
+                    <td>全押</td>
+                    <td>寻找推挤时机</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--purple);">10-15BB</td>
+                    <td>必须推挤</td>
+                    <td>全押</td>
+                    <td>全押</td>
+                    <td>紧急寻找机会</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--purple);">&lt;10BB</td>
+                    <td>几乎任何牌都推</td>
+                    <td>全押</td>
+                    <td>全押</td>
+                    <td>任何位置都要推</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="tips-section">
+            <h3>💡 筹码管理核心技巧</h3>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <h4>🎯 了解你的位置</h4>
+                    <p>时刻知道自己在哪个筹码区间，根据区间调整策略。不要用深筹码策略打短筹码，也不要用短筹码策略打深筹码。</p>
+                </div>
+                <div class="tip-card">
+                    <h4>⏰ 关注盲注上涨</h4>
+                    <p>盲注上涨前要积极行动！涨后你的筹码会相对缩水，推挤力量下降。在涨前找到好的推挤机会。</p>
+                </div>
+                <div class="tip-card">
+                    <h4>📊 计算M值</h4>
+                    <p>M值 = 筹码 / (小盲+大盲+Ante)。M值告诉你还能撑几轮。M&lt;10要紧急行动，M&lt;5是生死关头。</p>
+                </div>
+                <div class="tip-card">
+                    <h4>🔄 适应变化</h4>
+                    <p>筹码量会不断变化，策略也要跟着变。赢了大底池要调整，输了大底池也要调整。保持灵活。</p>
+                </div>
+                <div class="tip-card">
+                    <h4>🎭 读懂对手筹码</h4>
+                    <p>不只关注自己的筹码，也要关注对手的。短筹码会更激进，大筹码会更谨慎。利用这些信息。</p>
+                </div>
+                <div class="tip-card">
+                    <h4>💪 不要恐慌</h4>
+                    <p>筹码变短不要恐慌！很多冠军都是从短筹码翻盘的。保持冷静，执行正确的策略。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

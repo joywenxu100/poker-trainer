@@ -1,6 +1,6 @@
 // Service Worker for PWA offline support
 // 版本号更新会强制刷新所有缓存
-const CACHE_NAME = 'poker-trainer-v6.0.0';
+const CACHE_NAME = 'poker-trainer-v7.0.0';
 const urlsToCache = [
   'index.html',
   'poker_trainer.html',
@@ -13,6 +13,12 @@ const urlsToCache = [
   'wsop_icm_trainer.html',
   'wsop_bubble_master.html',
   'wsop_push_fold.html',
+  'wsop_final_table.html',
+  'wsop_assessment.html',
+  'wsop_stack_management.html',
+  'wsop_mental_game.html',
+  'wsop_icm_calculator.html',
+  'wsop_payout_analyzer.html',
   'manifest.json'
 ];
 
@@ -22,7 +28,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache v6.0.0');
+        console.log('Opened cache v7.0.0');
         return cache.addAll(urlsToCache);
       })
   );
