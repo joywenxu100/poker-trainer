@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>💥 泡沫期生存战 - WSOP锦标赛训练</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-dark: #0a0612;
+            --bg-card: #150d1f;
+            --bg-panel: #1e1430;
+            --gold: #ffd700;
+            --orange: #f39c12;
+            --red: #e74c3c;
+            --green: #2ecc71;
+            --text: #f0f0f0;
+            --text-dim: #8a8a9a;
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 15px;
+            padding-bottom: 100px;
+        }
+        .back-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: rgba(243, 156, 18, 0.2);
+            border: 1px solid rgba(243, 156, 18, 0.5);
+            color: var(--orange);
+            padding: 10px 18px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+        }
+        .container { max-width: 1000px; margin: 0 auto; padding-top: 50px; }
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-panel));
+            border-radius: 20px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(243, 156, 18, 0.3);
+        }
+        .header h1 { font-size: 1.8rem; color: var(--orange); margin-bottom: 10px; }
+        .header p { color: var(--text-dim); }
+
+        /* 模式选择 */
+        .mode-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        .mode-btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 20px;
+            background: var(--bg-card);
+            border: 2px solid transparent;
+            border-radius: 15px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .mode-btn:hover { border-color: var(--orange); }
+        .mode-btn.active { border-color: var(--gold); background: rgba(255, 215, 0, 0.1); }
+        .mode-icon { font-size: 2rem; margin-bottom: 10px; }
+        .mode-title { color: var(--gold); font-weight: 700; margin-bottom: 5px; }
+        .mode-desc { color: var(--text-dim); font-size: 0.85rem; }
+
+        /* 内容区域 */
+        .content-section { display: none; }
+        .content-section.active { display: block; }
+
+        /* 知识卡片 */
+        .knowledge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .knowledge-card {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 25px;
+            border-left: 4px solid var(--orange);
+        }
+        .knowledge-card h3 { color: var(--gold); margin-bottom: 15px; font-size: 1.1rem; }
+        .knowledge-card p { color: var(--text); line-height: 1.8; margin-bottom: 10px; }
+        .knowledge-card ul { padding-left: 20px; }
+        .knowledge-card li { color: var(--text-dim); margin: 8px 0; line-height: 1.6; }
+        .highlight { color: var(--gold); font-weight: 600; }
+        .danger { color: var(--red); }
+        .success { color: var(--green); }
+
+        /* 场景训练 */
+        .scenario-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(243, 156, 18, 0.2);
+        }
+        .scenario-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .scenario-badge {
+            background: var(--orange);
+            color: #000;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .scenario-title { color: var(--gold); font-size: 1.2rem; }
+        .scenario-content {
+            background: var(--bg-panel);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+        .stack-display {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        .stack-chip {
+            background: rgba(255, 215, 0, 0.1);
+            padding: 10px 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stack-chip .label { font-size: 0.75rem; color: var(--text-dim); }
+        .stack-chip .value { font-size: 1.1rem; color: var(--gold); font-weight: 700; }
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .option-btn {
+            background: var(--bg-panel);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 15px;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+        .option-btn:hover { border-color: var(--orange); }
+        .option-btn.correct { border-color: var(--green); background: rgba(46, 204, 113, 0.2); }
+        .option-btn.wrong { border-color: var(--red); background: rgba(231, 76, 60, 0.2); }
+        .explanation-box {
+            display: none;
+            background: var(--bg-panel);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid var(--green);
+        }
+        .explanation-box.show { display: block; }
+        .explanation-box h4 { color: var(--gold); margin-bottom: 15px; }
+        .explanation-box p { line-height: 1.8; }
+        .next-btn {
+            display: none;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--orange), #d68910);
+            border: none;
+            border-radius: 12px;
+            color: #000;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        .next-btn.show { display: block; }
+
+        /* 策略表格 */
+        .strategy-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .strategy-table th, .strategy-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+        }
+        .strategy-table th { color: var(--gold); background: var(--bg-panel); }
+        .strategy-table tr:hover { background: rgba(255, 215, 0, 0.05); }
+
+        /* 进度 */
+        .progress-bar {
+            background: var(--bg-card);
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+        }
+        .progress-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .progress-track { height: 8px; background: var(--bg-panel); border-radius: 4px; }
+        .progress-fill { height: 100%; background: var(--orange); border-radius: 4px; transition: width 0.3s; }
+
+        @media (max-width: 768px) {
+            .mode-selector { flex-direction: column; }
+            .options-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <a href="wsop_tournament_hub.html?v=5" class="back-btn">← 返回锦标赛中心</a>
+
+    <div class="container">
+        <div class="header">
+            <h1>💥 泡沫期生存战</h1>
+            <p>掌握泡沫期的施压与生存策略，利用ICM压力剥削对手</p>
+        </div>
+
+        <div class="mode-selector">
+            <div class="mode-btn active" onclick="switchMode('learn')">
+                <div class="mode-icon">📚</div>
+                <div class="mode-title">核心知识</div>
+                <div class="mode-desc">泡沫期基础理论</div>
+            </div>
+            <div class="mode-btn" onclick="switchMode('train')">
+                <div class="mode-icon">🎯</div>
+                <div class="mode-title">场景训练</div>
+                <div class="mode-desc">15个实战场景</div>
+            </div>
+            <div class="mode-btn" onclick="switchMode('strategy')">
+                <div class="mode-icon">📊</div>
+                <div class="mode-title">策略速查</div>
+                <div class="mode-desc">不同筹码量策略</div>
+            </div>
+        </div>
+
+        <!-- 核心知识 -->
+        <div class="content-section active" id="learn-section">
+            <div class="knowledge-grid">
+                <div class="knowledge-card">
+                    <h3>🎯 什么是泡沫期？</h3>
+                    <p>泡沫期是锦标赛中<span class="highlight">最关键的阶段</span>，指距离钱圈还差几个人出局的时期。</p>
+                    <ul>
+                        <li>例如：钱圈100人，剩余105人时就是泡沫期</li>
+                        <li>泡沫期的<span class="danger">ICM压力最大</span></li>
+                        <li>一个错误可能让你从进钱圈变成空手而归</li>
+                        <li>同时也是<span class="success">剥削机会最多</span>的时期</li>
+                    </ul>
+                </div>
+
+                <div class="knowledge-card">
+                    <h3>💰 ICM压力的本质</h3>
+                    <p>在泡沫期，<span class="highlight">筹码的边际价值急剧下降</span>：</p>
+                    <ul>
+                        <li>赢得筹码的价值 < 失去筹码的代价</li>
+                        <li>短筹码玩家压力最大（可能空手出局）</li>
+                        <li>中等筹码最尴尬（不敢冒险但也不能等死）</li>
+                        <li>大筹码是施压者（可以"免费"攻击）</li>
+                    </ul>
+                </div>
+
+                <div class="knowledge-card">
+                    <h3>🎭 不同筹码量的角色</h3>
+                    <p><span class="success">大筹码 (40BB+)</span> - 施压者</p>
+                    <ul>
+                        <li>积极攻击中小筹码</li>
+                        <li>扩大开池范围</li>
+                        <li>避免和其他大筹码对抗</li>
+                    </ul>
+                    <p style="margin-top: 15px;"><span class="highlight">中筹码 (15-40BB)</span> - 生存者</p>
+                    <ul>
+                        <li>收紧范围，等待机会</li>
+                        <li>避免边缘情况</li>
+                        <li>只在有明显优势时参与</li>
+                    </ul>
+                    <p style="margin-top: 15px;"><span class="danger">短筹码 (<15BB)</span> - 拼命者</p>
+                    <ul>
+                        <li>寻找推挤机会</li>
+                        <li>利用大筹码的ICM压力</li>
+                        <li>不能等死，要主动出击</li>
+                    </ul>
+                </div>
+
+                <div class="knowledge-card">
+                    <h3>⚡ 泡沫期黄金法则</h3>
+                    <ul>
+                        <li><span class="highlight">大筹码打小筹码</span> - 利用ICM压力</li>
+                        <li><span class="danger">避免大筹码互斗</span> - 风险太高</li>
+                        <li><span class="success">短筹码要激进</span> - 利用弃牌股权</li>
+                        <li>中筹码要<span class="highlight">极度谨慎</span></li>
+                        <li>位置比平时更重要</li>
+                        <li>手牌强度标准提高</li>
+                    </ul>
+                </div>
+
+                <div class="knowledge-card">
+                    <h3>🔥 大筹码施压策略</h3>
+                    <p>作为大筹码，你要<span class="success">积极利用ICM压力</span>：</p>
+                    <ul>
+                        <li>对中小筹码频繁加注</li>
+                        <li>使用小额加注(2-2.5BB)降低风险</li>
+                        <li>在后位大幅扩展开池范围</li>
+                        <li>面对3-Bet要根据对手调整</li>
+                        <li>记住：他们不敢轻易和你对抗！</li>
+                    </ul>
+                </div>
+
+                <div class="knowledge-card">
+                    <h3>🛡️ 中筹码生存策略</h3>
+                    <p>中筹码在泡沫期<span class="danger">最危险</span>：</p>
+                    <ul>
+                        <li>收紧开池范围到前15%</li>
+                        <li>避免和大筹码正面对抗</li>
+                        <li>只在有明确优势时参与</li>
+                        <li>利用位置偷盲要谨慎</li>
+                        <li>等待短筹码出局后再放松</li>
+                    </ul>
+                </div>
+
+                <div class="knowledge-card">
+                    <h3>⚔️ 短筹码反击策略</h3>
+                    <p>短筹码要<span class="highlight">利用ICM压力反击</span>：</p>
+                    <ul>
+                        <li>大筹码不想和你全押对抗</li>
+                        <li>选择好时机全押偷盲</li>
+                        <li>优先攻击中等筹码</li>
+                        <li>按钮位是最佳推挤位置</li>
+                        <li>不要等到筹码太少才行动</li>
+                    </ul>
+                </div>
+
+                <div class="knowledge-card">
+                    <h3>🎯 泡沫期常见错误</h3>
+                    <ul>
+                        <li><span class="danger">错误1:</span> 大筹码太保守，不利用优势</li>
+                        <li><span class="danger">错误2:</span> 中筹码太激进，不必要冒险</li>
+                        <li><span class="danger">错误3:</span> 短筹码太被动，等到筹码耗尽</li>
+                        <li><span class="danger">错误4:</span> 用边缘牌和大筹码对抗</li>
+                        <li><span class="danger">错误5:</span> 忽视位置的重要性</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 场景训练 -->
+        <div class="content-section" id="train-section">
+            <div class="progress-bar">
+                <div class="progress-header">
+                    <span style="color: var(--orange);">训练进度</span>
+                    <span id="train-progress">0 / 15</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill" id="train-fill" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="scenario-card" id="scenario-card">
+                <div class="scenario-header">
+                    <span class="scenario-title" id="scenario-title">场景 1</span>
+                    <span class="scenario-badge" id="scenario-badge">泡沫期</span>
+                </div>
+                <div class="scenario-content" id="scenario-content">
+                    加载中...
+                </div>
+                <div class="stack-display" id="stack-display"></div>
+                <div style="margin: 20px 0;">
+                    <p id="question-text" style="font-size: 1.1rem; color: var(--text);">加载中...</p>
+                </div>
+                <div class="options-grid" id="options-grid"></div>
+                <div class="explanation-box" id="explanation-box">
+                    <h4>📚 策略分析</h4>
+                    <p id="explanation-text"></p>
+                </div>
+                <button class="next-btn" id="next-btn" onclick="nextScenario()">下一个场景 →</button>
+            </div>
+
+            <div id="result-card" style="display: none; text-align: center; padding: 40px; background: var(--bg-card); border-radius: 20px;">
+                <div style="font-size: 4rem; margin-bottom: 20px;">🏆</div>
+                <h2 style="color: var(--gold); margin-bottom: 15px;">训练完成！</h2>
+                <p id="result-score" style="font-size: 2rem; margin-bottom: 20px;">0%</p>
+                <p id="result-desc" style="color: var(--text-dim); margin-bottom: 30px;"></p>
+                <button onclick="restartTraining()" style="padding: 15px 40px; background: var(--orange); border: none; border-radius: 30px; color: #000; font-weight: 700; cursor: pointer;">重新训练</button>
+            </div>
+        </div>
+
+        <!-- 策略速查 -->
+        <div class="content-section" id="strategy-section">
+            <div class="knowledge-card" style="margin-bottom: 20px;">
+                <h3>📊 泡沫期筹码策略速查表</h3>
+                <table class="strategy-table">
+                    <thead>
+                        <tr>
+                            <th>筹码量</th>
+                            <th>角色</th>
+                            <th>开池范围</th>
+                            <th>面对加注</th>
+                            <th>关键策略</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="color: var(--green);">50BB+</td>
+                            <td>施压者</td>
+                            <td>BTN: 45%+<br>CO: 35%+</td>
+                            <td>可以宽跟注</td>
+                            <td>积极攻击中小筹码</td>
+                        </tr>
+                        <tr>
+                            <td style="color: var(--green);">35-50BB</td>
+                            <td>次施压者</td>
+                            <td>BTN: 35%<br>CO: 25%</td>
+                            <td>谨慎跟注</td>
+                            <td>攻击短筹码，避开大筹码</td>
+                        </tr>
+                        <tr>
+                            <td style="color: var(--gold);">25-35BB</td>
+                            <td>观望者</td>
+                            <td>BTN: 25%<br>CO: 18%</td>
+                            <td>只用强牌继续</td>
+                            <td>等待机会，不冒险</td>
+                        </tr>
+                        <tr>
+                            <td style="color: var(--orange);">15-25BB</td>
+                            <td>推挤区</td>
+                            <td>推挤或弃牌</td>
+                            <td>只全押或弃牌</td>
+                            <td>寻找好的推挤时机</td>
+                        </tr>
+                        <tr>
+                            <td style="color: var(--red);">10-15BB</td>
+                            <td>危险区</td>
+                            <td>必须推挤</td>
+                            <td>全押或弃牌</td>
+                            <td>紧急寻找推挤机会</td>
+                        </tr>
+                        <tr>
+                            <td style="color: var(--red);"><10BB</td>
+                            <td>绝望区</td>
+                            <td>几乎任何牌</td>
+                            <td>全押</td>
+                            <td>任何合理位置都要推</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="knowledge-card" style="margin-bottom: 20px;">
+                <h3>🎯 泡沫期推挤范围 (按位置)</h3>
+                <table class="strategy-table">
+                    <thead>
+                        <tr>
+                            <th>筹码量</th>
+                            <th>UTG</th>
+                            <th>MP</th>
+                            <th>CO</th>
+                            <th>BTN</th>
+                            <th>SB</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>15BB</td>
+                            <td>77+, ATs+, AJo+</td>
+                            <td>66+, A9s+, ATo+, KQs</td>
+                            <td>55+, A7s+, A9o+, KJs+</td>
+                            <td>44+, A5s+, A8o+, KTs+, QJs</td>
+                            <td>33+, A4s+, A7o+, K9s+, QTs+</td>
+                        </tr>
+                        <tr>
+                            <td>12BB</td>
+                            <td>66+, A9s+, ATo+, KQs</td>
+                            <td>55+, A7s+, A9o+, KJs+</td>
+                            <td>44+, A5s+, A8o+, KTs+</td>
+                            <td>33+, A3s+, A7o+, K9s+, Q9s+</td>
+                            <td>22+, A2s+, A5o+, K8s+, Q9s+</td>
+                        </tr>
+                        <tr>
+                            <td>10BB</td>
+                            <td>55+, A7s+, A9o+, KJs+</td>
+                            <td>44+, A5s+, A8o+, KTs+</td>
+                            <td>33+, A3s+, A7o+, K9s+</td>
+                            <td>22+, A2s+, A5o+, K7s+, Q9s+</td>
+                            <td>22+, Axs, A3o+, K5s+, Q8s+</td>
+                        </tr>
+                        <tr>
+                            <td>8BB</td>
+                            <td>44+, A5s+, A8o+, KTs+</td>
+                            <td>33+, A3s+, A7o+, K9s+</td>
+                            <td>22+, A2s+, A5o+, K7s+</td>
+                            <td>22+, Axs, A3o+, K5s+, Q7s+</td>
+                            <td>22+, Axs, A2o+, K3s+, Q5s+</td>
+                        </tr>
+                        <tr>
+                            <td>6BB</td>
+                            <td>33+, A3s+, A7o+, K9s+</td>
+                            <td>22+, A2s+, A5o+, K7s+</td>
+                            <td>22+, Axs, A3o+, K5s+</td>
+                            <td>22+, Ax, K3s+, K8o+, Q5s+</td>
+                            <td>22+, Ax, K2s+, K5o+, Q3s+</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="knowledge-card">
+                <h3>⚠️ 泡沫期决策检查清单</h3>
+                <ul>
+                    <li>✅ 我的筹码量是多少？我是什么角色？</li>
+                    <li>✅ 对手的筹码量是多少？他们的ICM压力如何？</li>
+                    <li>✅ 距离钱圈还有几人？泡沫压力有多大？</li>
+                    <li>✅ 我的位置如何？后面还有谁？</li>
+                    <li>✅ 这手牌值得在泡沫期冒险吗？</li>
+                    <li>✅ 如果输了，我还能继续战斗吗？</li>
+                    <li>✅ 有没有更好的机会等着我？</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 泡沫期训练场景
+        const BUBBLE_SCENARIOS = [
+            {
+                title: "大筹码施压",
+                badge: "泡沫期 · 大筹码",
+                content: "WSOP主赛事，剩余112人，钱圈111人。你是桌上筹码最多的玩家。",
+                stacks: [
+                    { label: "你", value: "65BB" },
+                    { label: "BB", value: "22BB" },
+                    { label: "平均", value: "30BB" }
+                ],
+                question: "你在按钮位拿到K♥8♣。前面全弃到你。你应该怎么做？",
+                options: ["弃牌", "加注到2.2BB", "加注到3BB", "Limp"],
+                correctIndex: 1,
+                explanation: "作为大筹码在泡沫期，你要积极利用ICM压力！K8o在按钮位是明确的开池牌。小额加注(2.2BB)给BB最大压力，他22BB不敢轻易3-Bet你。即使被跟注，你有位置优势。被3-Bet可以轻松弃牌，损失小。"
+            },
+            {
+                title: "中筹码困境",
+                badge: "泡沫期 · 中筹码",
+                content: "泡沫期，剩余55人，钱圈54人。你是中等筹码。",
+                stacks: [
+                    { label: "你", value: "28BB" },
+                    { label: "加注者", value: "45BB" },
+                    { label: "平均", value: "32BB" }
+                ],
+                question: "大筹码在CO加注到2.5BB。你在按钮位拿到A♠J♣。你应该怎么做？",
+                options: ["3-Bet到7BB", "跟注", "弃牌", "全押"],
+                correctIndex: 2,
+                explanation: "泡沫期中筹码要极度谨慎！AJo虽然是好牌，但面对大筹码的加注，你不想在这里建大底池。3-Bet可能面对4-Bet全押的尴尬。跟注翻后OOP也不好打。最安全的选择是弃牌，等待更好的机会。"
+            },
+            {
+                title: "短筹码反击",
+                badge: "泡沫期 · 短筹码",
+                content: "泡沫期紧张时刻，剩余28人，钱圈27人。你是短筹码。",
+                stacks: [
+                    { label: "你", value: "10BB" },
+                    { label: "大盲", value: "55BB" },
+                    { label: "小盲", value: "35BB" }
+                ],
+                question: "你在按钮位拿到Q♦J♦。前面全弃到你。你应该怎么做？",
+                options: ["弃牌等更好的牌", "加注到2.5BB", "全押10BB", "Limp"],
+                correctIndex: 2,
+                explanation: "短筹码在泡沫期要利用ICM压力反击！大筹码不想和你全押对抗（他们有太多可以输的）。QJs是很好的推挤牌，有阻隔效应和不错的胜率。10BB是完美的推挤筹码量，弃牌股权很高。"
+            },
+            {
+                title: "大筹码对决",
+                badge: "泡沫期 · 避免互斗",
+                content: "泡沫期，剩余65人，钱圈63人。桌上有两个大筹码。",
+                stacks: [
+                    { label: "你", value: "52BB" },
+                    { label: "3-Bet者", value: "48BB" },
+                    { label: "短筹码", value: "8BB" }
+                ],
+                question: "你在CO加注到2.5BB。另一个大筹码在按钮位3-Bet到8BB。你拿的是A♣Q♣。你应该怎么做？",
+                options: ["4-Bet到22BB", "跟注", "弃牌", "全押"],
+                correctIndex: 2,
+                explanation: "泡沫期大筹码之间要避免互斗！即使AQs是好牌，和另一个大筹码打大底池对你没有好处。让短筹码出局对你更有利。弃牌保持筹码优势，等待更好的机会剥削中小筹码。"
+            },
+            {
+                title: "盲注防守",
+                badge: "泡沫期 · 大盲位",
+                content: "泡沫期，剩余42人，钱圈40人。你在大盲位。",
+                stacks: [
+                    { label: "你", value: "25BB" },
+                    { label: "加注者(BTN)", value: "60BB" },
+                    { label: "平均", value: "28BB" }
+                ],
+                question: "按钮位大筹码加注到2.2BB。小盲弃牌。你拿到K♠9♥。你应该怎么做？",
+                options: ["3-Bet到7BB", "跟注", "弃牌", "全押"],
+                correctIndex: 2,
+                explanation: "泡沫期面对大筹码的加注，中筹码要收紧防守范围！K9o不够强。大筹码在泡沫期会频繁偷盲，但你不需要用边缘牌去对抗。弃牌1.2BB的损失是可以接受的，保护你的筹码更重要。"
+            },
+            {
+                title: "挤压机会",
+                badge: "泡沫期 · Squeeze",
+                content: "泡沫期，剩余88人，钱圈85人。有一个limp进来。",
+                stacks: [
+                    { label: "你", value: "35BB" },
+                    { label: "Limper", value: "18BB" },
+                    { label: "大盲", value: "12BB" }
+                ],
+                question: "中位玩家(18BB)limp。你在CO拿到A♥K♥。你应该怎么做？",
+                options: ["跟着limp", "加注到4BB", "加注到6BB", "弃牌"],
+                correctIndex: 2,
+                explanation: "AKs面对limp应该加大加注！Limper在泡沫期limp通常是弱牌或者陷阱。6BB的加注给他足够的压力，同时隔离他。如果他全押18BB，你有AKs可以舒服地跟注。"
+            },
+            {
+                title: "极短筹码生存",
+                badge: "泡沫期 · 危机",
+                content: "泡沫期最后阶段，剩余101人，钱圈100人。你筹码告急。",
+                stacks: [
+                    { label: "你", value: "5BB" },
+                    { label: "大盲", value: "40BB" },
+                    { label: "小盲", value: "25BB" }
+                ],
+                question: "你在按钮位拿到9♠7♠。前面全弃到你。你应该怎么做？",
+                options: ["弃牌等AA", "全押5BB", "加注到2BB", "Limp"],
+                correctIndex: 1,
+                explanation: "5BB在泡沫期必须行动！97s虽然不是强牌，但在按钮位有足够的弃牌股权。大筹码和中筹码都不想在泡沫期和你全押对抗。等下去筹码会被盲注吃光，97s的胜率也不差(对抗跟注范围有35%+)。"
+            },
+            {
+                title: "钱圈边缘",
+                badge: "泡沫期 · 最后1人",
+                content: "最紧张时刻！剩余101人，钱圈100人，下一个出局的人空手而归。",
+                stacks: [
+                    { label: "你", value: "20BB" },
+                    { label: "全押者", value: "8BB" },
+                    { label: "平均", value: "25BB" }
+                ],
+                question: "短筹码在UTG全押8BB。你在MP拿到J♠J♣。后面还有5人。你应该怎么做？",
+                options: ["快速跟注", "弃牌让别人去", "超额全押", "只跟注8BB"],
+                correctIndex: 1,
+                explanation: "在钱圈边缘(只差1人)，ICM压力达到顶峰！即使JJ是好牌，让别人去淘汰短筹码对你更有利。如果你跟注输了，你可能从安全进钱圈变成危险区。等1个人出局后，ICM压力立刻释放，那时再激进也不迟。"
+            },
+            {
+                title: "泡沫刚破",
+                badge: "钱圈内 · 释放",
+                content: "泡沫刚破！进入钱圈，剩余99人。ICM压力暂时释放。",
+                stacks: [
+                    { label: "你", value: "22BB" },
+                    { label: "全押者", value: "10BB" },
+                    { label: "平均", value: "25BB" }
+                ],
+                question: "短筹码在CO全押10BB。你在按钮位拿到A♦Q♦。你应该怎么做？",
+                options: ["弃牌", "跟注", "超额全押", "只跟注10BB"],
+                correctIndex: 2,
+                explanation: "泡沫刚破后ICM压力释放！现在可以更激进地追求筹码。AQs对抗10BB全押范围是明显领先的。超额全押隔离，防止盲注位参与。即使输了还有12BB继续战斗，进钱圈后要开始积累筹码冲击更高名次。"
+            },
+            {
+                title: "多人底池陷阱",
+                badge: "泡沫期 · 陷阱",
+                content: "泡沫期，剩余75人，钱圈72人。多人已经进入底池。",
+                stacks: [
+                    { label: "你", value: "30BB" },
+                    { label: "加注者", value: "45BB" },
+                    { label: "跟注者", value: "20BB" }
+                ],
+                question: "CO(45BB)加注到2.5BB，按钮(20BB)跟注。你在大盲拿到8♥8♣。你应该怎么做？",
+                options: ["3-Bet Squeeze到12BB", "跟注set mine", "弃牌", "全押"],
+                correctIndex: 2,
+                explanation: "泡沫期不要用中等牌参与多人底池！88虽然是对子，但在泡沫期3-Bet squeeze风险太高。跟注后多人底池翻后也很难打。中筹码在泡沫期要避免这种边缘情况，弃牌等待更好的机会。"
+            },
+            {
+                title: "位置战争",
+                badge: "泡沫期 · 位置",
+                content: "泡沫期，剩余55人，钱圈52人。你有不错的筹码。",
+                stacks: [
+                    { label: "你", value: "38BB" },
+                    { label: "大盲", value: "15BB" },
+                    { label: "小盲", value: "28BB" }
+                ],
+                question: "你在按钮位拿到A♠4♠。前面全弃到你。你应该怎么做？",
+                options: ["弃牌", "加注到2.2BB", "加注到3BB", "Limp"],
+                correctIndex: 1,
+                explanation: "泡沫期在按钮位要积极偷盲！A4s是足够好的偷盲牌。小额加注(2.2BB)给盲注位最大压力。15BB的大盲不敢轻易3-Bet你(ICM压力)，28BB的小盲也会收紧。被3-Bet可以弃牌，损失小。"
+            },
+            {
+                title: "盲注上涨前",
+                badge: "泡沫期 · 时机",
+                content: "泡沫期，盲注即将从500/1000涨到750/1500。你的筹码会相对缩水。",
+                stacks: [
+                    { label: "你", value: "12BB" },
+                    { label: "大盲", value: "35BB" },
+                    { label: "平均", value: "22BB" }
+                ],
+                question: "盲注上涨前最后一手。你在CO拿到K♣J♣。前面全弃到你。你应该怎么做？",
+                options: ["弃牌等盲注涨后", "加注到2.5BB", "全押12BB", "Limp"],
+                correctIndex: 2,
+                explanation: "盲注上涨前必须行动！涨后你只有8BB，推挤力量大减。KJs是很好的推挤牌，有阻隔效应。12BB是完美的推挤筹码量，弃牌股权很高。大筹码在泡沫期不想和你对抗，这是最好的推挤时机！"
+            },
+            {
+                title: "面对短筹码全押",
+                badge: "泡沫期 · 决策",
+                content: "泡沫期，剩余63人，钱圈60人。短筹码在你前面全押。",
+                stacks: [
+                    { label: "你", value: "42BB" },
+                    { label: "全押者", value: "6BB" },
+                    { label: "后位", value: "25BB" }
+                ],
+                question: "UTG短筹码(6BB)全押。你在MP拿到A♥T♥。后面还有4人。你应该怎么做？",
+                options: ["弃牌", "跟注6BB", "超额全押", "加注到15BB"],
+                correctIndex: 1,
+                explanation: "面对极短筹码的全押，ATs可以跟注！6BB全押范围很宽，ATs是领先的。只跟注6BB而不是超额全押，给后位玩家参与的机会（多人分担风险）。如果有人squeeze，你可以弃牌。底池赔率也很好。"
+            },
+            {
+                title: "最后桌泡沫",
+                badge: "决赛桌泡沫",
+                content: "剩余10人，9人进决赛桌！决赛桌泡沫ICM压力巨大。",
+                stacks: [
+                    { label: "你", value: "28BB" },
+                    { label: "CL", value: "55BB" },
+                    { label: "短筹码", value: "8BB" }
+                ],
+                question: "筹码领先者在CO加注到2.5BB。你在按钮位拿到A♠K♠。你应该怎么做？",
+                options: ["4-Bet全押", "3-Bet到8BB", "跟注", "弃牌"],
+                correctIndex: 2,
+                explanation: "决赛桌泡沫期要极度谨慎！即使AKs是顶级手牌，和CL打大底池对你没有好处。有8BB短筹码可能随时出局，让他先出局对你更有利。跟注控制底池，保护你进决赛桌的机会。进了决赛桌再激进也不迟！"
+            },
+            {
+                title: "利用恐惧",
+                badge: "泡沫期 · 剥削",
+                content: "泡沫期，你注意到桌上有个玩家每次面对加注都弃牌。",
+                stacks: [
+                    { label: "你", value: "45BB" },
+                    { label: "紧手BB", value: "18BB" },
+                    { label: "平均", value: "25BB" }
+                ],
+                question: "那个紧手在大盲。你在按钮位拿到7♦5♦。前面全弃到你。你应该怎么做？",
+                options: ["弃牌", "加注到2BB", "加注到2.5BB", "全押"],
+                correctIndex: 2,
+                explanation: "利用对手的泡沫恐惧！这个紧手明显在泡沫期过度保守，面对加注总是弃牌。即使75s是弱牌，对抗这种对手偷盲成功率极高(80%+)。加注到2.5BB，如果他3-Bet就弃牌，但他几乎不会这么做。"
+            }
+        ];
+
+        let currentScenario = 0;
+        let correctCount = 0;
+        let answered = false;
+
+        function switchMode(mode) {
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
+            
+            event.target.closest('.mode-btn').classList.add('active');
+            document.getElementById(mode + '-section').classList.add('active');
+
+            if (mode === 'train') {
+                loadScenario();
+            }
+        }
+
+        function loadScenario() {
+            if (currentScenario >= BUBBLE_SCENARIOS.length) {
+                showResult();
+                return;
+            }
+
+            const s = BUBBLE_SCENARIOS[currentScenario];
+            answered = false;
+
+            document.getElementById('train-progress').textContent = `${currentScenario + 1} / ${BUBBLE_SCENARIOS.length}`;
+            document.getElementById('train-fill').style.width = `${((currentScenario + 1) / BUBBLE_SCENARIOS.length) * 100}%`;
+
+            document.getElementById('scenario-title').textContent = `场景 ${currentScenario + 1}: ${s.title}`;
+            document.getElementById('scenario-badge').textContent = s.badge;
+            document.getElementById('scenario-content').textContent = s.content;
+
+            document.getElementById('stack-display').innerHTML = s.stacks.map(st => `
+                <div class="stack-chip">
+                    <div class="label">${st.label}</div>
+                    <div class="value">${st.value}</div>
+                </div>
+            `).join('');
+
+            document.getElementById('question-text').textContent = s.question;
+
+            document.getElementById('options-grid').innerHTML = s.options.map((opt, i) => `
+                <button class="option-btn" onclick="selectOption(${i})">${opt}</button>
+            `).join('');
+
+            document.getElementById('explanation-box').classList.remove('show');
+            document.getElementById('next-btn').classList.remove('show');
+            document.getElementById('scenario-card').style.display = 'block';
+            document.getElementById('result-card').style.display = 'none';
+        }
+
+        function selectOption(index) {
+            if (answered) return;
+            answered = true;
+
+            const s = BUBBLE_SCENARIOS[currentScenario];
+            const buttons = document.querySelectorAll('.option-btn');
+
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === s.correctIndex) {
+                    btn.classList.add('correct');
+                } else if (i === index && index !== s.correctIndex) {
+                    btn.classList.add('wrong');
+                }
+            });
+
+            if (index === s.correctIndex) correctCount++;
+
+            document.getElementById('explanation-text').textContent = s.explanation;
+            document.getElementById('explanation-box').classList.add('show');
+            document.getElementById('next-btn').classList.add('show');
+        }
+
+        function nextScenario() {
+            currentScenario++;
+            loadScenario();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showResult() {
+            document.getElementById('scenario-card').style.display = 'none';
+            document.getElementById('result-card').style.display = 'block';
+
+            const pct = Math.round((correctCount / BUBBLE_SCENARIOS.length) * 100);
+            document.getElementById('result-score').textContent = pct + '%';
+
+            let desc = pct >= 80 ? '🏆 泡沫期大师！' : pct >= 60 ? '👍 不错，继续练习！' : '📚 需要更多练习！';
+            document.getElementById('result-desc').textContent = desc;
+        }
+
+        function restartTraining() {
+            currentScenario = 0;
+            correctCount = 0;
+            loadScenario();
+        }
+    </script>
+</body>
+</html>
+

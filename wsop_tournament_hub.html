@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🏆 WSOP锦标赛训练中心 - 夺冠之路</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0612;
+            --bg-card: #150d1f;
+            --bg-panel: #1e1430;
+            --gold: #ffd700;
+            --gold-dark: #b8860b;
+            --gold-light: #ffe55c;
+            --purple: #9b59b6;
+            --purple-dark: #6c3483;
+            --red: #e74c3c;
+            --green: #2ecc71;
+            --blue: #3498db;
+            --cyan: #00d9ff;
+            --text: #f0f0f0;
+            --text-dim: #8a8a9a;
+            --gradient-gold: linear-gradient(135deg, #ffd700 0%, #ffed4a 50%, #ffd700 100%);
+            --gradient-purple: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            --gradient-champion: linear-gradient(135deg, #ffd700 0%, #ff8c00 50%, #ffd700 100%);
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 背景效果 - 金色粒子 */
+        .bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255, 215, 0, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(155, 89, 182, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.8) 0%, var(--bg-dark) 100%);
+        }
+
+        /* 顶部冠军横幅 */
+        .champion-banner {
+            background: var(--gradient-champion);
+            padding: 8px 20px;
+            text-align: center;
+            font-weight: 700;
+            color: #000;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+        }
+
+        /* 头部 */
+        .header {
+            text-align: center;
+            padding: 40px 20px 30px;
+            position: relative;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .trophy-icon {
+            font-size: 3rem;
+            animation: trophyGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes trophyGlow {
+            0%, 100% { filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5)); }
+            50% { filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.8)); }
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 900;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 3px;
+        }
+
+        .tagline {
+            color: var(--gold);
+            font-size: 1.1rem;
+            margin-top: 10px;
+            letter-spacing: 3px;
+        }
+
+        .subtitle {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-top: 8px;
+        }
+
+        /* 统计栏 */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px 25px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            color: var(--gold);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-top: 5px;
+            letter-spacing: 1px;
+        }
+
+        /* 返回按钮 */
+        .back-btn {
+            position: fixed;
+            top: 50px;
+            left: 15px;
+            background: rgba(155, 89, 182, 0.2);
+            border: 1px solid rgba(155, 89, 182, 0.5);
+            color: var(--purple);
+            padding: 10px 18px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--purple);
+            color: #fff;
+        }
+
+        /* 主容器 */
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 锦标赛阶段导航 */
+        .stage-nav {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .stage-btn {
+            padding: 12px 25px;
+            background: var(--bg-card);
+            border: 2px solid transparent;
+            border-radius: 30px;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stage-btn:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .stage-btn.active {
+            background: var(--gradient-gold);
+            color: #000;
+            font-weight: 700;
+            border-color: var(--gold);
+        }
+
+        /* 分类标题 */
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 40px 0 25px;
+            padding-left: 10px;
+        }
+
+        .section-title h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            color: var(--gold);
+            letter-spacing: 2px;
+        }
+
+        .section-line {
+            flex: 1;
+            height: 2px;
+            background: linear-gradient(90deg, var(--gold), transparent);
+        }
+
+        /* 项目网格 */
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        /* 模块卡片 */
+        .module-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--card-color);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .module-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(255, 215, 0, 0.15);
+            border-color: var(--gold);
+        }
+
+        .module-card:hover::before {
+            opacity: 1;
+        }
+
+        .card-header {
+            padding: 25px 25px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            background: var(--card-gradient);
+        }
+
+        .card-badge {
+            margin-left: auto;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .badge-core { background: var(--gradient-gold); color: #000; }
+        .badge-critical { background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff; }
+        .badge-advanced { background: linear-gradient(135deg, #9b59b6, #8e44ad); color: #fff; }
+        .badge-tool { background: linear-gradient(135deg, #3498db, #2980b9); color: #fff; }
+        .badge-champion { background: linear-gradient(135deg, #ffd700, #ff8c00); color: #000; }
+
+        .card-content {
+            padding: 20px 25px 25px;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+
+        .card-desc {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .card-footer {
+            padding: 15px 25px;
+            border-top: 1px solid rgba(255, 215, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .card-tag {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .card-tag span {
+            color: var(--gold);
+        }
+
+        /* 卡片颜色主题 */
+        .card-icm { --card-color: #e74c3c; --card-gradient: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .card-bubble { --card-color: #f39c12; --card-gradient: linear-gradient(135deg, #f39c12, #d68910); }
+        .card-final { --card-color: #ffd700; --card-gradient: linear-gradient(135deg, #ffd700, #ff8c00); }
+        .card-push { --card-color: #9b59b6; --card-gradient: linear-gradient(135deg, #9b59b6, #8e44ad); }
+        .card-assess { --card-color: #3498db; --card-gradient: linear-gradient(135deg, #3498db, #2980b9); }
+        .card-mental { --card-color: #2ecc71; --card-gradient: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .card-stack { --card-color: #00d9ff; --card-gradient: linear-gradient(135deg, #00d9ff, #0099cc); }
+
+        /* 冠军路线图 */
+        .roadmap {
+            background: var(--bg-panel);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 40px 0;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .roadmap-title {
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            color: var(--gold);
+            margin-bottom: 25px;
+        }
+
+        .roadmap-stages {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .roadmap-stage {
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+            padding: 20px 15px;
+            background: var(--bg-card);
+            border-radius: 15px;
+            position: relative;
+        }
+
+        .roadmap-stage::after {
+            content: '→';
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold);
+            font-size: 1.5rem;
+        }
+
+        .roadmap-stage:last-child::after {
+            display: none;
+        }
+
+        .stage-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .stage-name {
+            font-size: 0.85rem;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .stage-desc {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            margin-top: 5px;
+        }
+
+        /* 底部 */
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 1.6rem;
+            }
+
+            .stats-bar {
+                gap: 15px;
+            }
+
+            .stat-item {
+                padding: 12px 18px;
+            }
+
+            .modules-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .roadmap-stages {
+                flex-direction: column;
+            }
+
+            .roadmap-stage::after {
+                content: '↓';
+                right: 50%;
+                transform: translateX(50%);
+                top: auto;
+                bottom: -25px;
+            }
+
+            .stage-nav {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .back-btn {
+                top: 10px;
+                left: 10px;
+                padding: 8px 15px;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* 动画 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .module-card {
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+        }
+
+        .module-card:nth-child(1) { animation-delay: 0.1s; }
+        .module-card:nth-child(2) { animation-delay: 0.2s; }
+        .module-card:nth-child(3) { animation-delay: 0.3s; }
+        .module-card:nth-child(4) { animation-delay: 0.4s; }
+        .module-card:nth-child(5) { animation-delay: 0.5s; }
+        .module-card:nth-child(6) { animation-delay: 0.6s; }
+    </style>
+</head>
+<body>
+    <div class="bg-particles"></div>
+    
+    <div class="champion-banner">
+        🏆 WSOP WORLD SERIES OF POKER · 冠军训练系统 🏆
+    </div>
+    
+    <a href="index.html?v=5" class="back-btn">← 返回主页</a>
+    
+    <header class="header">
+        <div class="logo-container">
+            <span class="trophy-icon">🏆</span>
+            <h1 class="logo">WSOP MASTER</h1>
+            <span class="trophy-icon">🏆</span>
+        </div>
+        <p class="tagline">锦标赛冠军训练系统</p>
+        <p class="subtitle">从第一手牌到最终夺冠 · 全阶段系统化训练</p>
+        
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value">7</div>
+                <div class="stat-label">训练模块</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">100+</div>
+                <div class="stat-label">训练题目</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">5</div>
+                <div class="stat-label">锦标赛阶段</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">ICM</div>
+                <div class="stat-label">核心计算</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- 冠军路线图 -->
+        <div class="roadmap">
+            <h3 class="roadmap-title">🏆 冠军之路 · 五阶段进化</h3>
+            <div class="roadmap-stages">
+                <div class="roadmap-stage">
+                    <div class="stage-icon">🎬</div>
+                    <div class="stage-name">早期阶段</div>
+                    <div class="stage-desc">50-100BB 积累筹码</div>
+                </div>
+                <div class="roadmap-stage">
+                    <div class="stage-icon">📈</div>
+                    <div class="stage-name">中期阶段</div>
+                    <div class="stage-desc">25-50BB 位置战争</div>
+                </div>
+                <div class="roadmap-stage">
+                    <div class="stage-icon">💥</div>
+                    <div class="stage-name">泡沫期</div>
+                    <div class="stage-desc">ICM压力 生死时刻</div>
+                </div>
+                <div class="roadmap-stage">
+                    <div class="stage-icon">⚔️</div>
+                    <div class="stage-name">钱圈内</div>
+                    <div class="stage-desc">晋级决赛桌</div>
+                </div>
+                <div class="roadmap-stage">
+                    <div class="stage-icon">🏆</div>
+                    <div class="stage-name">决赛桌</div>
+                    <div class="stage-desc">夺取冠军</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 核心训练模块 -->
+        <div class="section-title">
+            <h2>🎯 核心训练模块</h2>
+            <div class="section-line"></div>
+        </div>
+
+        <div class="modules-grid">
+            <a href="wsop_icm_trainer.html?v=5" class="module-card card-icm">
+                <div class="card-header">
+                    <div class="card-icon">📊</div>
+                    <span class="card-badge badge-critical">关键</span>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">ICM决策大师</h3>
+                    <p class="card-desc">独立筹码模型(ICM)是锦标赛的核心。学会计算筹码的真实价值，在关键时刻做出正确决策</p>
+                </div>
+                <div class="card-footer">
+                    <span class="card-tag">💰 <span>筹码价值</span></span>
+                    <span class="card-tag">📐 <span>数学精算</span></span>
+                </div>
+            </a>
+
+            <a href="wsop_bubble_master.html?v=5" class="module-card card-bubble">
+                <div class="card-header">
+                    <div class="card-icon">💥</div>
+                    <span class="card-badge badge-critical">关键</span>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">泡沫期生存战</h3>
+                    <p class="card-desc">泡沫期是锦标赛最关键的阶段。掌握施压与生存的平衡，利用ICM压力剥削对手</p>
+                </div>
+                <div class="card-footer">
+                    <span class="card-tag">⚠️ <span>高压决策</span></span>
+                    <span class="card-tag">🎯 <span>剥削技巧</span></span>
+                </div>
+            </a>
+
+            <a href="wsop_final_table.html?v=5" class="module-card card-final">
+                <div class="card-header">
+                    <div class="card-icon">🏆</div>
+                    <span class="card-badge badge-champion">冠军</span>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">决赛桌制霸</h3>
+                    <p class="card-desc">决赛桌是夺冠的最后战场。学习短桌策略、单挑技巧、奖金阶梯利用</p>
+                </div>
+                <div class="card-footer">
+                    <span class="card-tag">👑 <span>夺冠策略</span></span>
+                    <span class="card-tag">🥊 <span>单挑技巧</span></span>
+                </div>
+            </a>
+
+            <a href="wsop_push_fold.html?v=5" class="module-card card-push">
+                <div class="card-header">
+                    <div class="card-icon">🎲</div>
+                    <span class="card-badge badge-core">核心</span>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">推挤弃牌表</h3>
+                    <p class="card-desc">短筹码生存必备。完整的Push/Fold范围表，覆盖1-20BB各种场景</p>
+                </div>
+                <div class="card-footer">
+                    <span class="card-tag">📋 <span>完整范围</span></span>
+                    <span class="card-tag">⚡ <span>即时查询</span></span>
+                </div>
+            </a>
+        </div>
+
+        <!-- 诊断与评估 -->
+        <div class="section-title">
+            <h2>🔍 诊断与评估</h2>
+            <div class="section-line"></div>
+        </div>
+
+        <div class="modules-grid">
+            <a href="wsop_assessment.html?v=5" class="module-card card-assess">
+                <div class="card-header">
+                    <div class="card-icon">🎯</div>
+                    <span class="card-badge badge-tool">诊断</span>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">锦标赛漏洞诊断</h3>
+                    <p class="card-desc">50题全方位评估你的锦标赛技能，精准定位ICM、泡沫期、决赛桌等各阶段漏洞</p>
+                </div>
+                <div class="card-footer">
+                    <span class="card-tag">📝 <span>50题诊断</span></span>
+                    <span class="card-tag">📊 <span>6维度分析</span></span>
+                </div>
+            </a>
+
+            <a href="wsop_stack_management.html?v=5" class="module-card card-stack">
+                <div class="card-header">
+                    <div class="card-icon">📈</div>
+                    <span class="card-badge badge-advanced">进阶</span>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">筹码管理大师</h3>
+                    <p class="card-desc">不同筹码量的最优策略。从深筹码到短筹码，每个阶段都有最佳打法</p>
+                </div>
+                <div class="card-footer">
+                    <span class="card-tag">💰 <span>筹码策略</span></span>
+                    <span class="card-tag">🎯 <span>阶段适配</span></span>
+                </div>
+            </a>
+
+            <a href="wsop_mental_game.html?v=5" class="module-card card-mental">
+                <div class="card-header">
+                    <div class="card-icon">🧠</div>
+                    <span class="card-badge badge-advanced">进阶</span>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">锦标赛心态管理</h3>
+                    <p class="card-desc">长时间比赛的心理素质训练。控制情绪、保持专注、应对Bad Beat</p>
+                </div>
+                <div class="card-footer">
+                    <span class="card-tag">🧘 <span>心态控制</span></span>
+                    <span class="card-tag">💪 <span>耐力训练</span></span>
+                </div>
+            </a>
+        </div>
+
+        <!-- 快速工具 -->
+        <div class="section-title">
+            <h2>⚡ 快速工具</h2>
+            <div class="section-line"></div>
+        </div>
+
+        <div class="modules-grid">
+            <a href="wsop_icm_calculator.html?v=5" class="module-card card-icm">
+                <div class="card-header">
+                    <div class="card-icon">🔢</div>
+                    <span class="card-badge badge-tool">工具</span>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">ICM计算器</h3>
+                    <p class="card-desc">快速计算任意筹码分布下的ICM股权，支持最多9人桌</p>
+                </div>
+                <div class="card-footer">
+                    <span class="card-tag">📊 <span>实时计算</span></span>
+                    <span class="card-tag">💡 <span>决策辅助</span></span>
+                </div>
+            </a>
+
+            <a href="wsop_payout_analyzer.html?v=5" class="module-card card-final">
+                <div class="card-header">
+                    <div class="card-icon">💵</div>
+                    <span class="card-badge badge-tool">工具</span>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title">奖金结构分析</h3>
+                    <p class="card-desc">分析不同奖金结构对策略的影响，优化你的风险回报决策</p>
+                </div>
+                <div class="card-footer">
+                    <span class="card-tag">💰 <span>奖金分析</span></span>
+                    <span class="card-tag">📈 <span>EV优化</span></span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>🏆 WSOP MASTER · 锦标赛冠军训练系统</p>
+        <p style="margin-top: 5px;">从业余到冠军 · 系统化训练之路</p>
+    </footer>
+
+    <script>
+        // 版本号
+        const WSOP_VERSION = '1.0.0';
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🏆 WSOP Master 训练中心 v' + WSOP_VERSION + ' 已加载');
+        });
+    </script>
+</body>
+</html>
+

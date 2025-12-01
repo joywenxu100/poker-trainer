@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>📊 ICM决策大师 - WSOP锦标赛训练</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0612;
+            --bg-card: #150d1f;
+            --bg-panel: #1e1430;
+            --gold: #ffd700;
+            --gold-dark: #b8860b;
+            --red: #e74c3c;
+            --green: #2ecc71;
+            --blue: #3498db;
+            --purple: #9b59b6;
+            --text: #f0f0f0;
+            --text-dim: #8a8a9a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 15px;
+            padding-bottom: 100px;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            color: var(--gold);
+            padding: 10px 18px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: var(--gold);
+            color: #000;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding-top: 50px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-panel) 100%);
+            border-radius: 20px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+        }
+
+        /* 进度条 */
+        .progress-bar {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .progress-text {
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .progress-track {
+            height: 10px;
+            background: var(--bg-panel);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold), #ff8c00);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        /* 问题卡片 */
+        .question-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        .scenario-box {
+            background: var(--bg-panel);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 4px solid var(--gold);
+        }
+
+        .scenario-title {
+            color: var(--gold);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .scenario-content {
+            color: var(--text);
+            line-height: 1.8;
+        }
+
+        .stack-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        .stack-item {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .stack-label {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .stack-value {
+            font-size: 1.1rem;
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            color: var(--text);
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        /* 选项 */
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: var(--bg-panel);
+            border: 2px solid transparent;
+            border-radius: 15px;
+            padding: 18px 25px;
+            color: var(--text);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .option-btn:hover {
+            border-color: var(--gold);
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .option-btn.selected {
+            border-color: var(--gold);
+            background: rgba(255, 215, 0, 0.2);
+        }
+
+        .option-btn.correct {
+            border-color: var(--green);
+            background: rgba(46, 204, 113, 0.2);
+        }
+
+        .option-btn.wrong {
+            border-color: var(--red);
+            background: rgba(231, 76, 60, 0.2);
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        /* 解释框 */
+        .explanation {
+            background: var(--bg-panel);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 25px;
+            display: none;
+            border-left: 4px solid var(--green);
+        }
+
+        .explanation.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .explanation-title {
+            color: var(--gold);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .explanation-content {
+            color: var(--text);
+            line-height: 1.8;
+        }
+
+        .explanation-content ul {
+            margin: 15px 0;
+            padding-left: 20px;
+        }
+
+        .explanation-content li {
+            margin: 8px 0;
+        }
+
+        .icm-calc {
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+        }
+
+        .icm-calc-title {
+            color: var(--gold);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        /* 下一题按钮 */
+        .next-btn {
+            display: none;
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--gold), #ff8c00);
+            border: none;
+            border-radius: 15px;
+            color: #000;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .next-btn.show {
+            display: block;
+        }
+
+        .next-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+        }
+
+        /* 结果页面 */
+        .result-card {
+            display: none;
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            border: 2px solid var(--gold);
+        }
+
+        .result-card.show {
+            display: block;
+        }
+
+        .result-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .result-title {
+            font-size: 1.8rem;
+            color: var(--gold);
+            margin-bottom: 15px;
+        }
+
+        .result-score {
+            font-size: 3rem;
+            color: var(--text);
+            font-weight: 700;
+            margin: 20px 0;
+        }
+
+        .result-desc {
+            color: var(--text-dim);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .restart-btn {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, var(--gold), #ff8c00);
+            border: none;
+            border-radius: 30px;
+            color: #000;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.05);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.4rem;
+            }
+
+            .question-text {
+                font-size: 1.05rem;
+            }
+
+            .stack-info {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="wsop_tournament_hub.html?v=5" class="back-btn">← 返回锦标赛中心</a>
+
+    <div class="container">
+        <div class="header">
+            <h1>📊 ICM决策大师</h1>
+            <p>掌握独立筹码模型，在关键时刻做出正确决策</p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-header">
+                <span class="progress-text">训练进度</span>
+                <span class="progress-text" id="progress-count">0 / 15</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="question-card" id="question-card">
+            <div class="scenario-box">
+                <div class="scenario-title">📍 比赛场景</div>
+                <div class="scenario-content" id="scenario-content">
+                    加载中...
+                </div>
+                <div class="stack-info" id="stack-info"></div>
+            </div>
+
+            <div class="question-text" id="question-text">
+                加载中...
+            </div>
+
+            <div class="options" id="options"></div>
+
+            <div class="explanation" id="explanation">
+                <div class="explanation-title">📚 ICM分析</div>
+                <div class="explanation-content" id="explanation-content"></div>
+            </div>
+
+            <button class="next-btn" id="next-btn" onclick="nextQuestion()">下一题 →</button>
+        </div>
+
+        <div class="result-card" id="result-card">
+            <div class="result-icon">🏆</div>
+            <div class="result-title">训练完成！</div>
+            <div class="result-score" id="result-score">0%</div>
+            <div class="result-desc" id="result-desc">继续努力，成为ICM大师！</div>
+            <button class="restart-btn" onclick="restartTraining()">重新训练</button>
+        </div>
+    </div>
+
+    <script>
+        // ICM训练题库
+        const ICM_QUESTIONS = [
+            {
+                scenario: "WSOP主赛事，剩余5人，奖金结构：1st $10M, 2nd $6M, 3rd $4M, 4th $3M, 5th $2.5M",
+                stacks: [
+                    { label: "你", value: "45BB", chips: "4,500,000" },
+                    { label: "对手1", value: "35BB", chips: "3,500,000" },
+                    { label: "对手2", value: "30BB", chips: "3,000,000" },
+                    { label: "对手3", value: "25BB", chips: "2,500,000" },
+                    { label: "对手4", value: "15BB", chips: "1,500,000" }
+                ],
+                question: "你在大盲位拿到A♠K♠。筹码最少的对手4在按钮位全押15BB。小盲弃牌。你应该怎么做？",
+                options: [
+                    "A. 快速跟注 - AKs是好牌",
+                    "B. 弃牌 - 让其他人淘汰他",
+                    "C. 分析后跟注 - 但要考虑ICM",
+                    "D. 超额全押 - 隔离对手"
+                ],
+                correctIndex: 1,
+                explanation: {
+                    title: "弃牌 - ICM让AKs变成弃牌",
+                    content: `
+                        <p><strong>这是经典的ICM决策场景！</strong></p>
+                        <div class="icm-calc">
+                            <div class="icm-calc-title">📊 ICM分析</div>
+                            <p>• 你当前ICM股权: ~$5.2M (筹码领先)</p>
+                            <p>• 跟注赢: 淘汰对手4，股权升至~$5.8M (+$0.6M)</p>
+                            <p>• 跟注输: 筹码变30BB，股权降至~$4.2M (-$1.0M)</p>
+                            <p>• 弃牌: 股权保持~$5.2M，对手4可能被淘汰</p>
+                        </div>
+                        <ul>
+                            <li><strong>风险/回报不对称：</strong>输的代价($1M)远大于赢的收益($0.6M)</li>
+                            <li><strong>让别人去淘汰：</strong>你不需要冒险，让其他中等筹码去对抗</li>
+                            <li><strong>筹码领先的价值：</strong>保持领先让你有更多施压机会</li>
+                            <li><strong>AKs的真实价值：</strong>对抗全押范围只有~60%胜率，ICM下不够</li>
+                        </ul>
+                        <p>✅ <strong>结论：</strong>在ICM压力下，即使是AKs也应该弃牌！</p>
+                    `
+                }
+            },
+            {
+                scenario: "锦标赛泡沫期，剩余19人，18人进钱圈。最低奖金$5,000，你的买入是$1,000",
+                stacks: [
+                    { label: "你", value: "8BB", chips: "80,000" },
+                    { label: "大盲", value: "45BB", chips: "450,000" },
+                    { label: "平均", value: "26BB", chips: "260,000" }
+                ],
+                question: "你在按钮位拿到7♥7♠。前面全弃到你。大盲是桌上筹码最多的玩家。你应该怎么做？",
+                options: [
+                    "A. 全押 - 77是好牌，需要积累筹码",
+                    "B. 弃牌 - 泡沫期保守",
+                    "C. 小额加注到2BB试探",
+                    "D. 等待更好的机会"
+                ],
+                correctIndex: 0,
+                explanation: {
+                    title: "全押 - 这是绝佳的偷盲机会！",
+                    content: `
+                        <p><strong>泡沫期的ICM压力是双向的！</strong></p>
+                        <div class="icm-calc">
+                            <div class="icm-calc-title">📊 ICM分析</div>
+                            <p>• 大筹码不愿意和你对抗 - 他不想冒险</p>
+                            <p>• 你的8BB正处于"推挤或弃牌"区间</p>
+                            <p>• 77是前10%的手牌，足够强</p>
+                            <p>• 预计弃牌率: 70%+ (大筹码的ICM压力)</p>
+                        </div>
+                        <ul>
+                            <li><strong>利用ICM压力：</strong>大筹码玩家在泡沫期会收紧范围</li>
+                            <li><strong>8BB的紧迫性：</strong>再等下去筹码会被盲注吃掉</li>
+                            <li><strong>77的价值：</strong>即使被跟注，对抗大多数范围也有45%+胜率</li>
+                            <li><strong>位置优势：</strong>按钮位偷盲成功率最高</li>
+                        </ul>
+                        <p>✅ <strong>结论：</strong>利用大筹码的ICM压力，果断推挤！</p>
+                    `
+                }
+            },
+            {
+                scenario: "SNG单桌赛，剩余4人，奖金结构：1st 50%, 2nd 30%, 3rd 20%",
+                stacks: [
+                    { label: "你", value: "12BB", chips: "6,000" },
+                    { label: "对手1", value: "15BB", chips: "7,500" },
+                    { label: "对手2", value: "10BB", chips: "5,000" },
+                    { label: "对手3", value: "3BB", chips: "1,500" }
+                ],
+                question: "你在小盲位拿到A♦Q♣。对手3(3BB)在按钮位全押。你应该怎么做？",
+                options: [
+                    "A. 快速跟注 - AQ碾压短筹码范围",
+                    "B. 弃牌 - 让大盲去对抗",
+                    "C. 超额全押隔离",
+                    "D. 只跟注3BB"
+                ],
+                correctIndex: 2,
+                explanation: {
+                    title: "超额全押隔离 - 防止大盲参与",
+                    content: `
+                        <p><strong>SNG中的隔离策略！</strong></p>
+                        <div class="icm-calc">
+                            <div class="icm-calc-title">📊 ICM分析</div>
+                            <p>• 对手3(3BB)范围很宽: 任意两张~40%</p>
+                            <p>• AQo对抗宽范围: ~65%胜率</p>
+                            <p>• 如果大盲也跟注，你的胜率会下降</p>
+                            <p>• 淘汰对手3让你进入钱圈</p>
+                        </div>
+                        <ul>
+                            <li><strong>隔离的价值：</strong>防止大盲用边缘牌参与多人底池</li>
+                            <li><strong>ICM收益：</strong>淘汰最短筹码对你ICM股权提升最大</li>
+                            <li><strong>AQ的强度：</strong>对抗3BB全押范围是明显领先</li>
+                            <li><strong>只跟注的风险：</strong>大盲可能用各种牌参与，降低你的胜率</li>
+                        </ul>
+                        <p>✅ <strong>结论：</strong>超额全押隔离，最大化淘汰短筹码的机会！</p>
+                    `
+                }
+            },
+            {
+                scenario: "WSOP决赛桌，剩余3人，奖金：1st $8M, 2nd $5M, 3rd $3M",
+                stacks: [
+                    { label: "你", value: "60BB", chips: "12,000,000" },
+                    { label: "对手1", value: "50BB", chips: "10,000,000" },
+                    { label: "对手2", value: "40BB", chips: "8,000,000" }
+                ],
+                question: "你是筹码领先者。对手2在按钮位加注到2.5BB，对手1在小盲3-Bet到8BB。你在大盲拿到J♠J♥。你应该怎么做？",
+                options: [
+                    "A. 4-Bet到22BB",
+                    "B. 跟注8BB",
+                    "C. 弃牌",
+                    "D. 全押"
+                ],
+                correctIndex: 1,
+                explanation: {
+                    title: "跟注 - 控制底池大小",
+                    content: `
+                        <p><strong>三人决赛桌的筹码动态！</strong></p>
+                        <div class="icm-calc">
+                            <div class="icm-calc-title">📊 ICM分析</div>
+                            <p>• 你领先但优势不大(60BB vs 50BB vs 40BB)</p>
+                            <p>• 让两个对手互相消耗对你最有利</p>
+                            <p>• JJ是好牌但不是坚果</p>
+                            <p>• 4-Bet可能面对5-Bet全押的尴尬</p>
+                        </div>
+                        <ul>
+                            <li><strong>位置劣势：</strong>你在大盲，翻后OOP</li>
+                            <li><strong>JJ的定位：</strong>好牌但不想打大底池</li>
+                            <li><strong>保持领先：</strong>不需要冒险，让对手互相消耗</li>
+                            <li><strong>翻后优势：</strong>跟注后可以根据翻牌做决策</li>
+                        </ul>
+                        <p>✅ <strong>结论：</strong>跟注控制底池，保持筹码领先优势！</p>
+                    `
+                }
+            },
+            {
+                scenario: "MTT中期，平均筹码30BB，你刚刚输了一个大底池",
+                stacks: [
+                    { label: "你", value: "18BB", chips: "18,000" },
+                    { label: "对手(CO)", value: "45BB", chips: "45,000" },
+                    { label: "平均", value: "30BB", chips: "30,000" }
+                ],
+                question: "CO位玩家加注到2.5BB，你在按钮位拿到A♠5♠。你应该怎么做？",
+                options: [
+                    "A. 3-Bet全押18BB",
+                    "B. 跟注2.5BB",
+                    "C. 弃牌",
+                    "D. 3-Bet到7BB"
+                ],
+                correctIndex: 0,
+                explanation: {
+                    title: "3-Bet全押 - 18BB是完美的推挤筹码量",
+                    content: `
+                        <p><strong>中等筹码的推挤策略！</strong></p>
+                        <div class="icm-calc">
+                            <div class="icm-calc-title">📊 推挤分析</div>
+                            <p>• 18BB是经典的推挤筹码量(15-25BB)</p>
+                            <p>• 对手已投入2.5BB，弃牌成本高</p>
+                            <p>• A5s有阻隔效应(阻挡AA/AK)</p>
+                            <p>• 弃牌率预估: 55-60%</p>
+                        </div>
+                        <ul>
+                            <li><strong>弃牌股权：</strong>即使对手弃牌，赢得4BB(盲注+加注)也很好</li>
+                            <li><strong>被跟注时：</strong>A5s对抗跟注范围有35%+胜率</li>
+                            <li><strong>为什么不跟注：</strong>18BB太短，跟注后翻后难打</li>
+                            <li><strong>为什么不小3-Bet：</strong>7BB的3-Bet承诺了太多筹码，不如全押</li>
+                        </ul>
+                        <p>✅ <strong>结论：</strong>A5s在按钮位是完美的推挤牌！</p>
+                    `
+                }
+            },
+            {
+                scenario: "钱圈刚开始，剩余45人(钱圈54人)，最低奖金$2,000",
+                stacks: [
+                    { label: "你", value: "25BB", chips: "250,000" },
+                    { label: "UTG", value: "8BB", chips: "80,000" },
+                    { label: "平均", value: "35BB", chips: "350,000" }
+                ],
+                question: "UTG(8BB短筹码)全押。你在MP拿到T♠T♣。后面还有5个玩家。你应该怎么做？",
+                options: [
+                    "A. 快速跟注",
+                    "B. 弃牌 - 后面还有人",
+                    "C. 超额全押隔离",
+                    "D. 跟注8BB"
+                ],
+                correctIndex: 2,
+                explanation: {
+                    title: "超额全押隔离 - TT足够强",
+                    content: `
+                        <p><strong>钱圈内的隔离决策！</strong></p>
+                        <div class="icm-calc">
+                            <div class="icm-calc-title">📊 ICM分析</div>
+                            <p>• 已进钱圈，ICM压力减轻</p>
+                            <p>• UTG 8BB范围: 22+, A2s+, A7o+, KTs+, QJs</p>
+                            <p>• TT对抗该范围: ~55%胜率</p>
+                            <p>• 只跟注可能面对squeeze</p>
+                        </div>
+                        <ul>
+                            <li><strong>隔离的必要性：</strong>后面5人可能有更强牌或squeeze</li>
+                            <li><strong>TT的强度：</strong>对抗短筹码UTG范围是领先的</li>
+                            <li><strong>钱圈内策略：</strong>可以更激进地积累筹码</li>
+                            <li><strong>风险可控：</strong>即使输了还有17BB继续战斗</li>
+                        </ul>
+                        <p>✅ <strong>结论：</strong>全押隔离，争取单挑淘汰短筹码！</p>
+                    `
+                }
+            },
+            {
+                scenario: "泡沫期，剩余28人，27人进钱圈，你是全场筹码第一",
+                stacks: [
+                    { label: "你", value: "85BB", chips: "850,000" },
+                    { label: "对手", value: "22BB", chips: "220,000" },
+                    { label: "平均", value: "36BB", chips: "360,000" }
+                ],
+                question: "你在按钮位拿到K♥9♥。前面全弃到你。大盲是一个22BB的中等筹码。你应该怎么做？",
+                options: [
+                    "A. 弃牌 - K9不够强",
+                    "B. 加注到2.2BB",
+                    "C. 加注到3BB",
+                    "D. Limp"
+                ],
+                correctIndex: 1,
+                explanation: {
+                    title: "加注到2.2BB - 利用ICM压力偷盲",
+                    content: `
+                        <p><strong>大筹码在泡沫期的施压策略！</strong></p>
+                        <div class="icm-calc">
+                            <div class="icm-calc-title">📊 ICM分析</div>
+                            <p>• 你是筹码领先者，ICM压力在对手身上</p>
+                            <p>• 22BB的中筹码不想在泡沫期冒险</p>
+                            <p>• 小额加注给对手最大压力</p>
+                            <p>• K9s在按钮位是标准开池牌</p>
+                        </div>
+                        <ul>
+                            <li><strong>ICM施压：</strong>对手22BB不敢轻易3-Bet你</li>
+                            <li><strong>小额加注的好处：</strong>被3-Bet可以轻松弃牌，损失小</li>
+                            <li><strong>偷盲成功率高：</strong>预计70%+对手会弃牌</li>
+                            <li><strong>K9s的可玩性：</strong>即使被跟注，翻后也有不错的可玩性</li>
+                        </ul>
+                        <p>✅ <strong>结论：</strong>利用大筹码优势，积极偷盲！</p>
+                    `
+                }
+            },
+            {
+                scenario: "决赛桌6人，你是短筹码，盲注即将上涨",
+                stacks: [
+                    { label: "你", value: "10BB", chips: "500,000" },
+                    { label: "CL", value: "45BB", chips: "2,250,000" },
+                    { label: "其他", value: "20-30BB", chips: "~1,000,000" }
+                ],
+                question: "盲注马上要从5k/10k涨到7.5k/15k。你在CO位拿到Q♦J♦。前面全弃。你应该怎么做？",
+                options: [
+                    "A. 弃牌等更好的牌",
+                    "B. 加注到2.5BB",
+                    "C. 全押10BB",
+                    "D. Limp"
+                ],
+                correctIndex: 2,
+                explanation: {
+                    title: "全押 - 盲注上涨前必须行动！",
+                    content: `
+                        <p><strong>短筹码的紧迫性决策！</strong></p>
+                        <div class="icm-calc">
+                            <div class="icm-calc-title">📊 筹码分析</div>
+                            <p>• 当前: 10BB</p>
+                            <p>• 盲注上涨后: 约6.7BB (10BB × 10k/15k)</p>
+                            <p>• QJs是前15%的手牌</p>
+                            <p>• 弃牌股权 + 胜率 = 正EV</p>
+                        </div>
+                        <ul>
+                            <li><strong>时机紧迫：</strong>盲注上涨后你的推挤力量大减</li>
+                            <li><strong>QJs的质量：</strong>同花连张有很好的胜率和阻隔</li>
+                            <li><strong>弃牌股权：</strong>CO位全押有足够的弃牌股权</li>
+                            <li><strong>不能等：</strong>等到6BB再推挤，弃牌股权会大幅下降</li>
+                        </ul>
+                        <p>✅ <strong>结论：</strong>在盲注上涨前果断全押！</p>
+                    `
+                }
+            },
+            {
+                scenario: "MTT后期，剩余15人，9人进决赛桌，奖金大幅跳跃",
+                stacks: [
+                    { label: "你", value: "35BB", chips: "3,500,000" },
+                    { label: "对手", value: "40BB", chips: "4,000,000" },
+                    { label: "短筹", value: "12BB", chips: "1,200,000" }
+                ],
+                question: "你在按钮位拿到A♣K♣。CO(40BB)加注到2.2BB。你应该怎么做？",
+                options: [
+                    "A. 跟注 - 控制底池",
+                    "B. 3-Bet到6.5BB",
+                    "C. 3-Bet到8BB",
+                    "D. 弃牌 - 等进决赛桌"
+                ],
+                correctIndex: 0,
+                explanation: {
+                    title: "跟注 - 决赛桌泡沫期的谨慎策略",
+                    content: `
+                        <p><strong>决赛桌泡沫期的ICM考量！</strong></p>
+                        <div class="icm-calc">
+                            <div class="icm-calc-title">📊 ICM分析</div>
+                            <p>• 进决赛桌的奖金跳跃巨大</p>
+                            <p>• 你35BB vs 对手40BB，都是中等偏大筹码</p>
+                            <p>• 有12BB短筹码可能随时出局</p>
+                            <p>• 3-Bet可能引发大底池对抗</p>
+                        </div>
+                        <ul>
+                            <li><strong>ICM压力：</strong>两个大筹码互相对抗对短筹码最有利</li>
+                            <li><strong>AKs的灵活性：</strong>跟注后可以根据翻牌决定投入程度</li>
+                            <li><strong>控制风险：</strong>不需要在这里冒险打大底池</li>
+                            <li><strong>等待更好时机：</strong>进决赛桌后再激进也不迟</li>
+                        </ul>
+                        <p>✅ <strong>结论：</strong>跟注控制底池，保护决赛桌泡沫期的股权！</p>
+                    `
+                }
+            },
+            {
+                scenario: "Heads-up单挑决赛，奖金差距：1st $500K, 2nd $300K",
+                stacks: [
+                    { label: "你", value: "55BB", chips: "5,500,000" },
+                    { label: "对手", value: "45BB", chips: "4,500,000" }
+                ],
+                question: "你在按钮位(小盲)拿到8♠6♠。你应该怎么做？",
+                options: [
+                    "A. 弃牌",
+                    "B. Limp",
+                    "C. 加注到2.5BB",
+                    "D. 加注到3BB"
+                ],
+                correctIndex: 2,
+                explanation: {
+                    title: "加注到2.5BB - 单挑要激进！",
+                    content: `
+                        <p><strong>单挑决赛的策略转变！</strong></p>
+                        <div class="icm-calc">
+                            <div class="icm-calc-title">📊 单挑分析</div>
+                            <p>• 单挑时ICM影响最小</p>
+                            <p>• 筹码优势(55BB vs 45BB)要利用</p>
+                            <p>• 86s在单挑是完全可玩的牌</p>
+                            <p>• 按钮位要加注几乎所有牌</p>
+                        </div>
+                        <ul>
+                            <li><strong>单挑范围扩大：</strong>单挑时86s是前50%的牌</li>
+                            <li><strong>位置优势：</strong>按钮位有绝对的位置优势</li>
+                            <li><strong>施加压力：</strong>不断加注消耗对手筹码</li>
+                            <li><strong>筹码领先：</strong>利用优势不断施压</li>
+                        </ul>
+                        <p>✅ <strong>结论：</strong>单挑按钮位要激进，86s是标准加注牌！</p>
+                    `
+                }
+            },
+            {
+                scenario: "MTT早期，刚开始第2级，筹码很深",
+                stacks: [
+                    { label: "你", value: "150BB", chips: "15,000" },
+                    { label: "对手", value: "200BB", chips: "20,000" },
+                    { label: "起始", value: "150BB", chips: "15,000" }
+                ],
+                question: "你在BB拿到5♥5♣。UTG(200BB)加注到3BB，MP跟注，按钮跟注，小盲弃牌。你应该怎么做？",
+                options: [
+                    "A. 弃牌",
+                    "B. 跟注 - Set Mining",
+                    "C. 3-Bet Squeeze到15BB",
+                    "D. 全押"
+                ],
+                correctIndex: 1,
+                explanation: {
+                    title: "跟注 - 深筹码Set Mining",
+                    content: `
+                        <p><strong>锦标赛早期的深筹码策略！</strong></p>
+                        <div class="icm-calc">
+                            <div class="icm-calc-title">📊 赔率分析</div>
+                            <p>• 底池: 3+3+3+0.5 = 9.5BB</p>
+                            <p>• 需要跟注: 2BB (你已投入1BB)</p>
+                            <p>• 直接赔率: 9.5:2 ≈ 5:1</p>
+                            <p>• 击中Set概率: ~12% (8:1)</p>
+                            <p>• 隐含赔率: 巨大！(150BB+深度)</p>
+                        </div>
+                        <ul>
+                            <li><strong>深筹码价值：</strong>150BB深度，击中Set可以赢大底池</li>
+                            <li><strong>多人底池：</strong>更容易在击中时得到支付</li>
+                            <li><strong>早期策略：</strong>锦标赛早期ICM影响小，可以追求大底池</li>
+                            <li><strong>55的定位：</strong>只为击中Set，没中就放弃</li>
+                        </ul>
+                        <p>✅ <strong>结论：</strong>深筹码早期，小对子set mining是标准策略！</p>
+                    `
+                }
+            },
+            {
+                scenario: "SNG 6人桌，剩余3人，奖金：1st 65%, 2nd 35%",
+                stacks: [
+                    { label: "你", value: "6BB", chips: "3,000" },
+                    { label: "对手1", value: "9BB", chips: "4,500" },
+                    { label: "对手2", value: "15BB", chips: "7,500" }
+                ],
+                question: "你在按钮位拿到K♦3♦。小盲是9BB，大盲是15BB。你应该怎么做？",
+                options: [
+                    "A. 弃牌 - K3太弱",
+                    "B. 全押6BB",
+                    "C. 加注到2BB",
+                    "D. Limp"
+                ],
+                correctIndex: 1,
+                explanation: {
+                    title: "全押 - 6BB必须推挤！",
+                    content: `
+                        <p><strong>短筹码的生存策略！</strong></p>
+                        <div class="icm-calc">
+                            <div class="icm-calc-title">📊 推挤分析</div>
+                            <p>• 6BB是"推挤或弃牌"区间</p>
+                            <p>• K3s在按钮位是可推挤的牌</p>
+                            <p>• 两个对手都有ICM压力(3人只有2人有奖金)</p>
+                            <p>• 弃牌股权: 预估50%+</p>
+                        </div>
+                        <ul>
+                            <li><strong>筹码紧迫性：</strong>6BB再不行动就要被盲注吃掉</li>
+                            <li><strong>K的阻隔：</strong>K阻挡了对手的KK/AK等强牌</li>
+                            <li><strong>ICM压力：</strong>两个对手都不想在这里冒险</li>
+                            <li><strong>按钮位优势：</strong>最好的偷盲位置</li>
+                        </ul>
+                        <p>✅ <strong>结论：</strong>6BB在按钮位，K3s是必须全押的牌！</p>
+                    `
+                }
+            },
+            {
+                scenario: "WSOP主赛事Day2，剩余800人，钱圈1000人",
+                stacks: [
+                    { label: "你", value: "45BB", chips: "450,000" },
+                    { label: "对手", value: "60BB", chips: "600,000" },
+                    { label: "平均", value: "50BB", chips: "500,000" }
+                ],
+                question: "你在CO拿到A♠J♠。UTG(60BB紧凶玩家)加注到2.2BB。你应该怎么做？",
+                options: [
+                    "A. 弃牌",
+                    "B. 跟注",
+                    "C. 3-Bet到6.5BB",
+                    "D. 3-Bet到8BB"
+                ],
+                correctIndex: 1,
+                explanation: {
+                    title: "跟注 - 对抗紧凶UTG要谨慎",
+                    content: `
+                        <p><strong>Day2的稳健策略！</strong></p>
+                        <div class="icm-calc">
+                            <div class="icm-calc-title">📊 范围分析</div>
+                            <p>• 紧凶UTG范围: 77+, ATs+, AJo+, KQs</p>
+                            <p>• AJs对抗该范围: ~45%胜率</p>
+                            <p>• 3-Bet可能面对4-Bet</p>
+                            <p>• 距离钱圈还有200人出局</p>
+                        </div>
+                        <ul>
+                            <li><strong>对手范围强：</strong>紧凶UTG的范围很强，AJs不是明显领先</li>
+                            <li><strong>位置优势：</strong>CO位有位置，跟注后翻后好打</li>
+                            <li><strong>筹码保护：</strong>不需要在这里冒险建大底池</li>
+                            <li><strong>灵活性：</strong>跟注后可以根据翻牌和后续行动决定</li>
+                        </ul>
+                        <p>✅ <strong>结论：</strong>跟注保持灵活性，翻后利用位置优势！</p>
+                    `
+                }
+            },
+            {
+                scenario: "Final Table 4人，筹码差距很大",
+                stacks: [
+                    { label: "CL", value: "80BB", chips: "8,000,000" },
+                    { label: "你", value: "35BB", chips: "3,500,000" },
+                    { label: "对手2", value: "30BB", chips: "3,000,000" },
+                    { label: "短筹", value: "5BB", chips: "500,000" }
+                ],
+                question: "5BB短筹码在UTG全押。CL在按钮位跟注。你在小盲拿到Q♠Q♥。你应该怎么做？",
+                options: [
+                    "A. 弃牌 - 让CL去淘汰他",
+                    "B. 跟注5BB",
+                    "C. 超额全押35BB",
+                    "D. 加注到15BB"
+                ],
+                correctIndex: 2,
+                explanation: {
+                    title: "超额全押 - QQ足够强，争取淘汰短筹码",
+                    content: `
+                        <p><strong>决赛桌的关键决策！</strong></p>
+                        <div class="icm-calc">
+                            <div class="icm-calc-title">📊 ICM分析</div>
+                            <p>• QQ是顶级手牌</p>
+                            <p>• 淘汰短筹码对你ICM股权提升大</p>
+                            <p>• CL的跟注范围可能很宽(想淘汰短筹码)</p>
+                            <p>• 全押可以让CL弃牌，单挑短筹码</p>
+                        </div>
+                        <ul>
+                            <li><strong>QQ的强度：</strong>对抗短筹码5BB范围有70%+胜率</li>
+                            <li><strong>隔离CL：</strong>全押让CL很难跟注(除非AA/KK)</li>
+                            <li><strong>ICM收益：</strong>淘汰短筹码让你更接近冠军</li>
+                            <li><strong>风险可控：</strong>即使CL跟注，QQ也有很好的胜率</li>
+                        </ul>
+                        <p>✅ <strong>结论：</strong>QQ全押隔离，争取单挑淘汰短筹码！</p>
+                    `
+                }
+            },
+            {
+                scenario: "Turbo赛制，盲注上涨快，平均筹码15BB",
+                stacks: [
+                    { label: "你", value: "20BB", chips: "20,000" },
+                    { label: "大盲", value: "12BB", chips: "12,000" },
+                    { label: "平均", value: "15BB", chips: "15,000" }
+                ],
+                question: "你在按钮位拿到A♥8♣。前面全弃到你。你应该怎么做？",
+                options: [
+                    "A. 弃牌",
+                    "B. 加注到2BB",
+                    "C. 加注到2.5BB",
+                    "D. 全押20BB"
+                ],
+                correctIndex: 2,
+                explanation: {
+                    title: "加注到2.5BB - Turbo赛制的标准打法",
+                    content: `
+                        <p><strong>Turbo赛制的节奏把握！</strong></p>
+                        <div class="icm-calc">
+                            <div class="icm-calc-title">📊 Turbo分析</div>
+                            <p>• 20BB在Turbo中是健康筹码</p>
+                            <p>• A8o在按钮位是明确开池牌</p>
+                            <p>• 全押太激进，浪费了弃牌股权</p>
+                            <p>• 2.5BB给对手最大压力</p>
+                        </div>
+                        <ul>
+                            <li><strong>筹码量健康：</strong>20BB不需要全押</li>
+                            <li><strong>保持灵活：</strong>小额加注被3-Bet可以弃牌</li>
+                            <li><strong>偷盲价值：</strong>A8o足够强，值得争取盲注</li>
+                            <li><strong>Turbo节奏：</strong>要积极但不要过度激进</li>
+                        </ul>
+                        <p>✅ <strong>结论：</strong>标准加注到2.5BB，保持灵活性！</p>
+                    `
+                }
+            }
+        ];
+
+        let currentQuestion = 0;
+        let correctCount = 0;
+        let answered = false;
+
+        function loadQuestion() {
+            if (currentQuestion >= ICM_QUESTIONS.length) {
+                showResult();
+                return;
+            }
+
+            const q = ICM_QUESTIONS[currentQuestion];
+            answered = false;
+
+            // 更新进度
+            document.getElementById('progress-count').textContent = `${currentQuestion + 1} / ${ICM_QUESTIONS.length}`;
+            document.getElementById('progress-fill').style.width = `${((currentQuestion + 1) / ICM_QUESTIONS.length) * 100}%`;
+
+            // 加载场景
+            document.getElementById('scenario-content').innerHTML = q.scenario;
+
+            // 加载筹码信息
+            const stackInfo = document.getElementById('stack-info');
+            stackInfo.innerHTML = q.stacks.map(s => `
+                <div class="stack-item">
+                    <div class="stack-label">${s.label}</div>
+                    <div class="stack-value">${s.value}</div>
+                </div>
+            `).join('');
+
+            // 加载问题
+            document.getElementById('question-text').textContent = q.question;
+
+            // 加载选项
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = q.options.map((opt, i) => `
+                <button class="option-btn" onclick="selectOption(${i})">${opt}</button>
+            `).join('');
+
+            // 隐藏解释和下一题按钮
+            document.getElementById('explanation').classList.remove('show');
+            document.getElementById('next-btn').classList.remove('show');
+        }
+
+        function selectOption(index) {
+            if (answered) return;
+            answered = true;
+
+            const q = ICM_QUESTIONS[currentQuestion];
+            const buttons = document.querySelectorAll('.option-btn');
+
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === q.correctIndex) {
+                    btn.classList.add('correct');
+                } else if (i === index && index !== q.correctIndex) {
+                    btn.classList.add('wrong');
+                }
+            });
+
+            if (index === q.correctIndex) {
+                correctCount++;
+            }
+
+            // 显示解释
+            const explanation = document.getElementById('explanation');
+            document.getElementById('explanation-content').innerHTML = q.explanation.content;
+            explanation.classList.add('show');
+
+            // 显示下一题按钮
+            document.getElementById('next-btn').classList.add('show');
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            loadQuestion();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showResult() {
+            document.getElementById('question-card').style.display = 'none';
+            document.getElementById('result-card').classList.add('show');
+
+            const percentage = Math.round((correctCount / ICM_QUESTIONS.length) * 100);
+            document.getElementById('result-score').textContent = `${percentage}%`;
+
+            let desc = '';
+            if (percentage >= 90) {
+                desc = '🏆 ICM大师！你已经掌握了锦标赛的核心技能！';
+            } else if (percentage >= 70) {
+                desc = '👍 不错！继续练习，你离大师不远了！';
+            } else if (percentage >= 50) {
+                desc = '📚 还需要更多练习，重点关注ICM压力下的决策！';
+            } else {
+                desc = '💪 ICM是锦标赛的核心，建议从基础开始学习！';
+            }
+            document.getElementById('result-desc').textContent = desc;
+        }
+
+        function restartTraining() {
+            currentQuestion = 0;
+            correctCount = 0;
+            document.getElementById('question-card').style.display = 'block';
+            document.getElementById('result-card').classList.remove('show');
+            loadQuestion();
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', loadQuestion);
+    </script>
+</body>
+</html>
+

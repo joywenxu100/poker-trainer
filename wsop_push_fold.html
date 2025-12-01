@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🎲 推挤弃牌表 - WSOP锦标赛工具</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-dark: #0a0612;
+            --bg-card: #150d1f;
+            --bg-panel: #1e1430;
+            --gold: #ffd700;
+            --purple: #9b59b6;
+            --red: #e74c3c;
+            --green: #2ecc71;
+            --blue: #3498db;
+            --text: #f0f0f0;
+            --text-dim: #8a8a9a;
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 15px;
+            padding-bottom: 100px;
+        }
+        .back-btn {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            background: rgba(155, 89, 182, 0.2);
+            border: 1px solid rgba(155, 89, 182, 0.5);
+            color: var(--purple);
+            padding: 10px 18px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            z-index: 100;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding-top: 50px; }
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-panel));
+            border-radius: 20px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(155, 89, 182, 0.3);
+        }
+        .header h1 { font-size: 1.8rem; color: var(--purple); margin-bottom: 10px; }
+        .header p { color: var(--text-dim); }
+
+        /* 控制面板 */
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        .control-group {
+            flex: 1;
+            min-width: 200px;
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 15px;
+        }
+        .control-group label {
+            display: block;
+            color: var(--gold);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .control-group select, .control-group input {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-panel);
+            border: 1px solid rgba(155, 89, 182, 0.3);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 1rem;
+        }
+        .control-group select:focus, .control-group input:focus {
+            outline: none;
+            border-color: var(--purple);
+        }
+
+        /* 范围显示 */
+        .range-display {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        .range-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .range-title { color: var(--gold); font-size: 1.2rem; }
+        .range-stats {
+            display: flex;
+            gap: 20px;
+        }
+        .stat-box {
+            text-align: center;
+            padding: 10px 20px;
+            background: var(--bg-panel);
+            border-radius: 10px;
+        }
+        .stat-value { color: var(--purple); font-size: 1.3rem; font-weight: 700; }
+        .stat-label { color: var(--text-dim); font-size: 0.8rem; }
+
+        /* 手牌矩阵 */
+        .matrix-container {
+            overflow-x: auto;
+        }
+        .hand-matrix {
+            display: grid;
+            grid-template-columns: repeat(13, 1fr);
+            gap: 3px;
+            min-width: 500px;
+        }
+        .hand-cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--bg-panel);
+            color: var(--text-dim);
+        }
+        .hand-cell:hover {
+            transform: scale(1.1);
+            z-index: 10;
+        }
+        .hand-cell.push {
+            background: linear-gradient(135deg, var(--green), #27ae60);
+            color: #000;
+        }
+        .hand-cell.fold {
+            background: var(--bg-panel);
+            color: var(--text-dim);
+        }
+        .hand-cell.marginal {
+            background: linear-gradient(135deg, #f39c12, #d68910);
+            color: #000;
+        }
+        .hand-cell.premium {
+            background: linear-gradient(135deg, var(--gold), #ff8c00);
+            color: #000;
+        }
+
+        /* 图例 */
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        .legend-color.premium { background: linear-gradient(135deg, var(--gold), #ff8c00); }
+        .legend-color.push { background: linear-gradient(135deg, var(--green), #27ae60); }
+        .legend-color.marginal { background: linear-gradient(135deg, #f39c12, #d68910); }
+        .legend-color.fold { background: var(--bg-panel); border: 1px solid var(--text-dim); }
+
+        /* 策略说明 */
+        .strategy-notes {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 25px;
+        }
+        .strategy-notes h3 { color: var(--gold); margin-bottom: 15px; }
+        .strategy-notes ul { padding-left: 20px; }
+        .strategy-notes li { color: var(--text-dim); margin: 8px 0; line-height: 1.6; }
+        .highlight { color: var(--gold); font-weight: 600; }
+
+        /* 快速查询 */
+        .quick-lookup {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        .quick-lookup h3 { color: var(--gold); margin-bottom: 15px; }
+        .lookup-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .lookup-input input {
+            flex: 1;
+            padding: 12px;
+            background: var(--bg-panel);
+            border: 1px solid rgba(155, 89, 182, 0.3);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 1rem;
+            text-transform: uppercase;
+        }
+        .lookup-btn {
+            padding: 12px 25px;
+            background: var(--purple);
+            border: none;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .lookup-result {
+            padding: 15px;
+            background: var(--bg-panel);
+            border-radius: 10px;
+            display: none;
+        }
+        .lookup-result.show { display: block; }
+        .lookup-result.push { border-left: 4px solid var(--green); }
+        .lookup-result.fold { border-left: 4px solid var(--red); }
+
+        @media (max-width: 768px) {
+            .controls { flex-direction: column; }
+            .hand-cell { font-size: 0.6rem; }
+            .range-stats { flex-direction: column; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <a href="wsop_tournament_hub.html?v=5" class="back-btn">← 返回锦标赛中心</a>
+
+    <div class="container">
+        <div class="header">
+            <h1>🎲 推挤弃牌表</h1>
+            <p>短筹码生存必备 · 覆盖1-20BB各种场景</p>
+        </div>
+
+        <div class="quick-lookup">
+            <h3>⚡ 快速查询</h3>
+            <div class="lookup-input">
+                <input type="text" id="hand-input" placeholder="输入手牌 (如: AKs, 77, QJo)" maxlength="4">
+                <button class="lookup-btn" onclick="lookupHand()">查询</button>
+            </div>
+            <div class="lookup-result" id="lookup-result"></div>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label>📍 你的位置</label>
+                <select id="position" onchange="updateMatrix()">
+                    <option value="BTN">按钮位 (BTN)</option>
+                    <option value="CO">关煞位 (CO)</option>
+                    <option value="MP">中间位置 (MP)</option>
+                    <option value="UTG">枪口位 (UTG)</option>
+                    <option value="SB">小盲位 (SB)</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>💰 你的筹码量</label>
+                <select id="stack" onchange="updateMatrix()">
+                    <option value="15">15BB</option>
+                    <option value="12">12BB</option>
+                    <option value="10" selected>10BB</option>
+                    <option value="8">8BB</option>
+                    <option value="6">6BB</option>
+                    <option value="5">5BB</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>🎭 比赛阶段</label>
+                <select id="stage" onchange="updateMatrix()">
+                    <option value="normal">常规阶段</option>
+                    <option value="bubble">泡沫期</option>
+                    <option value="itm">钱圈内</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="range-display">
+            <div class="range-header">
+                <span class="range-title" id="range-title">BTN位 10BB 推挤范围</span>
+                <div class="range-stats">
+                    <div class="stat-box">
+                        <div class="stat-value" id="push-pct">35%</div>
+                        <div class="stat-label">推挤比例</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value" id="hand-count">169</div>
+                        <div class="stat-label">推挤手数</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="matrix-container">
+                <div class="hand-matrix" id="hand-matrix"></div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color premium"></div>
+                    <span>顶级牌 - 必推</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color push"></div>
+                    <span>推挤 - 标准推</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color marginal"></div>
+                    <span>边缘 - 看情况</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color fold"></div>
+                    <span>弃牌</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="strategy-notes">
+            <h3>📚 使用说明</h3>
+            <ul>
+                <li><span class="highlight">推挤或弃牌：</span>短筹码(≤15BB)不要加注后弃牌，要么全押要么弃牌</li>
+                <li><span class="highlight">位置调整：</span>后位可以更宽，前位要更紧</li>
+                <li><span class="highlight">泡沫期调整：</span>泡沫期可以更激进(对手弃牌率更高)</li>
+                <li><span class="highlight">对手调整：</span>面对紧手扩大范围，面对跟注站收紧范围</li>
+                <li><span class="highlight">筹码深度：</span>筹码越少，推挤范围越宽</li>
+            </ul>
+        </div>
+
+        <div class="strategy-notes">
+            <h3>⚠️ 重要提醒</h3>
+            <ul>
+                <li>这是<span class="highlight">首入底池</span>的推挤范围，前面有人加注时需要收紧</li>
+                <li>面对<span class="highlight">大筹码盲注</span>可以稍微放宽(他们不想和你对抗)</li>
+                <li>面对<span class="highlight">短筹码盲注</span>要收紧(他们可能会跟注)</li>
+                <li><span class="highlight">边缘牌</span>需要根据具体情况判断</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // 手牌矩阵
+        const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
+        
+        // 推挤范围数据 (简化版本)
+        const PUSH_RANGES = {
+            BTN: {
+                15: { push: 'AA,KK,QQ,JJ,TT,99,88,77,66,55,44,33,22,AKs,AQs,AJs,ATs,A9s,A8s,A7s,A6s,A5s,A4s,A3s,A2s,KQs,KJs,KTs,K9s,K8s,K7s,QJs,QTs,Q9s,JTs,J9s,T9s,T8s,98s,97s,87s,76s,65s,54s,AKo,AQo,AJo,ATo,A9o,A8o,A7o,KQo,KJo,KTo,QJo,QTo,JTo', marginal: 'K6s,K5s,Q8s,J8s,96s,86s,75s,64s,53s,A6o,A5o,K9o,Q9o,J9o,T9o' },
+                12: { push: 'AA,KK,QQ,JJ,TT,99,88,77,66,55,44,33,22,AKs,AQs,AJs,ATs,A9s,A8s,A7s,A6s,A5s,A4s,A3s,A2s,KQs,KJs,KTs,K9s,K8s,K7s,K6s,K5s,QJs,QTs,Q9s,Q8s,JTs,J9s,J8s,T9s,T8s,98s,97s,87s,86s,76s,75s,65s,64s,54s,53s,AKo,AQo,AJo,ATo,A9o,A8o,A7o,A6o,A5o,KQo,KJo,KTo,K9o,QJo,QTo,Q9o,JTo,J9o,T9o', marginal: 'K4s,K3s,Q7s,J7s,T7s,96s,85s,74s,63s,52s,A4o,A3o,K8o,Q8o,J8o,T8o,98o' },
+                10: { push: 'AA,KK,QQ,JJ,TT,99,88,77,66,55,44,33,22,AKs,AQs,AJs,ATs,A9s,A8s,A7s,A6s,A5s,A4s,A3s,A2s,KQs,KJs,KTs,K9s,K8s,K7s,K6s,K5s,K4s,K3s,K2s,QJs,QTs,Q9s,Q8s,Q7s,JTs,J9s,J8s,J7s,T9s,T8s,T7s,98s,97s,96s,87s,86s,85s,76s,75s,74s,65s,64s,63s,54s,53s,52s,43s,AKo,AQo,AJo,ATo,A9o,A8o,A7o,A6o,A5o,A4o,A3o,A2o,KQo,KJo,KTo,K9o,K8o,QJo,QTo,Q9o,Q8o,JTo,J9o,J8o,T9o,T8o,98o', marginal: 'Q6s,J6s,T6s,95s,84s,73s,62s,42s,32s,K7o,Q7o,J7o,T7o,97o,87o' },
+                8: { push: 'AA,KK,QQ,JJ,TT,99,88,77,66,55,44,33,22,AKs,AQs,AJs,ATs,A9s,A8s,A7s,A6s,A5s,A4s,A3s,A2s,KQs,KJs,KTs,K9s,K8s,K7s,K6s,K5s,K4s,K3s,K2s,QJs,QTs,Q9s,Q8s,Q7s,Q6s,Q5s,JTs,J9s,J8s,J7s,J6s,T9s,T8s,T7s,T6s,98s,97s,96s,95s,87s,86s,85s,84s,76s,75s,74s,73s,65s,64s,63s,62s,54s,53s,52s,43s,42s,32s,AKo,AQo,AJo,ATo,A9o,A8o,A7o,A6o,A5o,A4o,A3o,A2o,KQo,KJo,KTo,K9o,K8o,K7o,K6o,QJo,QTo,Q9o,Q8o,Q7o,JTo,J9o,J8o,J7o,T9o,T8o,T7o,98o,97o,87o', marginal: 'Q4s,Q3s,J5s,T5s,94s,83s,72s,K5o,Q6o,J6o,T6o,96o,86o,76o' },
+                6: { push: 'AA,KK,QQ,JJ,TT,99,88,77,66,55,44,33,22,AKs,AQs,AJs,ATs,A9s,A8s,A7s,A6s,A5s,A4s,A3s,A2s,KQs,KJs,KTs,K9s,K8s,K7s,K6s,K5s,K4s,K3s,K2s,QJs,QTs,Q9s,Q8s,Q7s,Q6s,Q5s,Q4s,Q3s,Q2s,JTs,J9s,J8s,J7s,J6s,J5s,J4s,T9s,T8s,T7s,T6s,T5s,T4s,98s,97s,96s,95s,94s,87s,86s,85s,84s,83s,76s,75s,74s,73s,72s,65s,64s,63s,62s,54s,53s,52s,43s,42s,32s,AKo,AQo,AJo,ATo,A9o,A8o,A7o,A6o,A5o,A4o,A3o,A2o,KQo,KJo,KTo,K9o,K8o,K7o,K6o,K5o,K4o,QJo,QTo,Q9o,Q8o,Q7o,Q6o,Q5o,JTo,J9o,J8o,J7o,J6o,T9o,T8o,T7o,T6o,98o,97o,96o,87o,86o,76o,65o', marginal: 'J3s,T3s,93s,82s,K3o,Q4o,J5o,T5o,95o,85o,75o,54o' },
+                5: { push: 'AA,KK,QQ,JJ,TT,99,88,77,66,55,44,33,22,AKs,AQs,AJs,ATs,A9s,A8s,A7s,A6s,A5s,A4s,A3s,A2s,KQs,KJs,KTs,K9s,K8s,K7s,K6s,K5s,K4s,K3s,K2s,QJs,QTs,Q9s,Q8s,Q7s,Q6s,Q5s,Q4s,Q3s,Q2s,JTs,J9s,J8s,J7s,J6s,J5s,J4s,J3s,J2s,T9s,T8s,T7s,T6s,T5s,T4s,T3s,T2s,98s,97s,96s,95s,94s,93s,92s,87s,86s,85s,84s,83s,82s,76s,75s,74s,73s,72s,65s,64s,63s,62s,54s,53s,52s,43s,42s,32s,AKo,AQo,AJo,ATo,A9o,A8o,A7o,A6o,A5o,A4o,A3o,A2o,KQo,KJo,KTo,K9o,K8o,K7o,K6o,K5o,K4o,K3o,K2o,QJo,QTo,Q9o,Q8o,Q7o,Q6o,Q5o,Q4o,Q3o,JTo,J9o,J8o,J7o,J6o,J5o,J4o,T9o,T8o,T7o,T6o,T5o,98o,97o,96o,95o,87o,86o,85o,76o,75o,65o,54o', marginal: 'Q2o,J3o,T4o,94o,84o,74o,64o,53o,43o' }
+            },
+            CO: {
+                15: { push: 'AA,KK,QQ,JJ,TT,99,88,77,66,55,44,AKs,AQs,AJs,ATs,A9s,A8s,A7s,A6s,A5s,A4s,A3s,A2s,KQs,KJs,KTs,K9s,QJs,QTs,JTs,T9s,98s,87s,76s,65s,AKo,AQo,AJo,ATo,A9o,KQo,KJo,QJo', marginal: '33,22,K8s,Q9s,J9s,T8s,97s,86s,75s,54s,A8o,KTo,QTo,JTo' },
+                12: { push: 'AA,KK,QQ,JJ,TT,99,88,77,66,55,44,33,AKs,AQs,AJs,ATs,A9s,A8s,A7s,A6s,A5s,A4s,A3s,A2s,KQs,KJs,KTs,K9s,K8s,QJs,QTs,Q9s,JTs,J9s,T9s,T8s,98s,97s,87s,86s,76s,75s,65s,54s,AKo,AQo,AJo,ATo,A9o,A8o,KQo,KJo,KTo,QJo,QTo,JTo', marginal: '22,K7s,Q8s,J8s,T7s,96s,85s,74s,64s,53s,A7o,K9o,Q9o,J9o,T9o' },
+                10: { push: 'AA,KK,QQ,JJ,TT,99,88,77,66,55,44,33,22,AKs,AQs,AJs,ATs,A9s,A8s,A7s,A6s,A5s,A4s,A3s,A2s,KQs,KJs,KTs,K9s,K8s,K7s,QJs,QTs,Q9s,Q8s,JTs,J9s,J8s,T9s,T8s,T7s,98s,97s,96s,87s,86s,85s,76s,75s,74s,65s,64s,54s,53s,AKo,AQo,AJo,ATo,A9o,A8o,A7o,A6o,KQo,KJo,KTo,K9o,QJo,QTo,Q9o,JTo,J9o,T9o', marginal: 'K6s,Q7s,J7s,T6s,95s,84s,73s,63s,52s,43s,A5o,K8o,Q8o,J8o,T8o,98o' },
+                8: { push: 'AA,KK,QQ,JJ,TT,99,88,77,66,55,44,33,22,AKs,AQs,AJs,ATs,A9s,A8s,A7s,A6s,A5s,A4s,A3s,A2s,KQs,KJs,KTs,K9s,K8s,K7s,K6s,K5s,QJs,QTs,Q9s,Q8s,Q7s,JTs,J9s,J8s,J7s,T9s,T8s,T7s,T6s,98s,97s,96s,95s,87s,86s,85s,84s,76s,75s,74s,73s,65s,64s,63s,54s,53s,52s,43s,AKo,AQo,AJo,ATo,A9o,A8o,A7o,A6o,A5o,A4o,KQo,KJo,KTo,K9o,K8o,QJo,QTo,Q9o,Q8o,JTo,J9o,J8o,T9o,T8o,98o,87o', marginal: 'K4s,Q6s,J6s,T5s,94s,83s,72s,62s,42s,32s,A3o,K7o,Q7o,J7o,T7o,97o,86o,76o' },
+                6: { push: 'AA,KK,QQ,JJ,TT,99,88,77,66,55,44,33,22,AKs,AQs,AJs,ATs,A9s,A8s,A7s,A6s,A5s,A4s,A3s,A2s,KQs,KJs,KTs,K9s,K8s,K7s,K6s,K5s,K4s,K3s,K2s,QJs,QTs,Q9s,Q8s,Q7s,Q6s,Q5s,JTs,J9s,J8s,J7s,J6s,J5s,T9s,T8s,T7s,T6s,T5s,98s,97s,96s,95s,94s,87s,86s,85s,84s,83s,76s,75s,74s,73s,72s,65s,64s,63s,62s,54s,53s,52s,43s,42s,32s,AKo,AQo,AJo,ATo,A9o,A8o,A7o,A6o,A5o,A4o,A3o,A2o,KQo,KJo,KTo,K9o,K8o,K7o,K6o,QJo,QTo,Q9o,Q8o,Q7o,Q6o,JTo,J9o,J8o,J7o,T9o,T8o,T7o,98o,97o,87o,86o,76o,65o', marginal: 'Q4s,J4s,T4s,93s,82s,K5o,Q5o,J6o,T6o,96o,85o,75o,54o' },
+                5: { push: 'AA,KK,QQ,JJ,TT,99,88,77,66,55,44,33,22,AKs,AQs,AJs,ATs,A9s,A8s,A7s,A6s,A5s,A4s,A3s,A2s,KQs,KJs,KTs,K9s,K8s,K7s,K6s,K5s,K4s,K3s,K2s,QJs,QTs,Q9s,Q8s,Q7s,Q6s,Q5s,Q4s,Q3s,JTs,J9s,J8s,J7s,J6s,J5s,J4s,J3s,T9s,T8s,T7s,T6s,T5s,T4s,T3s,98s,97s,96s,95s,94s,93s,87s,86s,85s,84s,83s,82s,76s,75s,74s,73s,72s,65s,64s,63s,62s,54s,53s,52s,43s,42s,32s,AKo,AQo,AJo,ATo,A9o,A8o,A7o,A6o,A5o,A4o,A3o,A2o,KQo,KJo,KTo,K9o,K8o,K7o,K6o,K5o,K4o,K3o,QJo,QTo,Q9o,Q8o,Q7o,Q6o,Q5o,Q4o,JTo,J9o,J8o,J7o,J6o,J5o,T9o,T8o,T7o,T6o,98o,97o,96o,87o,86o,85o,76o,75o,65o,54o', marginal: 'Q2s,J2s,T2s,92s,K2o,Q3o,J4o,T5o,95o,84o,74o,64o,53o,43o' }
+            },
+            MP: {
+                15: { push: 'AA,KK,QQ,JJ,TT,99,88,77,AKs,AQs,AJs,ATs,A9s,KQs,KJs,QJs,JTs,AKo,AQo,AJo,KQo', marginal: '66,55,A8s,A7s,KTs,QTs,T9s,98s,ATo,KJo' },
+                12: { push: 'AA,KK,QQ,JJ,TT,99,88,77,66,AKs,AQs,AJs,ATs,A9s,A8s,KQs,KJs,KTs,QJs,QTs,JTs,T9s,AKo,AQo,AJo,ATo,KQo,KJo,QJo', marginal: '55,44,A7s,A6s,K9s,Q9s,J9s,98s,87s,A9o,KTo,QTo' },
+                10: { push: 'AA,KK,QQ,JJ,TT,99,88,77,66,55,AKs,AQs,AJs,ATs,A9s,A8s,A7s,A6s,A5s,KQs,KJs,KTs,K9s,QJs,QTs,Q9s,JTs,J9s,T9s,T8s,98s,97s,87s,76s,65s,AKo,AQo,AJo,ATo,A9o,KQo,KJo,KTo,QJo,QTo,JTo', marginal: '44,33,A4s,A3s,K8s,Q8s,J8s,T7s,96s,86s,75s,54s,A8o,K9o,Q9o,J9o,T9o' },
+                8: { push: 'AA,KK,QQ,JJ,TT,99,88,77,66,55,44,33,AKs,AQs,AJs,ATs,A9s,A8s,A7s,A6s,A5s,A4s,A3s,A2s,KQs,KJs,KTs,K9s,K8s,QJs,QTs,Q9s,Q8s,JTs,J9s,J8s,T9s,T8s,T7s,98s,97s,96s,87s,86s,85s,76s,75s,65s,64s,54s,53s,AKo,AQo,AJo,ATo,A9o,A8o,A7o,KQo,KJo,KTo,K9o,QJo,QTo,Q9o,JTo,J9o,T9o,98o', marginal: '22,K7s,Q7s,J7s,T6s,95s,84s,74s,63s,43s,A6o,K8o,Q8o,J8o,T8o,87o' },
+                6: { push: 'AA,KK,QQ,JJ,TT,99,88,77,66,55,44,33,22,AKs,AQs,AJs,ATs,A9s,A8s,A7s,A6s,A5s,A4s,A3s,A2s,KQs,KJs,KTs,K9s,K8s,K7s,K6s,K5s,QJs,QTs,Q9s,Q8s,Q7s,Q6s,JTs,J9s,J8s,J7s,J6s,T9s,T8s,T7s,T6s,T5s,98s,97s,96s,95s,87s,86s,85s,84s,76s,75s,74s,73s,65s,64s,63s,54s,53s,52s,43s,42s,AKo,AQo,AJo,ATo,A9o,A8o,A7o,A6o,A5o,A4o,KQo,KJo,KTo,K9o,K8o,K7o,QJo,QTo,Q9o,Q8o,Q7o,JTo,J9o,J8o,J7o,T9o,T8o,T7o,98o,97o,87o,86o,76o', marginal: 'K4s,Q5s,J5s,T4s,94s,83s,72s,62s,32s,A3o,K6o,Q6o,J6o,T6o,96o,85o,75o,65o' },
+                5: { push: 'AA,KK,QQ,JJ,TT,99,88,77,66,55,44,33,22,AKs,AQs,AJs,ATs,A9s,A8s,A7s,A6s,A5s,A4s,A3s,A2s,KQs,KJs,KTs,K9s,K8s,K7s,K6s,K5s,K4s,K3s,QJs,QTs,Q9s,Q8s,Q7s,Q6s,Q5s,Q4s,JTs,J9s,J8s,J7s,J6s,J5s,J4s,T9s,T8s,T7s,T6s,T5s,T4s,98s,97s,96s,95s,94s,93s,87s,86s,85s,84s,83s,76s,75s,74s,73s,72s,65s,64s,63s,62s,54s,53s,52s,43s,42s,32s,AKo,AQo,AJo,ATo,A9o,A8o,A7o,A6o,A5o,A4o,A3o,A2o,KQo,KJo,KTo,K9o,K8o,K7o,K6o,K5o,QJo,QTo,Q9o,Q8o,Q7o,Q6o,Q5o,JTo,J9o,J8o,J7o,J6o,T9o,T8o,T7o,T6o,98o,97o,96o,87o,86o,85o,76o,75o,65o,54o', marginal: 'K2s,Q3s,J3s,T3s,92s,82s,K4o,Q4o,J5o,T5o,95o,84o,74o,64o,53o,43o' }
+            },
+            UTG: {
+                15: { push: 'AA,KK,QQ,JJ,TT,99,AKs,AQs,AJs,KQs,AKo,AQo', marginal: '88,77,ATs,A9s,KJs,QJs,AJo,KQo' },
+                12: { push: 'AA,KK,QQ,JJ,TT,99,88,AKs,AQs,AJs,ATs,KQs,KJs,QJs,AKo,AQo,AJo,KQo', marginal: '77,66,A9s,A8s,KTs,QTs,JTs,ATo,KJo' },
+                10: { push: 'AA,KK,QQ,JJ,TT,99,88,77,66,AKs,AQs,AJs,ATs,A9s,KQs,KJs,KTs,QJs,QTs,JTs,T9s,AKo,AQo,AJo,ATo,KQo,KJo,QJo', marginal: '55,44,A8s,A7s,K9s,Q9s,J9s,98s,A9o,KTo,QTo,JTo' },
+                8: { push: 'AA,KK,QQ,JJ,TT,99,88,77,66,55,44,AKs,AQs,AJs,ATs,A9s,A8s,A7s,A6s,A5s,KQs,KJs,KTs,K9s,QJs,QTs,Q9s,JTs,J9s,T9s,T8s,98s,97s,87s,76s,65s,AKo,AQo,AJo,ATo,A9o,A8o,KQo,KJo,KTo,QJo,QTo,JTo,T9o', marginal: '33,22,A4s,A3s,K8s,Q8s,J8s,T7s,96s,86s,75s,54s,A7o,K9o,Q9o,J9o,98o' },
+                6: { push: 'AA,KK,QQ,JJ,TT,99,88,77,66,55,44,33,22,AKs,AQs,AJs,ATs,A9s,A8s,A7s,A6s,A5s,A4s,A3s,A2s,KQs,KJs,KTs,K9s,K8s,K7s,QJs,QTs,Q9s,Q8s,Q7s,JTs,J9s,J8s,J7s,T9s,T8s,T7s,T6s,98s,97s,96s,95s,87s,86s,85s,76s,75s,74s,65s,64s,54s,53s,43s,AKo,AQo,AJo,ATo,A9o,A8o,A7o,A6o,A5o,KQo,KJo,KTo,K9o,K8o,QJo,QTo,Q9o,Q8o,JTo,J9o,J8o,T9o,T8o,98o,87o,76o', marginal: 'K6s,Q6s,J6s,T5s,94s,84s,73s,63s,52s,42s,A4o,K7o,Q7o,J7o,T7o,97o,86o,75o,65o' },
+                5: { push: 'AA,KK,QQ,JJ,TT,99,88,77,66,55,44,33,22,AKs,AQs,AJs,ATs,A9s,A8s,A7s,A6s,A5s,A4s,A3s,A2s,KQs,KJs,KTs,K9s,K8s,K7s,K6s,K5s,K4s,QJs,QTs,Q9s,Q8s,Q7s,Q6s,Q5s,JTs,J9s,J8s,J7s,J6s,J5s,T9s,T8s,T7s,T6s,T5s,T4s,98s,97s,96s,95s,94s,87s,86s,85s,84s,83s,76s,75s,74s,73s,65s,64s,63s,62s,54s,53s,52s,43s,42s,32s,AKo,AQo,AJo,ATo,A9o,A8o,A7o,A6o,A5o,A4o,A3o,KQo,KJo,KTo,K9o,K8o,K7o,K6o,QJo,QTo,Q9o,Q8o,Q7o,Q6o,JTo,J9o,J8o,J7o,J6o,T9o,T8o,T7o,T6o,98o,97o,96o,87o,86o,85o,76o,75o,65o,54o', marginal: 'K3s,Q4s,J4s,T3s,93s,82s,72s,A2o,K5o,Q5o,J5o,T5o,95o,84o,74o,64o,53o,43o' }
+            },
+            SB: {
+                15: { push: 'AA,KK,QQ,JJ,TT,99,88,77,66,55,44,33,22,AKs,AQs,AJs,ATs,A9s,A8s,A7s,A6s,A5s,A4s,A3s,A2s,KQs,KJs,KTs,K9s,K8s,K7s,K6s,QJs,QTs,Q9s,Q8s,JTs,J9s,J8s,T9s,T8s,T7s,98s,97s,96s,87s,86s,76s,75s,65s,64s,54s,53s,43s,AKo,AQo,AJo,ATo,A9o,A8o,A7o,A6o,KQo,KJo,KTo,K9o,QJo,QTo,Q9o,JTo,J9o,T9o,98o', marginal: 'K5s,Q7s,J7s,T6s,95s,85s,74s,63s,52s,42s,32s,A5o,K8o,Q8o,J8o,T8o,97o,87o,76o' },
+                12: { push: 'AA,KK,QQ,JJ,TT,99,88,77,66,55,44,33,22,AKs,AQs,AJs,ATs,A9s,A8s,A7s,A6s,A5s,A4s,A3s,A2s,KQs,KJs,KTs,K9s,K8s,K7s,K6s,K5s,K4s,QJs,QTs,Q9s,Q8s,Q7s,Q6s,JTs,J9s,J8s,J7s,J6s,T9s,T8s,T7s,T6s,T5s,98s,97s,96s,95s,87s,86s,85s,84s,76s,75s,74s,73s,65s,64s,63s,54s,53s,52s,43s,42s,32s,AKo,AQo,AJo,ATo,A9o,A8o,A7o,A6o,A5o,A4o,KQo,KJo,KTo,K9o,K8o,K7o,QJo,QTo,Q9o,Q8o,Q7o,JTo,J9o,J8o,J7o,T9o,T8o,T7o,98o,97o,87o,86o,76o,65o', marginal: 'K3s,Q5s,J5s,T4s,94s,83s,72s,62s,A3o,K6o,Q6o,J6o,T6o,96o,85o,75o,54o' },
+                10: { push: 'AA,KK,QQ,JJ,TT,99,88,77,66,55,44,33,22,AKs,AQs,AJs,ATs,A9s,A8s,A7s,A6s,A5s,A4s,A3s,A2s,KQs,KJs,KTs,K9s,K8s,K7s,K6s,K5s,K4s,K3s,K2s,QJs,QTs,Q9s,Q8s,Q7s,Q6s,Q5s,Q4s,JTs,J9s,J8s,J7s,J6s,J5s,J4s,T9s,T8s,T7s,T6s,T5s,T4s,98s,97s,96s,95s,94s,93s,87s,86s,85s,84s,83s,76s,75s,74s,73s,72s,65s,64s,63s,62s,54s,53s,52s,43s,42s,32s,AKo,AQo,AJo,ATo,A9o,A8o,A7o,A6o,A5o,A4o,A3o,A2o,KQo,KJo,KTo,K9o,K8o,K7o,K6o,K5o,QJo,QTo,Q9o,Q8o,Q7o,Q6o,Q5o,JTo,J9o,J8o,J7o,J6o,T9o,T8o,T7o,T6o,98o,97o,96o,87o,86o,85o,76o,75o,65o,54o', marginal: 'Q3s,J3s,T3s,92s,82s,K4o,Q4o,J5o,T5o,95o,84o,74o,64o,53o,43o' },
+                8: { push: 'ALL', marginal: '' },
+                6: { push: 'ALL', marginal: '' },
+                5: { push: 'ALL', marginal: '' }
+            }
+        };
+
+        // 顶级牌
+        const PREMIUM_HANDS = ['AA', 'KK', 'QQ', 'JJ', 'AKs', 'AKo'];
+
+        function getHandNotation(row, col) {
+            const r1 = RANKS[row];
+            const r2 = RANKS[col];
+            if (row === col) return r1 + r2;
+            if (row < col) return r1 + r2 + 's';
+            return r2 + r1 + 'o';
+        }
+
+        function isInRange(hand, rangeStr) {
+            if (rangeStr === 'ALL') return true;
+            const hands = rangeStr.split(',');
+            return hands.includes(hand);
+        }
+
+        function updateMatrix() {
+            const position = document.getElementById('position').value;
+            const stack = document.getElementById('stack').value;
+            const stage = document.getElementById('stage').value;
+
+            const range = PUSH_RANGES[position][stack];
+            const matrix = document.getElementById('hand-matrix');
+            matrix.innerHTML = '';
+
+            let pushCount = 0;
+
+            for (let row = 0; row < 13; row++) {
+                for (let col = 0; col < 13; col++) {
+                    const hand = getHandNotation(row, col);
+                    const cell = document.createElement('div');
+                    cell.className = 'hand-cell';
+                    cell.textContent = hand;
+                    cell.onclick = () => showHandInfo(hand, position, stack);
+
+                    if (PREMIUM_HANDS.includes(hand)) {
+                        cell.classList.add('premium');
+                        pushCount++;
+                    } else if (range.push === 'ALL' || isInRange(hand, range.push)) {
+                        cell.classList.add('push');
+                        pushCount++;
+                    } else if (isInRange(hand, range.marginal)) {
+                        cell.classList.add('marginal');
+                    } else {
+                        cell.classList.add('fold');
+                    }
+
+                    matrix.appendChild(cell);
+                }
+            }
+
+            const totalHands = 169;
+            const pct = Math.round((pushCount / totalHands) * 100);
+            document.getElementById('push-pct').textContent = pct + '%';
+            document.getElementById('hand-count').textContent = pushCount;
+            document.getElementById('range-title').textContent = `${position}位 ${stack}BB 推挤范围`;
+        }
+
+        function showHandInfo(hand, position, stack) {
+            alert(`${hand} 在 ${position}位 ${stack}BB:\n\n点击"快速查询"获取详细建议`);
+        }
+
+        function lookupHand() {
+            const input = document.getElementById('hand-input').value.toUpperCase().trim();
+            const result = document.getElementById('lookup-result');
+            
+            if (!input) {
+                result.classList.remove('show');
+                return;
+            }
+
+            const position = document.getElementById('position').value;
+            const stack = document.getElementById('stack').value;
+            const range = PUSH_RANGES[position][stack];
+
+            let action, advice;
+            if (PREMIUM_HANDS.includes(input)) {
+                action = 'push';
+                advice = `🏆 ${input} 是顶级牌！在任何位置、任何筹码量都应该全押。`;
+            } else if (range.push === 'ALL' || isInRange(input, range.push)) {
+                action = 'push';
+                advice = `✅ ${input} 在 ${position}位 ${stack}BB 应该【全押】。\n\n这是标准推挤范围内的牌，有足够的弃牌股权和胜率。`;
+            } else if (isInRange(input, range.marginal)) {
+                action = 'push';
+                advice = `⚠️ ${input} 在 ${position}位 ${stack}BB 是【边缘牌】。\n\n建议：\n• 对手紧 → 可以推\n• 对手松 → 建议弃牌\n• 泡沫期 → 可以更激进`;
+            } else {
+                action = 'fold';
+                advice = `❌ ${input} 在 ${position}位 ${stack}BB 应该【弃牌】。\n\n这手牌不在标准推挤范围内，弃牌股权和胜率都不够。`;
+            }
+
+            result.className = 'lookup-result show ' + action;
+            result.innerHTML = `<p style="white-space: pre-line;">${advice}</p>`;
+        }
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', updateMatrix);
+        document.getElementById('hand-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') lookupHand();
+        });
+    </script>
+</body>
+</html>
+
