@@ -217,7 +217,7 @@
     </style>
 </head>
 <body>
-    <a href="wsop_tournament_hub.html?v=5" class="back-btn">← 返回锦标赛中心</a>
+    <a href="wsop_tournament_hub.html?v=6" class="back-btn">← 返回锦标赛中心</a>
 
     <div class="container">
         <div class="header">
@@ -226,17 +226,17 @@
         </div>
 
         <div class="mode-selector">
-            <div class="mode-btn active" onclick="switchMode('learn')">
+            <div class="mode-btn active" onclick="switchMode('learn', event)">
                 <div class="mode-icon">📚</div>
                 <div class="mode-title">核心知识</div>
                 <div class="mode-desc">泡沫期基础理论</div>
             </div>
-            <div class="mode-btn" onclick="switchMode('train')">
+            <div class="mode-btn" onclick="switchMode('train', event)">
                 <div class="mode-icon">🎯</div>
                 <div class="mode-title">场景训练</div>
                 <div class="mode-desc">15个实战场景</div>
             </div>
-            <div class="mode-btn" onclick="switchMode('strategy')">
+            <div class="mode-btn" onclick="switchMode('strategy', event)">
                 <div class="mode-icon">📊</div>
                 <div class="mode-title">策略速查</div>
                 <div class="mode-desc">不同筹码量策略</div>
@@ -745,11 +745,16 @@
         let correctCount = 0;
         let answered = false;
 
-        function switchMode(mode) {
+        function switchMode(mode, event) {
             document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
             
-            event.target.closest('.mode-btn').classList.add('active');
+            if (event && event.target) {
+                event.target.closest('.mode-btn').classList.add('active');
+            } else {
+                // 如果没有event，通过mode找到对应按钮
+                document.querySelector(`.mode-btn[onclick*="${mode}"]`).classList.add('active');
+            }
             document.getElementById(mode + '-section').classList.add('active');
 
             if (mode === 'train') {

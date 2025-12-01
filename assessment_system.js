@@ -707,3 +707,5 @@ console.log('漏洞评估系统加载完成');
 console.log('总题目数:', ASSESSMENT_QUESTIONS.length);
 console.log('覆盖维度:', [...new Set(ASSESSMENT_QUESTIONS.map(q => q.category))].join(', '));
 
+
+
