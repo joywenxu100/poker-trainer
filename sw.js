@@ -1,63 +1,67 @@
 // Service Worker for PWA offline support
-const CACHE_NAME = 'poker-trainer-v3.1.0';
+// 版本号更新会强制刷新所有缓存
+const CACHE_NAME = 'poker-trainer-v4.0.0';
 const urlsToCache = [
   'index.html',
   'poker_trainer.html',
-  'poker_trainer.js',
-  'poker_trainer_v2.js',
-  'poker_trainer_pro.js',
   'exploit_trainer.html',
-  'exploit_trainer.js',
   'advanced_trainer.html',
-  'advanced_trainer.js',
   'assessment_full.html',
-  'assessment_full.js',
   'straddle_exploit_master.html',
   'straddle_exploit_trainer.html',
-  'straddle_exploit_trainer.js',
   'manifest.json'
 ];
 
-// 安装Service Worker
+// 安装Service Worker - 跳过等待立即激活
 self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache');
+        console.log('Opened cache v4.0.0');
         return cache.addAll(urlsToCache);
       })
   );
 });
 
-// 激活Service Worker
+// 激活Service Worker - 立即接管所有页面
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
+          // 删除所有旧版本缓存
           if (cacheName !== CACHE_NAME) {
             console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
+    }).then(() => {
+      // 立即接管所有客户端
+      return self.clients.claim();
     })
   );
 });
 
-// 拦截请求
+// 拦截请求 - 网络优先策略
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request)
+    // 先尝试网络请求
+    fetch(event.request)
       .then(response => {
-        // 缓存命中，返回缓存
-        if (response) {
-          return response;
+        // 网络请求成功，更新缓存
+        if (response && response.status === 200) {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseClone);
+          });
         }
-        // 否则发起网络请求
-        return fetch(event.request);
+        return response;
+      })
+      .catch(() => {
+        // 网络失败，使用缓存
+        return caches.match(event.request);
       })
   );
 });
-
-

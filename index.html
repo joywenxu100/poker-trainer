@@ -639,27 +639,23 @@
     </footer>
     
     <script>
-        // 强制清除旧的 Service Worker 缓存
+        // 版本号 - 用于强制刷新
+        const APP_VERSION = '4.0.0';
+        
+        // 注册新的 Service Worker
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                for(let registration of registrations) {
-                    registration.unregister();
-                }
-            });
-            
-            // 清除所有缓存
-            if ('caches' in window) {
-                caches.keys().then(function(names) {
-                    for (let name of names) {
-                        caches.delete(name);
-                    }
+            navigator.serviceWorker.register('sw.js?v=' + APP_VERSION)
+                .then(function(registration) {
+                    console.log('SW registered v' + APP_VERSION);
+                    // 强制更新
+                    registration.update();
                 });
-            }
         }
         
         // 统计数据动态更新
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🎰 Poker Master 训练中心 v3.1 已加载');
+            console.log('🎰 Poker Master 训练中心 v' + APP_VERSION + ' 已加载');
+            console.log('训练模块: 11个');
         });
     </script>
 </body>
