@@ -1,6 +1,7 @@
 // 完整版漏洞评估系统 - 60题全方位诊断
-// 针对：8人桌 + 200-300BB深筹码 + 强制Straddle + Ante(1SB)
-// 版本: 3.0.0
+// 针对：8人桌 + 200-300BB深筹码 + SB(1BB)-BB(2BB)-Straddle(4BB) + Ante(1BB/人)
+// 起始底池: 15BB (7BB盲注 + 8BB Ante)
+// 版本: 3.1.0
 
 // ==================== 完整评估题库 ====================
 const FULL_ASSESSMENT = {
@@ -22,11 +23,11 @@ const FULL_ASSESSMENT = {
             id: "pre_2",
             category: "翻前决策",
             subcategory: "Straddle pot sizing",
-            scenario: "8人桌有Straddle(2BB)和Ante。CO open到多少合适？",
+            scenario: "8人桌有Straddle(4BB)和Ante(1BB/人)。CO open到多少合适？",
             question: "标准open sizing应该是？",
-            options: ["2x Straddle (4BB)", "2.5x Straddle (5BB)", "3x Straddle (6BB)", "4x Straddle (8BB)"],
+            options: ["2x Straddle (8BB)", "2.5x Straddle (10BB)", "3x Straddle (12BB)", "3.5x Straddle (14BB)"],
             correctIndex: 1,
-            explanation: "🧠 Straddle pot的sizing：\n• Straddle=2BB，所以基准是2BB\n• 标准open是2.5x straddle = 5BB\n• 太小没有fold equity\n• 太大只被坚果call\n\n✅ 2.5x Straddle (5BB)是标准",
+            explanation: "🧠 Straddle pot的sizing：\n• Straddle=4BB，所以基准是4BB\n• 标准open是2.5x straddle = 10BB\n• 太小没有fold equity\n• 太大只被坚果call\n\n✅ 2.5x Straddle (10BB)是标准",
             leakTag: "straddle_sizing_error",
             leakDesc: "Straddle pot sizing错误"
         },
@@ -46,11 +47,11 @@ const FULL_ASSESSMENT = {
             id: "pre_4",
             category: "翻前决策",
             subcategory: "Straddle位置",
-            scenario: "你在Straddle位置(强制下注2BB)。UTG open到5BB，其他人fold。你拿到A9s。",
+            scenario: "你在Straddle位置(强制下注4BB)。UTG open到10BB，其他人fold。你拿到A9s。",
             question: "你应该怎么做？",
-            options: ["Fold", "Call", "3bet to 16BB", "3bet to 20BB"],
+            options: ["Fold", "Call", "3bet to 28BB", "3bet to 35BB"],
             correctIndex: 1,
-            explanation: "🧠 Straddle位置策略：\n• 你已经投入2BB，需要再加3BB call\n• A9s有位置（翻后你OOP）\n• 深筹码A9s 3bet被4bet很尴尬\n• Call看翻牌，利用hidden equity\n\n✅ Call是深筹码的正确选择",
+            explanation: "🧠 Straddle位置策略：\n• 你已经投入4BB，需要再加6BB call\n• A9s在Straddle位置OOP\n• 深筹码A9s 3bet被4bet很尴尬\n• Call看翻牌，利用hidden equity\n\n✅ Call是深筹码的正确选择",
             leakTag: "straddle_defense_error",
             leakDesc: "Straddle位置防守错误"
         },
@@ -58,11 +59,11 @@ const FULL_ASSESSMENT = {
             id: "pre_5",
             category: "翻前决策",
             subcategory: "Ante调整",
-            scenario: "8人桌有Ante(每人0.5BB)和Straddle(2BB)。底池已有6BB死钱。你在CO拿到K9s。",
+            scenario: "8人桌有Ante(每人1BB)和Straddle(4BB)。底池已有15BB死钱。你在CO拿到K9s。",
             question: "你应该怎么做？",
-            options: ["Fold", "Open 5BB", "Open 6BB", "Limp"],
+            options: ["Fold", "Open 10BB", "Open 12BB", "Limp"],
             correctIndex: 1,
-            explanation: "🧠 Ante+Straddle调整：\n• 底池有6BB死钱（4BB ante + 2BB straddle）\n• 偷盲价值大增\n• K9s从边缘变成明确open\n• 标准2.5x straddle = 5BB\n\n✅ Open 5BB利用死钱",
+            explanation: "🧠 Ante+Straddle调整：\n• 底池有15BB死钱（8BB ante + 7BB盲注）\n• 偷盲价值大增\n• K9s从边缘变成明确open\n• 标准2.5x straddle = 10BB\n\n✅ Open 10BB利用死钱",
             leakTag: "ante_straddle_error",
             leakDesc: "Ante+Straddle调整错误"
         },
@@ -590,11 +591,11 @@ const FULL_ASSESSMENT = {
             id: "math_6",
             category: "数学计算",
             subcategory: "Straddle pot计算",
-            scenario: "8人桌有Straddle(2BB)和Ante(每人0.5BB)。底池一共有多少死钱？",
+            scenario: "8人桌有Straddle(4BB)和Ante(每人1BB)。底池一共有多少死钱？",
             question: "计算底池死钱：",
-            options: ["3BB", "5BB", "6BB", "7BB"],
+            options: ["10BB", "13BB", "15BB", "18BB"],
             correctIndex: 2,
-            explanation: "🧠 死钱计算：\n• SB: 0.5BB\n• BB: 1BB\n• Straddle: 2BB\n• Ante: 8 × 0.5BB = 4BB... \n\n修正：SB+BB+Straddle+Ante = 0.5+1+2+4 = 7.5BB\n\n最接近6BB（不含Straddle的dead money）",
+            explanation: "🧠 死钱计算：\n• SB: 1BB\n• BB: 2BB\n• Straddle: 4BB\n• Ante: 8 × 1BB = 8BB\n\n总计：SB+BB+Straddle+Ante = 1+2+4+8 = 15BB\n\n✅ 底池起始15BB",
             leakTag: "straddle_pot_calc_error",
             leakDesc: "Straddle pot计算错误"
         }
