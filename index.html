@@ -639,24 +639,27 @@
     </footer>
     
     <script>
-        // 注册 Service Worker
+        // 强制清除旧的 Service Worker 缓存
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('sw.js')
-                    .then(function(registration) {
-                        console.log('ServiceWorker 注册成功');
-                        // 强制更新
-                        registration.update();
-                    })
-                    .catch(function(error) {
-                        console.log('ServiceWorker 注册失败:', error);
-                    });
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for(let registration of registrations) {
+                    registration.unregister();
+                }
             });
+            
+            // 清除所有缓存
+            if ('caches' in window) {
+                caches.keys().then(function(names) {
+                    for (let name of names) {
+                        caches.delete(name);
+                    }
+                });
+            }
         }
         
         // 统计数据动态更新
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🎰 Poker Master 训练中心已加载');
+            console.log('🎰 Poker Master 训练中心 v3.1 已加载');
         });
     </script>
 </body>
