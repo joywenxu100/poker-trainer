@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>德州扑克快速复盘 | Quick Hand Review</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a24;
+            --bg-card-hover: #22222e;
+            --accent-gold: #ffd700;
+            --accent-green: #00d4aa;
+            --accent-red: #ff4757;
+            --accent-blue: #4a9eff;
+            --text-primary: #f5f5f7;
+            --text-secondary: #a0a0a8;
+            --text-muted: #6a6a72;
+            --border-color: #2a2a36;
+            --gradient-gold: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+            --gradient-dark: linear-gradient(180deg, #1a1a24 0%, #0a0a0f 100%);
+            --shadow-glow: 0 0 40px rgba(255, 215, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* 背景装饰 */
+        .bg-decoration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-decoration::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(255, 215, 0, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(0, 212, 170, 0.03) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(74, 158, 255, 0.02) 0%, transparent 60%);
+        }
+
+        /* 扑克牌花色装饰 */
+        .suit-decoration {
+            position: fixed;
+            font-size: 200px;
+            opacity: 0.02;
+            pointer-events: none;
+        }
+
+        .suit-1 { top: 10%; left: 5%; }
+        .suit-2 { top: 60%; right: 5%; }
+        .suit-3 { bottom: 10%; left: 15%; }
+        .suit-4 { top: 30%; right: 15%; }
+
+        /* 主容器 */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* 标题区域 */
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .logo {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .title {
+            font-size: 36px;
+            font-weight: 700;
+            background: var(--gradient-gold);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+            font-weight: 300;
+        }
+
+        /* 主面板 */
+        .main-panel {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 40px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-glow);
+        }
+
+        /* 上传区域 */
+        .upload-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .upload-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .upload-card {
+            background: var(--bg-secondary);
+            border: 2px dashed var(--border-color);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-card:hover {
+            border-color: var(--accent-gold);
+            background: var(--bg-card-hover);
+        }
+
+        .upload-card.has-image {
+            border-style: solid;
+            border-color: var(--accent-green);
+        }
+
+        .upload-card input[type="file"] {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .upload-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .upload-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .upload-preview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 12px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .upload-card.has-image .upload-preview {
+            display: block;
+        }
+
+        .upload-card.has-image .upload-placeholder {
+            display: none;
+        }
+
+        /* 设置区域 */
+        .settings-section {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .settings-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            color: var(--accent-gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .setting-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .setting-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .setting-input {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.3s ease;
+        }
+
+        .setting-input:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+        }
+
+        .setting-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--accent-gold);
+            cursor: pointer;
+        }
+
+        /* 分析按钮 */
+        .analyze-btn {
+            width: 100%;
+            padding: 18px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #000;
+            background: var(--gradient-gold);
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .analyze-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .analyze-btn .spinner {
+            display: none;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(0, 0, 0, 0.2);
+            border-top-color: #000;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .analyze-btn.loading .spinner {
+            display: block;
+        }
+
+        .analyze-btn.loading .btn-text {
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* 结果区域 */
+        .result-section {
+            margin-top: 40px;
+            display: none;
+        }
+
+        .result-section.visible {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+
+        .result-title {
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .copy-btn {
+            padding: 10px 20px;
+            font-size: 14px;
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-gold);
+        }
+
+        .result-content {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        .result-text {
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text-primary);
+            white-space: pre-wrap;
+        }
+
+        /* Markdown 样式 */
+        .result-text h1, .result-text h2, .result-text h3 {
+            color: var(--accent-gold);
+            margin: 20px 0 10px 0;
+        }
+
+        .result-text h1 { font-size: 24px; }
+        .result-text h2 { font-size: 20px; }
+        .result-text h3 { font-size: 17px; }
+
+        .result-text strong {
+            color: var(--accent-green);
+        }
+
+        .result-text code {
+            background: var(--bg-card);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-blue);
+        }
+
+        .result-text ul, .result-text ol {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+
+        .result-text li {
+            margin: 8px 0;
+        }
+
+        .result-text blockquote {
+            border-left: 4px solid var(--accent-gold);
+            padding-left: 20px;
+            margin: 15px 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        /* 日志区域 */
+        .log-section {
+            margin-top: 30px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .log-title {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .log-content {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .log-item {
+            padding: 4px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .log-item:last-child {
+            border-bottom: none;
+        }
+
+        .log-time {
+            color: var(--text-muted);
+            margin-right: 10px;
+        }
+
+        .log-success { color: var(--accent-green); }
+        .log-error { color: var(--accent-red); }
+        .log-info { color: var(--accent-blue); }
+
+        /* 错误提示 */
+        .error-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--accent-red);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-size: 14px;
+            z-index: 1000;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .error-toast.visible {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* 页脚 */
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .footer a {
+            color: var(--accent-gold);
+            text-decoration: none;
+        }
+
+        /* 提示气泡 */
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* API Key 提示 */
+        .api-notice {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(0, 212, 170, 0.1) 100%);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .api-notice-icon {
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 背景装饰 -->
+    <div class="bg-decoration"></div>
+    <div class="suit-decoration suit-1">♠</div>
+    <div class="suit-decoration suit-2">♥</div>
+    <div class="suit-decoration suit-3">♦</div>
+    <div class="suit-decoration suit-4">♣</div>
+
+    <!-- 错误提示 -->
+    <div class="error-toast" id="errorToast"></div>
+
+    <div class="container">
+        <!-- 标题 -->
+        <header class="header">
+            <div class="logo">🃏</div>
+            <h1 class="title">德州扑克快速复盘</h1>
+            <p class="subtitle">AI 驱动的手牌分析 · 提升每一次决策</p>
+        </header>
+
+        <!-- 主面板 -->
+        <main class="main-panel">
+            <!-- API 提示 -->
+            <div class="api-notice">
+                <span class="api-notice-icon">🔑</span>
+                <span>使用 Google Gemini AI 进行深度手牌分析，支持图像识别和策略建议</span>
+            </div>
+
+            <!-- 上传区域 -->
+            <div class="upload-section">
+                <!-- 手牌截图 -->
+                <div class="upload-card" id="handCard" onclick="document.getElementById('handInput').click()">
+                    <input type="file" id="handInput" accept="image/*" onchange="handleImageUpload(this, 'hand')">
+                    <div class="upload-placeholder">
+                        <div class="upload-icon">🎴</div>
+                        <div class="upload-title">上传手牌截图</div>
+                        <div class="upload-desc">牌局回顾界面，包含公共牌和玩家手牌</div>
+                    </div>
+                    <img class="upload-preview" id="handPreview" alt="手牌预览">
+                </div>
+
+                <!-- 对手数据截图 -->
+                <div class="upload-card" id="opponentCard" onclick="document.getElementById('opponentInput').click()">
+                    <input type="file" id="opponentInput" accept="image/*" onchange="handleImageUpload(this, 'opponent')">
+                    <div class="upload-placeholder">
+                        <div class="upload-icon">👤</div>
+                        <div class="upload-title">上传对手数据</div>
+                        <div class="upload-desc">对手面板，包含入局率、胜率等统计</div>
+                    </div>
+                    <img class="upload-preview" id="opponentPreview" alt="对手数据预览">
+                </div>
+            </div>
+
+            <!-- 设置区域 -->
+            <div class="settings-section">
+                <div class="settings-title">
+                    <span>⚙️</span>
+                    <span>分析设置</span>
+                </div>
+                <div class="settings-grid">
+                    <div class="setting-item">
+                        <label class="setting-label">你的游戏昵称</label>
+                        <input type="text" class="setting-input" id="username" value="luckywm" placeholder="默认: luckywm">
+                    </div>
+                    <div class="setting-item">
+                        <label class="setting-label">有效筹码深度 (BB)</label>
+                        <input type="text" class="setting-input" id="stackDepth" placeholder="默认: 200-300BB，留空则自动识别">
+                    </div>
+                    <div class="setting-item">
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="isShortStack">
+                            <span>对手是短码 (Short Stack)</span>
+                        </label>
+                    </div>
+                    <div class="setting-item" id="shortStackInput" style="display: none;">
+                        <label class="setting-label">对手有效筹码 (BB)</label>
+                        <input type="text" class="setting-input" id="opponentStack" placeholder="输入对手的有效筹码量">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 分析按钮 -->
+            <button class="analyze-btn" id="analyzeBtn" onclick="analyzeHand()">
+                <span class="spinner"></span>
+                <span class="btn-text">🚀 开始 AI 复盘分析</span>
+            </button>
+
+            <!-- 结果区域 -->
+            <section class="result-section" id="resultSection">
+                <div class="result-header">
+                    <h2 class="result-title">
+                        <span>📊</span>
+                        <span>分析结果</span>
+                    </h2>
+                    <button class="copy-btn" onclick="copyResult()">📋 复制结果</button>
+                </div>
+                <div class="result-content">
+                    <div class="result-text" id="resultText"></div>
+                </div>
+            </section>
+
+            <!-- 日志区域 -->
+            <div class="log-section">
+                <div class="log-title">
+                    <span>📝</span>
+                    <span>运行日志</span>
+                </div>
+                <div class="log-content" id="logContent">
+                    <div class="log-item">
+                        <span class="log-time">[系统]</span>
+                        <span class="log-info">工具已就绪，等待上传截图...</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 页脚 -->
+        <footer class="footer">
+            <p>Powered by Google Gemini AI · <a href="index.html">返回主页</a></p>
+        </footer>
+    </div>
+
+    <script>
+        // ==================== 配置 ====================
+        const CONFIG = {
+            API_KEY: 'AIzaSyCGLHoZLcXU7oQiKXT9929PZwal1UenRjY',
+            API_URL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
+            DEFAULT_USERNAME: 'luckywm',
+            DEFAULT_STACK_DEPTH: '200-300'
+        };
+
+        // 存储上传的图片
+        let uploadedImages = {
+            hand: null,
+            opponent: null
+        };
+
+        // ==================== 图片上传处理 ====================
+        function handleImageUpload(input, type) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Data = e.target.result;
+                uploadedImages[type] = base64Data;
+
+                // 显示预览
+                const previewId = type === 'hand' ? 'handPreview' : 'opponentPreview';
+                const cardId = type === 'hand' ? 'handCard' : 'opponentCard';
+                
+                document.getElementById(previewId).src = base64Data;
+                document.getElementById(cardId).classList.add('has-image');
+
+                addLog(`✅ ${type === 'hand' ? '手牌截图' : '对手数据截图'}上传成功`, 'success');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 短码选项切换
+        document.getElementById('isShortStack').addEventListener('change', function() {
+            document.getElementById('shortStackInput').style.display = this.checked ? 'block' : 'none';
+        });
+
+        // ==================== 日志系统 ====================
+        function addLog(message, type = 'info') {
+            const logContent = document.getElementById('logContent');
+            const time = new Date().toLocaleTimeString();
+            const logItem = document.createElement('div');
+            logItem.className = 'log-item';
+            logItem.innerHTML = `
+                <span class="log-time">[${time}]</span>
+                <span class="log-${type}">${message}</span>
+            `;
+            logContent.appendChild(logItem);
+            logContent.scrollTop = logContent.scrollHeight;
+        }
+
+        // ==================== 错误提示 ====================
+        function showError(message) {
+            const toast = document.getElementById('errorToast');
+            toast.textContent = message;
+            toast.classList.add('visible');
+            setTimeout(() => toast.classList.remove('visible'), 5000);
+        }
+
+        // ==================== 构建提示词 ====================
+        function buildPrompt() {
+            const username = document.getElementById('username').value || CONFIG.DEFAULT_USERNAME;
+            const stackDepth = document.getElementById('stackDepth').value || CONFIG.DEFAULT_STACK_DEPTH;
+            const isShortStack = document.getElementById('isShortStack').checked;
+            const opponentStack = document.getElementById('opponentStack').value;
+
+            let stackInfo = `有效筹码深度约为 ${stackDepth} BB`;
+            if (isShortStack && opponentStack) {
+                stackInfo += `，对手是短码玩家，有效筹码约 ${opponentStack} BB`;
+            }
+
+            return `你是一位世界顶级的德州扑克职业选手和教练，拥有20年以上的高级别现金局和锦标赛经验。你的任务是帮助玩家复盘和分析他们的手牌，找出决策中的问题并提供改进建议。
+
+## 基本信息
+- **目标玩家昵称**: ${username}（请在截图中找到这个玩家，分析他的决策）
+- **筹码深度信息**: ${stackInfo}
+- **游戏类型**: 这是一局有 Straddle 的现金局（盲注结构通常是 小盲/大盲/Straddle）
+
+## 分析要求
+
+请仔细查看提供的两张截图：
+1. **第一张图片**：牌局回顾界面，包含：
+   - 牌局ID和时间
+   - 盲注结构（如 2/4/8 表示小盲2、大盲4、Straddle 8）
+   - 底池大小和保险信息
+   - 所有玩家的手牌（如果有显示）
+   - 公共牌（翻牌、转牌、河牌）
+   - 每个玩家的行动和盈亏结果
+
+2. **第二张图片**：对手数据面板，包含：
+   - 对手昵称和ID
+   - 本级别手数
+   - 胜率
+   - 入局率（VPIP）
+   - 摊牌率
+
+## 分析框架
+
+请按以下结构进行详细分析：
+
+### 1️⃣ 牌局信息提取
+- 准确识别并列出：盲注结构、底池大小、参与玩家、每个玩家的手牌、公共牌
+- 识别目标玩家 ${username} 的位置和手牌
+
+### 2️⃣ 对手画像分析
+- 根据对手的统计数据（入局率、胜率、摊牌率）判断对手类型
+- 入局率 > 40% 通常是松手玩家
+- 摊牌率低说明对手弃牌频率高
+- 结合手数判断数据的可靠性
+
+### 3️⃣ 翻前分析 (Preflop)
+- ${username} 的起手牌强度如何？
+- 在当前位置，这手牌应该如何行动？（加注、跟注、弃牌）
+- 如果有加注，加注量是否合理？
+- 考虑到对手类型，翻前策略是否需要调整？
+
+### 4️⃣ 翻牌分析 (Flop)
+- 翻牌结构如何？（干燥/湿润、有无听牌、高/低牌面）
+- ${username} 在翻牌上的牌力如何？
+- 翻牌上的行动是否正确？（下注尺寸、是否应该持续下注、check-raise等）
+- 如果有犯错，应该如何改进？
+
+### 5️⃣ 转牌分析 (Turn)
+- 转牌对双方牌力的影响
+- 行动是否合理？
+- 底池控制 vs 价值下注的权衡
+
+### 6️⃣ 河牌分析 (River)
+- 河牌对最终牌力的影响
+- 最终行动是否正确？
+- 如果是诈唬，诈唬故事是否可信？
+- 如果是价值下注，下注尺寸是否最优？
+
+### 7️⃣ 关键决策点评估
+- 指出本手牌中最关键的决策点
+- 评估每个决策点的 EV（期望值）
+- 如果有明显错误，计算大约损失了多少 EV
+
+### 8️⃣ 总结与建议
+- 本手牌打得如何？（优秀/良好/一般/需改进）
+- 主要问题在哪里？
+- 具体的改进建议
+- 类似情况下的最优打法
+
+## 输出格式要求
+- 使用清晰的层级结构
+- 重要信息用 **粗体** 标注
+- 数字和金额用精确数值
+- 对错决策要明确给出判断
+- 语言简洁但分析要深入
+- 最后给出一个简短的结论和评分（1-10分）
+
+请开始分析：`;
+        }
+
+        // ==================== 调用 Gemini API ====================
+        async function analyzeHand() {
+            // 验证图片上传
+            if (!uploadedImages.hand || !uploadedImages.opponent) {
+                showError('请先上传两张截图（手牌截图和对手数据截图）');
+                addLog('❌ 缺少截图，请上传两张图片', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('analyzeBtn');
+            btn.disabled = true;
+            btn.classList.add('loading');
+
+            addLog('🚀 开始分析，正在调用 Gemini AI...', 'info');
+
+            try {
+                // 提取 base64 数据（去除前缀）
+                const handBase64 = uploadedImages.hand.split(',')[1];
+                const opponentBase64 = uploadedImages.opponent.split(',')[1];
+
+                // 获取图片 MIME 类型
+                const handMimeType = uploadedImages.hand.match(/data:(.*?);/)[1];
+                const opponentMimeType = uploadedImages.opponent.match(/data:(.*?);/)[1];
+
+                const prompt = buildPrompt();
+
+                addLog('📤 发送请求到 Gemini API...', 'info');
+
+                const response = await fetch(`${CONFIG.API_URL}?key=${CONFIG.API_KEY}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [
+                                { text: prompt },
+                                {
+                                    inline_data: {
+                                        mime_type: handMimeType,
+                                        data: handBase64
+                                    }
+                                },
+                                {
+                                    inline_data: {
+                                        mime_type: opponentMimeType,
+                                        data: opponentBase64
+                                    }
+                                }
+                            ]
+                        }],
+                        generationConfig: {
+                            temperature: 0.7,
+                            topK: 40,
+                            topP: 0.95,
+                            maxOutputTokens: 8192,
+                        },
+                        safetySettings: [
+                            {
+                                category: "HARM_CATEGORY_HARASSMENT",
+                                threshold: "BLOCK_NONE"
+                            },
+                            {
+                                category: "HARM_CATEGORY_HATE_SPEECH",
+                                threshold: "BLOCK_NONE"
+                            },
+                            {
+                                category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                                threshold: "BLOCK_NONE"
+                            },
+                            {
+                                category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+                                threshold: "BLOCK_NONE"
+                            }
+                        ]
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error?.message || `API 请求失败: ${response.status}`);
+                }
+
+                const data = await response.json();
+                addLog('✅ 收到 API 响应，正在解析...', 'success');
+
+                // 提取回复文本
+                const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                if (!resultText) {
+                    throw new Error('未能获取有效的分析结果');
+                }
+
+                // 显示结果
+                displayResult(resultText);
+                addLog('🎉 分析完成！', 'success');
+
+            } catch (error) {
+                console.error('分析错误:', error);
+                showError(`分析失败: ${error.message}`);
+                addLog(`❌ 错误: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.classList.remove('loading');
+            }
+        }
+
+        // ==================== 显示结果 ====================
+        function displayResult(text) {
+            const resultSection = document.getElementById('resultSection');
+            const resultText = document.getElementById('resultText');
+            
+            // 简单的 Markdown 渲染
+            let html = text
+                // 标题
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                // 粗体
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                // 斜体
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                // 代码
+                .replace(/`(.*?)`/g, '<code>$1</code>')
+                // 列表
+                .replace(/^\- (.*$)/gim, '<li>$1</li>')
+                .replace(/^\d+\. (.*$)/gim, '<li>$1</li>')
+                // 换行
+                .replace(/\n/g, '<br>');
+
+            resultText.innerHTML = html;
+            resultSection.classList.add('visible');
+
+            // 滚动到结果区域
+            resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // ==================== 复制结果 ====================
+        function copyResult() {
+            const resultText = document.getElementById('resultText').innerText;
+            navigator.clipboard.writeText(resultText).then(() => {
+                addLog('📋 结果已复制到剪贴板', 'success');
+            }).catch(err => {
+                addLog('❌ 复制失败', 'error');
+            });
+        }
+
+        // ==================== 初始化 ====================
+        addLog('🎮 德州扑克快速复盘工具 v1.0', 'info');
+        addLog('📌 请上传手牌截图和对手数据截图开始分析', 'info');
+    </script>
+</body>
+</html>
+
