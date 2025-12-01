@@ -58,71 +58,109 @@ def find_working_proxy():
 # 自动检测代理
 PROXY = find_working_proxy()
 
-# ==================== 提示词模板 (优化版) ====================
-def build_prompt(username='luckywm', stack_depth='200-300', is_short_stack=False, opponent_stack=''):
-    """构建专业的德州扑克复盘提示词 - 优化版"""
+# ==================== 提示词模板 (优化版 v2.1 - 支持多种输入模式) ====================
+def build_prompt(username='luckywm', stack_depth='200-300', is_short_stack=False, opponent_stack='',
+                 hand_mode='image', opponent_mode='image', manual_hand_text='', manual_opponent_text=''):
+    """
+    构建专业的德州扑克复盘提示词 - 支持多种输入模式
+    
+    Args:
+        hand_mode: 'image' 或 'manual' - 手牌信息输入方式
+        opponent_mode: 'image' 或 'manual' - 对手数据输入方式
+        manual_hand_text: 手动输入的手牌信息文本
+        manual_opponent_text: 手动输入的对手数据文本
+    """
     
     stack_info = f"有效筹码深度约为 {stack_depth} BB"
     if is_short_stack and opponent_stack:
         stack_info += f"，对手是短码玩家，有效筹码约 {opponent_stack} BB"
 
+    # 根据输入模式构建不同的数据说明
+    input_description = ""
+    
+    if hand_mode == 'image' and opponent_mode == 'image':
+        input_description = """
+## 📸 输入数据：两张截图
+
+你将收到两张截图：
+1. **第一张图片** - 牌局回顾界面
+2. **第二张图片** - 对手数据面板
+
+请从截图中识别所有必要信息。"""
+    
+    elif hand_mode == 'manual' and opponent_mode == 'manual':
+        input_description = f"""
+## 📝 输入数据：用户手动输入
+
+用户已手动输入所有信息，**无需识别截图**，请直接使用以下数据进行分析：
+
+{manual_hand_text}
+
+{manual_opponent_text}"""
+    
+    elif hand_mode == 'image' and opponent_mode == 'manual':
+        input_description = f"""
+## 📸+📝 输入数据：混合模式
+
+**手牌信息**：请从截图中识别（第一张图片 - 牌局回顾界面）
+
+**对手数据**：用户已手动输入，请直接使用：
+{manual_opponent_text}"""
+    
+    elif hand_mode == 'manual' and opponent_mode == 'image':
+        input_description = f"""
+## 📝+📸 输入数据：混合模式
+
+**手牌信息**：用户已手动输入，请直接使用：
+{manual_hand_text}
+
+**对手数据**：请从截图中识别（图片 - 对手数据面板）"""
+
     return f'''你是一位世界顶级的德州扑克职业选手和教练，拥有20年以上的高级别现金局经验，擅长深筹码博弈(200BB+)和漏洞利用打法。你的任务是帮助玩家复盘和分析他们的手牌，找出决策中的问题并提供专业的改进建议。
 
 ## 基本信息
-- **目标玩家昵称**: {username}（请在截图中找到这个玩家，分析他的所有决策）
+- **目标玩家昵称**: {username}（分析这个玩家的所有决策）
 - **筹码深度信息**: {stack_info}
 - **游戏类型**: 这是一局有 Straddle 的中国线上现金局（盲注结构通常是 小盲/大盲/Straddle，如2/4/8）
 
-## ⚠️ 重要：图片识别说明
+{input_description}
 
-你将看到两张**中文界面**的截图，请仔细识别：
+## ⚠️ 截图识别说明（如需要从截图识别）
 
-### 第一张图片 - 牌局回顾界面（牌局回顾/Hand History）
-需要识别的信息：
-- 顶部显示 **牌局ID** 和 **日期时间**
-- **盲注结构**: 格式如 "2/4/8(2)" 表示 小盲2/大盲4/Straddle8
-- **底池**: 显示为 "底池: xxx"
-- **保险**: 显示为 "保险 xx.x"（绿色数字）
-- **玩家列表**: 每行一个玩家，包含：
-  - 头像和昵称
-  - 手牌（两张牌，可能是彩色牌面或红色背面表示弃牌）
-  - 行动描述（如"弃牌"、"加注xxx"、"Allin xxx"等）
-  - 投保额/赔付额/保险盈利（如果有）
-  - 盈亏数字（绿色正数表示赢，红色负数表示输）
-- **公共牌**: 5张公共牌显示在中间区域
-- **底部**: 有翻页控制，显示 "x/x" 表示当前手牌编号
+如果需要从截图识别信息，这是**中文界面**的截图格式说明：
 
-### 第二张图片 - 对手数据面板
-需要识别的信息：
-- **昵称** 和 **ID号**
-- **本级别手数**: 数字（手数越多数据越可靠）
-- **胜率**: 百分比
-- **入局率**: 百分比（VPIP，>40%为松手玩家）
-- **摊牌率**: 百分比（低表示弃牌多）
+### 牌局回顾界面
+- 顶部: **牌局ID** 和 **日期时间**
+- **盲注结构**: 格式如 "2/4/8(2)" = 小盲2/大盲4/Straddle8
+- **底池**: "底池: xxx"
+- **保险**: "保险 xx.x"（绿色数字）
+- **玩家列表**: 头像+昵称+手牌+行动+盈亏
+- **公共牌**: 5张牌
+- 红色背面 = 弃牌
+
+### 对手数据面板
+- 昵称、ID号
+- 本级别手数、胜率、入局率(VPIP)、摊牌率
 
 ## 🎯 分析要求
 
-**请先确认你识别到的信息，然后再进行分析。**
-
 ### 步骤1️⃣ 信息确认（必须完成）
 
-请先列出你从截图中识别到的所有关键信息：
+请先列出所有关键信息（从截图识别或用户输入）：
 ```
 【牌局基本信息】
-- 牌局ID: [识别到的ID]
 - 盲注结构: [小盲/大盲/Straddle]
 - 底池大小: [数值]
-- 保险金额: [数值，如有]
 
 【{username}的信息】
-- 位置: [根据玩家列表顺序判断：SB/BB/Straddle/UTG/MP/CO/BTN]
+- 位置: [SB/BB/Straddle/UTG/MP/CO/BTN]
 - 手牌: [两张牌]
 - 行动: [所有行动]
 - 最终盈亏: [数值]
 
 【对手信息】
 - 主要对手昵称: [昵称]
-- 手牌: [两张牌]
+- 手牌: [两张牌，如已知]
 - 统计数据: 手数[x] / 入局率[x%] / 胜率[x%] / 摊牌率[x%]
 
 【公共牌】
@@ -287,47 +325,90 @@ class QuickReviewHandler(http.server.SimpleHTTPRequestHandler):
             is_short_stack = data.get('isShortStack', False)
             opponent_stack = data.get('opponentStack', '')
             
+            # 新增：输入模式和手动输入数据
+            hand_mode = data.get('handMode', 'image')
+            opponent_mode = data.get('opponentMode', 'image')
+            manual_hand_text = data.get('manualHandText', '')
+            manual_opponent_text = data.get('manualOpponentText', '')
+            
             print(f"\n{'='*50}")
             print(f"📥 收到分析请求")
             print(f"   用户: {username}")
             print(f"   筹码: {stack_depth} BB")
+            print(f"   输入模式: 手牌={hand_mode}, 对手={opponent_mode}")
             print(f"   短码对手: {'是 (' + opponent_stack + 'BB)' if is_short_stack else '否'}")
             
-            # 验证图片
-            if not hand_image or not opponent_image:
+            # 验证输入（根据模式）
+            if hand_mode == 'image' and not hand_image:
                 self.send_json_response(400, {
                     "success": False,
-                    "error": "请上传两张截图（手牌截图和对手数据截图）"
+                    "error": "请上传手牌截图或切换到手动输入模式"
                 })
                 return
             
-            # 构建提示词
-            prompt = build_prompt(username, stack_depth, is_short_stack, opponent_stack)
+            if opponent_mode == 'image' and not opponent_image:
+                self.send_json_response(400, {
+                    "success": False,
+                    "error": "请上传对手数据截图或切换到手动输入模式"
+                })
+                return
+            
+            if hand_mode == 'manual' and not manual_hand_text:
+                self.send_json_response(400, {
+                    "success": False,
+                    "error": "请输入手牌信息"
+                })
+                return
+            
+            if opponent_mode == 'manual' and not manual_opponent_text:
+                self.send_json_response(400, {
+                    "success": False,
+                    "error": "请输入对手数据"
+                })
+                return
+            
+            # 构建提示词（支持多种输入模式）
+            prompt = build_prompt(
+                username=username,
+                stack_depth=stack_depth,
+                is_short_stack=is_short_stack,
+                opponent_stack=opponent_stack,
+                hand_mode=hand_mode,
+                opponent_mode=opponent_mode,
+                manual_hand_text=manual_hand_text,
+                manual_opponent_text=manual_opponent_text
+            )
             
             # 准备Gemini API请求
             parts = [{"text": prompt}]
             
-            # 添加手牌图片
-            mime_type, image_data = self.parse_image_data(hand_image)
-            if image_data:
-                parts.append({
-                    "inline_data": {
-                        "mime_type": mime_type,
-                        "data": image_data
-                    }
-                })
-                print(f"   ✅ 手牌图片已添加 ({mime_type})")
+            # 添加手牌图片（仅在图片模式时）
+            if hand_mode == 'image' and hand_image:
+                mime_type, image_data = self.parse_image_data(hand_image)
+                if image_data:
+                    parts.append({
+                        "inline_data": {
+                            "mime_type": mime_type,
+                            "data": image_data
+                        }
+                    })
+                    print(f"   ✅ 手牌图片已添加 ({mime_type})")
+            else:
+                print(f"   📝 手牌信息: 手动输入")
             
-            # 添加对手数据图片
-            mime_type, image_data = self.parse_image_data(opponent_image)
-            if image_data:
-                parts.append({
-                    "inline_data": {
-                        "mime_type": mime_type,
-                        "data": image_data
-                    }
-                })
-                print(f"   ✅ 对手数据图片已添加 ({mime_type})")
+            # 添加对手数据图片（仅在图片模式时）
+            if opponent_mode == 'image' and opponent_image:
+                mime_type, image_data = self.parse_image_data(opponent_image)
+                if image_data:
+                    parts.append({
+                        "inline_data": {
+                            "mime_type": mime_type,
+                            "data": image_data
+                        }
+                    })
+                    print(f"   ✅ 对手数据图片已添加 ({mime_type})")
+            else:
+                print(f"   📝 对手数据: 手动输入")
             
             # 调用Gemini API
             print(f"\n🚀 调用 Gemini API (代理: {PROXY})...")

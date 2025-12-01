@@ -119,8 +119,67 @@
             box-shadow: var(--shadow-glow);
         }
 
-        /* 上传区域 */
-        .upload-section {
+        /* 输入模式选择 */
+        .input-mode-section {
+            margin-bottom: 25px;
+        }
+
+        .mode-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .mode-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .mode-group {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .mode-label {
+            display: block;
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .mode-toggle {
+            display: flex;
+            gap: 8px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 10px 16px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mode-btn:hover {
+            border-color: var(--accent-gold);
+            color: var(--text-primary);
+        }
+
+        .mode-btn.active {
+            background: var(--gradient-gold);
+            color: #000;
+            border-color: var(--accent-gold);
+            font-weight: 500;
+        }
+
+        /* 输入区域 */
+        .input-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 30px;
@@ -128,9 +187,88 @@
         }
 
         @media (max-width: 768px) {
-            .upload-section {
+            .input-section {
                 grid-template-columns: 1fr;
             }
+        }
+
+        .input-panel {
+            min-height: 200px;
+        }
+
+        .input-panel.hidden {
+            display: none;
+        }
+
+        /* 手动输入卡片 */
+        .manual-input-card {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 25px;
+            height: 100%;
+        }
+
+        .manual-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--accent-gold);
+            margin-bottom: 20px;
+        }
+
+        .manual-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            position: relative;
+        }
+
+        .form-group.full {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .form-group .setting-input {
+            font-size: 14px;
+            padding: 10px 14px;
+        }
+
+        .form-group .textarea {
+            min-height: 100px;
+            resize: vertical;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .input-suffix {
+            position: absolute;
+            right: 12px;
+            bottom: 12px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* 上传区域 - 保持原样但移除 upload-section */
+        .upload-card {
+            height: 100%;
+            min-height: 280px;
         }
 
         .upload-card {
@@ -622,30 +760,158 @@
                 <span>请先运行本地服务器：<code style="background:#1a1a24;padding:2px 8px;border-radius:4px;color:#ffd700;">python quick_review_server.py</code></span>
             </div>
 
-            <!-- 上传区域 -->
-            <div class="upload-section">
-                <!-- 手牌截图 -->
-                <div class="upload-card" id="handCard" onclick="triggerUpload('hand', event)">
-                    <input type="file" id="handInput" accept="image/*" onchange="handleImageUpload(this, 'hand')">
-                    <div class="upload-placeholder">
-                        <div class="upload-icon">🎴</div>
-                        <div class="upload-title">上传手牌截图</div>
-                        <div class="upload-desc">牌局回顾界面，包含公共牌和玩家手牌</div>
+            <!-- 输入模式选择 -->
+            <div class="input-mode-section">
+                <div class="mode-row">
+                    <div class="mode-group">
+                        <label class="mode-label">📋 手牌信息输入方式</label>
+                        <div class="mode-toggle">
+                            <button class="mode-btn active" data-mode="hand-image" onclick="switchMode('hand', 'image')">📷 截图上传</button>
+                            <button class="mode-btn" data-mode="hand-manual" onclick="switchMode('hand', 'manual')">⌨️ 手动输入</button>
+                        </div>
                     </div>
-                    <img class="upload-preview" id="handPreview" alt="手牌预览" onclick="event.stopPropagation()">
-                    <button class="clear-btn" id="handClearBtn" onclick="clearImage('hand'); event.stopPropagation();">✕ 重新上传</button>
+                    <div class="mode-group">
+                        <label class="mode-label">📊 对手数据输入方式</label>
+                        <div class="mode-toggle">
+                            <button class="mode-btn active" data-mode="opponent-image" onclick="switchMode('opponent', 'image')">📷 截图上传</button>
+                            <button class="mode-btn" data-mode="opponent-manual" onclick="switchMode('opponent', 'manual')">⌨️ 手动输入</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 手牌输入区域 -->
+            <div class="input-section">
+                <!-- 手牌截图模式 -->
+                <div class="input-panel" id="handImagePanel">
+                    <div class="upload-card" id="handCard" onclick="triggerUpload('hand', event)">
+                        <input type="file" id="handInput" accept="image/*" onchange="handleImageUpload(this, 'hand')">
+                        <div class="upload-placeholder">
+                            <div class="upload-icon">🎴</div>
+                            <div class="upload-title">上传手牌截图</div>
+                            <div class="upload-desc">牌局回顾界面，包含公共牌和玩家手牌</div>
+                        </div>
+                        <img class="upload-preview" id="handPreview" alt="手牌预览" onclick="event.stopPropagation()">
+                        <button class="clear-btn" id="handClearBtn" onclick="clearImage('hand'); event.stopPropagation();">✕ 重新上传</button>
+                    </div>
                 </div>
 
-                <!-- 对手数据截图 -->
-                <div class="upload-card" id="opponentCard" onclick="triggerUpload('opponent', event)">
-                    <input type="file" id="opponentInput" accept="image/*" onchange="handleImageUpload(this, 'opponent')">
-                    <div class="upload-placeholder">
-                        <div class="upload-icon">👤</div>
-                        <div class="upload-title">上传对手数据</div>
-                        <div class="upload-desc">对手面板，包含入局率、胜率等统计</div>
+                <!-- 手牌手动输入模式 -->
+                <div class="input-panel hidden" id="handManualPanel">
+                    <div class="manual-input-card">
+                        <div class="manual-title">🎴 手动输入手牌信息</div>
+                        <div class="manual-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>盲注结构</label>
+                                    <input type="text" id="manualBlinds" placeholder="例如: 2/4/8" class="setting-input">
+                                </div>
+                                <div class="form-group">
+                                    <label>底池大小</label>
+                                    <input type="text" id="manualPot" placeholder="例如: 959.3" class="setting-input">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>你的手牌</label>
+                                    <input type="text" id="manualMyHand" placeholder="例如: AKo, KQs, JJ" class="setting-input">
+                                </div>
+                                <div class="form-group">
+                                    <label>你的位置</label>
+                                    <select id="manualPosition" class="setting-input">
+                                        <option value="">选择位置</option>
+                                        <option value="SB">小盲 (SB)</option>
+                                        <option value="BB">大盲 (BB)</option>
+                                        <option value="Straddle">Straddle</option>
+                                        <option value="UTG">枪口 (UTG)</option>
+                                        <option value="MP">中位 (MP)</option>
+                                        <option value="CO">关煞 (CO)</option>
+                                        <option value="BTN">按钮 (BTN)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group full">
+                                    <label>公共牌</label>
+                                    <input type="text" id="manualBoard" placeholder="例如: Jc Qc 7c 5s 5s (用空格分隔)" class="setting-input">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group full">
+                                    <label>对手手牌（如已知）</label>
+                                    <input type="text" id="manualVillainHand" placeholder="例如: JJ (如果不知道可留空)" class="setting-input">
+                                </div>
+                            </div>
+                            <div class="form-group full">
+                                <label>行动记录 (每街用 | 分隔)</label>
+                                <textarea id="manualAction" class="setting-input textarea" placeholder="例如:
+翻前: Hero CO加注到24, Villain BTN 3bet到80, Hero call
+翻牌(Jc Qc 7c): Hero check, Villain bet 60, Hero call
+转牌(5s): Hero check, Villain bet 150, Hero call
+河牌(5s): Hero check, Villain all-in 300, Hero call"></textarea>
+                            </div>
+                            <div class="form-group full">
+                                <label>最终结果</label>
+                                <input type="text" id="manualResult" placeholder="例如: 输了438.5 或 赢了422.2" class="setting-input">
+                            </div>
+                        </div>
                     </div>
-                    <img class="upload-preview" id="opponentPreview" alt="对手数据预览" onclick="event.stopPropagation()">
-                    <button class="clear-btn" id="opponentClearBtn" onclick="clearImage('opponent'); event.stopPropagation();">✕ 重新上传</button>
+                </div>
+
+                <!-- 对手数据截图模式 -->
+                <div class="input-panel" id="opponentImagePanel">
+                    <div class="upload-card" id="opponentCard" onclick="triggerUpload('opponent', event)">
+                        <input type="file" id="opponentInput" accept="image/*" onchange="handleImageUpload(this, 'opponent')">
+                        <div class="upload-placeholder">
+                            <div class="upload-icon">👤</div>
+                            <div class="upload-title">上传对手数据</div>
+                            <div class="upload-desc">对手面板，包含入局率、胜率等统计</div>
+                        </div>
+                        <img class="upload-preview" id="opponentPreview" alt="对手数据预览" onclick="event.stopPropagation()">
+                        <button class="clear-btn" id="opponentClearBtn" onclick="clearImage('opponent'); event.stopPropagation();">✕ 重新上传</button>
+                    </div>
+                </div>
+
+                <!-- 对手数据手动输入模式 -->
+                <div class="input-panel hidden" id="opponentManualPanel">
+                    <div class="manual-input-card">
+                        <div class="manual-title">👤 手动输入对手数据</div>
+                        <div class="manual-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>对手昵称</label>
+                                    <input type="text" id="manualVillainName" placeholder="例如: xiaolv" class="setting-input">
+                                </div>
+                                <div class="form-group">
+                                    <label>本级别手数</label>
+                                    <input type="text" id="manualVillainHands" placeholder="例如: 8446" class="setting-input">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>入局率 (VPIP)</label>
+                                    <input type="text" id="manualVillainVPIP" placeholder="例如: 45" class="setting-input">
+                                    <span class="input-suffix">%</span>
+                                </div>
+                                <div class="form-group">
+                                    <label>胜率</label>
+                                    <input type="text" id="manualVillainWinRate" placeholder="例如: 20" class="setting-input">
+                                    <span class="input-suffix">%</span>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>摊牌率</label>
+                                    <input type="text" id="manualVillainShowdown" placeholder="例如: 13" class="setting-input">
+                                    <span class="input-suffix">%</span>
+                                </div>
+                                <div class="form-group">
+                                    <label>其他备注</label>
+                                    <input type="text" id="manualVillainNotes" placeholder="例如: 喜欢诈唬" class="setting-input">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -732,6 +998,124 @@
             hand: null,
             opponent: null
         };
+
+        // 输入模式
+        let inputModes = {
+            hand: 'image',      // 'image' 或 'manual'
+            opponent: 'image'   // 'image' 或 'manual'
+        };
+
+        // ==================== 模式切换 ====================
+        function switchMode(type, mode) {
+            inputModes[type] = mode;
+            
+            // 更新按钮状态
+            const buttons = document.querySelectorAll(`.mode-btn[data-mode^="${type}-"]`);
+            buttons.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mode === `${type}-${mode}`);
+            });
+            
+            // 更新面板显示
+            const imagePanel = document.getElementById(`${type}ImagePanel`);
+            const manualPanel = document.getElementById(`${type}ManualPanel`);
+            
+            if (mode === 'image') {
+                imagePanel.classList.remove('hidden');
+                manualPanel.classList.add('hidden');
+            } else {
+                imagePanel.classList.add('hidden');
+                manualPanel.classList.remove('hidden');
+            }
+            
+            addLog(`📝 ${type === 'hand' ? '手牌' : '对手数据'}输入模式切换为: ${mode === 'image' ? '截图上传' : '手动输入'}`, 'info');
+        }
+
+        // ==================== 收集手动输入数据 ====================
+        function collectManualHandData() {
+            return {
+                blinds: document.getElementById('manualBlinds').value.trim(),
+                pot: document.getElementById('manualPot').value.trim(),
+                myHand: document.getElementById('manualMyHand').value.trim(),
+                position: document.getElementById('manualPosition').value,
+                board: document.getElementById('manualBoard').value.trim(),
+                villainHand: document.getElementById('manualVillainHand').value.trim(),
+                action: document.getElementById('manualAction').value.trim(),
+                result: document.getElementById('manualResult').value.trim()
+            };
+        }
+
+        function collectManualOpponentData() {
+            return {
+                name: document.getElementById('manualVillainName').value.trim(),
+                hands: document.getElementById('manualVillainHands').value.trim(),
+                vpip: document.getElementById('manualVillainVPIP').value.trim(),
+                winRate: document.getElementById('manualVillainWinRate').value.trim(),
+                showdown: document.getElementById('manualVillainShowdown').value.trim(),
+                notes: document.getElementById('manualVillainNotes').value.trim()
+            };
+        }
+
+        function formatManualHandData(data) {
+            if (!data.myHand) return '';
+            
+            let text = '【手动输入的手牌信息】\n';
+            if (data.blinds) text += `盲注结构: ${data.blinds}\n`;
+            if (data.pot) text += `底池大小: ${data.pot}\n`;
+            text += `我的手牌: ${data.myHand}\n`;
+            if (data.position) text += `我的位置: ${data.position}\n`;
+            if (data.board) text += `公共牌: ${data.board}\n`;
+            if (data.villainHand) text += `对手手牌: ${data.villainHand}\n`;
+            if (data.action) text += `行动记录:\n${data.action}\n`;
+            if (data.result) text += `最终结果: ${data.result}\n`;
+            
+            return text;
+        }
+
+        function formatManualOpponentData(data) {
+            if (!data.vpip && !data.winRate) return '';
+            
+            let text = '【手动输入的对手数据】\n';
+            if (data.name) text += `对手昵称: ${data.name}\n`;
+            if (data.hands) text += `本级别手数: ${data.hands}\n`;
+            if (data.vpip) text += `入局率(VPIP): ${data.vpip}%\n`;
+            if (data.winRate) text += `胜率: ${data.winRate}%\n`;
+            if (data.showdown) text += `摊牌率: ${data.showdown}%\n`;
+            if (data.notes) text += `备注: ${data.notes}\n`;
+            
+            return text;
+        }
+
+        function validateInput() {
+            // 验证手牌输入
+            if (inputModes.hand === 'image') {
+                if (!uploadedImages.hand) {
+                    showError('请上传手牌截图，或切换到手动输入模式');
+                    return false;
+                }
+            } else {
+                const handData = collectManualHandData();
+                if (!handData.myHand) {
+                    showError('请输入你的手牌');
+                    return false;
+                }
+            }
+            
+            // 验证对手数据输入
+            if (inputModes.opponent === 'image') {
+                if (!uploadedImages.opponent) {
+                    showError('请上传对手数据截图，或切换到手动输入模式');
+                    return false;
+                }
+            } else {
+                const opponentData = collectManualOpponentData();
+                if (!opponentData.vpip && !opponentData.winRate) {
+                    showError('请至少输入对手的入局率或胜率');
+                    return false;
+                }
+            }
+            
+            return true;
+        }
 
         // ==================== 图片上传处理 ====================
         const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -870,10 +1254,9 @@
 
         // ==================== 调用本地服务器 API ====================
         async function analyzeHand() {
-            // 验证图片上传
-            if (!uploadedImages.hand || !uploadedImages.opponent) {
-                showError('请先上传两张截图（手牌截图和对手数据截图）');
-                addLog('❌ 缺少截图，请上传两张图片', 'error');
+            // 验证输入
+            if (!validateInput()) {
+                addLog('❌ 输入验证失败', 'error');
                 return;
             }
 
@@ -889,6 +1272,17 @@
                 const isShortStack = document.getElementById('isShortStack').checked;
                 const opponentStack = document.getElementById('opponentStack').value;
 
+                // 收集数据
+                const handData = inputModes.hand === 'manual' ? collectManualHandData() : null;
+                const opponentData = inputModes.opponent === 'manual' ? collectManualOpponentData() : null;
+                
+                // 格式化手动输入的文本
+                const manualHandText = handData ? formatManualHandData(handData) : '';
+                const manualOpponentText = opponentData ? formatManualOpponentData(opponentData) : '';
+
+                // 记录输入模式
+                const modeInfo = `手牌:${inputModes.hand === 'image' ? '截图' : '手动'} + 对手:${inputModes.opponent === 'image' ? '截图' : '手动'}`;
+                addLog(`📊 输入模式: ${modeInfo}`, 'info');
                 addLog('📤 发送请求到本地服务器...', 'info');
                 addLog('⏳ AI正在分析中，请稍候（约30-60秒）...', 'info');
 
@@ -902,8 +1296,16 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        handImage: uploadedImages.hand,
-                        opponentImage: uploadedImages.opponent,
+                        // 图片数据（如果是图片模式）
+                        handImage: inputModes.hand === 'image' ? uploadedImages.hand : null,
+                        opponentImage: inputModes.opponent === 'image' ? uploadedImages.opponent : null,
+                        // 手动输入数据
+                        manualHandText: manualHandText,
+                        manualOpponentText: manualOpponentText,
+                        // 输入模式
+                        handMode: inputModes.hand,
+                        opponentMode: inputModes.opponent,
+                        // 其他设置
                         username: username,
                         stackDepth: stackDepth,
                         isShortStack: isShortStack,
@@ -1008,9 +1410,9 @@
         }
 
         // ==================== 初始化 ====================
-        addLog('🎮 德州扑克快速复盘工具 v2.0', 'info');
-        addLog('📌 请上传两张截图：手牌回顾 + 对手数据面板', 'info');
-        addLog('💡 提示：点击已上传的图片可重新上传', 'info');
+        addLog('🎮 德州扑克快速复盘工具 v2.1', 'info');
+        addLog('📌 支持4种输入模式：截图/手动输入自由组合', 'info');
+        addLog('💡 提示：如果AI识别截图有误，可切换到手动输入', 'info');
     </script>
 </body>
 </html>
