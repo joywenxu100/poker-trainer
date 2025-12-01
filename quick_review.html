@@ -16,13 +16,12 @@
             --accent-red: #ff4757;
             --accent-blue: #4a9eff;
             --accent-purple: #a855f7;
+            --accent-orange: #ff9500;
             --text-primary: #f5f5f7;
             --text-secondary: #a0a0a8;
             --text-muted: #6a6a72;
             --border-color: #2a2a36;
             --gradient-gold: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
-            --gradient-blue: linear-gradient(135deg, #4a9eff 0%, #0066cc 100%);
-            --gradient-purple: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
             --shadow-glow: 0 0 40px rgba(255, 215, 0, 0.15);
         }
 
@@ -113,15 +112,23 @@
             margin-top: 8px;
         }
 
-        .ai-option.gemini .ai-badge {
-            background: rgba(74, 158, 255, 0.2);
-            color: var(--accent-blue);
+        .ai-option.gemini .ai-badge { background: rgba(74, 158, 255, 0.2); color: var(--accent-blue); }
+        .ai-option.deepseek .ai-badge { background: rgba(168, 85, 247, 0.2); color: var(--accent-purple); }
+
+        /* DeepSeek警告 */
+        .deepseek-warning {
+            display: none;
+            background: rgba(255, 149, 0, 0.1);
+            border: 1px solid var(--accent-orange);
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: var(--accent-orange);
         }
 
-        .ai-option.deepseek .ai-badge {
-            background: rgba(168, 85, 247, 0.2);
-            color: var(--accent-purple);
-        }
+        .deepseek-warning.visible { display: flex; align-items: center; gap: 12px; }
+        .deepseek-warning .warning-icon { font-size: 24px; }
 
         /* 输入模式 */
         .input-mode-section { margin-bottom: 20px; }
@@ -267,11 +274,7 @@
         }
 
         .form-group.full { grid-column: 1 / -1; }
-
-        .form-group label {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
+        .form-group label { font-size: 12px; color: var(--text-muted); }
 
         .setting-input {
             background: var(--bg-card);
@@ -283,10 +286,7 @@
             font-family: inherit;
         }
 
-        .setting-input:focus {
-            outline: none;
-            border-color: var(--accent-gold);
-        }
+        .setting-input:focus { outline: none; border-color: var(--accent-gold); }
 
         .setting-input.textarea {
             min-height: 80px;
@@ -372,15 +372,8 @@
         @keyframes spin { to { transform: rotate(360deg); } }
 
         /* 结果区域 */
-        .result-section {
-            margin-top: 30px;
-            display: none;
-        }
-
-        .result-section.visible {
-            display: block;
-            animation: fadeIn 0.4s ease;
-        }
+        .result-section { margin-top: 30px; display: none; }
+        .result-section.visible { display: block; animation: fadeIn 0.4s ease; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(15px); }
@@ -392,6 +385,8 @@
             align-items: center;
             justify-content: space-between;
             margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .result-title {
@@ -408,15 +403,8 @@
             font-size: 12px;
         }
 
-        .result-ai-badge.gemini {
-            background: rgba(74, 158, 255, 0.2);
-            color: var(--accent-blue);
-        }
-
-        .result-ai-badge.deepseek {
-            background: rgba(168, 85, 247, 0.2);
-            color: var(--accent-purple);
-        }
+        .result-ai-badge.gemini { background: rgba(74, 158, 255, 0.2); color: var(--accent-blue); }
+        .result-ai-badge.deepseek { background: rgba(168, 85, 247, 0.2); color: var(--accent-purple); }
 
         .copy-btn {
             padding: 8px 16px;
@@ -439,6 +427,7 @@
             font-size: 14px;
             line-height: 1.8;
             color: var(--text-primary);
+            word-wrap: break-word;
         }
 
         .result-text h1, .result-text h2, .result-text h3 {
@@ -451,7 +440,7 @@
         .result-text h3 { font-size: 15px; }
 
         .result-text strong { color: var(--accent-green); }
-        .result-text em { color: var(--text-secondary); }
+        .result-text em { color: var(--text-secondary); font-style: italic; }
 
         .result-text code {
             background: var(--bg-card);
@@ -471,21 +460,12 @@
             border: 1px solid var(--border-color);
         }
 
-        .result-text pre code {
-            background: transparent;
-            padding: 0;
-            color: var(--text-secondary);
-        }
-
-        .result-text ul, .result-text ol {
-            margin: 10px 0;
-            padding-left: 20px;
-        }
-
+        .result-text pre code { background: transparent; padding: 0; color: var(--text-secondary); }
+        .result-text ul, .result-text ol { margin: 10px 0; padding-left: 20px; }
         .result-text li { margin: 6px 0; }
         .result-text hr { border: none; border-top: 1px solid var(--border-color); margin: 15px 0; }
 
-        /* 思考过程展示 */
+        /* 思考过程 */
         .thinking-section {
             margin-bottom: 20px;
             background: rgba(168, 85, 247, 0.05);
@@ -515,6 +495,7 @@
             line-height: 1.7;
             max-height: 400px;
             overflow-y: auto;
+            white-space: pre-wrap;
         }
 
         .thinking-content.visible { display: block; }
@@ -529,42 +510,36 @@
             overflow-y: auto;
         }
 
-        .log-title {
-            font-size: 12px;
-            color: var(--text-muted);
-            margin-bottom: 10px;
-        }
-
-        .log-content {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-        }
-
-        .log-item {
-            padding: 3px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
+        .log-title { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+        .log-content { font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+        .log-item { padding: 3px 0; border-bottom: 1px solid var(--border-color); }
         .log-item:last-child { border-bottom: none; }
         .log-time { color: var(--text-muted); margin-right: 8px; }
         .log-success { color: var(--accent-green); }
         .log-error { color: var(--accent-red); }
         .log-info { color: var(--accent-blue); }
+        .log-warning { color: var(--accent-orange); }
 
         /* Toast */
-        .error-toast {
+        .toast {
             position: fixed;
             top: 20px; right: 20px;
-            background: var(--accent-red);
-            color: white;
             padding: 12px 20px;
             border-radius: 10px;
             font-size: 13px;
             z-index: 1000;
             display: none;
+            max-width: 350px;
         }
 
-        .error-toast.visible { display: block; }
+        .toast.visible { display: block; animation: slideIn 0.3s ease; }
+        .toast.error { background: var(--accent-red); color: white; }
+        .toast.success { background: var(--accent-green); color: white; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
 
         .footer {
             text-align: center;
@@ -579,7 +554,8 @@
 </head>
 <body>
     <div class="bg-decoration"></div>
-    <div class="error-toast" id="errorToast"></div>
+    <div class="toast error" id="errorToast"></div>
+    <div class="toast success" id="successToast"></div>
 
     <div class="container">
         <header class="header">
@@ -603,6 +579,12 @@
                     <div class="ai-desc">深度思考模式，推理能力强</div>
                     <div class="ai-badge">国内可用</div>
                 </div>
+            </div>
+
+            <!-- DeepSeek警告 -->
+            <div class="deepseek-warning" id="deepseekWarning">
+                <span class="warning-icon">🧠</span>
+                <span><strong>DeepSeek模式：</strong>请使用<strong>手动输入</strong>填写手牌信息和对手数据。如需截图识别请切换到Gemini（需VPN）。</span>
             </div>
 
             <!-- 输入模式选择 -->
@@ -659,7 +641,7 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>你的手牌</label>
-                                    <input type="text" id="manualMyHand" placeholder="如: AKo, KQs, JJ" class="setting-input">
+                                    <input type="text" id="manualMyHand" placeholder="如: KsAd (黑桃K方块A)" class="setting-input">
                                 </div>
                                 <div class="form-group">
                                     <label>你的位置</label>
@@ -676,22 +658,23 @@
                                 </div>
                             </div>
                             <div class="form-group full">
-                                <label>公共牌</label>
+                                <label>公共牌 (用空格分隔)</label>
                                 <input type="text" id="manualBoard" placeholder="如: Jc Qc 7c 5s 5h" class="setting-input">
                             </div>
                             <div class="form-group full">
                                 <label>对手手牌（如已知）</label>
-                                <input type="text" id="manualVillainHand" placeholder="如: JJ" class="setting-input">
+                                <input type="text" id="manualVillainHand" placeholder="如: JdJh (方块J红桃J)" class="setting-input">
                             </div>
                             <div class="form-group full">
                                 <label>行动记录</label>
-                                <textarea id="manualAction" class="setting-input textarea" placeholder="翻前: Hero CO加注24, Villain 3bet80, Hero call
-翻牌: Hero check, Villain bet 60, Hero call
-..."></textarea>
+                                <textarea id="manualAction" class="setting-input textarea" placeholder="翻前: Hero加注458.2, xiaolv All-in 436.4
+翻牌(Jc Qc 7c): ...
+转牌(5s): ...
+河牌(5h): ..."></textarea>
                             </div>
                             <div class="form-group full">
                                 <label>结果</label>
-                                <input type="text" id="manualResult" placeholder="如: 输438.5" class="setting-input">
+                                <input type="text" id="manualResult" placeholder="如: Hero输438.5, xiaolv赢422.2" class="setting-input">
                             </div>
                         </div>
                     </div>
@@ -722,7 +705,7 @@
                                     <input type="text" id="manualVillainName" placeholder="如: xiaolv" class="setting-input">
                                 </div>
                                 <div class="form-group">
-                                    <label>手数</label>
+                                    <label>本级别手数</label>
                                     <input type="text" id="manualVillainHands" placeholder="如: 8446" class="setting-input">
                                 </div>
                             </div>
@@ -742,8 +725,8 @@
                                     <input type="text" id="manualVillainShowdown" placeholder="如: 13" class="setting-input">
                                 </div>
                                 <div class="form-group">
-                                    <label>备注</label>
-                                    <input type="text" id="manualVillainNotes" placeholder="如: 爱诈唬" class="setting-input">
+                                    <label>备注/风格</label>
+                                    <input type="text" id="manualVillainNotes" placeholder="如: 松凶玩家" class="setting-input">
                                 </div>
                             </div>
                         </div>
@@ -756,8 +739,8 @@
                 <div class="settings-title">⚙️ 分析设置</div>
                 <div class="settings-grid">
                     <div class="setting-item">
-                        <label class="setting-label">你的昵称</label>
-                        <input type="text" class="setting-input" id="username" value="luckywm">
+                        <label class="setting-label">你的昵称 (区分大小写)</label>
+                        <input type="text" class="setting-input" id="username" value="Luckywm">
                     </div>
                     <div class="setting-item">
                         <label class="setting-label">筹码深度 (BB)</label>
@@ -831,8 +814,9 @@
             GEMINI_API_URL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
             DEEPSEEK_API_KEY: 'sk-e4f2758c58d14807bc9004539ffbb0e8',
             DEEPSEEK_API_URL: 'https://api.deepseek.com/chat/completions',
-            DEFAULT_USERNAME: 'luckywm',
-            DEFAULT_STACK_DEPTH: '200-300'
+            DEFAULT_USERNAME: 'Luckywm',
+            DEFAULT_STACK_DEPTH: '200-300',
+            REQUEST_TIMEOUT: 120000 // 2分钟超时
         };
 
         // 状态
@@ -842,20 +826,55 @@
 
         // ==================== AI 选择 ====================
         function selectAI(ai) {
+            // DeepSeek不支持图片，如果当前是截图模式则自动切换到手动输入
+            if (ai === 'deepseek') {
+                if (inputModes.hand === 'image' || inputModes.opponent === 'image') {
+                    // 自动切换到手动输入模式
+                    if (inputModes.hand === 'image') {
+                        switchMode('hand', 'manual');
+                    }
+                    if (inputModes.opponent === 'image') {
+                        switchMode('opponent', 'manual');
+                    }
+                    addLog('⚠️ DeepSeek不支持图片，已自动切换到手动输入模式', 'warning');
+                    showError('DeepSeek不支持图片识别，已切换到手动输入');
+                }
+            }
+            
             selectedAI = ai;
             document.querySelectorAll('.ai-option').forEach(opt => opt.classList.remove('active'));
             document.querySelector(`.ai-option.${ai}`).classList.add('active');
+            
+            // 更新警告显示
+            updateDeepSeekWarning();
+            
             addLog(`🤖 切换到 ${ai === 'gemini' ? 'Google Gemini' : 'DeepSeek R1 深度思考'}`, 'info');
+        }
+
+        function updateDeepSeekWarning() {
+            const warning = document.getElementById('deepseekWarning');
+            // DeepSeek模式下始终显示提示
+            warning.classList.toggle('visible', selectedAI === 'deepseek');
         }
 
         // ==================== 模式切换 ====================
         function switchMode(type, mode) {
+            // 如果选择截图模式但当前是DeepSeek，自动切换到Gemini
+            if (mode === 'image' && selectedAI === 'deepseek') {
+                selectAI('gemini');
+                addLog('📷 截图模式需要Gemini，已自动切换', 'warning');
+                showError('截图识别需要Gemini（需VPN），已自动切换');
+            }
+            
             inputModes[type] = mode;
             document.querySelectorAll(`.mode-btn[data-mode^="${type}-"]`).forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.mode === `${type}-${mode}`);
             });
             document.getElementById(`${type}ImagePanel`).classList.toggle('hidden', mode !== 'image');
             document.getElementById(`${type}ManualPanel`).classList.toggle('hidden', mode !== 'manual');
+            
+            // 更新DeepSeek警告
+            updateDeepSeekWarning();
         }
 
         function toggleShortStack() {
@@ -872,10 +891,13 @@
         function handleImageUpload(input, type) {
             const file = input.files[0];
             if (!file) return;
+            
             if (file.size > 10 * 1024 * 1024) {
                 showError('图片太大，最大10MB');
                 return;
             }
+
+            addLog(`📷 正在处理${type === 'hand' ? '手牌' : '对手'}图片...`, 'info');
 
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -886,13 +908,16 @@
                     addLog(`✅ ${type === 'hand' ? '手牌' : '对手'}截图已上传`, 'success');
                 });
             };
+            reader.onerror = function() {
+                showError('图片读取失败');
+            };
             reader.readAsDataURL(file);
         }
 
         function compressImage(dataUrl, callback) {
             const img = new Image();
             img.onload = function() {
-                const maxDim = 1536;
+                const maxDim = 1600; // 稍微提高分辨率以提升识别率
                 let w = img.width, h = img.height;
                 if (w > maxDim || h > maxDim) {
                     const ratio = Math.min(maxDim / w, maxDim / h);
@@ -901,10 +926,13 @@
                     const canvas = document.createElement('canvas');
                     canvas.width = w; canvas.height = h;
                     canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                    callback(canvas.toDataURL('image/jpeg', 0.85));
+                    callback(canvas.toDataURL('image/jpeg', 0.9)); // 提高质量
                 } else {
                     callback(dataUrl);
                 }
+            };
+            img.onerror = function() {
+                callback(dataUrl);
             };
             img.src = dataUrl;
         }
@@ -914,6 +942,7 @@
             document.getElementById(`${type}Preview`).src = '';
             document.getElementById(`${type}Card`).classList.remove('has-image');
             document.getElementById(`${type}Input`).value = '';
+            addLog(`🗑️ 已清除${type === 'hand' ? '手牌' : '对手'}截图`, 'info');
         }
 
         // ==================== 数据收集 ====================
@@ -944,24 +973,24 @@
         function formatManualData(handData, opponentData) {
             let text = '';
             if (handData) {
-                text += '【手牌信息】\n';
-                if (handData.blinds) text += `盲注: ${handData.blinds}\n`;
-                if (handData.pot) text += `底池: ${handData.pot}\n`;
-                if (handData.myHand) text += `我的手牌: ${handData.myHand}\n`;
-                if (handData.position) text += `我的位置: ${handData.position}\n`;
-                if (handData.board) text += `公共牌: ${handData.board}\n`;
-                if (handData.villainHand) text += `对手手牌: ${handData.villainHand}\n`;
-                if (handData.action) text += `行动:\n${handData.action}\n`;
-                if (handData.result) text += `结果: ${handData.result}\n`;
+                text += '【手牌信息 - 用户手动输入】\n';
+                if (handData.blinds) text += `- 盲注结构: ${handData.blinds}\n`;
+                if (handData.pot) text += `- 最终底池: ${handData.pot}\n`;
+                if (handData.myHand) text += `- Hero手牌: ${handData.myHand}\n`;
+                if (handData.position) text += `- Hero位置: ${handData.position}\n`;
+                if (handData.board) text += `- 公共牌: ${handData.board}\n`;
+                if (handData.villainHand) text += `- 对手手牌: ${handData.villainHand}\n`;
+                if (handData.action) text += `- 行动记录:\n${handData.action}\n`;
+                if (handData.result) text += `- 最终结果: ${handData.result}\n`;
             }
             if (opponentData) {
-                text += '\n【对手数据】\n';
-                if (opponentData.name) text += `昵称: ${opponentData.name}\n`;
-                if (opponentData.hands) text += `手数: ${opponentData.hands}\n`;
-                if (opponentData.vpip) text += `入局率: ${opponentData.vpip}%\n`;
-                if (opponentData.winRate) text += `胜率: ${opponentData.winRate}%\n`;
-                if (opponentData.showdown) text += `摊牌率: ${opponentData.showdown}%\n`;
-                if (opponentData.notes) text += `备注: ${opponentData.notes}\n`;
+                text += '\n【对手数据 - 用户手动输入】\n';
+                if (opponentData.name) text += `- 对手昵称: ${opponentData.name}\n`;
+                if (opponentData.hands) text += `- 本级别手数: ${opponentData.hands}\n`;
+                if (opponentData.vpip) text += `- 入局率(VPIP): ${opponentData.vpip}%\n`;
+                if (opponentData.winRate) text += `- 胜率: ${opponentData.winRate}%\n`;
+                if (opponentData.showdown) text += `- 摊牌率: ${opponentData.showdown}%\n`;
+                if (opponentData.notes) text += `- 备注: ${opponentData.notes}\n`;
             }
             return text;
         }
@@ -972,54 +1001,120 @@
             const stackDepth = document.getElementById('stackDepth').value || CONFIG.DEFAULT_STACK_DEPTH;
             
             let inputDesc = '';
+            const hasImageInput = inputModes.hand === 'image' || inputModes.opponent === 'image';
+            
             if (inputModes.hand === 'image' && inputModes.opponent === 'image') {
-                inputDesc = '请从两张截图中识别信息：第一张是牌局回顾，第二张是对手数据面板。';
+                inputDesc = `## 输入数据：两张中文界面截图
+
+请仔细识别截图内容：
+- **第一张图片**：牌局回顾界面（包含盲注、底池、所有玩家手牌、公共牌、盈亏）
+- **第二张图片**：对手数据面板（包含入局率、胜率、摊牌率、手数）
+
+### 截图识别要点：
+1. 盲注格式如 "2/4/8(2)" = 小盲2/大盲4/Straddle8
+2. 红色牌背表示该玩家弃牌
+3. 绿色数字=赢，红色数字=输
+4. "葫芦"="Full House", "对子"="Pair"`;
             } else if (inputModes.hand === 'manual' && inputModes.opponent === 'manual') {
-                inputDesc = `用户已手动输入所有信息，请直接使用：\n\n${manualText}`;
+                inputDesc = `## 输入数据：用户手动输入（请直接使用以下信息）
+
+${manualText}`;
             } else if (inputModes.hand === 'image') {
-                inputDesc = `请从截图识别手牌信息，对手数据由用户提供：\n\n${manualText}`;
+                inputDesc = `## 输入数据：混合模式
+
+**手牌信息**：请从截图识别（第一张图 - 牌局回顾界面）
+
+**对手数据**：用户手动输入如下
+${manualText}`;
             } else {
-                inputDesc = `手牌信息由用户提供，请从截图识别对手数据：\n\n${manualText}`;
+                inputDesc = `## 输入数据：混合模式
+
+**手牌信息**：用户手动输入如下
+${manualText}
+
+**对手数据**：请从截图识别（图片 - 对手数据面板）`;
             }
 
-            return `你是世界顶级德州扑克职业选手和教练，20年高级别现金局经验。帮助玩家${username}复盘手牌。
+            return `你是世界顶级德州扑克职业选手和教练，拥有20年高级别深筹码现金局经验，精通GTO和剥削策略。
 
 ## 基本信息
-- 玩家昵称: ${username}
-- 筹码深度: ${stackDepth} BB
-- 游戏类型: 有Straddle的现金局
+- **目标玩家昵称**: ${username}（请在截图/数据中找到此玩家，分析TA的决策）
+- **筹码深度**: 约${stackDepth}BB
+- **游戏类型**: 有Straddle的中国线上现金局
 
-## 输入数据
 ${inputDesc}
 
-## 分析要求
+---
+
+## 分析框架（请严格按此结构输出）
 
 ### 1️⃣ 信息确认
-列出识别/输入的关键信息：盲注、底池、手牌、位置、公共牌、对手数据
+首先列出你从截图/用户输入中获取的所有关键信息：
+- 盲注结构: 
+- 最终底池: 
+- ${username}的手牌: 
+- ${username}的位置: 
+- 公共牌: Flop / Turn / River
+- 主要对手及手牌:
+- 对手统计: 手数 / VPIP% / 胜率% / 摊牌率%
 
-### 2️⃣ 对手类型
-根据VPIP/摊牌率判断：松凶LAG/松被动LP/紧凶TAG/紧被动TP/鱼
+### 2️⃣ 对手类型分析
+根据统计数据判断对手类型：
+- VPIP>40% + 低摊牌率 = 松凶(LAG)
+- VPIP>40% + 高摊牌率 = 松被动(Calling Station)
+- VPIP<25% + 低摊牌率 = 紧凶(TAG)
+- 手数>500手数据才可靠
 
 ### 3️⃣ 逐街分析
-- **翻前**: 起手牌强度、位置、行动是否正确
-- **翻牌**: 牌面结构、范围优势、行动选择
-- **转牌**: 牌力变化、SPR、是否继续
-- **河牌**: 听牌完成情况、价值/诈唬选择
 
-### 4️⃣ 关键决策EV评估
-指出1-2个关键决策点，评估EV
+**翻前 (Preflop)**
+- ${username}的起手牌强度
+- 位置优劣
+- 行动是否正确？加注尺寸是否合理？
 
-### 5️⃣ 总结
-- 评价: 优秀/良好/一般/需改进
-- 主要问题
-- 改进建议
-- 评分: X/10
+**翻牌 (Flop)**
+- 牌面结构（干燥/湿润/连接）
+- ${username}在此牌面的范围优势
+- 行动选择是否正确？
+
+**转牌 (Turn)**
+- 转牌对双方范围的影响
+- 行动是否合理？
+
+**河牌 (River)**
+- 最终牌力
+- 价值/诈唬/过牌的选择
+
+### 4️⃣ 关键错误分析
+指出${username}在本手牌中的1-2个最大错误（如有）：
+- 错误点
+- 为什么是错误
+- 正确打法
+
+### 5️⃣ 总结评分
+
+**整体评价**: [优秀/良好/一般/需改进]
+
+**评分**: X/10
+
+**一句话总结**: 
+
+---
 
 请开始分析：`;
         }
 
         // ==================== 验证输入 ====================
         function validateInput() {
+            // 检查DeepSeek+截图模式
+            if (selectedAI === 'deepseek') {
+                if (inputModes.hand === 'image' || inputModes.opponent === 'image') {
+                    showError('DeepSeek不支持图片识别，请切换到手动输入或使用Gemini');
+                    addLog('⚠️ DeepSeek需要手动输入模式', 'warning');
+                    return false;
+                }
+            }
+            
             if (inputModes.hand === 'image' && !uploadedImages.hand) {
                 showError('请上传手牌截图或切换到手动输入');
                 return false;
@@ -1042,77 +1137,130 @@ ${inputDesc}
             return true;
         }
 
+        // ==================== API调用（带超时） ====================
+        async function fetchWithTimeout(url, options, timeout = CONFIG.REQUEST_TIMEOUT) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeout);
+            
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+                return response;
+            } catch (error) {
+                clearTimeout(timeoutId);
+                if (error.name === 'AbortError') {
+                    throw new Error('请求超时，请重试');
+                }
+                throw error;
+            }
+        }
+
         // ==================== 调用 Gemini API ====================
         async function callGemini(prompt) {
             const parts = [{ text: prompt }];
             
             if (inputModes.hand === 'image' && uploadedImages.hand) {
-                const [header, data] = uploadedImages.hand.split(',');
-                const mimeType = header.match(/:(.*?);/)[1];
-                parts.push({ inline_data: { mime_type: mimeType, data: data } });
+                try {
+                    const [header, data] = uploadedImages.hand.split(',');
+                    const mimeType = header.match(/:(.*?);/)[1];
+                    parts.push({ inline_data: { mime_type: mimeType, data: data } });
+                } catch (e) {
+                    throw new Error('手牌图片格式错误');
+                }
             }
             
             if (inputModes.opponent === 'image' && uploadedImages.opponent) {
-                const [header, data] = uploadedImages.opponent.split(',');
-                const mimeType = header.match(/:(.*?);/)[1];
-                parts.push({ inline_data: { mime_type: mimeType, data: data } });
+                try {
+                    const [header, data] = uploadedImages.opponent.split(',');
+                    const mimeType = header.match(/:(.*?);/)[1];
+                    parts.push({ inline_data: { mime_type: mimeType, data: data } });
+                } catch (e) {
+                    throw new Error('对手数据图片格式错误');
+                }
             }
 
-            const response = await fetch(`${CONFIG.GEMINI_API_URL}?key=${CONFIG.GEMINI_API_KEY}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts }],
-                    generationConfig: { temperature: 0.7, maxOutputTokens: 8192 }
-                })
-            });
+            const response = await fetchWithTimeout(
+                `${CONFIG.GEMINI_API_URL}?key=${CONFIG.GEMINI_API_KEY}`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts }],
+                        generationConfig: { 
+                            temperature: 0.7, 
+                            maxOutputTokens: 8192,
+                            topP: 0.95
+                        }
+                    })
+                }
+            );
 
             if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.error?.message || `Gemini错误: ${response.status}`);
+                let errMsg = `Gemini错误: ${response.status}`;
+                try {
+                    const err = await response.json();
+                    errMsg = err.error?.message || errMsg;
+                    if (errMsg.includes('location')) {
+                        errMsg = '您的网络位置不支持Gemini，请开启VPN';
+                    }
+                } catch (e) {}
+                throw new Error(errMsg);
             }
 
             const data = await response.json();
-            return {
-                text: data.candidates?.[0]?.content?.parts?.[0]?.text || '',
-                thinking: null
-            };
+            const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            
+            if (!text) {
+                const reason = data.candidates?.[0]?.finishReason;
+                if (reason === 'SAFETY') {
+                    throw new Error('内容被安全过滤，请重试');
+                }
+                throw new Error('未获取到分析结果');
+            }
+
+            return { text, thinking: null };
         }
 
         // ==================== 调用 DeepSeek API ====================
         async function callDeepSeek(prompt) {
-            // DeepSeek不支持图片，需要把图片信息转为文本描述
-            let fullPrompt = prompt;
-            if (inputModes.hand === 'image') {
-                fullPrompt += '\n\n注意：用户上传了手牌截图，但你无法查看图片。请提示用户切换到手动输入模式，或者用户可以口述截图内容。';
-            }
-            if (inputModes.opponent === 'image') {
-                fullPrompt += '\n\n注意：用户上传了对手数据截图，但你无法查看图片。请提示用户切换到手动输入模式。';
-            }
-
-            const response = await fetch(CONFIG.DEEPSEEK_API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${CONFIG.DEEPSEEK_API_KEY}`
-                },
-                body: JSON.stringify({
-                    model: 'deepseek-reasoner',
-                    messages: [{ role: 'user', content: fullPrompt }],
-                    max_tokens: 8192
-                })
-            });
+            const response = await fetchWithTimeout(
+                CONFIG.DEEPSEEK_API_URL,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${CONFIG.DEEPSEEK_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: 'deepseek-reasoner',
+                        messages: [{ role: 'user', content: prompt }],
+                        max_tokens: 8192
+                    })
+                }
+            );
 
             if (!response.ok) {
-                const err = await response.json();
-                throw new Error(err.error?.message || `DeepSeek错误: ${response.status}`);
+                let errMsg = `DeepSeek错误: ${response.status}`;
+                try {
+                    const err = await response.json();
+                    errMsg = err.error?.message || errMsg;
+                } catch (e) {}
+                throw new Error(errMsg);
             }
 
             const data = await response.json();
             const choice = data.choices?.[0];
+            
+            if (!choice?.message?.content) {
+                throw new Error('DeepSeek未返回结果');
+            }
+
             return {
-                text: choice?.message?.content || '',
-                thinking: choice?.message?.reasoning_content || null
+                text: choice.message.content,
+                thinking: choice.message.reasoning_content || null
             };
         }
 
@@ -1124,17 +1272,17 @@ ${inputDesc}
             btn.disabled = true;
             btn.classList.add('loading');
 
-            addLog(`🚀 开始分析 (${selectedAI === 'gemini' ? 'Gemini' : 'DeepSeek R1'})...`, 'info');
+            const aiName = selectedAI === 'gemini' ? 'Gemini' : 'DeepSeek R1';
+            addLog(`🚀 开始分析 (${aiName})...`, 'info');
 
             try {
-                // 收集手动输入数据
                 const handData = inputModes.hand === 'manual' ? collectManualHandData() : null;
                 const opponentData = inputModes.opponent === 'manual' ? collectManualOpponentData() : null;
                 const manualText = formatManualData(handData, opponentData);
 
                 const prompt = buildPrompt(manualText);
                 
-                addLog('⏳ AI分析中，请稍候...', 'info');
+                addLog('⏳ AI分析中，预计30-60秒...', 'info');
 
                 let result;
                 if (selectedAI === 'gemini') {
@@ -1145,13 +1293,18 @@ ${inputDesc}
 
                 addLog('✅ 分析完成！', 'success');
                 displayResult(result.text, result.thinking);
+                showSuccess('分析完成！');
 
             } catch (error) {
                 console.error('Error:', error);
                 let msg = error.message;
-                if (msg.includes('Failed to fetch')) {
-                    msg = selectedAI === 'gemini' ? '无法连接Gemini，请检查VPN' : '无法连接DeepSeek';
+                
+                if (msg.includes('Failed to fetch') || msg.includes('NetworkError')) {
+                    msg = selectedAI === 'gemini' 
+                        ? '无法连接Gemini，请检查VPN是否开启' 
+                        : '无法连接DeepSeek，请检查网络';
                 }
+                
                 showError(msg);
                 addLog(`❌ ${msg}`, 'error');
             } finally {
@@ -1167,11 +1320,9 @@ ${inputDesc}
             const badge = document.getElementById('resultAiBadge');
             const thinkingSection = document.getElementById('thinkingSection');
             
-            // AI标记
             badge.textContent = selectedAI === 'gemini' ? 'Gemini' : 'DeepSeek R1';
             badge.className = `result-ai-badge ${selectedAI}`;
             
-            // 思考过程（DeepSeek）
             if (thinking) {
                 thinkingSection.style.display = 'block';
                 document.getElementById('thinkingContent').textContent = thinking;
@@ -1179,23 +1330,27 @@ ${inputDesc}
                 thinkingSection.style.display = 'none';
             }
 
-            // 渲染Markdown
+            // 改进的Markdown渲染（兼容Safari）
             let html = text
                 .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
                 .replace(/^### (.*$)/gim, '<h3>$1</h3>')
                 .replace(/^## (.*$)/gim, '<h2>$1</h2>')
                 .replace(/^# (.*$)/gim, '<h1>$1</h1>')
                 .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-                .replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>') // 简化斜体匹配
                 .replace(/`([^`]+)`/g, '<code>$1</code>')
                 .replace(/^---$/gim, '<hr>')
                 .replace(/^[\-\*] (.*)$/gim, '<li>$1</li>')
                 .replace(/^\d+\. (.*)$/gim, '<li>$1</li>');
 
-            html = html.replace(/(<li>[\s\S]*?<\/li>)+/g, '<ul>$&</ul>');
+            // 包装列表
+            html = html.replace(/(<li>[\s\S]*?<\/li>)+/g, match => `<ul>${match}</ul>`);
+            
+            // 换行处理
             html = html.replace(/\n/g, '<br>');
             html = html.replace(/<br>\s*<br>/g, '<br>');
             html = html.replace(/<\/(h[123]|li|ul|hr|pre)><br>/g, '</$1>');
+            html = html.replace(/<br><(h[123]|ul|hr|pre)/g, '<$1');
 
             resultText.innerHTML = html;
             resultSection.classList.add('visible');
@@ -1227,15 +1382,29 @@ ${inputDesc}
             setTimeout(() => toast.classList.remove('visible'), 5000);
         }
 
+        function showSuccess(message) {
+            const toast = document.getElementById('successToast');
+            toast.textContent = message;
+            toast.classList.add('visible');
+            setTimeout(() => toast.classList.remove('visible'), 3000);
+        }
+
         function copyResult() {
-            navigator.clipboard.writeText(document.getElementById('resultText').innerText)
-                .then(() => addLog('📋 已复制', 'success'))
-                .catch(() => addLog('❌ 复制失败', 'error'));
+            const text = document.getElementById('resultText').innerText;
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                    showSuccess('已复制到剪贴板');
+                    addLog('📋 已复制', 'success');
+                })
+                .catch(() => {
+                    addLog('❌ 复制失败', 'error');
+                });
         }
 
         // ==================== 初始化 ====================
-        addLog('🎮 德州扑克快速复盘 v3.0', 'info');
-        addLog('📌 双AI引擎：Gemini(需VPN) + DeepSeek(国内可用)', 'info');
+        addLog('🎮 德州扑克快速复盘 v3.1', 'info');
+        addLog('📌 双AI：Gemini(需VPN+截图) / DeepSeek(国内+手动)', 'info');
+        addLog('💡 建议：截图分析用Gemini，手动输入用DeepSeek', 'info');
     </script>
 </body>
 </html>
