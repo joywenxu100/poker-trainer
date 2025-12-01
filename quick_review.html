@@ -15,20 +15,18 @@
             --accent-green: #00d4aa;
             --accent-red: #ff4757;
             --accent-blue: #4a9eff;
+            --accent-purple: #a855f7;
             --text-primary: #f5f5f7;
             --text-secondary: #a0a0a8;
             --text-muted: #6a6a72;
             --border-color: #2a2a36;
             --gradient-gold: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
-            --gradient-dark: linear-gradient(180deg, #1a1a24 0%, #0a0a0f 100%);
+            --gradient-blue: linear-gradient(135deg, #4a9eff 0%, #0066cc 100%);
+            --gradient-purple: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
             --shadow-glow: 0 0 40px rgba(255, 215, 0, 0.15);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -38,101 +36,106 @@
             line-height: 1.6;
         }
 
-        /* 背景装饰 */
         .bg-decoration {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             pointer-events: none;
             z-index: -1;
-            overflow: hidden;
-        }
-
-        .bg-decoration::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
             background: 
                 radial-gradient(ellipse at 20% 20%, rgba(255, 215, 0, 0.03) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 80%, rgba(0, 212, 170, 0.03) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 50%, rgba(74, 158, 255, 0.02) 0%, transparent 60%);
+                radial-gradient(ellipse at 80% 80%, rgba(168, 85, 247, 0.03) 0%, transparent 50%);
         }
 
-        /* 扑克牌花色装饰 */
-        .suit-decoration {
-            position: fixed;
-            font-size: 200px;
-            opacity: 0.02;
-            pointer-events: none;
-        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 30px 20px; }
 
-        .suit-1 { top: 10%; left: 5%; }
-        .suit-2 { top: 60%; right: 5%; }
-        .suit-3 { bottom: 10%; left: 15%; }
-        .suit-4 { top: 30%; right: 15%; }
-
-        /* 主容器 */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        /* 标题区域 */
-        .header {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-
-        .logo {
-            font-size: 48px;
-            margin-bottom: 10px;
-        }
-
+        .header { text-align: center; margin-bottom: 40px; }
+        .logo { font-size: 48px; margin-bottom: 10px; }
         .title {
-            font-size: 36px;
-            font-weight: 700;
+            font-size: 32px; font-weight: 700;
             background: var(--gradient-gold);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 10px;
         }
+        .subtitle { color: var(--text-secondary); font-size: 14px; margin-top: 8px; }
 
-        .subtitle {
-            color: var(--text-secondary);
-            font-size: 16px;
-            font-weight: 300;
-        }
-
-        /* 主面板 */
         .main-panel {
             background: var(--bg-card);
-            border-radius: 24px;
-            padding: 40px;
+            border-radius: 20px;
+            padding: 30px;
             border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-glow);
         }
 
-        /* 输入模式选择 */
-        .input-mode-section {
+        /* AI 选择器 */
+        .ai-selector {
+            display: flex;
+            gap: 15px;
             margin-bottom: 25px;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
         }
+
+        .ai-option {
+            flex: 1;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .ai-option:hover { border-color: var(--accent-gold); }
+
+        .ai-option.active.gemini {
+            border-color: var(--accent-blue);
+            background: rgba(74, 158, 255, 0.1);
+        }
+
+        .ai-option.active.deepseek {
+            border-color: var(--accent-purple);
+            background: rgba(168, 85, 247, 0.1);
+        }
+
+        .ai-option .ai-icon { font-size: 32px; margin-bottom: 10px; }
+        .ai-option .ai-name { font-size: 16px; font-weight: 600; margin-bottom: 5px; }
+        .ai-option .ai-desc { font-size: 12px; color: var(--text-muted); }
+
+        .ai-option.gemini .ai-name { color: var(--accent-blue); }
+        .ai-option.deepseek .ai-name { color: var(--accent-purple); }
+
+        .ai-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            font-size: 10px;
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+
+        .ai-option.gemini .ai-badge {
+            background: rgba(74, 158, 255, 0.2);
+            color: var(--accent-blue);
+        }
+
+        .ai-option.deepseek .ai-badge {
+            background: rgba(168, 85, 247, 0.2);
+            color: var(--accent-purple);
+        }
+
+        /* 输入模式 */
+        .input-mode-section { margin-bottom: 20px; }
 
         .mode-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 15px;
         }
 
         @media (max-width: 768px) {
-            .mode-row {
-                grid-template-columns: 1fr;
+            .mode-row, .input-section, .ai-selector { 
+                grid-template-columns: 1fr; 
+                flex-direction: column;
             }
         }
 
@@ -144,20 +147,17 @@
 
         .mode-label {
             display: block;
-            font-size: 14px;
+            font-size: 13px;
             color: var(--text-secondary);
             margin-bottom: 10px;
         }
 
-        .mode-toggle {
-            display: flex;
-            gap: 8px;
-        }
+        .mode-toggle { display: flex; gap: 8px; }
 
         .mode-btn {
             flex: 1;
-            padding: 10px 16px;
-            font-size: 13px;
+            padding: 10px 12px;
+            font-size: 12px;
             color: var(--text-secondary);
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -166,10 +166,7 @@
             transition: all 0.3s ease;
         }
 
-        .mode-btn:hover {
-            border-color: var(--accent-gold);
-            color: var(--text-primary);
-        }
+        .mode-btn:hover { border-color: var(--accent-gold); color: var(--text-primary); }
 
         .mode-btn.active {
             background: var(--gradient-gold);
@@ -182,314 +179,211 @@
         .input-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
+            gap: 20px;
+            margin-bottom: 20px;
         }
 
-        @media (max-width: 768px) {
-            .input-section {
-                grid-template-columns: 1fr;
-            }
+        .input-panel { min-height: 200px; }
+        .input-panel.hidden { display: none; }
+
+        .upload-card {
+            background: var(--bg-secondary);
+            border: 2px dashed var(--border-color);
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
-        .input-panel {
-            min-height: 200px;
-        }
+        .upload-card:hover { border-color: var(--accent-gold); }
+        .upload-card.has-image { border-style: solid; border-color: var(--accent-green); }
+        .upload-card input[type="file"] { display: none; }
 
-        .input-panel.hidden {
+        .upload-icon { font-size: 40px; margin-bottom: 12px; }
+        .upload-title { font-size: 16px; font-weight: 500; margin-bottom: 6px; }
+        .upload-desc { font-size: 12px; color: var(--text-muted); }
+
+        .upload-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 10px;
+            margin-top: 10px;
             display: none;
         }
+
+        .upload-card.has-image .upload-preview { display: block; }
+        .upload-card.has-image .upload-placeholder { display: none; }
+
+        .clear-btn {
+            display: none;
+            position: absolute;
+            top: 10px; right: 10px;
+            padding: 6px 12px;
+            font-size: 11px;
+            color: white;
+            background: var(--accent-red);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .upload-card.has-image .clear-btn { display: block; }
 
         /* 手动输入卡片 */
         .manual-input-card {
             background: var(--bg-secondary);
             border: 2px solid var(--border-color);
             border-radius: 16px;
-            padding: 25px;
+            padding: 20px;
             height: 100%;
         }
 
         .manual-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 500;
             color: var(--accent-gold);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
-        .manual-form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+        .manual-form { display: flex; flex-direction: column; gap: 12px; }
 
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 12px;
         }
 
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 6px;
-            position: relative;
+            gap: 4px;
         }
 
-        .form-group.full {
-            grid-column: 1 / -1;
-        }
+        .form-group.full { grid-column: 1 / -1; }
 
         .form-group label {
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .form-group .setting-input {
-            font-size: 14px;
-            padding: 10px 14px;
-        }
-
-        .form-group .textarea {
-            min-height: 100px;
-            resize: vertical;
-            font-family: 'JetBrains Mono', monospace;
             font-size: 12px;
-            line-height: 1.5;
-        }
-
-        .input-suffix {
-            position: absolute;
-            right: 12px;
-            bottom: 12px;
-            font-size: 13px;
             color: var(--text-muted);
-        }
-
-        /* 上传区域 - 保持原样但移除 upload-section */
-        .upload-card {
-            height: 100%;
-            min-height: 280px;
-        }
-
-        .upload-card {
-            background: var(--bg-secondary);
-            border: 2px dashed var(--border-color);
-            border-radius: 16px;
-            padding: 30px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .upload-card:hover {
-            border-color: var(--accent-gold);
-            background: var(--bg-card-hover);
-        }
-
-        .upload-card.has-image {
-            border-style: solid;
-            border-color: var(--accent-green);
-        }
-
-        .upload-card input[type="file"] {
-            display: none;
-        }
-
-        .upload-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-        }
-
-        .upload-title {
-            font-size: 18px;
-            font-weight: 500;
-            margin-bottom: 8px;
-            color: var(--text-primary);
-        }
-
-        .upload-desc {
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-
-        .upload-preview {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 12px;
-            margin-top: 15px;
-            display: none;
-        }
-
-        .upload-card.has-image .upload-preview {
-            display: block;
-        }
-
-        .upload-card.has-image .upload-placeholder {
-            display: none;
-        }
-
-        .clear-btn {
-            display: none;
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 8px 16px;
-            font-size: 12px;
-            color: var(--text-primary);
-            background: rgba(255, 71, 87, 0.9);
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 10;
-        }
-
-        .clear-btn:hover {
-            background: var(--accent-red);
-            transform: scale(1.05);
-        }
-
-        .upload-card.has-image .clear-btn {
-            display: block;
-        }
-
-        /* 设置区域 */
-        .settings-section {
-            background: var(--bg-secondary);
-            border-radius: 16px;
-            padding: 25px;
-            margin-bottom: 30px;
-        }
-
-        .settings-title {
-            font-size: 16px;
-            font-weight: 500;
-            margin-bottom: 20px;
-            color: var(--accent-gold);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .settings-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-
-        .setting-item {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .setting-label {
-            font-size: 14px;
-            color: var(--text-secondary);
         }
 
         .setting-input {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 12px 16px;
+            border-radius: 8px;
+            padding: 10px 12px;
             color: var(--text-primary);
-            font-size: 15px;
-            font-family: 'JetBrains Mono', monospace;
-            transition: all 0.3s ease;
+            font-size: 13px;
+            font-family: inherit;
         }
 
         .setting-input:focus {
             outline: none;
             border-color: var(--accent-gold);
-            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
         }
 
-        .setting-input::placeholder {
-            color: var(--text-muted);
+        .setting-input.textarea {
+            min-height: 80px;
+            resize: vertical;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
         }
+
+        /* 设置区域 */
+        .settings-section {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .settings-title {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 15px;
+            color: var(--accent-gold);
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .setting-item { display: flex; flex-direction: column; gap: 6px; }
+        .setting-label { font-size: 12px; color: var(--text-secondary); }
 
         .checkbox-item {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             cursor: pointer;
+            font-size: 13px;
         }
 
         .checkbox-item input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
+            width: 18px; height: 18px;
             accent-color: var(--accent-gold);
-            cursor: pointer;
         }
 
         /* 分析按钮 */
         .analyze-btn {
             width: 100%;
-            padding: 18px 40px;
-            font-size: 18px;
+            padding: 16px;
+            font-size: 16px;
             font-weight: 600;
             color: #000;
             background: var(--gradient-gold);
             border: none;
-            border-radius: 14px;
+            border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .analyze-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
         }
 
-        .analyze-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
+        .analyze-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
         .analyze-btn .spinner {
             display: none;
-            width: 24px;
-            height: 24px;
-            border: 3px solid rgba(0, 0, 0, 0.2);
+            width: 20px; height: 20px;
+            border: 2px solid rgba(0,0,0,0.2);
             border-top-color: #000;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
 
-        .analyze-btn.loading .spinner {
-            display: block;
-        }
+        .analyze-btn.loading .spinner { display: block; }
+        .analyze-btn.loading .btn-text { display: none; }
 
-        .analyze-btn.loading .btn-text {
-            display: none;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         /* 结果区域 */
         .result-section {
-            margin-top: 40px;
+            margin-top: 30px;
             display: none;
         }
 
         .result-section.visible {
             display: block;
-            animation: fadeIn 0.5s ease;
+            animation: fadeIn 0.4s ease;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -497,75 +391,83 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .result-title {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+        }
+
+        .result-ai-badge {
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        .result-ai-badge.gemini {
+            background: rgba(74, 158, 255, 0.2);
+            color: var(--accent-blue);
+        }
+
+        .result-ai-badge.deepseek {
+            background: rgba(168, 85, 247, 0.2);
+            color: var(--accent-purple);
         }
 
         .copy-btn {
-            padding: 10px 20px;
-            font-size: 14px;
+            padding: 8px 16px;
+            font-size: 12px;
             color: var(--text-primary);
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .copy-btn:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--accent-gold);
         }
 
         .result-content {
             background: var(--bg-secondary);
-            border-radius: 16px;
-            padding: 30px;
+            border-radius: 12px;
+            padding: 25px;
             border: 1px solid var(--border-color);
         }
 
         .result-text {
-            font-size: 15px;
+            font-size: 14px;
             line-height: 1.8;
             color: var(--text-primary);
-            white-space: pre-wrap;
         }
 
-        /* Markdown 样式 */
         .result-text h1, .result-text h2, .result-text h3 {
             color: var(--accent-gold);
-            margin: 20px 0 10px 0;
+            margin: 18px 0 10px 0;
         }
 
-        .result-text h1 { font-size: 24px; }
-        .result-text h2 { font-size: 20px; }
-        .result-text h3 { font-size: 17px; }
+        .result-text h1 { font-size: 22px; }
+        .result-text h2 { font-size: 18px; }
+        .result-text h3 { font-size: 15px; }
 
-        .result-text strong {
-            color: var(--accent-green);
-        }
+        .result-text strong { color: var(--accent-green); }
+        .result-text em { color: var(--text-secondary); }
 
         .result-text code {
             background: var(--bg-card);
-            padding: 2px 8px;
+            padding: 2px 6px;
             border-radius: 4px;
             font-family: 'JetBrains Mono', monospace;
             color: var(--accent-blue);
+            font-size: 12px;
         }
 
         .result-text pre {
             background: var(--bg-card);
-            padding: 16px;
+            padding: 15px;
             border-radius: 8px;
             overflow-x: auto;
-            margin: 15px 0;
+            margin: 12px 0;
             border: 1px solid var(--border-color);
         }
 
@@ -573,248 +475,191 @@
             background: transparent;
             padding: 0;
             color: var(--text-secondary);
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-
-        .result-text hr {
-            border: none;
-            border-top: 1px solid var(--border-color);
-            margin: 20px 0;
-        }
-
-        .result-text em {
-            color: var(--text-secondary);
-            font-style: italic;
         }
 
         .result-text ul, .result-text ol {
             margin: 10px 0;
-            padding-left: 25px;
-        }
-
-        .result-text li {
-            margin: 8px 0;
-        }
-
-        .result-text blockquote {
-            border-left: 4px solid var(--accent-gold);
             padding-left: 20px;
-            margin: 15px 0;
-            color: var(--text-secondary);
-            font-style: italic;
         }
 
-        /* 日志区域 */
-        .log-section {
-            margin-top: 30px;
-            background: var(--bg-secondary);
+        .result-text li { margin: 6px 0; }
+        .result-text hr { border: none; border-top: 1px solid var(--border-color); margin: 15px 0; }
+
+        /* 思考过程展示 */
+        .thinking-section {
+            margin-bottom: 20px;
+            background: rgba(168, 85, 247, 0.05);
+            border: 1px solid rgba(168, 85, 247, 0.2);
             border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .thinking-header {
+            padding: 12px 20px;
+            background: rgba(168, 85, 247, 0.1);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            color: var(--accent-purple);
+        }
+
+        .thinking-header:hover { background: rgba(168, 85, 247, 0.15); }
+
+        .thinking-content {
             padding: 20px;
-            max-height: 200px;
+            display: none;
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .thinking-content.visible { display: block; }
+
+        /* 日志 */
+        .log-section {
+            margin-top: 25px;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 15px;
+            max-height: 150px;
             overflow-y: auto;
         }
 
         .log-title {
-            font-size: 14px;
+            font-size: 12px;
             color: var(--text-muted);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            margin-bottom: 10px;
         }
 
         .log-content {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
-            color: var(--text-secondary);
+            font-size: 11px;
         }
 
         .log-item {
-            padding: 4px 0;
+            padding: 3px 0;
             border-bottom: 1px solid var(--border-color);
         }
 
-        .log-item:last-child {
-            border-bottom: none;
-        }
-
-        .log-time {
-            color: var(--text-muted);
-            margin-right: 10px;
-        }
-
+        .log-item:last-child { border-bottom: none; }
+        .log-time { color: var(--text-muted); margin-right: 8px; }
         .log-success { color: var(--accent-green); }
         .log-error { color: var(--accent-red); }
         .log-info { color: var(--accent-blue); }
 
-        /* 错误提示 */
+        /* Toast */
         .error-toast {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 20px; right: 20px;
             background: var(--accent-red);
             color: white;
-            padding: 15px 25px;
-            border-radius: 12px;
-            font-size: 14px;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 13px;
             z-index: 1000;
             display: none;
-            animation: slideIn 0.3s ease;
         }
 
-        .error-toast.visible {
-            display: block;
-        }
+        .error-toast.visible { display: block; }
 
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        /* 页脚 */
         .footer {
             text-align: center;
-            margin-top: 50px;
+            margin-top: 40px;
             padding: 20px;
             color: var(--text-muted);
-            font-size: 13px;
-        }
-
-        .footer a {
-            color: var(--accent-gold);
-            text-decoration: none;
-        }
-
-        /* 提示气泡 */
-        .tooltip {
-            position: relative;
-        }
-
-        .tooltip::after {
-            content: attr(data-tip);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--bg-card);
-            color: var(--text-secondary);
-            padding: 8px 12px;
-            border-radius: 8px;
             font-size: 12px;
-            white-space: nowrap;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            border: 1px solid var(--border-color);
         }
 
-        .tooltip:hover::after {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        /* API Key 提示 */
-        .api-notice {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(0, 212, 170, 0.1) 100%);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            border-radius: 12px;
-            padding: 15px 20px;
-            margin-bottom: 30px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        .api-notice-icon {
-            font-size: 24px;
-        }
+        .footer a { color: var(--accent-gold); text-decoration: none; }
     </style>
 </head>
 <body>
-    <!-- 背景装饰 -->
     <div class="bg-decoration"></div>
-    <div class="suit-decoration suit-1">♠</div>
-    <div class="suit-decoration suit-2">♥</div>
-    <div class="suit-decoration suit-3">♦</div>
-    <div class="suit-decoration suit-4">♣</div>
-
-    <!-- 错误提示 -->
     <div class="error-toast" id="errorToast"></div>
 
     <div class="container">
-        <!-- 标题 -->
         <header class="header">
             <div class="logo">🃏</div>
             <h1 class="title">德州扑克快速复盘</h1>
-            <p class="subtitle">AI 驱动的手牌分析 · 提升每一次决策</p>
+            <p class="subtitle">双AI引擎 · Gemini + DeepSeek深度思考 · 支持截图/手动输入</p>
         </header>
 
-        <!-- 主面板 -->
         <main class="main-panel">
-            <!-- API 提示 -->
-            <div class="api-notice">
-                <span class="api-notice-icon">🖥️</span>
-                <span>请先运行本地服务器：<code style="background:#1a1a24;padding:2px 8px;border-radius:4px;color:#ffd700;">python quick_review_server.py</code></span>
+            <!-- AI 选择器 -->
+            <div class="ai-selector">
+                <div class="ai-option gemini active" onclick="selectAI('gemini')">
+                    <div class="ai-icon">🌐</div>
+                    <div class="ai-name">Google Gemini</div>
+                    <div class="ai-desc">强大的多模态AI，图像识别精准</div>
+                    <div class="ai-badge">需要VPN</div>
+                </div>
+                <div class="ai-option deepseek" onclick="selectAI('deepseek')">
+                    <div class="ai-icon">🧠</div>
+                    <div class="ai-name">DeepSeek R1</div>
+                    <div class="ai-desc">深度思考模式，推理能力强</div>
+                    <div class="ai-badge">国内可用</div>
+                </div>
             </div>
 
             <!-- 输入模式选择 -->
             <div class="input-mode-section">
                 <div class="mode-row">
                     <div class="mode-group">
-                        <label class="mode-label">📋 手牌信息输入方式</label>
+                        <label class="mode-label">📋 手牌信息</label>
                         <div class="mode-toggle">
-                            <button class="mode-btn active" data-mode="hand-image" onclick="switchMode('hand', 'image')">📷 截图上传</button>
-                            <button class="mode-btn" data-mode="hand-manual" onclick="switchMode('hand', 'manual')">⌨️ 手动输入</button>
+                            <button class="mode-btn active" data-mode="hand-image" onclick="switchMode('hand', 'image')">📷 截图</button>
+                            <button class="mode-btn" data-mode="hand-manual" onclick="switchMode('hand', 'manual')">⌨️ 手动</button>
                         </div>
                     </div>
                     <div class="mode-group">
-                        <label class="mode-label">📊 对手数据输入方式</label>
+                        <label class="mode-label">📊 对手数据</label>
                         <div class="mode-toggle">
-                            <button class="mode-btn active" data-mode="opponent-image" onclick="switchMode('opponent', 'image')">📷 截图上传</button>
-                            <button class="mode-btn" data-mode="opponent-manual" onclick="switchMode('opponent', 'manual')">⌨️ 手动输入</button>
+                            <button class="mode-btn active" data-mode="opponent-image" onclick="switchMode('opponent', 'image')">📷 截图</button>
+                            <button class="mode-btn" data-mode="opponent-manual" onclick="switchMode('opponent', 'manual')">⌨️ 手动</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 手牌输入区域 -->
+            <!-- 输入区域 -->
             <div class="input-section">
-                <!-- 手牌截图模式 -->
+                <!-- 手牌截图 -->
                 <div class="input-panel" id="handImagePanel">
                     <div class="upload-card" id="handCard" onclick="triggerUpload('hand', event)">
                         <input type="file" id="handInput" accept="image/*" onchange="handleImageUpload(this, 'hand')">
                         <div class="upload-placeholder">
                             <div class="upload-icon">🎴</div>
                             <div class="upload-title">上传手牌截图</div>
-                            <div class="upload-desc">牌局回顾界面，包含公共牌和玩家手牌</div>
+                            <div class="upload-desc">牌局回顾界面</div>
                         </div>
-                        <img class="upload-preview" id="handPreview" alt="手牌预览" onclick="event.stopPropagation()">
-                        <button class="clear-btn" id="handClearBtn" onclick="clearImage('hand'); event.stopPropagation();">✕ 重新上传</button>
+                        <img class="upload-preview" id="handPreview" alt="预览">
+                        <button class="clear-btn" onclick="clearImage('hand'); event.stopPropagation();">✕ 重新上传</button>
                     </div>
                 </div>
 
-                <!-- 手牌手动输入模式 -->
+                <!-- 手牌手动输入 -->
                 <div class="input-panel hidden" id="handManualPanel">
                     <div class="manual-input-card">
-                        <div class="manual-title">🎴 手动输入手牌信息</div>
+                        <div class="manual-title">🎴 手动输入手牌</div>
                         <div class="manual-form">
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>盲注结构</label>
-                                    <input type="text" id="manualBlinds" placeholder="例如: 2/4/8" class="setting-input">
+                                    <input type="text" id="manualBlinds" placeholder="如: 2/4/8" class="setting-input">
                                 </div>
                                 <div class="form-group">
                                     <label>底池大小</label>
-                                    <input type="text" id="manualPot" placeholder="例如: 959.3" class="setting-input">
+                                    <input type="text" id="manualPot" placeholder="如: 959.3" class="setting-input">
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>你的手牌</label>
-                                    <input type="text" id="manualMyHand" placeholder="例如: AKo, KQs, JJ" class="setting-input">
+                                    <input type="text" id="manualMyHand" placeholder="如: AKo, KQs, JJ" class="setting-input">
                                 </div>
                                 <div class="form-group">
                                     <label>你的位置</label>
@@ -830,49 +675,43 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="form-row">
-                                <div class="form-group full">
-                                    <label>公共牌</label>
-                                    <input type="text" id="manualBoard" placeholder="例如: Jc Qc 7c 5s 5s (用空格分隔)" class="setting-input">
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group full">
-                                    <label>对手手牌（如已知）</label>
-                                    <input type="text" id="manualVillainHand" placeholder="例如: JJ (如果不知道可留空)" class="setting-input">
-                                </div>
+                            <div class="form-group full">
+                                <label>公共牌</label>
+                                <input type="text" id="manualBoard" placeholder="如: Jc Qc 7c 5s 5h" class="setting-input">
                             </div>
                             <div class="form-group full">
-                                <label>行动记录 (每街用 | 分隔)</label>
-                                <textarea id="manualAction" class="setting-input textarea" placeholder="例如:
-翻前: Hero CO加注到24, Villain BTN 3bet到80, Hero call
-翻牌(Jc Qc 7c): Hero check, Villain bet 60, Hero call
-转牌(5s): Hero check, Villain bet 150, Hero call
-河牌(5s): Hero check, Villain all-in 300, Hero call"></textarea>
+                                <label>对手手牌（如已知）</label>
+                                <input type="text" id="manualVillainHand" placeholder="如: JJ" class="setting-input">
                             </div>
                             <div class="form-group full">
-                                <label>最终结果</label>
-                                <input type="text" id="manualResult" placeholder="例如: 输了438.5 或 赢了422.2" class="setting-input">
+                                <label>行动记录</label>
+                                <textarea id="manualAction" class="setting-input textarea" placeholder="翻前: Hero CO加注24, Villain 3bet80, Hero call
+翻牌: Hero check, Villain bet 60, Hero call
+..."></textarea>
+                            </div>
+                            <div class="form-group full">
+                                <label>结果</label>
+                                <input type="text" id="manualResult" placeholder="如: 输438.5" class="setting-input">
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 对手数据截图模式 -->
+                <!-- 对手截图 -->
                 <div class="input-panel" id="opponentImagePanel">
                     <div class="upload-card" id="opponentCard" onclick="triggerUpload('opponent', event)">
                         <input type="file" id="opponentInput" accept="image/*" onchange="handleImageUpload(this, 'opponent')">
                         <div class="upload-placeholder">
                             <div class="upload-icon">👤</div>
                             <div class="upload-title">上传对手数据</div>
-                            <div class="upload-desc">对手面板，包含入局率、胜率等统计</div>
+                            <div class="upload-desc">对手面板截图</div>
                         </div>
-                        <img class="upload-preview" id="opponentPreview" alt="对手数据预览" onclick="event.stopPropagation()">
-                        <button class="clear-btn" id="opponentClearBtn" onclick="clearImage('opponent'); event.stopPropagation();">✕ 重新上传</button>
+                        <img class="upload-preview" id="opponentPreview" alt="预览">
+                        <button class="clear-btn" onclick="clearImage('opponent'); event.stopPropagation();">✕ 重新上传</button>
                     </div>
                 </div>
 
-                <!-- 对手数据手动输入模式 -->
+                <!-- 对手手动输入 -->
                 <div class="input-panel hidden" id="opponentManualPanel">
                     <div class="manual-input-card">
                         <div class="manual-title">👤 手动输入对手数据</div>
@@ -880,34 +719,31 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>对手昵称</label>
-                                    <input type="text" id="manualVillainName" placeholder="例如: xiaolv" class="setting-input">
+                                    <input type="text" id="manualVillainName" placeholder="如: xiaolv" class="setting-input">
                                 </div>
                                 <div class="form-group">
-                                    <label>本级别手数</label>
-                                    <input type="text" id="manualVillainHands" placeholder="例如: 8446" class="setting-input">
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>入局率 (VPIP)</label>
-                                    <input type="text" id="manualVillainVPIP" placeholder="例如: 45" class="setting-input">
-                                    <span class="input-suffix">%</span>
-                                </div>
-                                <div class="form-group">
-                                    <label>胜率</label>
-                                    <input type="text" id="manualVillainWinRate" placeholder="例如: 20" class="setting-input">
-                                    <span class="input-suffix">%</span>
+                                    <label>手数</label>
+                                    <input type="text" id="manualVillainHands" placeholder="如: 8446" class="setting-input">
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label>摊牌率</label>
-                                    <input type="text" id="manualVillainShowdown" placeholder="例如: 13" class="setting-input">
-                                    <span class="input-suffix">%</span>
+                                    <label>入局率 VPIP (%)</label>
+                                    <input type="text" id="manualVillainVPIP" placeholder="如: 45" class="setting-input">
                                 </div>
                                 <div class="form-group">
-                                    <label>其他备注</label>
-                                    <input type="text" id="manualVillainNotes" placeholder="例如: 喜欢诈唬" class="setting-input">
+                                    <label>胜率 (%)</label>
+                                    <input type="text" id="manualVillainWinRate" placeholder="如: 20" class="setting-input">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>摊牌率 (%)</label>
+                                    <input type="text" id="manualVillainShowdown" placeholder="如: 13" class="setting-input">
+                                </div>
+                                <div class="form-group">
+                                    <label>备注</label>
+                                    <input type="text" id="manualVillainNotes" placeholder="如: 爱诈唬" class="setting-input">
                                 </div>
                             </div>
                         </div>
@@ -915,30 +751,27 @@
                 </div>
             </div>
 
-            <!-- 设置区域 -->
+            <!-- 设置 -->
             <div class="settings-section">
-                <div class="settings-title">
-                    <span>⚙️</span>
-                    <span>分析设置</span>
-                </div>
+                <div class="settings-title">⚙️ 分析设置</div>
                 <div class="settings-grid">
                     <div class="setting-item">
-                        <label class="setting-label">你的游戏昵称</label>
-                        <input type="text" class="setting-input" id="username" value="luckywm" placeholder="默认: luckywm">
+                        <label class="setting-label">你的昵称</label>
+                        <input type="text" class="setting-input" id="username" value="luckywm">
                     </div>
                     <div class="setting-item">
-                        <label class="setting-label">有效筹码深度 (BB)</label>
-                        <input type="text" class="setting-input" id="stackDepth" placeholder="默认: 200-300BB，留空则自动识别">
+                        <label class="setting-label">筹码深度 (BB)</label>
+                        <input type="text" class="setting-input" id="stackDepth" placeholder="默认: 200-300">
                     </div>
                     <div class="setting-item">
                         <label class="checkbox-item">
-                            <input type="checkbox" id="isShortStack">
-                            <span>对手是短码 (Short Stack)</span>
+                            <input type="checkbox" id="isShortStack" onchange="toggleShortStack()">
+                            <span>对手是短码</span>
                         </label>
                     </div>
                     <div class="setting-item" id="shortStackInput" style="display: none;">
-                        <label class="setting-label">对手有效筹码 (BB)</label>
-                        <input type="text" class="setting-input" id="opponentStack" placeholder="输入对手的有效筹码量">
+                        <label class="setting-label">对手筹码 (BB)</label>
+                        <input type="text" class="setting-input" id="opponentStack" placeholder="如: 50">
                     </div>
                 </div>
             </div>
@@ -946,7 +779,7 @@
             <!-- 分析按钮 -->
             <button class="analyze-btn" id="analyzeBtn" onclick="analyzeHand()">
                 <span class="spinner"></span>
-                <span class="btn-text">🚀 开始 AI 复盘分析</span>
+                <span class="btn-text">🚀 开始AI复盘分析</span>
             </button>
 
             <!-- 结果区域 -->
@@ -955,82 +788,135 @@
                     <h2 class="result-title">
                         <span>📊</span>
                         <span>分析结果</span>
+                        <span class="result-ai-badge" id="resultAiBadge"></span>
                     </h2>
-                    <button class="copy-btn" onclick="copyResult()">📋 复制结果</button>
+                    <button class="copy-btn" onclick="copyResult()">📋 复制</button>
                 </div>
+                
+                <!-- DeepSeek思考过程 -->
+                <div class="thinking-section" id="thinkingSection" style="display: none;">
+                    <div class="thinking-header" onclick="toggleThinking()">
+                        <span>🧠 DeepSeek 思考过程</span>
+                        <span id="thinkingToggle">▼ 展开</span>
+                    </div>
+                    <div class="thinking-content" id="thinkingContent"></div>
+                </div>
+                
                 <div class="result-content">
                     <div class="result-text" id="resultText"></div>
                 </div>
             </section>
 
-            <!-- 日志区域 -->
+            <!-- 日志 -->
             <div class="log-section">
-                <div class="log-title">
-                    <span>📝</span>
-                    <span>运行日志</span>
-                </div>
+                <div class="log-title">📝 运行日志</div>
                 <div class="log-content" id="logContent">
                     <div class="log-item">
                         <span class="log-time">[系统]</span>
-                        <span class="log-info">工具已就绪，等待上传截图...</span>
+                        <span class="log-info">工具已就绪</span>
                     </div>
                 </div>
             </div>
         </main>
 
-        <!-- 页脚 -->
         <footer class="footer">
-            <p>Powered by Google Gemini AI · <a href="index.html">返回主页</a></p>
+            <p>双AI引擎：Gemini + DeepSeek · <a href="index.html">返回主页</a></p>
         </footer>
     </div>
 
     <script>
         // ==================== 配置 ====================
         const CONFIG = {
-            // 本地服务器API（通过代理调用Gemini）
-            API_URL: 'http://localhost:8899/api/analyze',
+            GEMINI_API_KEY: 'AIzaSyCGLHoZLcXU7oQiKXT9929PZwal1UenRjY',
+            GEMINI_API_URL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
+            DEEPSEEK_API_KEY: 'sk-e4f2758c58d14807bc9004539ffbb0e8',
+            DEEPSEEK_API_URL: 'https://api.deepseek.com/chat/completions',
             DEFAULT_USERNAME: 'luckywm',
             DEFAULT_STACK_DEPTH: '200-300'
         };
 
-        // 存储上传的图片
-        let uploadedImages = {
-            hand: null,
-            opponent: null
-        };
+        // 状态
+        let selectedAI = 'gemini';
+        let uploadedImages = { hand: null, opponent: null };
+        let inputModes = { hand: 'image', opponent: 'image' };
 
-        // 输入模式
-        let inputModes = {
-            hand: 'image',      // 'image' 或 'manual'
-            opponent: 'image'   // 'image' 或 'manual'
-        };
+        // ==================== AI 选择 ====================
+        function selectAI(ai) {
+            selectedAI = ai;
+            document.querySelectorAll('.ai-option').forEach(opt => opt.classList.remove('active'));
+            document.querySelector(`.ai-option.${ai}`).classList.add('active');
+            addLog(`🤖 切换到 ${ai === 'gemini' ? 'Google Gemini' : 'DeepSeek R1 深度思考'}`, 'info');
+        }
 
         // ==================== 模式切换 ====================
         function switchMode(type, mode) {
             inputModes[type] = mode;
-            
-            // 更新按钮状态
-            const buttons = document.querySelectorAll(`.mode-btn[data-mode^="${type}-"]`);
-            buttons.forEach(btn => {
+            document.querySelectorAll(`.mode-btn[data-mode^="${type}-"]`).forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.mode === `${type}-${mode}`);
             });
-            
-            // 更新面板显示
-            const imagePanel = document.getElementById(`${type}ImagePanel`);
-            const manualPanel = document.getElementById(`${type}ManualPanel`);
-            
-            if (mode === 'image') {
-                imagePanel.classList.remove('hidden');
-                manualPanel.classList.add('hidden');
-            } else {
-                imagePanel.classList.add('hidden');
-                manualPanel.classList.remove('hidden');
-            }
-            
-            addLog(`📝 ${type === 'hand' ? '手牌' : '对手数据'}输入模式切换为: ${mode === 'image' ? '截图上传' : '手动输入'}`, 'info');
+            document.getElementById(`${type}ImagePanel`).classList.toggle('hidden', mode !== 'image');
+            document.getElementById(`${type}ManualPanel`).classList.toggle('hidden', mode !== 'manual');
         }
 
-        // ==================== 收集手动输入数据 ====================
+        function toggleShortStack() {
+            document.getElementById('shortStackInput').style.display = 
+                document.getElementById('isShortStack').checked ? 'block' : 'none';
+        }
+
+        // ==================== 图片处理 ====================
+        function triggerUpload(type, event) {
+            if (event.target.classList.contains('clear-btn')) return;
+            document.getElementById(`${type}Input`).click();
+        }
+
+        function handleImageUpload(input, type) {
+            const file = input.files[0];
+            if (!file) return;
+            if (file.size > 10 * 1024 * 1024) {
+                showError('图片太大，最大10MB');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                compressImage(e.target.result, function(data) {
+                    uploadedImages[type] = data;
+                    document.getElementById(`${type}Preview`).src = data;
+                    document.getElementById(`${type}Card`).classList.add('has-image');
+                    addLog(`✅ ${type === 'hand' ? '手牌' : '对手'}截图已上传`, 'success');
+                });
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function compressImage(dataUrl, callback) {
+            const img = new Image();
+            img.onload = function() {
+                const maxDim = 1536;
+                let w = img.width, h = img.height;
+                if (w > maxDim || h > maxDim) {
+                    const ratio = Math.min(maxDim / w, maxDim / h);
+                    w = Math.round(w * ratio);
+                    h = Math.round(h * ratio);
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    callback(canvas.toDataURL('image/jpeg', 0.85));
+                } else {
+                    callback(dataUrl);
+                }
+            };
+            img.src = dataUrl;
+        }
+
+        function clearImage(type) {
+            uploadedImages[type] = null;
+            document.getElementById(`${type}Preview`).src = '';
+            document.getElementById(`${type}Card`).classList.remove('has-image');
+            document.getElementById(`${type}Input`).value = '';
+        }
+
+        // ==================== 数据收集 ====================
         function collectManualHandData() {
             return {
                 blinds: document.getElementById('manualBlinds').value.trim(),
@@ -1055,296 +941,219 @@
             };
         }
 
-        function formatManualHandData(data) {
-            if (!data.myHand) return '';
-            
-            let text = '【手动输入的手牌信息】\n';
-            if (data.blinds) text += `盲注结构: ${data.blinds}\n`;
-            if (data.pot) text += `底池大小: ${data.pot}\n`;
-            text += `我的手牌: ${data.myHand}\n`;
-            if (data.position) text += `我的位置: ${data.position}\n`;
-            if (data.board) text += `公共牌: ${data.board}\n`;
-            if (data.villainHand) text += `对手手牌: ${data.villainHand}\n`;
-            if (data.action) text += `行动记录:\n${data.action}\n`;
-            if (data.result) text += `最终结果: ${data.result}\n`;
-            
+        function formatManualData(handData, opponentData) {
+            let text = '';
+            if (handData) {
+                text += '【手牌信息】\n';
+                if (handData.blinds) text += `盲注: ${handData.blinds}\n`;
+                if (handData.pot) text += `底池: ${handData.pot}\n`;
+                if (handData.myHand) text += `我的手牌: ${handData.myHand}\n`;
+                if (handData.position) text += `我的位置: ${handData.position}\n`;
+                if (handData.board) text += `公共牌: ${handData.board}\n`;
+                if (handData.villainHand) text += `对手手牌: ${handData.villainHand}\n`;
+                if (handData.action) text += `行动:\n${handData.action}\n`;
+                if (handData.result) text += `结果: ${handData.result}\n`;
+            }
+            if (opponentData) {
+                text += '\n【对手数据】\n';
+                if (opponentData.name) text += `昵称: ${opponentData.name}\n`;
+                if (opponentData.hands) text += `手数: ${opponentData.hands}\n`;
+                if (opponentData.vpip) text += `入局率: ${opponentData.vpip}%\n`;
+                if (opponentData.winRate) text += `胜率: ${opponentData.winRate}%\n`;
+                if (opponentData.showdown) text += `摊牌率: ${opponentData.showdown}%\n`;
+                if (opponentData.notes) text += `备注: ${opponentData.notes}\n`;
+            }
             return text;
         }
 
-        function formatManualOpponentData(data) {
-            if (!data.vpip && !data.winRate) return '';
+        // ==================== 构建提示词 ====================
+        function buildPrompt(manualText) {
+            const username = document.getElementById('username').value || CONFIG.DEFAULT_USERNAME;
+            const stackDepth = document.getElementById('stackDepth').value || CONFIG.DEFAULT_STACK_DEPTH;
             
-            let text = '【手动输入的对手数据】\n';
-            if (data.name) text += `对手昵称: ${data.name}\n`;
-            if (data.hands) text += `本级别手数: ${data.hands}\n`;
-            if (data.vpip) text += `入局率(VPIP): ${data.vpip}%\n`;
-            if (data.winRate) text += `胜率: ${data.winRate}%\n`;
-            if (data.showdown) text += `摊牌率: ${data.showdown}%\n`;
-            if (data.notes) text += `备注: ${data.notes}\n`;
-            
-            return text;
+            let inputDesc = '';
+            if (inputModes.hand === 'image' && inputModes.opponent === 'image') {
+                inputDesc = '请从两张截图中识别信息：第一张是牌局回顾，第二张是对手数据面板。';
+            } else if (inputModes.hand === 'manual' && inputModes.opponent === 'manual') {
+                inputDesc = `用户已手动输入所有信息，请直接使用：\n\n${manualText}`;
+            } else if (inputModes.hand === 'image') {
+                inputDesc = `请从截图识别手牌信息，对手数据由用户提供：\n\n${manualText}`;
+            } else {
+                inputDesc = `手牌信息由用户提供，请从截图识别对手数据：\n\n${manualText}`;
+            }
+
+            return `你是世界顶级德州扑克职业选手和教练，20年高级别现金局经验。帮助玩家${username}复盘手牌。
+
+## 基本信息
+- 玩家昵称: ${username}
+- 筹码深度: ${stackDepth} BB
+- 游戏类型: 有Straddle的现金局
+
+## 输入数据
+${inputDesc}
+
+## 分析要求
+
+### 1️⃣ 信息确认
+列出识别/输入的关键信息：盲注、底池、手牌、位置、公共牌、对手数据
+
+### 2️⃣ 对手类型
+根据VPIP/摊牌率判断：松凶LAG/松被动LP/紧凶TAG/紧被动TP/鱼
+
+### 3️⃣ 逐街分析
+- **翻前**: 起手牌强度、位置、行动是否正确
+- **翻牌**: 牌面结构、范围优势、行动选择
+- **转牌**: 牌力变化、SPR、是否继续
+- **河牌**: 听牌完成情况、价值/诈唬选择
+
+### 4️⃣ 关键决策EV评估
+指出1-2个关键决策点，评估EV
+
+### 5️⃣ 总结
+- 评价: 优秀/良好/一般/需改进
+- 主要问题
+- 改进建议
+- 评分: X/10
+
+请开始分析：`;
         }
 
+        // ==================== 验证输入 ====================
         function validateInput() {
-            // 验证手牌输入
-            if (inputModes.hand === 'image') {
-                if (!uploadedImages.hand) {
-                    showError('请上传手牌截图，或切换到手动输入模式');
-                    return false;
-                }
-            } else {
-                const handData = collectManualHandData();
-                if (!handData.myHand) {
-                    showError('请输入你的手牌');
+            if (inputModes.hand === 'image' && !uploadedImages.hand) {
+                showError('请上传手牌截图或切换到手动输入');
+                return false;
+            }
+            if (inputModes.hand === 'manual' && !document.getElementById('manualMyHand').value.trim()) {
+                showError('请输入你的手牌');
+                return false;
+            }
+            if (inputModes.opponent === 'image' && !uploadedImages.opponent) {
+                showError('请上传对手数据截图或切换到手动输入');
+                return false;
+            }
+            if (inputModes.opponent === 'manual') {
+                const vpip = document.getElementById('manualVillainVPIP').value.trim();
+                if (!vpip) {
+                    showError('请至少输入对手入局率');
                     return false;
                 }
             }
-            
-            // 验证对手数据输入
-            if (inputModes.opponent === 'image') {
-                if (!uploadedImages.opponent) {
-                    showError('请上传对手数据截图，或切换到手动输入模式');
-                    return false;
-                }
-            } else {
-                const opponentData = collectManualOpponentData();
-                if (!opponentData.vpip && !opponentData.winRate) {
-                    showError('请至少输入对手的入局率或胜率');
-                    return false;
-                }
-            }
-            
             return true;
         }
 
-        // ==================== 图片上传处理 ====================
-        const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-        const MAX_IMAGE_DIMENSION = 2048; // 最大尺寸
-
-        function handleImageUpload(input, type) {
-            const file = input.files[0];
-            if (!file) return;
-
-            // 检查文件大小
-            if (file.size > MAX_FILE_SIZE) {
-                showError(`图片太大！最大允许 ${MAX_FILE_SIZE / 1024 / 1024}MB`);
-                addLog(`❌ 图片超过大小限制`, 'error');
-                input.value = '';
-                return;
+        // ==================== 调用 Gemini API ====================
+        async function callGemini(prompt) {
+            const parts = [{ text: prompt }];
+            
+            if (inputModes.hand === 'image' && uploadedImages.hand) {
+                const [header, data] = uploadedImages.hand.split(',');
+                const mimeType = header.match(/:(.*?);/)[1];
+                parts.push({ inline_data: { mime_type: mimeType, data: data } });
+            }
+            
+            if (inputModes.opponent === 'image' && uploadedImages.opponent) {
+                const [header, data] = uploadedImages.opponent.split(',');
+                const mimeType = header.match(/:(.*?);/)[1];
+                parts.push({ inline_data: { mime_type: mimeType, data: data } });
             }
 
-            // 检查文件类型
-            if (!file.type.startsWith('image/')) {
-                showError('请上传图片文件');
-                addLog(`❌ 文件类型不正确`, 'error');
-                input.value = '';
-                return;
+            const response = await fetch(`${CONFIG.GEMINI_API_URL}?key=${CONFIG.GEMINI_API_KEY}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts }],
+                    generationConfig: { temperature: 0.7, maxOutputTokens: 8192 }
+                })
+            });
+
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error?.message || `Gemini错误: ${response.status}`);
             }
 
-            addLog(`📷 正在处理${type === 'hand' ? '手牌' : '对手数据'}图片...`, 'info');
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                // 压缩大图片
-                compressImage(e.target.result, function(compressedData) {
-                    uploadedImages[type] = compressedData;
-
-                    // 显示预览
-                    const previewId = type === 'hand' ? 'handPreview' : 'opponentPreview';
-                    const cardId = type === 'hand' ? 'handCard' : 'opponentCard';
-                    
-                    document.getElementById(previewId).src = compressedData;
-                    document.getElementById(cardId).classList.add('has-image');
-
-                    const typeName = type === 'hand' ? '手牌截图' : '对手数据截图';
-                    addLog(`✅ ${typeName}上传成功`, 'success');
-                });
+            const data = await response.json();
+            return {
+                text: data.candidates?.[0]?.content?.parts?.[0]?.text || '',
+                thinking: null
             };
-            reader.onerror = function() {
-                showError('图片读取失败');
-                addLog(`❌ 图片读取失败`, 'error');
-            };
-            reader.readAsDataURL(file);
         }
 
-        // 压缩图片
-        function compressImage(dataUrl, callback) {
-            const img = new Image();
-            img.onload = function() {
-                let width = img.width;
-                let height = img.height;
-                
-                // 如果图片太大，按比例缩小
-                if (width > MAX_IMAGE_DIMENSION || height > MAX_IMAGE_DIMENSION) {
-                    const ratio = Math.min(MAX_IMAGE_DIMENSION / width, MAX_IMAGE_DIMENSION / height);
-                    width = Math.round(width * ratio);
-                    height = Math.round(height * ratio);
-                    
-                    const canvas = document.createElement('canvas');
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    
-                    // 使用较高质量的JPEG
-                    callback(canvas.toDataURL('image/jpeg', 0.9));
-                    addLog(`📐 图片已压缩: ${img.width}x${img.height} → ${width}x${height}`, 'info');
-                } else {
-                    callback(dataUrl);
-                }
-            };
-            img.onerror = function() {
-                callback(dataUrl); // 失败时使用原图
-            };
-            img.src = dataUrl;
-        }
-
-        // 清除图片
-        function clearImage(type) {
-            uploadedImages[type] = null;
-            
-            const previewId = type === 'hand' ? 'handPreview' : 'opponentPreview';
-            const cardId = type === 'hand' ? 'handCard' : 'opponentCard';
-            const inputId = type === 'hand' ? 'handInput' : 'opponentInput';
-            
-            document.getElementById(previewId).src = '';
-            document.getElementById(cardId).classList.remove('has-image');
-            document.getElementById(inputId).value = '';
-            
-            addLog(`🗑️ ${type === 'hand' ? '手牌截图' : '对手数据截图'}已清除`, 'info');
-        }
-
-        // 触发文件上传（避免已有图片时的误触发）
-        function triggerUpload(type, event) {
-            // 如果点击的是清除按钮或预览图，不触发上传
-            if (event.target.classList.contains('clear-btn') || 
-                event.target.classList.contains('upload-preview')) {
-                return;
+        // ==================== 调用 DeepSeek API ====================
+        async function callDeepSeek(prompt) {
+            // DeepSeek不支持图片，需要把图片信息转为文本描述
+            let fullPrompt = prompt;
+            if (inputModes.hand === 'image') {
+                fullPrompt += '\n\n注意：用户上传了手牌截图，但你无法查看图片。请提示用户切换到手动输入模式，或者用户可以口述截图内容。';
             }
-            const inputId = type === 'hand' ? 'handInput' : 'opponentInput';
-            document.getElementById(inputId).click();
+            if (inputModes.opponent === 'image') {
+                fullPrompt += '\n\n注意：用户上传了对手数据截图，但你无法查看图片。请提示用户切换到手动输入模式。';
+            }
+
+            const response = await fetch(CONFIG.DEEPSEEK_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${CONFIG.DEEPSEEK_API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: 'deepseek-reasoner',
+                    messages: [{ role: 'user', content: fullPrompt }],
+                    max_tokens: 8192
+                })
+            });
+
+            if (!response.ok) {
+                const err = await response.json();
+                throw new Error(err.error?.message || `DeepSeek错误: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const choice = data.choices?.[0];
+            return {
+                text: choice?.message?.content || '',
+                thinking: choice?.message?.reasoning_content || null
+            };
         }
 
-        // 短码选项切换
-        document.getElementById('isShortStack').addEventListener('change', function() {
-            document.getElementById('shortStackInput').style.display = this.checked ? 'block' : 'none';
-        });
-
-        // ==================== 日志系统 ====================
-        function addLog(message, type = 'info') {
-            const logContent = document.getElementById('logContent');
-            const time = new Date().toLocaleTimeString();
-            const logItem = document.createElement('div');
-            logItem.className = 'log-item';
-            logItem.innerHTML = `
-                <span class="log-time">[${time}]</span>
-                <span class="log-${type}">${message}</span>
-            `;
-            logContent.appendChild(logItem);
-            logContent.scrollTop = logContent.scrollHeight;
-        }
-
-        // ==================== 错误提示 ====================
-        function showError(message) {
-            const toast = document.getElementById('errorToast');
-            toast.textContent = message;
-            toast.classList.add('visible');
-            setTimeout(() => toast.classList.remove('visible'), 5000);
-        }
-
-        // ==================== 调用本地服务器 API ====================
+        // ==================== 主分析函数 ====================
         async function analyzeHand() {
-            // 验证输入
-            if (!validateInput()) {
-                addLog('❌ 输入验证失败', 'error');
-                return;
-            }
+            if (!validateInput()) return;
 
             const btn = document.getElementById('analyzeBtn');
             btn.disabled = true;
             btn.classList.add('loading');
 
-            addLog('🚀 开始分析，正在连接本地服务器...', 'info');
+            addLog(`🚀 开始分析 (${selectedAI === 'gemini' ? 'Gemini' : 'DeepSeek R1'})...`, 'info');
 
             try {
-                const username = document.getElementById('username').value || CONFIG.DEFAULT_USERNAME;
-                const stackDepth = document.getElementById('stackDepth').value || CONFIG.DEFAULT_STACK_DEPTH;
-                const isShortStack = document.getElementById('isShortStack').checked;
-                const opponentStack = document.getElementById('opponentStack').value;
-
-                // 收集数据
+                // 收集手动输入数据
                 const handData = inputModes.hand === 'manual' ? collectManualHandData() : null;
                 const opponentData = inputModes.opponent === 'manual' ? collectManualOpponentData() : null;
+                const manualText = formatManualData(handData, opponentData);
+
+                const prompt = buildPrompt(manualText);
                 
-                // 格式化手动输入的文本
-                const manualHandText = handData ? formatManualHandData(handData) : '';
-                const manualOpponentText = opponentData ? formatManualOpponentData(opponentData) : '';
+                addLog('⏳ AI分析中，请稍候...', 'info');
 
-                // 记录输入模式
-                const modeInfo = `手牌:${inputModes.hand === 'image' ? '截图' : '手动'} + 对手:${inputModes.opponent === 'image' ? '截图' : '手动'}`;
-                addLog(`📊 输入模式: ${modeInfo}`, 'info');
-                addLog('📤 发送请求到本地服务器...', 'info');
-                addLog('⏳ AI正在分析中，请稍候（约30-60秒）...', 'info');
-
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 180000); // 3分钟超时
-
-                const response = await fetch(CONFIG.API_URL, {
-                    signal: controller.signal,
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        // 图片数据（如果是图片模式）
-                        handImage: inputModes.hand === 'image' ? uploadedImages.hand : null,
-                        opponentImage: inputModes.opponent === 'image' ? uploadedImages.opponent : null,
-                        // 手动输入数据
-                        manualHandText: manualHandText,
-                        manualOpponentText: manualOpponentText,
-                        // 输入模式
-                        handMode: inputModes.hand,
-                        opponentMode: inputModes.opponent,
-                        // 其他设置
-                        username: username,
-                        stackDepth: stackDepth,
-                        isShortStack: isShortStack,
-                        opponentStack: opponentStack
-                    })
-                });
-
-                clearTimeout(timeoutId);
-                const data = await response.json();
-                
-                if (!data.success) {
-                    throw new Error(data.error || '分析失败');
+                let result;
+                if (selectedAI === 'gemini') {
+                    result = await callGemini(prompt);
+                } else {
+                    result = await callDeepSeek(prompt);
                 }
 
-                addLog('✅ 收到 API 响应，正在解析...', 'success');
-
-                // 显示结果
-                displayResult(data.result);
-                addLog('🎉 分析完成！', 'success');
+                addLog('✅ 分析完成！', 'success');
+                displayResult(result.text, result.thinking);
 
             } catch (error) {
-                console.error('分析错误:', error);
-                
-                let errorMsg = error.message;
-                let logMsg = error.message;
-                
-                if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-                    errorMsg = '无法连接本地服务器';
-                    logMsg = '❌ 无法连接服务器，请先运行: python quick_review_server.py';
-                } else if (error.message.includes('timeout') || error.name === 'AbortError') {
-                    errorMsg = '请求超时，请重试';
-                    logMsg = '❌ 请求超时，可能是网络问题或图片太大';
-                } else if (error.message.includes('代理')) {
-                    errorMsg = '代理连接失败，请检查VPN是否开启';
-                    logMsg = '❌ 代理连接失败';
+                console.error('Error:', error);
+                let msg = error.message;
+                if (msg.includes('Failed to fetch')) {
+                    msg = selectedAI === 'gemini' ? '无法连接Gemini，请检查VPN' : '无法连接DeepSeek';
                 }
-                
-                showError(errorMsg);
-                addLog(logMsg, 'error');
+                showError(msg);
+                addLog(`❌ ${msg}`, 'error');
             } finally {
                 btn.disabled = false;
                 btn.classList.remove('loading');
@@ -1352,68 +1161,81 @@
         }
 
         // ==================== 显示结果 ====================
-        function displayResult(text) {
+        function displayResult(text, thinking) {
             const resultSection = document.getElementById('resultSection');
             const resultText = document.getElementById('resultText');
+            const badge = document.getElementById('resultAiBadge');
+            const thinkingSection = document.getElementById('thinkingSection');
             
-            // 改进的 Markdown 渲染
+            // AI标记
+            badge.textContent = selectedAI === 'gemini' ? 'Gemini' : 'DeepSeek R1';
+            badge.className = `result-ai-badge ${selectedAI}`;
+            
+            // 思考过程（DeepSeek）
+            if (thinking) {
+                thinkingSection.style.display = 'block';
+                document.getElementById('thinkingContent').textContent = thinking;
+            } else {
+                thinkingSection.style.display = 'none';
+            }
+
+            // 渲染Markdown
             let html = text
-                // 代码块（先处理，避免被其他规则影响）
                 .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
-                // 标题（按顺序从大到小）
                 .replace(/^### (.*$)/gim, '<h3>$1</h3>')
                 .replace(/^## (.*$)/gim, '<h2>$1</h2>')
                 .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-                // 粗体（先处理，避免和斜体冲突）
                 .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-                // 斜体（排除已处理的粗体）
                 .replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>')
-                // 行内代码
                 .replace(/`([^`]+)`/g, '<code>$1</code>')
-                // 水平线
                 .replace(/^---$/gim, '<hr>')
-                // 处理列表（包装在ul中）
                 .replace(/^[\-\*] (.*)$/gim, '<li>$1</li>')
-                .replace(/(<li>.*<\/li>)(?:\s*<br>)?/g, '$1')
-                // 数字列表
                 .replace(/^\d+\. (.*)$/gim, '<li>$1</li>');
-            
-            // 将连续的li包装在ul中
-            html = html.replace(/(<li>[\s\S]*?<\/li>)(\s*<br>\s*)?(<li>)/g, '$1$3');
+
             html = html.replace(/(<li>[\s\S]*?<\/li>)+/g, '<ul>$&</ul>');
-            
-            // 换行处理（排除已有HTML标签后的换行）
-            html = html.replace(/\n(?!<)/g, '<br>\n');
-            
-            // 清理多余的br
+            html = html.replace(/\n/g, '<br>');
             html = html.replace(/<br>\s*<br>/g, '<br>');
-            html = html.replace(/<\/h([123])><br>/g, '</h$1>');
-            html = html.replace(/<\/li><br>/g, '</li>');
-            html = html.replace(/<\/ul><br>/g, '</ul>');
-            html = html.replace(/<hr><br>/g, '<hr>');
+            html = html.replace(/<\/(h[123]|li|ul|hr|pre)><br>/g, '</$1>');
 
             resultText.innerHTML = html;
             resultSection.classList.add('visible');
-
-            // 滚动到结果区域
-            resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            resultSection.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // ==================== 复制结果 ====================
+        function toggleThinking() {
+            const content = document.getElementById('thinkingContent');
+            const toggle = document.getElementById('thinkingToggle');
+            content.classList.toggle('visible');
+            toggle.textContent = content.classList.contains('visible') ? '▲ 收起' : '▼ 展开';
+        }
+
+        // ==================== 工具函数 ====================
+        function addLog(message, type = 'info') {
+            const logContent = document.getElementById('logContent');
+            const time = new Date().toLocaleTimeString();
+            const logItem = document.createElement('div');
+            logItem.className = 'log-item';
+            logItem.innerHTML = `<span class="log-time">[${time}]</span><span class="log-${type}">${message}</span>`;
+            logContent.appendChild(logItem);
+            logContent.scrollTop = logContent.scrollHeight;
+        }
+
+        function showError(message) {
+            const toast = document.getElementById('errorToast');
+            toast.textContent = message;
+            toast.classList.add('visible');
+            setTimeout(() => toast.classList.remove('visible'), 5000);
+        }
+
         function copyResult() {
-            const resultText = document.getElementById('resultText').innerText;
-            navigator.clipboard.writeText(resultText).then(() => {
-                addLog('📋 结果已复制到剪贴板', 'success');
-            }).catch(err => {
-                addLog('❌ 复制失败', 'error');
-            });
+            navigator.clipboard.writeText(document.getElementById('resultText').innerText)
+                .then(() => addLog('📋 已复制', 'success'))
+                .catch(() => addLog('❌ 复制失败', 'error'));
         }
 
         // ==================== 初始化 ====================
-        addLog('🎮 德州扑克快速复盘工具 v2.1', 'info');
-        addLog('📌 支持4种输入模式：截图/手动输入自由组合', 'info');
-        addLog('💡 提示：如果AI识别截图有误，可切换到手动输入', 'info');
+        addLog('🎮 德州扑克快速复盘 v3.0', 'info');
+        addLog('📌 双AI引擎：Gemini(需VPN) + DeepSeek(国内可用)', 'info');
     </script>
 </body>
 </html>
-
