@@ -171,6 +171,27 @@ function fileToBase64(file) {
     });
 }
 
+// 带超时的fetch
+async function fetchWithTimeout(url, options, timeout = 60000) {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    
+    try {
+        const response = await fetch(url, {
+            ...options,
+            signal: controller.signal
+        });
+        clearTimeout(id);
+        return response;
+    } catch (error) {
+        clearTimeout(id);
+        if (error.name === 'AbortError') {
+            throw new Error('请求超时（60秒），请检查网络或VPN');
+        }
+        throw error;
+    }
+}
+
 // 调用Claude API
 async function callClaude(question, imageBase64) {
     try {
@@ -197,7 +218,7 @@ async function callClaude(question, imageBase64) {
             text: question || '请描述这张图片的内容'
         });
 
-        const response = await fetch('https://api.anthropic.com/v1/messages', {
+        const response = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -263,7 +284,7 @@ async function callGemini(question, imageBase64) {
 
         if (parts.length === 0) parts.push({ text: '你好' });
 
-        const response = await fetch(
+        const response = await fetchWithTimeout(
             `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${API_KEYS.gemini}`,
             {
                 method: 'POST',
@@ -321,7 +342,7 @@ async function callDeepSeek(question, imageBase64) {
             finalQuestion = '（您上传了图片，但DeepSeek暂不支持图片分析，请用文字描述您的问题）';
         }
 
-        const response = await fetch('https://api.deepseek.com/chat/completions', {
+        const response = await fetchWithTimeout('https://api.deepseek.com/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
