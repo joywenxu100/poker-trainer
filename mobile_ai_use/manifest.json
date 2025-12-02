@@ -1,0 +1,16 @@
+{
+  "name": "多模型AI对比助手",
+  "short_name": "AI对比",
+  "description": "同时询问Claude、Gemini、DeepSeek三个AI模型",
+  "version": "1.0.0",
+  "manifest_version": 3,
+  "icons": {
+    "192": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23667eea'/><text x='50' y='65' font-size='50' text-anchor='middle' fill='white' font-family='Arial'>🤖</text></svg>"
+  },
+  "display": "standalone",
+  "start_url": "./index.html",
+  "background_color": "#667eea",
+  "theme_color": "#667eea",
+  "orientation": "portrait-primary"
+}
+
