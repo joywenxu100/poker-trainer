@@ -979,18 +979,18 @@
                     heroPos: 'BB', villainPos: 'BTN',
                     heroHand: ['Jc', 'Tc'],
                     board: ['9h', '7d', '2s'],
-                    boardTexture: '中低张 + 双头顺draw',
+                    boardTexture: '中低张 + 卡顺draw + Overcards',
                     pot: '26BB', spr: '7.7', stack: '200BB',
-                    question: '你OOP call 3bet有OESD，对手可能C-bet，你应该？',
+                    question: '你OOP call 3bet有顺子draw，对手可能C-bet，你应该？',
                     options: ['Check-fold', 'Check-call', 'Check-raise 3x', 'Donk bet 50%'],
                     correct: 2,
                     explanation: `<strong>正确答案：Check-raise 3x</strong>
-                        <div class="key-point"><strong>核心逻辑：</strong>JTcc在972有OESD+两个overcards，这是一个强大的check-raise bluff牌型！</div>
+                        <div class="key-point"><strong>核心逻辑：</strong>JTcc在972有Gutshot(需要8成7-8-9-T-J)+两个overcards(J/T)，配合后门花，这是一个可以激进的牌型！</div>
                         <p><strong>为什么check-raise？</strong></p>
-                        <p>• 你有~45%equity，即使被call也不怕</p>
+                        <p>• 你有4张顺子补牌+6张高张补牌，约35%equity</p>
                         <p>• 这个牌面对手会高频C-bet，你需要fight back</p>
                         <p>• Check-raise让对手fold AK/AQ等overcards</p>
-                        <p><strong>OOP caller需要构建check-raise范围</strong>，强draw是完美的选择。</p>`
+                        <p><strong>OOP caller需要构建check-raise范围</strong>，带补牌的牌型是好的选择。</p>`
                 },
                 {
                     heroPos: 'CO', villainPos: 'BTN',
@@ -1030,19 +1030,19 @@
                     heroPos: 'CO', villainPos: 'BTN',
                     heroHand: ['Qd', 'Jd'],
                     board: ['Td', '8d', '3c'],
-                    boardTexture: '两头顺 + 花draw',
+                    boardTexture: '卡顺 + 坚果花draw',
                     pot: '28BB', spr: '6.9', stack: '200BB',
-                    question: '你OOP call 3bet有超强combo draw，对手C-bet 75%，你应该？',
+                    question: '你OOP call 3bet有强combo draw，对手C-bet 75%，你应该？',
                     options: ['Fold', 'Call', 'Check-raise 3x', 'Check-raise全下'],
                     correct: 3,
                     explanation: `<strong>正确答案：Check-raise 全下</strong>
-                        <div class="key-point"><strong>核心逻辑：</strong>QJdd在T8d3c有OESD(8张)+花draw(9张)+两overcards = 超过50%equity！这是必须全下的怪物draw！</div>
+                        <div class="key-point"><strong>核心逻辑：</strong>QJdd在T8d3c有Gutshot(4张9成8-9-T-J-Q)+坚果花draw(9张)+两overcards = 约46%equity，足够全下！</div>
                         <p><strong>数学计算：</strong></p>
-                        <p>• 花draw: 9张 (~36%到river)</p>
-                        <p>• 顺子draw: ~6张额外 (~24%)</p>
-                        <p>• 对子: ~6张 (~24%)</p>
-                        <p>• 总equity: 约55%，你是favorite！</p>
-                        <p><strong>当你有超强combo draw</strong>，全下是唯一正确的打法，别让对手有任何免费牌。</p>`
+                        <p>• 花draw: 9张方块 (~36%到river)</p>
+                        <p>• 顺子draw: 4张9（减去9d已算在花里）= 3张额外</p>
+                        <p>• 高张补牌: Q/J各3张 = 6张</p>
+                        <p>• 总补牌约15张 ≈ 46%equity</p>
+                        <p><strong>当你有坚果花draw + 额外补牌</strong>，全下是唯一正确的打法，别让对手有任何免费牌。</p>`
                 }
             ]
         };
