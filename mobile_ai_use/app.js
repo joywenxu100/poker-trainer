@@ -381,7 +381,7 @@ async function callGemini(question, imageBase64) {
         const apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
         const apiKey = API_KEYS.openrouter;
         
-        console.log('📤 正在通过OpenRouter调用Gemini 2.5...');
+        console.log('📤 正在通过OpenRouter调用Gemini 3 Pro...');
         
         if (!apiKey || !apiKey.startsWith('sk-or-')) {
             throw new Error('OpenRouter密钥未配置');
@@ -413,7 +413,7 @@ async function callGemini(question, imageBase64) {
                 'X-Title': 'Multi-Model AI Assistant'
             },
             body: JSON.stringify({
-                model: 'google/gemini-2.5-flash',  // Gemini 2.5 Flash（正确的模型名）
+                model: 'google/gemini-3-pro-preview',  // Gemini 3 Pro - 最新旗舰模型
                 max_tokens: 16384,  // 🔧 增加到16384，确保完整回答
                 messages: [{ 
                     role: 'user', 
@@ -440,7 +440,7 @@ async function callGemini(question, imageBase64) {
         if (!data.choices?.[0]?.message?.content) throw new Error('返回数据格式异常');
         
         return {
-            model: 'Gemini 2.5',
+            model: 'Gemini 3 Pro',
             icon: 'gemini',
             success: true,
             content: data.choices[0].message.content
