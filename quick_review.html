@@ -792,20 +792,20 @@
             </div>
 
             <!-- API Key 设置 -->
-            <div class="settings-section" style="border: 2px solid var(--accent-orange);">
-                <div class="settings-title" style="color: var(--accent-orange);">🔑 API 密钥设置（首次使用必填）</div>
+            <div class="settings-section" style="border: 2px solid var(--accent-green);">
+                <div class="settings-title" style="color: var(--accent-green);">🔑 API 密钥设置（已内置，开箱即用）</div>
                 <div class="settings-grid">
                     <div class="setting-item">
-                        <label class="setting-label">Gemini API Key <span style="color: var(--accent-red);">*</span></label>
-                        <input type="password" class="setting-input" id="geminiApiKey" placeholder="AIzaSy..." style="font-family: monospace;">
+                        <label class="setting-label">Gemini API Key <span style="color: var(--text-muted);">(可选自定义)</span></label>
+                        <input type="password" class="setting-input" id="geminiApiKey" placeholder="留空使用内置密钥，或输入你的密钥" style="font-family: monospace;">
                     </div>
                     <div class="setting-item">
-                        <label class="setting-label">DeepSeek API Key (可选)</label>
-                        <input type="password" class="setting-input" id="deepseekApiKey" placeholder="sk-..." style="font-family: monospace;">
+                        <label class="setting-label">DeepSeek API Key <span style="color: var(--text-muted);">(可选自定义)</span></label>
+                        <input type="password" class="setting-input" id="deepseekApiKey" placeholder="留空使用内置密钥，或输入你的密钥" style="font-family: monospace;">
                     </div>
                 </div>
                 <div style="margin-top: 12px; font-size: 11px; color: var(--text-muted);">
-                    💡 API密钥仅保存在本地浏览器，不会上传到服务器。
+                    ✅ 已内置混淆密钥，直接使用即可。如需自定义，输入后仅保存在本地浏览器。
                     <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: var(--accent-blue); text-decoration: none; margin-left: 10px;">获取Gemini密钥 →</a>
                 </div>
             </div>
@@ -863,12 +863,31 @@
     </div>
 
     <script>
+        // ==================== 密钥解密工具 ====================
+        // 注意：这是混淆而非真正的加密，仅防止源码中明文显示
+        // 任何前端加密都可以被逆向，请勿用于真正的安全场景
+        function _d(s) {
+            // 简单的Base64解码 + 字符偏移
+            try {
+                const decoded = atob(s);
+                return decoded.split('').map((c, i) => 
+                    String.fromCharCode(c.charCodeAt(0) - (i % 7 + 1))
+                ).join('');
+            } catch (e) {
+                return '';
+            }
+        }
+        
+        // 混淆后的密钥（开发者工具中仍可见，但源码中不明文）
+        const _k1 = 'Qkt9ZVh/SU1cdDx6Wm03SE5weEk4YE08WlN3dXNreFxscF9IL2VV'; // Gemini
+        const _k2 = 'dG0waTlsOTg3O2c6PmsyNjs0PGhqOjIzODo5QGdoZWY1az8='; // DeepSeek
+        
         // ==================== 配置 ====================
         const CONFIG = {
-            // API密钥从localStorage读取（首次使用需要用户输入）
-            GEMINI_API_KEY: localStorage.getItem('GEMINI_API_KEY') || '',
+            // 优先使用用户自定义密钥，否则使用内置混淆密钥
+            GEMINI_API_KEY: localStorage.getItem('GEMINI_API_KEY') || _d(_k1),
             GEMINI_API_URL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
-            DEEPSEEK_API_KEY: localStorage.getItem('DEEPSEEK_API_KEY') || '',
+            DEEPSEEK_API_KEY: localStorage.getItem('DEEPSEEK_API_KEY') || _d(_k2),
             DEEPSEEK_API_URL: 'https://api.deepseek.com/chat/completions',
             REQUEST_TIMEOUT: 120000, // 2分钟超时
             MAX_LOG_ITEMS: 50 // 最大日志条数
@@ -1126,11 +1145,6 @@
         }
 
         async function performOCR() {
-            // 检查API key
-            if (!CONFIG.GEMINI_API_KEY) {
-                throw new Error('请先设置 Gemini API Key（在下方设置区域）');
-            }
-            
             // 【修复】使用用户设置的昵称
             const username = document.getElementById('username')?.value || 'Luckywm';
             
@@ -1406,11 +1420,6 @@
         }
 
         async function callGemini(prompt) {
-            // 检查API key
-            if (!CONFIG.GEMINI_API_KEY) {
-                throw new Error('请先设置 Gemini API Key（在下方设置区域）');
-            }
-            
             // 【修复】使用带超时的fetch
             const response = await fetchWithTimeout(`${CONFIG.GEMINI_API_URL}?key=${CONFIG.GEMINI_API_KEY}`, {
                 method: 'POST',
@@ -1495,11 +1504,6 @@
         }
 
         async function callDeepSeek(prompt) {
-            // 检查API key
-            if (!CONFIG.DEEPSEEK_API_KEY) {
-                throw new Error('请先设置 DeepSeek API Key（在下方设置区域）');
-            }
-            
             // 【修复】使用带超时的fetch
             const response = await fetchWithTimeout(CONFIG.DEEPSEEK_API_URL, {
                 method: 'POST',
@@ -1715,15 +1719,16 @@
 
         // ==================== API Key 管理 ====================
         function initApiKeys() {
-            // 加载保存的API keys
+            // 加载用户自定义的API keys（如有）
             const geminiKey = localStorage.getItem('GEMINI_API_KEY') || '';
             const deepseekKey = localStorage.getItem('DEEPSEEK_API_KEY') || '';
             
             const geminiInput = document.getElementById('geminiApiKey');
             const deepseekInput = document.getElementById('deepseekApiKey');
             
-            if (geminiInput) geminiInput.value = geminiKey;
-            if (deepseekInput) deepseekInput.value = deepseekKey;
+            // 显示用户自定义的密钥（如有）
+            if (geminiInput && geminiKey) geminiInput.value = geminiKey;
+            if (deepseekInput && deepseekKey) deepseekInput.value = deepseekKey;
             
             // 监听输入变化，自动保存
             if (geminiInput) {
@@ -1732,7 +1737,11 @@
                     if (key) {
                         localStorage.setItem('GEMINI_API_KEY', key);
                         CONFIG.GEMINI_API_KEY = key;
-                        addLog('✅ Gemini API Key 已保存', 'success');
+                        addLog('✅ 自定义 Gemini API Key 已保存', 'success');
+                    } else {
+                        localStorage.removeItem('GEMINI_API_KEY');
+                        CONFIG.GEMINI_API_KEY = _d(_k1);
+                        addLog('✅ 已恢复使用内置 Gemini 密钥', 'info');
                     }
                 });
             }
@@ -1743,22 +1752,34 @@
                     if (key) {
                         localStorage.setItem('DEEPSEEK_API_KEY', key);
                         CONFIG.DEEPSEEK_API_KEY = key;
-                        addLog('✅ DeepSeek API Key 已保存', 'success');
+                        addLog('✅ 自定义 DeepSeek API Key 已保存', 'success');
+                    } else {
+                        localStorage.removeItem('DEEPSEEK_API_KEY');
+                        CONFIG.DEEPSEEK_API_KEY = _d(_k2);
+                        addLog('✅ 已恢复使用内置 DeepSeek 密钥', 'info');
                     }
                 });
             }
             
-            // 检查是否已设置API key
-            if (!geminiKey) {
-                addLog('⚠️ 请先设置 Gemini API Key', 'warning');
+            // 显示当前使用的密钥来源
+            if (geminiKey) {
+                addLog('🔑 使用自定义 Gemini 密钥', 'info');
+            } else {
+                addLog('🔑 使用内置 Gemini 密钥', 'success');
+            }
+            
+            if (deepseekKey) {
+                addLog('🔑 使用自定义 DeepSeek 密钥', 'info');
+            } else {
+                addLog('🔑 使用内置 DeepSeek 密钥', 'success');
             }
         }
 
         // ==================== 初始化 ====================
-        addLog('🎮 德州扑克快速复盘 v4.3 (API密钥安全版)', 'info');
+        addLog('🎮 德州扑克快速复盘 v4.4 (内置密钥·开箱即用)', 'info');
         addLog('📌 流程：上传截图 → OCR识别 → 确认/修正 → AI分析', 'info');
         initApiKeys();
-        addLog('✅ 系统已就绪', 'success');
+        addLog('✅ 系统已就绪，可直接使用', 'success');
     </script>
 </body>
 </html>
