@@ -210,9 +210,23 @@ async function handleSubmit() {
                 deepseekResult.model = 'DeepSeek R1 (深度分析)';
                 results.push({ status: 'fulfilled', value: deepseekResult });
             } else {
-                // Gemini失败了，直接用原问题调用DeepSeek
-                const deepseekResult = await callDeepSeekR1(question, imageBase64);
-                results.push({ status: 'fulfilled', value: deepseekResult });
+                // Gemini失败了，尝试用Claude的结果
+                let claudeResult = imageResults.find(r => 
+                    r.status === 'fulfilled' && r.value?.model === 'Claude' && r.value?.success
+                );
+                
+                if (claudeResult) {
+                    const claudeContent = claudeResult.value.content;
+                    const deepseekQuestion = `用户问题：${question || '请分析这张图片'}\n\n图片内容（由Claude识别）：\n${claudeContent}\n\n请基于以上信息，进行深度分析和推理。`;
+                    const deepseekResult = await callDeepSeekR1(deepseekQuestion, null);
+                    deepseekResult.model = 'DeepSeek R1 (深度分析)';
+                    results.push({ status: 'fulfilled', value: deepseekResult });
+                } else {
+                    // Claude也失败了，只能用文字问题
+                    const deepseekResult = await callDeepSeekR1(question || '请帮我分析问题', null);
+                    deepseekResult.model = 'DeepSeek R1';
+                    results.push({ status: 'fulfilled', value: deepseekResult });
+                }
             }
         }
     } else {
@@ -446,11 +460,6 @@ async function callDeepSeekR1(question, imageBase64) {
         // 如果有推理过程，也显示出来
         if (data.choices[0].message.reasoning_content) {
             content = '🧠 **推理过程：**\n' + data.choices[0].message.reasoning_content + '\n\n📝 **结论：**\n' + content;
-        }
-        
-        // 如果有图片，提示R1不支持图片
-        if (imageBase64) {
-            content = '⚠️ R1推理模型不支持图片，以下仅针对文字问题回答：\n\n' + content;
         }
         
         return {
