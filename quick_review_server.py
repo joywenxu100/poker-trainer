@@ -25,7 +25,8 @@ if sys.platform == 'win32':
 
 # ==================== 配置 ====================
 PORT = 8899
-API_KEY = 'AIzaSyCGLHoZLcXU7oQiKXT9929PZwal1UenRjY'
+# 从环境变量读取API密钥（更安全）
+API_KEY = os.environ.get('GEMINI_API_KEY', 'AIzaSyBLZq8uTf6FKlsC1_K9VNqnriuXgjXG-bQ')
 API_URL = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={API_KEY}'
 
 # 代理配置 - 自动检测
@@ -536,8 +537,19 @@ def open_browser():
 def main():
     """主函数"""
     print("\n" + "=" * 60)
-    print("🃏 德州扑克快速复盘工具 - 本地服务器 v2.0")
+    print("🃏 德州扑克快速复盘工具 - 本地服务器 v2.1")
     print("=" * 60)
+    
+    # 检查API密钥
+    if not os.environ.get('GEMINI_API_KEY'):
+        print("\n⚠️ 警告：未设置 GEMINI_API_KEY 环境变量")
+        print("   当前使用内置密钥，可能有使用限制")
+        print("\n💡 建议设置你自己的API密钥：")
+        print("   Windows: $env:GEMINI_API_KEY = \"你的密钥\"")
+        print("   Linux/Mac: export GEMINI_API_KEY=\"你的密钥\"")
+        print("\n   获取密钥: https://aistudio.google.com/app/apikey")
+        print("\n按 Enter 继续使用内置密钥...")
+        input()
     
     # 检查端口
     if is_port_in_use(PORT):
