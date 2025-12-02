@@ -766,16 +766,16 @@
                 {
                     heroPos: 'BTN', villainPos: 'BB',
                     heroHand: ['Kd', 'Jd'],
-                    board: ['Qh', '9c', '4s'],
+                    board: ['Qd', '9c', '4s'],
                     boardTexture: '中张偏湿牌面 - 对手范围更有利',
                     pot: '26BB', spr: '7.7', stack: '200BB',
                     question: '翻牌对手check，你应该？',
                     options: ['C-bet 33% pot', 'C-bet 75% pot', 'Check back', 'C-bet全下'],
                     correct: 2,
                     explanation: `<strong>正确答案：Check back</strong>
-                        <div class="key-point"><strong>核心逻辑：</strong>Q94彩虹牌面对BB的防守范围更有利！BB会有很多Qx/99/44/Q9等，而你的3bet范围中Qx并不多。</div>
+                        <div class="key-point"><strong>核心逻辑：</strong>Q94牌面对BB的防守范围更有利！BB会有很多Qx/99/44/Q9等，而你的3bet范围中Qx并不多。</div>
                         <p><strong>为什么check？</strong></p>
-                        <p>• KJ只有两个高张+后门花，没有击中牌面</p>
+                        <p>• KJdd只有两个高张+后门方块花，没有击中牌面</p>
                         <p>• 这个牌面对手会有很高的check-raise频率</p>
                         <p>• Check保护了showdown value，也让你在转牌可以bluff catch</p>
                         <p><strong>3-bettor不是每个牌面都要C-bet！</strong>识别对手范围更有利的牌面是关键技能。</p>`
@@ -852,17 +852,17 @@
                 {
                     heroPos: 'SB', villainPos: 'BTN',
                     heroHand: ['Ac', 'Kc'],
-                    board: ['Qd', '9h', '5s'],
+                    board: ['Qc', '9h', '5s'],
                     boardTexture: '未击中的中高张面',
                     pot: '28BB', spr: '6.9', stack: '200BB',
                     question: '你OOP 3bet AKs未击中，翻牌你应该？',
                     options: ['Check', 'C-bet 33% pot', 'C-bet 75% pot', 'C-bet全下'],
                     correct: 1,
                     explanation: `<strong>正确答案：C-bet 33% pot</strong>
-                        <div class="key-point"><strong>核心逻辑：</strong>AKs有两个高张overcards+后门花，是很好的小注bluff牌型。</div>
+                        <div class="key-point"><strong>核心逻辑：</strong>AKcc有两个高张overcards+后门梅花花draw，是很好的小注bluff牌型。</div>
                         <p><strong>策略要点：</strong></p>
                         <p>• 小注给自己留下转牌继续施压的空间</p>
-                        <p>• 可能击中A/K获得顶对</p>
+                        <p>• 可能击中A/K获得顶对，或转牌来梅花增加补牌</p>
                         <p>• 33% pot被raise时可以轻松放弃</p>
                         <p><strong>不要check：</strong>AK有太多equity放弃，也有blockers（阻挡了对手的AQ/KQ）</p>`
                 },
@@ -978,16 +978,16 @@
                 {
                     heroPos: 'BB', villainPos: 'BTN',
                     heroHand: ['Jc', 'Tc'],
-                    board: ['9h', '7d', '2s'],
-                    boardTexture: '中低张 + 卡顺draw + Overcards',
+                    board: ['9c', '7d', '2s'],
+                    boardTexture: '中低张 + 卡顺draw + 后门花',
                     pot: '26BB', spr: '7.7', stack: '200BB',
                     question: '你OOP call 3bet有顺子draw，对手可能C-bet，你应该？',
                     options: ['Check-fold', 'Check-call', 'Check-raise 3x', 'Donk bet 50%'],
                     correct: 2,
                     explanation: `<strong>正确答案：Check-raise 3x</strong>
-                        <div class="key-point"><strong>核心逻辑：</strong>JTcc在972有Gutshot(需要8成7-8-9-T-J)+两个overcards(J/T)，配合后门花，这是一个可以激进的牌型！</div>
+                        <div class="key-point"><strong>核心逻辑：</strong>JTcc在9c72有Gutshot(需要8成7-8-9-T-J)+两个overcards(J/T)+后门梅花花draw，这是一个可以激进的牌型！</div>
                         <p><strong>为什么check-raise？</strong></p>
-                        <p>• 你有4张顺子补牌+6张高张补牌，约35%equity</p>
+                        <p>• 你有4张顺子补牌+6张高张补牌+后门花，约35%equity</p>
                         <p>• 这个牌面对手会高频C-bet，你需要fight back</p>
                         <p>• Check-raise让对手fold AK/AQ等overcards</p>
                         <p><strong>OOP caller需要构建check-raise范围</strong>，带补牌的牌型是好的选择。</p>`
@@ -995,18 +995,18 @@
                 {
                     heroPos: 'CO', villainPos: 'BTN',
                     heroHand: ['As', 'Ks'],
-                    board: ['Qh', '8c', '3d'],
-                    boardTexture: '未击中的高张面',
+                    board: ['Qs', '8c', '3d'],
+                    boardTexture: '未击中的高张面 + 后门黑桃',
                     pot: '28BB', spr: '6.9', stack: '200BB',
                     question: '你OOP call 3bet AKs未击中，对手C-bet 66%，你应该？',
                     options: ['Fold', 'Call', 'Check-raise 3x', 'Check-raise全下'],
                     correct: 1,
                     explanation: `<strong>正确答案：Call</strong>
-                        <div class="key-point"><strong>核心逻辑：</strong>AKs有两个overcards+后门花draw，面对C-bet应该call一条街看转牌。</div>
+                        <div class="key-point"><strong>核心逻辑：</strong>AKss有两个overcards+后门黑桃花draw，面对C-bet应该call一条街看转牌。</div>
                         <p><strong>为什么call而不是raise？</strong></p>
                         <p>• 你没有击中牌面，check-raise作为bluff太expensive</p>
-                        <p>• AK有6张clean outs来击中顶对</p>
-                        <p>• 如果转牌来A或K，你可以翻转局面</p>
+                        <p>• AK有6张clean outs来击中顶对，后门黑桃增加equity</p>
+                        <p>• 如果转牌来A或K或黑桃，你可以翻转局面</p>
                         <p><strong>浮动Call</strong>是AK未击中时的标准打法，保持底池可控。</p>`
                 },
                 {
