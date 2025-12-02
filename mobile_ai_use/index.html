@@ -394,7 +394,7 @@
     <div class="container">
         <div class="header">
             <h1>🤖 多模型AI对比助手</h1>
-            <p>同时询问Claude、Gemini、DeepSeek三个AI模型</p>
+            <p>同时询问Claude Sonnet 4.5、Gemini 2.5 Pro、DeepSeek三个AI模型</p>
         </div>
 
         <div class="input-section">
@@ -407,10 +407,16 @@
                 <label>🖼️ 上传图片（可选）：</label>
                 <div class="image-upload">
                     <input type="file" id="imageInput" accept="image/*">
-                    <button class="upload-btn" onclick="document.getElementById('imageInput').click()">
-                        <span>📷</span>
-                        <span>选择图片</span>
-                    </button>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="upload-btn" onclick="document.getElementById('imageInput').click()">
+                            <span>📷</span>
+                            <span>选择图片</span>
+                        </button>
+                        <button class="upload-btn" id="clearImageBtn" style="display: none; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);" onclick="clearImage()">
+                            <span>🗑️</span>
+                            <span>清除</span>
+                        </button>
+                    </div>
                     <img id="imagePreview" alt="预览">
                 </div>
             </div>
@@ -424,6 +430,11 @@
         </div>
 
         <div class="results-section" id="results"></div>
+        
+        <div style="text-align: center; color: rgba(255,255,255,0.7); font-size: 12px; margin-top: 30px; padding: 10px;">
+            <p>🔐 API密钥已加密内置 | 📱 支持移动端 | ⚡ 60秒超时保护</p>
+            <p style="margin-top: 5px;">💡 使用提示：需要开启VPN（不支持香港节点）</p>
+        </div>
     </div>
 
     <button class="settings-btn" onclick="openSettings()">⚙️</button>

@@ -94,6 +94,14 @@ function closeSettings() {
     document.getElementById('settingsModal').classList.remove('show');
 }
 
+// 清除图片
+function clearImage() {
+    document.getElementById('imageInput').value = '';
+    document.getElementById('imagePreview').src = '';
+    document.getElementById('imagePreview').classList.remove('show');
+    document.getElementById('clearImageBtn').style.display = 'none';
+}
+
 // 设置事件监听器
 function setupEventListeners() {
     // 图片预览
@@ -111,6 +119,7 @@ function setupEventListeners() {
                 const preview = document.getElementById('imagePreview');
                 preview.src = e.target.result;
                 preview.classList.add('show');
+                document.getElementById('clearImageBtn').style.display = 'inline-flex';
             };
             reader.onerror = () => alert('⚠️ 图片读取失败');
             reader.readAsDataURL(file);
@@ -166,6 +175,15 @@ async function handleSubmit() {
     if (API_KEYS.gemini) promises.push(callGemini(question, imageBase64));
     if (API_KEYS.deepseek) promises.push(callDeepSeek(question, imageBase64));
     if (API_KEYS.claude) promises.push(callClaude(question, imageBase64));
+
+    // 检查是否有可用的API
+    if (promises.length === 0) {
+        alert('⚠️ 没有可用的API密钥，请点击右下角⚙️配置');
+        document.getElementById('loading').classList.remove('show');
+        document.getElementById('submitBtn').disabled = false;
+        openSettings();
+        return;
+    }
 
     const results = await Promise.allSettled(promises);
 
@@ -433,6 +451,8 @@ function displayResults(results) {
         
         const resultDiv = document.createElement('div');
         resultDiv.className = 'model-result';
+        // 动态设置动画延迟，避免nth-child被VPN提示打乱
+        resultDiv.style.animationDelay = `${(index + 1) * 0.1}s`;
 
         const headerDiv = document.createElement('div');
         headerDiv.className = 'model-header';
