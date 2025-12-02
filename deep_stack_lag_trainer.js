@@ -165,6 +165,43 @@ const lagRanges = {
                 sizing: '3x (vs 2.5BB = 7.5BB)',
                 notes: '对抗UTG紧一些，JJ+/AQ+价值，Axs阻断牌诈唬'
             },
+            vsLJ: {
+                range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99',
+                       'AKs', 'AQs', 'AJs', 'ATs',
+                       'KQs', 'KJs',
+                       'AKo', 'AQo',
+                       'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'K9s', 'K8s',
+                       'Q9s',
+                       'J9s', 'J8s',
+                       'T9s', 'T8s',
+                       '98s', '97s',
+                       '87s', '86s',
+                       '76s', '75s',
+                       '65s', '54s'],
+                percentage: '12%',
+                sizing: '3x',
+                notes: 'BTN vs LJ：对抗中位扩张范围，增加99和更多同花连牌'
+            },
+            vsHJ: {
+                range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88',
+                       'AKs', 'AQs', 'AJs', 'ATs', 'A9s',
+                       'KQs', 'KJs', 'KTs',
+                       'QJs', 'QTs',
+                       'AKo', 'AQo', 'AJo',
+                       'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'K9s', 'K8s',
+                       'Q9s', 'Q8s',
+                       'J9s', 'J8s',
+                       'T9s', 'T8s',
+                       '98s', '97s',
+                       '87s', '86s',
+                       '76s', '75s',
+                       '65s', '54s'],
+                percentage: '14%',
+                sizing: '3x',
+                notes: 'BTN vs HJ：进一步扩张，增加88和更多Axs'
+            },
             vsCO: {
                 range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99',
                        'AKs', 'AQs', 'AJs', 'ATs',
@@ -215,6 +252,24 @@ const lagRanges = {
                 sizing: '3x',
                 notes: 'CO vs UTG较紧，强价值+阻断牌'
             },
+            vsLJ: {
+                range: ['AA', 'KK', 'QQ', 'JJ', 'TT',
+                       'AKs', 'AQs', 'AJs',
+                       'KQs',
+                       'AKo', 'AQo',
+                       'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'K9s',
+                       'Q9s',
+                       'J8s',
+                       'T8s',
+                       '98s', '97s',
+                       '87s', '86s',
+                       '76s', '75s',
+                       '65s', '54s'],
+                percentage: '10%',
+                sizing: '3x',
+                notes: 'CO vs LJ：适度扩张，增加TT和同花连牌'
+            },
             vsHJ: {
                 range: ['AA', 'KK', 'QQ', 'JJ', 'TT',
                        'AKs', 'AQs', 'AJs',
@@ -234,6 +289,40 @@ const lagRanges = {
                 notes: 'CO vs HJ适度扩张'
             }
         },
+        HJ: {
+            vsUTG: {
+                range: ['AA', 'KK', 'QQ', 'JJ',
+                       'AKs', 'AQs',
+                       'AKo',
+                       'A5s', 'A4s', 'A3s', 'A2s',
+                       '87s', '76s'],
+                percentage: '6%',
+                sizing: '3x',
+                notes: 'HJ vs UTG：紧而激进，主要价值牌+少量诈唬'
+            },
+            vsLJ: {
+                range: ['AA', 'KK', 'QQ', 'JJ', 'TT',
+                       'AKs', 'AQs', 'AJs',
+                       'AKo', 'AQo',
+                       'A5s', 'A4s', 'A3s', 'A2s',
+                       'K9s',
+                       '87s', '76s', '65s'],
+                percentage: '8%',
+                sizing: '3x',
+                notes: 'HJ vs LJ：增加TT和更多诈唬牌'
+            }
+        },
+        LJ: {
+            vsUTG: {
+                range: ['AA', 'KK', 'QQ', 'JJ',
+                       'AKs', 'AQs',
+                       'AKo',
+                       'A5s', 'A4s', 'A3s'],
+                percentage: '5%',
+                sizing: '3x',
+                notes: 'LJ vs UTG：极紧，只有最强价值+阻断牌'
+            }
+        },
         SB: {
             vsUTG: {
                 range: ['AA', 'KK', 'QQ', 'JJ', 'TT',
@@ -243,6 +332,47 @@ const lagRanges = {
                 percentage: '7%',
                 sizing: '3.5x (vs 2.5BB = 8.75BB)',
                 notes: 'SB有位置劣势，需要更强的范围'
+            },
+            vsLJ: {
+                range: ['AA', 'KK', 'QQ', 'JJ', 'TT',
+                       'AKs', 'AQs', 'AJs',
+                       'AKo', 'AQo',
+                       'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'K9s',
+                       '87s', '76s', '65s'],
+                percentage: '8%',
+                sizing: '3.5x',
+                notes: 'SB vs LJ：稍微扩张，增加少量诈唬'
+            },
+            vsHJ: {
+                range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99',
+                       'AKs', 'AQs', 'AJs', 'ATs',
+                       'KQs', 'KJs',
+                       'AKo', 'AQo',
+                       'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'K9s',
+                       'Q9s',
+                       'J9s',
+                       'T9s',
+                       '98s', '87s', '76s', '65s', '54s'],
+                percentage: '9%',
+                sizing: '3.5x',
+                notes: 'SB vs HJ：继续扩张，增加99和更多同花连牌'
+            },
+            vsCO: {
+                range: ['AA', 'KK', 'QQ', 'JJ', 'TT',
+                       'AKs', 'AQs', 'AJs', 'ATs',
+                       'KQs', 'KJs',
+                       'AKo', 'AQo',
+                       'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'K8s',
+                       'Q9s',
+                       'J8s',
+                       'T8s',
+                       '98s', '87s', '76s', '65s', '54s'],
+                percentage: '10%',
+                sizing: '3.5x',
+                notes: 'SB vs CO平衡的范围'
             },
             vsBTN: {
                 range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99',
@@ -259,21 +389,6 @@ const lagRanges = {
                 percentage: '12%',
                 sizing: '3.5x',
                 notes: 'SB vs BTN需要防守，范围扩大'
-            },
-            vsCO: {
-                range: ['AA', 'KK', 'QQ', 'JJ', 'TT',
-                       'AKs', 'AQs', 'AJs', 'ATs',
-                       'KQs', 'KJs',
-                       'AKo', 'AQo',
-                       'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
-                       'K8s',
-                       'Q9s',
-                       'J8s',
-                       'T8s',
-                       '98s', '87s', '76s', '65s', '54s'],
-                percentage: '10%',
-                sizing: '3.5x',
-                notes: 'SB vs CO平衡的范围'
             }
         },
         BB: {
@@ -286,6 +401,47 @@ const lagRanges = {
                 percentage: '6.5%',
                 sizing: '3.5x',
                 notes: 'BB vs UTG紧而激进'
+            },
+            vsLJ: {
+                range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99',
+                       'AKs', 'AQs', 'AJs',
+                       'AKo', 'AQo',
+                       'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'K9s',
+                       '87s', '76s', '65s', '54s'],
+                percentage: '9%',
+                sizing: '3.5x',
+                notes: 'BB vs LJ：扩张范围，增加99和更多诈唬'
+            },
+            vsHJ: {
+                range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88',
+                       'AKs', 'AQs', 'AJs', 'ATs',
+                       'KQs', 'KJs',
+                       'AKo', 'AQo',
+                       'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'K9s', 'K8s',
+                       'Q9s',
+                       'J9s',
+                       'T9s',
+                       '98s', '87s', '76s', '65s', '54s'],
+                percentage: '10%',
+                sizing: '3.5x',
+                notes: 'BB vs HJ：进一步扩张，增加88和更多同花牌'
+            },
+            vsCO: {
+                range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99',
+                       'AKs', 'AQs', 'AJs', 'ATs',
+                       'KQs', 'KJs',
+                       'AKo', 'AQo',
+                       'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'K9s',
+                       'Q9s',
+                       'J9s',
+                       'T9s',
+                       '98s', '87s', '76s', '65s', '54s'],
+                percentage: '11%',
+                sizing: '3.5x',
+                notes: 'BB vs CO需要积极防守'
             },
             vsBTN: {
                 range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88',
@@ -306,20 +462,22 @@ const lagRanges = {
                 sizing: '3.5x',
                 notes: 'BB vs BTN大幅扩张，必须防守偷盲'
             },
-            vsCO: {
-                range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99',
-                       'AKs', 'AQs', 'AJs', 'ATs',
-                       'KQs', 'KJs',
-                       'AKo', 'AQo',
-                       'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+            vsSB: {
+                range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77',
+                       'AKs', 'AQs', 'AJs', 'ATs', 'A9s',
+                       'KQs', 'KJs', 'KTs',
+                       'QJs', 'QTs',
+                       'JTs',
+                       'AKo', 'AQo', 'AJo',
+                       'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
                        'K9s',
                        'Q9s',
                        'J9s',
                        'T9s',
-                       '98s', '87s', '76s', '65s', '54s'],
-                percentage: '11%',
+                       '98s', '87s', '76s', '65s'],
+                percentage: '13%',
                 sizing: '3.5x',
-                notes: 'BB vs CO需要积极防守'
+                notes: 'BB vs SB：对抗SB Open也要积极防守'
             }
         }
     },
@@ -793,6 +951,59 @@ const lagRanges = {
                        'QJo'],
                 percentage: '24%',
                 notes: 'vs HJ大幅扩张投机牌'
+            }
+        },
+
+        // HJ facing open (HJ位平跟) - 新增！
+        HJ: {
+            vsUTG: {
+                range: ['TT', '99', '88', '77', '66', '55', '44', '33', '22',
+                       'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'KQs', 'KJs', 'KTs',
+                       'QJs', 'QTs',
+                       'JTs', 'J9s',
+                       'T9s', 'T8s',
+                       '98s', '97s',
+                       '87s', '86s',
+                       '76s',
+                       'AJo', 'ATo',
+                       'KQo'],
+                percentage: '18%',
+                notes: 'HJ vs UTG：较紧，因为还有3个位置在后面'
+            },
+            vsLJ: {
+                range: ['TT', '99', '88', '77', '66', '55', '44', '33', '22',
+                       'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'KQs', 'KJs', 'KTs', 'K9s',
+                       'QJs', 'QTs', 'Q9s',
+                       'JTs', 'J9s', 'J8s',
+                       'T9s', 'T8s', 'T7s',
+                       '98s', '97s', '96s',
+                       '87s', '86s',
+                       '76s', '75s',
+                       '65s',
+                       'AJo', 'ATo', 'A9o',
+                       'KQo', 'KJo'],
+                percentage: '22%',
+                notes: 'HJ vs LJ：适度扩张，增加更多同花牌'
+            }
+        },
+
+        // LJ facing open (LJ位平跟) - 新增！
+        LJ: {
+            vsUTG: {
+                range: ['TT', '99', '88', '77', '66', '55', '44', '33', '22',
+                       'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'KQs', 'KJs', 'KTs',
+                       'QJs', 'QTs',
+                       'JTs', 'J9s',
+                       'T9s', 'T8s',
+                       '98s', '97s',
+                       '87s', '76s',
+                       'AJo', 'ATo',
+                       'KQo'],
+                percentage: '17%',
+                notes: 'LJ vs UTG：保守，因为还有4个位置在后面。主要是对子和强同花牌'
             }
         }
     },
