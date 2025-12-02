@@ -1222,15 +1222,21 @@ function highlightRange(position, action, vsPosition = null) {
         `;
     } else if (action === 'vs3bet') {
         // vs 3-Bet - 面对3-Bet的完整决策
+        // ✅ 修复：添加安全保护
+        const fourBetData = lagRanges.fourBet?.general || {};
+        const call3BetData = lagRanges.call3Bet?.IP || {};
+        const fourBetRange = fourBetData.range || [];
+        const call3BetRange = call3BetData.range || [];
+        
         details = `
             <div><span class="highlight">vs 3-Bet 决策树</span></div>
             <div><span class="highlight">位置：</span>${position}</div>
             <div style="margin-top: 15px; padding: 15px; background: rgba(255,215,0,0.1); border-radius: 5px;">
                 <strong>📊 面对3-Bet的三种选择：</strong><br><br>
-                <div style="margin: 10px 0;"><span class="highlight">1. 4-Bet (${lagRanges.fourBet.general.percentage})：</span>
-                ${lagRanges.fourBet.general.range.slice(0, 10).join(', ')}...</div>
-                <div style="margin: 10px 0;"><span class="highlight">2. Call 3-Bet (${lagRanges.call3Bet.IP.percentage})：</span>
-                ${lagRanges.call3Bet.IP.range.slice(0, 10).join(', ')}...</div>
+                <div style="margin: 10px 0;"><span class="highlight">1. 4-Bet (${fourBetData.percentage || 'N/A'})：</span>
+                ${fourBetRange.slice(0, 10).join(', ')}${fourBetRange.length > 10 ? '...' : ''}</div>
+                <div style="margin: 10px 0;"><span class="highlight">2. Call 3-Bet (${call3BetData.percentage || 'N/A'})：</span>
+                ${call3BetRange.slice(0, 10).join(', ')}${call3BetRange.length > 10 ? '...' : ''}</div>
                 <div style="margin: 10px 0;"><span class="highlight">3. Fold：</span>所有其他牌</div>
             </div>
             <div style="margin-top: 15px; padding: 15px; background: rgba(0,191,255,0.1); border-radius: 5px;">
@@ -1240,20 +1246,24 @@ function highlightRange(position, action, vsPosition = null) {
             </div>
         `;
         // 显示4-Bet + Call 3-Bet的合并范围
-        const fourBetRange = lagRanges.fourBet.general.range || [];
-        const call3BetRange = lagRanges.call3Bet.IP.range || [];
         range = [...fourBetRange, ...call3BetRange];
     } else if (action === 'vs4bet') {
         // vs 4-Bet - 面对4-Bet的完整决策
+        // ✅ 修复：添加安全保护
+        const fiveBetData = lagRanges.fiveBet?.general || {};
+        const call4BetData = lagRanges.call4Bet?.general || {};
+        const fiveBetRange = fiveBetData.range || [];
+        const call4BetRange = call4BetData.range || [];
+        
         details = `
             <div><span class="highlight">vs 4-Bet 决策树</span></div>
             <div><span class="highlight">位置：</span>${position}</div>
             <div style="margin-top: 15px; padding: 15px; background: rgba(255,215,0,0.1); border-radius: 5px;">
                 <strong>📊 面对4-Bet的三种选择：</strong><br><br>
-                <div style="margin: 10px 0;"><span class="highlight">1. 5-Bet/All-in (${lagRanges.fiveBet.general.percentage})：</span>
-                ${lagRanges.fiveBet.general.range.join(', ')}</div>
-                <div style="margin: 10px 0;"><span class="highlight">2. Call 4-Bet (${lagRanges.call4Bet.general.percentage})：</span>
-                ${lagRanges.call4Bet.general.range.join(', ')}</div>
+                <div style="margin: 10px 0;"><span class="highlight">1. 5-Bet/All-in (${fiveBetData.percentage || 'N/A'})：</span>
+                ${fiveBetRange.join(', ')}</div>
+                <div style="margin: 10px 0;"><span class="highlight">2. Call 4-Bet (${call4BetData.percentage || 'N/A'})：</span>
+                ${call4BetRange.join(', ')}</div>
                 <div style="margin: 10px 0;"><span class="highlight">3. Fold：</span>所有其他牌（包括大部分3-Bet诈唬牌）</div>
             </div>
             <div style="margin-top: 15px; padding: 15px; background: rgba(220,20,60,0.1); border-radius: 5px;">
@@ -1261,8 +1271,6 @@ function highlightRange(position, action, vsPosition = null) {
                 但100BB时，通常是5-Bet or Fold（QQ可以5-Bet all-in）
             </div>
         `;
-        const fiveBetRange = lagRanges.fiveBet.general.range || [];
-        const call4BetRange = lagRanges.call4Bet.general.range || [];
         range = [...fiveBetRange, ...call4BetRange];
     } else if (action === 'defend') {
         // Defend - 总防守范围（Call + 3-Bet）
@@ -1302,7 +1310,11 @@ function highlightRange(position, action, vsPosition = null) {
         }
     }
 
-    document.getElementById('combo-details').innerHTML = details || '选择位置和动作查看详细范围...';
+    // 安全更新详情显示
+    const comboDetailsEl = document.getElementById('combo-details');
+    if (comboDetailsEl) {
+        comboDetailsEl.innerHTML = details || '选择位置和动作查看详细范围...';
+    }
 
     // 高亮显示范围内的手牌
     cells.forEach(cell => {

@@ -213,6 +213,26 @@
             border-color: #8A2BE2;
         }
 
+        /* 答案按钮状态样式 - 修复缺失的CSS类 */
+        .answer-btn.correct {
+            background: rgba(50, 205, 50, 0.8) !important;
+            border-color: #32CD32 !important;
+            animation: correctPulse 0.5s;
+        }
+
+        .answer-btn.incorrect {
+            background: rgba(220, 20, 60, 0.8) !important;
+            border-color: #DC143C !important;
+            animation: shake 0.5s;
+        }
+
+        /* 通用active状态 */
+        .active {
+            background: #FFD700 !important;
+            color: #000 !important;
+            border-color: #FFD700 !important;
+        }
+
         .hand-cell:hover {
             transform: scale(1.1);
             z-index: 10;
@@ -365,17 +385,6 @@
             transform: translateY(-2px);
         }
 
-        .answer-btn.correct {
-            background: rgba(50, 205, 50, 0.8);
-            border-color: #32CD32;
-            animation: correctPulse 0.5s;
-        }
-
-        .answer-btn.incorrect {
-            background: rgba(220, 20, 60, 0.8);
-            border-color: #DC143C;
-            animation: shake 0.5s;
-        }
 
         @keyframes correctPulse {
             0%, 100% { transform: scale(1); }
