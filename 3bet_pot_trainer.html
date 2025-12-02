@@ -104,6 +104,7 @@
 
         @media (max-width: 768px) {
             .stats-panel { grid-template-columns: repeat(2, 1fr); }
+            .title { font-size: 1.8rem; }
         }
 
         .stat-card {
@@ -112,6 +113,7 @@
             padding: 20px;
             text-align: center;
             border: 1px solid var(--border-color);
+            position: relative;
         }
 
         .stat-value {
@@ -131,6 +133,23 @@
             color: var(--text-muted);
             text-transform: uppercase;
         }
+
+        .reset-stats-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 71, 87, 0.2);
+            border: none;
+            color: var(--accent-red);
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .stat-card:hover .reset-stats-btn { opacity: 1; }
 
         /* 场景选择 */
         .scenario-selector {
@@ -187,19 +206,9 @@
             margin-bottom: 10px;
         }
 
-        .scenario-icon {
-            font-size: 24px;
-        }
-
-        .scenario-name {
-            font-weight: 600;
-            font-size: 15px;
-        }
-
-        .scenario-desc {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
+        .scenario-icon { font-size: 24px; }
+        .scenario-name { font-weight: 600; font-size: 15px; }
+        .scenario-desc { font-size: 12px; color: var(--text-muted); }
 
         .scenario-badge {
             display: inline-block;
@@ -211,6 +220,12 @@
 
         .badge-ip { background: rgba(0, 212, 170, 0.2); color: var(--accent-green); }
         .badge-oop { background: rgba(255, 71, 87, 0.2); color: var(--accent-red); }
+
+        .scenario-count {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-left: 8px;
+        }
 
         /* 训练区域 */
         .training-panel {
@@ -243,6 +258,7 @@
         .position-badges {
             display: flex;
             gap: 10px;
+            align-items: center;
         }
 
         .pos-badge {
@@ -292,7 +308,6 @@
             font-size: 18px;
             font-weight: 700;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            position: relative;
         }
 
         .card.hearts, .card.diamonds { color: #e74c3c; }
@@ -358,9 +373,7 @@
             font-size: 16px;
         }
 
-        .hand-cards .card .suit {
-            font-size: 20px;
-        }
+        .hand-cards .card .suit { font-size: 20px; }
 
         /* 信息面板 */
         .info-panel {
@@ -448,25 +461,9 @@
             transform: translateY(-2px);
         }
 
-        .option-btn:disabled {
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        .option-btn.correct {
-            border-color: var(--accent-green);
-            background: rgba(0, 212, 170, 0.15);
-        }
-
-        .option-btn.wrong {
-            border-color: var(--accent-red);
-            background: rgba(255, 71, 87, 0.15);
-        }
-
-        .option-btn.selected {
-            border-color: var(--accent-blue);
-            background: rgba(74, 158, 255, 0.15);
-        }
+        .option-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .option-btn.correct { border-color: var(--accent-green); background: rgba(0, 212, 170, 0.15); }
+        .option-btn.wrong { border-color: var(--accent-red); background: rgba(255, 71, 87, 0.15); }
 
         /* 解析区域 */
         .explanation-section {
@@ -504,9 +501,7 @@
             color: var(--text-secondary);
         }
 
-        .explanation-content strong {
-            color: var(--accent-green);
-        }
+        .explanation-content strong { color: var(--accent-green); }
 
         .explanation-content .key-point {
             background: rgba(255, 107, 53, 0.1);
@@ -516,9 +511,7 @@
             border-radius: 0 8px 8px 0;
         }
 
-        .explanation-content .key-point strong {
-            color: var(--accent-orange);
-        }
+        .explanation-content .key-point strong { color: var(--accent-orange); }
 
         /* 下一题按钮 */
         .next-btn {
@@ -536,45 +529,11 @@
             display: none;
         }
 
-        .next-btn.visible {
-            display: block;
-        }
+        .next-btn.visible { display: block; }
 
         .next-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(255, 107, 53, 0.4);
-        }
-
-        /* 策略卡片 */
-        .strategy-cards {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        @media (max-width: 600px) {
-            .strategy-cards { grid-template-columns: 1fr; }
-        }
-
-        .strategy-card {
-            background: var(--bg-card);
-            border-radius: 10px;
-            padding: 15px;
-            border: 1px solid var(--border-color);
-        }
-
-        .strategy-card-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--accent-blue);
-            margin-bottom: 8px;
-        }
-
-        .strategy-card-content {
-            font-size: 12px;
-            color: var(--text-muted);
-            line-height: 1.6;
         }
 
         /* 底部提示 */
@@ -639,6 +598,7 @@
             <div class="stat-card">
                 <div class="stat-value blue" id="accuracy">0%</div>
                 <div class="stat-label">正确率</div>
+                <button class="reset-stats-btn" onclick="resetStats()">清零</button>
             </div>
         </div>
 
@@ -648,39 +608,8 @@
                 <span>🎯</span>
                 <span>选择训练场景</span>
             </div>
-            <div class="scenario-grid">
-                <div class="scenario-card active" onclick="selectScenario('3bettor_ip')">
-                    <div class="scenario-header">
-                        <span class="scenario-icon">🔥</span>
-                        <span class="scenario-name">3-Bettor IP</span>
-                    </div>
-                    <div class="scenario-desc">你3bet后在位置内，对手OOP call</div>
-                    <span class="scenario-badge badge-ip">有位置优势</span>
-                </div>
-                <div class="scenario-card" onclick="selectScenario('3bettor_oop')">
-                    <div class="scenario-header">
-                        <span class="scenario-icon">⚔️</span>
-                        <span class="scenario-name">3-Bettor OOP</span>
-                    </div>
-                    <div class="scenario-desc">你3bet后在位置外，对手IP call</div>
-                    <span class="scenario-badge badge-oop">位置劣势</span>
-                </div>
-                <div class="scenario-card" onclick="selectScenario('caller_ip')">
-                    <div class="scenario-header">
-                        <span class="scenario-icon">🛡️</span>
-                        <span class="scenario-name">Caller IP</span>
-                    </div>
-                    <div class="scenario-desc">你call 3bet，有位置优势</div>
-                    <span class="scenario-badge badge-ip">有位置优势</span>
-                </div>
-                <div class="scenario-card" onclick="selectScenario('caller_oop')">
-                    <div class="scenario-header">
-                        <span class="scenario-icon">🎭</span>
-                        <span class="scenario-name">Caller OOP</span>
-                    </div>
-                    <div class="scenario-desc">你call 3bet，没有位置</div>
-                    <span class="scenario-badge badge-oop">位置劣势</span>
-                </div>
+            <div class="scenario-grid" id="scenarioGrid">
+                <!-- 动态生成 -->
             </div>
         </div>
 
@@ -701,22 +630,15 @@
             <!-- 牌面 -->
             <div class="board-section">
                 <div class="board-label">公共牌 (Flop)</div>
-                <div class="board-cards" id="boardCards">
-                    <div class="card spades"><span>A</span><span class="suit">♠</span></div>
-                    <div class="card hearts"><span>K</span><span class="suit">♥</span></div>
-                    <div class="card diamonds"><span>7</span><span class="suit">♦</span></div>
-                </div>
-                <div id="boardTexture" style="font-size: 13px; color: var(--text-muted);">高张干燥牌面</div>
+                <div class="board-cards" id="boardCards"></div>
+                <div id="boardTexture" style="font-size: 13px; color: var(--text-muted);"></div>
             </div>
 
             <!-- 手牌 -->
             <div class="hand-section">
                 <div class="hand-card hero">
                     <div class="hand-label">🔥 你的手牌 (Hero)</div>
-                    <div class="hand-cards" id="heroHand">
-                        <div class="card hearts"><span>A</span><span class="suit">♥</span></div>
-                        <div class="card spades"><span>Q</span><span class="suit">♠</span></div>
-                    </div>
+                    <div class="hand-cards" id="heroHand"></div>
                 </div>
                 <div class="hand-card villain">
                     <div class="hand-label">👤 对手范围 (Reg)</div>
@@ -745,15 +667,8 @@
 
             <!-- 问题 -->
             <div class="question-section">
-                <div class="question-text" id="questionText">
-                    作为 <span class="highlight">3-bettor IP</span>，对手check，你应该？
-                </div>
-                <div class="options-grid" id="optionsGrid">
-                    <button class="option-btn" onclick="selectAnswer(0)">🎯 C-bet 33% pot</button>
-                    <button class="option-btn" onclick="selectAnswer(1)">💰 C-bet 66% pot</button>
-                    <button class="option-btn" onclick="selectAnswer(2)">🔥 C-bet 100% pot</button>
-                    <button class="option-btn" onclick="selectAnswer(3)">✓ Check back</button>
-                </div>
+                <div class="question-text" id="questionText"></div>
+                <div class="options-grid" id="optionsGrid"></div>
             </div>
 
             <!-- 解析 -->
@@ -762,15 +677,11 @@
                     <span>📖</span>
                     <span>策略解析</span>
                 </div>
-                <div class="explanation-content" id="explanationContent">
-                    <!-- 动态内容 -->
-                </div>
+                <div class="explanation-content" id="explanationContent"></div>
             </div>
 
             <!-- 下一题按钮 -->
-            <button class="next-btn" id="nextBtn" onclick="nextQuestion()">
-                下一题 →
-            </button>
+            <button class="next-btn" id="nextBtn" onclick="nextQuestion()">下一题 →</button>
         </div>
 
         <!-- 策略提示 -->
@@ -785,25 +696,55 @@
         </div>
 
         <footer class="footer">
-            3-Bet Pot 专项训练 · <a href="index.html">返回主页</a>
+            3-Bet Pot 专项训练 v1.1 · <a href="index.html?v=7">返回主页</a>
         </footer>
     </div>
 
     <script>
         // ==================== 配置 ====================
-        const SUITS = ['♠', '♥', '♦', '♣'];
         const SUIT_CLASSES = { '♠': 'spades', '♥': 'hearts', '♦': 'diamonds', '♣': 'clubs' };
-        const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
+        const SUIT_MAP = { 's': '♠', 'h': '♥', 'd': '♦', 'c': '♣' };
 
         // 状态
         let currentScenario = '3bettor_ip';
         let stats = { total: 0, correct: 0, wrong: 0 };
         let currentQuestion = null;
+        let lastQuestionIndex = -1; // 【修复】避免连续相同题目
         let answered = false;
 
         // ==================== 题库 ====================
+        const SCENARIOS = {
+            '3bettor_ip': {
+                name: '3-Bettor IP',
+                icon: '🔥',
+                desc: '你3bet后在位置内，对手OOP call',
+                badge: 'ip',
+                title: '3-Bettor IP 训练'
+            },
+            '3bettor_oop': {
+                name: '3-Bettor OOP',
+                icon: '⚔️',
+                desc: '你3bet后在位置外，对手IP call',
+                badge: 'oop',
+                title: '3-Bettor OOP 训练'
+            },
+            'caller_ip': {
+                name: 'Caller IP',
+                icon: '🛡️',
+                desc: '你call 3bet，有位置优势',
+                badge: 'ip',
+                title: 'Caller IP 训练'
+            },
+            'caller_oop': {
+                name: 'Caller OOP',
+                icon: '🎭',
+                desc: '你call 3bet，没有位置',
+                badge: 'oop',
+                title: 'Caller OOP 训练'
+            }
+        };
+
         const QUESTIONS = {
-            // 3-Bettor IP 场景
             '3bettor_ip': [
                 {
                     heroPos: 'BTN', villainPos: 'CO',
@@ -814,17 +755,13 @@
                     question: '翻牌对手check，你应该？',
                     options: ['C-bet 33% pot', 'C-bet 66% pot', 'C-bet 100% pot', 'Check back'],
                     correct: 0,
-                    explanation: `
-                        <strong>正确答案：C-bet 33% pot</strong>
-                        <div class="key-point">
-                            <strong>核心逻辑：</strong>AK7彩虹牌面，你作为3-bettor有巨大的范围优势。这是一个"高频小注C-bet"的经典牌面。
-                        </div>
+                    explanation: `<strong>正确答案：C-bet 33% pot</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>AK7彩虹牌面，你作为3-bettor有巨大的范围优势。这是一个"高频小注C-bet"的经典牌面。</div>
                         <p><strong>为什么小注？</strong></p>
                         <p>• 你的范围中有大量Ax/Kx/强对子，对手很难有足够的强牌反击</p>
                         <p>• 小注可以让对手弃掉所有空气牌（如67s/89s等）</p>
                         <p>• 用小注保持你的诈唬范围</p>
-                        <p><strong>AQo在这里：</strong>顶对+第二踢脚，属于价值下注范围的中间部分</p>
-                    `
+                        <p><strong>AQo在这里：</strong>顶对+第二踢脚，属于价值下注范围的中间部分</p>`
                 },
                 {
                     heroPos: 'BTN', villainPos: 'BB',
@@ -835,17 +772,13 @@
                     question: '翻牌对手check，你应该？',
                     options: ['C-bet 33% pot', 'C-bet 75% pot', 'Check back', 'C-bet全下'],
                     correct: 2,
-                    explanation: `
-                        <strong>正确答案：Check back</strong>
-                        <div class="key-point">
-                            <strong>核心逻辑：</strong>Q94彩虹牌面对BB的防守范围更有利！BB会有很多Qx/99/44/Q9等，而你的3bet范围中Qx并不多。
-                        </div>
+                    explanation: `<strong>正确答案：Check back</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>Q94彩虹牌面对BB的防守范围更有利！BB会有很多Qx/99/44/Q9等，而你的3bet范围中Qx并不多。</div>
                         <p><strong>为什么check？</strong></p>
                         <p>• KJ只有两个高张+后门花，没有击中牌面</p>
                         <p>• 这个牌面对手会有很高的check-raise频率</p>
                         <p>• Check保护了showdown value，也让你在转牌可以bluff catch</p>
-                        <p><strong>3-bettor不是每个牌面都要C-bet！</strong>识别对手范围更有利的牌面是关键技能。</p>
-                    `
+                        <p><strong>3-bettor不是每个牌面都要C-bet！</strong>识别对手范围更有利的牌面是关键技能。</p>`
                 },
                 {
                     heroPos: 'CO', villainPos: 'UTG',
@@ -856,17 +789,13 @@
                     question: '翻牌对手check，你应该？',
                     options: ['C-bet 33% pot', 'C-bet 66% pot', 'Check back', '全下'],
                     correct: 1,
-                    explanation: `
-                        <strong>正确答案：C-bet 66% pot</strong>
-                        <div class="key-point">
-                            <strong>核心逻辑：</strong>T73彩虹牌面，你的JJ是一个强超对。这个牌面需要较大的下注尺寸来保护你的权益。
-                        </div>
+                    explanation: `<strong>正确答案：C-bet 66% pot</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>T73彩虹牌面，你的JJ是一个强超对。这个牌面需要较大的下注尺寸来保护你的权益。</div>
                         <p><strong>为什么大注？</strong></p>
                         <p>• JJ在这里是明确的价值手牌</p>
                         <p>• 牌面有很多听牌组合（98/J9/86等）需要让对手付出代价</p>
                         <p>• UTG的range有TT/77/33，但你不怕check-raise，因为JJ很强</p>
-                        <p><strong>较大尺寸</strong>可以建立底池，为后续街的价值下注做准备。</p>
-                    `
+                        <p><strong>较大尺寸</strong>可以建立底池，为后续街的价值下注做准备。</p>`
                 },
                 {
                     heroPos: 'BTN', villainPos: 'CO',
@@ -877,17 +806,13 @@
                     question: '翻牌对手check，你应该？',
                     options: ['C-bet 25% pot', 'C-bet 50% pot', 'Check back', 'C-bet 75% pot'],
                     correct: 2,
-                    explanation: `
-                        <strong>正确答案：Check back</strong>
-                        <div class="key-point">
-                            <strong>核心逻辑：</strong>AKQ三高张连接！虽然你是3-bettor，但99在这个牌面完全无法继续激进。
-                        </div>
+                    explanation: `<strong>正确答案：Check back</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>AKQ三高张连接！虽然你是3-bettor，但99在这个牌面完全无法继续激进。</div>
                         <p><strong>为什么必须check？</strong></p>
                         <p>• 对手CO call 3bet的范围有大量AK/AQ/KQ/JT等击中牌面的牌</p>
                         <p>• 你的99只有showdown value，C-bet会被频繁raise</p>
                         <p>• 如果下注被call，转牌河牌几乎无法继续</p>
-                        <p><strong>低对子在高张连接面</strong>应该进入pot control模式，不要主动膨胀底池。</p>
-                    `
+                        <p><strong>低对子在高张连接面</strong>应该进入pot control模式，不要主动膨胀底池。</p>`
                 },
                 {
                     heroPos: 'BTN', villainPos: 'BB',
@@ -898,20 +823,15 @@
                     question: '翻牌对手check，你应该？',
                     options: ['C-bet 25% pot', 'C-bet 50% pot', 'Check back', 'C-bet全部范围'],
                     correct: 0,
-                    explanation: `
-                        <strong>正确答案：C-bet 25% pot</strong>
-                        <div class="key-point">
-                            <strong>核心逻辑：</strong>K72彩虹是经典的"高频小注C-bet"牌面，但66在这里实际上应该放入check范围保护。
-                        </div>
-                        <p><strong>这道题有争议，两种思路都可接受：</strong></p>
+                    explanation: `<strong>正确答案：C-bet 25% pot</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>K72彩虹是经典的"高频小注C-bet"牌面。</div>
+                        <p><strong>两种思路都可接受：</strong></p>
                         <p>• <strong>小注思路：</strong>用25% pot可以让对手fold很多空气，66有一些SDV</p>
                         <p>• <strong>Check思路：</strong>66是你check范围中最强的牌之一，可以抓对手的诈唬</p>
-                        <p><strong>GTO解：</strong>这类边缘牌型可以混合策略，但在较低级别小注C-bet是更简单的选择。</p>
-                    `
+                        <p><strong>GTO解：</strong>这类边缘牌型可以混合策略，但在较低级别小注C-bet是更简单的选择。</p>`
                 }
             ],
 
-            // 3-Bettor OOP 场景
             '3bettor_oop': [
                 {
                     heroPos: 'BB', villainPos: 'BTN',
@@ -922,16 +842,12 @@
                     question: '你OOP 3bet后，翻牌你应该？',
                     options: ['Check', 'C-bet 33% pot', 'C-bet 66% pot', 'C-bet全下'],
                     correct: 2,
-                    explanation: `
-                        <strong>正确答案：C-bet 66% pot</strong>
-                        <div class="key-point">
-                            <strong>核心逻辑：</strong>QQ在J84牌面是明确的超对，OOP时需要用较大尺寸保护。
-                        </div>
+                    explanation: `<strong>正确答案：C-bet 66% pot</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>QQ在J84牌面是明确的超对，OOP时需要用较大尺寸保护。</div>
                         <p><strong>为什么不check？</strong></p>
                         <p>• 给对手免费牌太危险，89/T9/67等有很多补牌</p>
                         <p>• QQ是你范围中的强牌，需要榨取价值</p>
-                        <p><strong>OOP 3-bettor策略：</strong>在中低张面用较大尺寸C-bet强牌，check一些弱对子和抓诈范围。</p>
-                    `
+                        <p><strong>OOP 3-bettor策略：</strong>在中低张面用较大尺寸C-bet强牌，check一些弱对子和抓诈范围。</p>`
                 },
                 {
                     heroPos: 'SB', villainPos: 'BTN',
@@ -942,17 +858,13 @@
                     question: '你OOP 3bet AKs未击中，翻牌你应该？',
                     options: ['Check', 'C-bet 33% pot', 'C-bet 75% pot', 'C-bet全下'],
                     correct: 1,
-                    explanation: `
-                        <strong>正确答案：C-bet 33% pot</strong>
-                        <div class="key-point">
-                            <strong>核心逻辑：</strong>AKs有两个高张overcards+后门花，是很好的小注bluff牌型。
-                        </div>
+                    explanation: `<strong>正确答案：C-bet 33% pot</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>AKs有两个高张overcards+后门花，是很好的小注bluff牌型。</div>
                         <p><strong>策略要点：</strong></p>
                         <p>• 小注给自己留下转牌继续施压的空间</p>
                         <p>• 可能击中A/K获得顶对</p>
                         <p>• 33% pot被raise时可以轻松放弃</p>
-                        <p><strong>不要check：</strong>AK有太多equity放弃，也有blockers（阻挡了对手的AQ/KQ）</p>
-                    `
+                        <p><strong>不要check：</strong>AK有太多equity放弃，也有blockers（阻挡了对手的AQ/KQ）</p>`
                 },
                 {
                     heroPos: 'BB', villainPos: 'CO',
@@ -963,17 +875,13 @@
                     question: '你OOP 3bet，翻牌你应该？',
                     options: ['Check', 'C-bet 25% pot', 'C-bet 66% pot', 'C-bet全下'],
                     correct: 0,
-                    explanation: `
-                        <strong>正确答案：Check</strong>
-                        <div class="key-point">
-                            <strong>核心逻辑：</strong>虽然AK7是3-bettor范围优势的牌面，但TT作为中对应该放入check范围。
-                        </div>
+                    explanation: `<strong>正确答案：Check</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>虽然AK7是3-bettor范围优势的牌面，但TT作为中对应该放入check范围。</div>
                         <p><strong>为什么check？</strong></p>
                         <p>• TT有SDV，但面对raise非常尴尬</p>
                         <p>• 你需要一些check范围来保护，TT是完美的选择</p>
                         <p>• 对手不太可能用air大力bluff AK7牌面</p>
-                        <p><strong>OOP时</strong>即使有范围优势，也需要构建check范围，不能只C-bet。</p>
-                    `
+                        <p><strong>OOP时</strong>即使有范围优势，也需要构建check范围，不能只C-bet。</p>`
                 },
                 {
                     heroPos: 'BB', villainPos: 'BTN',
@@ -984,21 +892,16 @@
                     question: '你OOP 3bet有坚果花draw，翻牌你应该？',
                     options: ['Check', 'C-bet 33% pot', 'C-bet 75% pot', 'Check-raise all in'],
                     correct: 2,
-                    explanation: `
-                        <strong>正确答案：C-bet 75% pot</strong>
-                        <div class="key-point">
-                            <strong>核心逻辑：</strong>AJhh有坚果花draw(9张补牌)+两个overcards(6张)+后门顺子可能性，这是一个强大的半诈唬牌型！
-                        </div>
+                    explanation: `<strong>正确答案：C-bet 75% pot</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>AJhh有坚果花draw(9张补牌)+两个overcards(6张)+后门顺子可能性，这是一个强大的半诈唬牌型！</div>
                         <p><strong>为什么大注C-bet？</strong></p>
                         <p>• 你有~45%的equity，不怕被call</p>
                         <p>• 大注可以让对手fold很多小对子和弱draws</p>
                         <p>• 构建大底池，准备在转牌hit时获得巨额价值</p>
-                        <p><strong>强draw + position aggression</strong> = 激进下注，不要被动打法！</p>
-                    `
+                        <p><strong>强draw + position aggression</strong> = 激进下注，不要被动打法！</p>`
                 }
             ],
 
-            // Caller IP 场景
             'caller_ip': [
                 {
                     heroPos: 'BTN', villainPos: 'SB',
@@ -1009,17 +912,13 @@
                     question: '你call 3bet IP，对手C-bet 33%，你应该？',
                     options: ['Fold', 'Call', 'Raise 3x', 'Raise全下'],
                     correct: 1,
-                    explanation: `
-                        <strong>正确答案：Call</strong>
-                        <div class="key-point">
-                            <strong>核心逻辑：</strong>99在K高牌面是一个中等强度的抓诈牌。Call是唯一正确的选择。
-                        </div>
+                    explanation: `<strong>正确答案：Call</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>99在K高牌面是一个中等强度的抓诈牌。Call是唯一正确的选择。</div>
                         <p><strong>为什么call？</strong></p>
                         <p>• 对手用小注C-bet这种牌面是标准打法</p>
                         <p>• 99打败对手的AQ/AJ/JJ等诈唬和弱牌</p>
                         <p>• Raise会fold掉所有比你差的牌，只被更好的牌call</p>
-                        <p><strong>作为caller</strong>在这种牌面保持被动，用位置优势在后续街获取信息。</p>
-                    `
+                        <p><strong>作为caller</strong>在这种牌面保持被动，用位置优势在后续街获取信息。</p>`
                 },
                 {
                     heroPos: 'CO', villainPos: 'BB',
@@ -1030,17 +929,13 @@
                     question: '你call 3bet IP，对手C-bet 66%，你应该？',
                     options: ['Fold', 'Call', 'Raise 2.5x', 'Raise全下'],
                     correct: 1,
-                    explanation: `
-                        <strong>正确答案：Call</strong>
-                        <div class="key-point">
-                            <strong>核心逻辑：</strong>顶对J踢脚是一个强但不是极强的牌，应该call而不是raise。
-                        </div>
+                    explanation: `<strong>正确答案：Call</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>顶对J踢脚是一个强但不是极强的牌，应该call而不是raise。</div>
                         <p><strong>为什么不raise？</strong></p>
                         <p>• Raise会让对手的AK/AQ继续，fold掉AJ以下</p>
                         <p>• 你在IP，可以控制底池大小</p>
                         <p>• 如果对手有AA/TT/44，raise只会让你陷入更大的麻烦</p>
-                        <p><strong>Call-down策略：</strong>这种牌通常call三条街，但不要主动膨胀底池。</p>
-                    `
+                        <p><strong>Call-down策略：</strong>这种牌通常call三条街，但不要主动膨胀底池。</p>`
                 },
                 {
                     heroPos: 'BTN', villainPos: 'BB',
@@ -1051,17 +946,13 @@
                     question: '你call 3bet IP有OESD，对手C-bet 75%，你应该？',
                     options: ['Fold', 'Call', 'Raise小注', 'Raise全下'],
                     correct: 1,
-                    explanation: `
-                        <strong>正确答案：Call</strong>
-                        <div class="key-point">
-                            <strong>核心逻辑：</strong>76s有8张顺子补牌，面对一个大注C-bet正好有足够的odds来call。
-                        </div>
+                    explanation: `<strong>正确答案：Call</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>76s有8张顺子补牌，面对一个大注C-bet正好有足够的odds来call。</div>
                         <p><strong>数学分析：</strong></p>
                         <p>• 你需要call ~20BB到~46BB的底池 = 约30%赔率</p>
                         <p>• OESD有~32%击中率，刚好够call</p>
                         <p>• 还有隐含赔率：hit后可能赢得更多</p>
-                        <p><strong>不要raise：</strong>76s没有什么fold equity，对手很少会fold AA/KK/AK等。</p>
-                    `
+                        <p><strong>不要raise：</strong>76s没有什么fold equity，对手很少会fold AA/KK/AK等。</p>`
                 },
                 {
                     heroPos: 'BTN', villainPos: 'SB',
@@ -1072,22 +963,17 @@
                     question: '你call 3bet IP有OESD+两高张，对手C-bet 50%，你应该？',
                     options: ['Fold', 'Call', 'Raise 3x', 'Raise全下'],
                     correct: 2,
-                    explanation: `
-                        <strong>正确答案：Raise 3x</strong>
-                        <div class="key-point">
-                            <strong>核心逻辑：</strong>KQo在JT3有OESD(8张)+两个overcards，这是一个绝佳的半诈唬raise机会！
-                        </div>
+                    explanation: `<strong>正确答案：Raise 3x</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>KQo在JT3有OESD(8张)+两个overcards，这是一个绝佳的半诈唬raise机会！</div>
                         <p><strong>为什么raise？</strong></p>
                         <p>• 你有~47%的equity对抗对手的C-bet范围</p>
                         <p>• Raise可以让对手的AK/AQ等高张fold</p>
                         <p>• 你block了QQ/KK，对手更少有强牌</p>
                         <p>• 如果被call，转牌任何A/K/Q/9都让你很强</p>
-                        <p><strong>这是典型的IP float raise机会！</strong></p>
-                    `
+                        <p><strong>这是典型的IP float raise机会！</strong></p>`
                 }
             ],
 
-            // Caller OOP 场景
             'caller_oop': [
                 {
                     heroPos: 'BB', villainPos: 'BTN',
@@ -1098,17 +984,13 @@
                     question: '你OOP call 3bet有OESD，对手可能C-bet，你应该？',
                     options: ['Check-fold', 'Check-call', 'Check-raise 3x', 'Donk bet 50%'],
                     correct: 2,
-                    explanation: `
-                        <strong>正确答案：Check-raise 3x</strong>
-                        <div class="key-point">
-                            <strong>核心逻辑：</strong>JTcc在972有OESD+两个overcards，这是一个强大的check-raise bluff牌型！
-                        </div>
+                    explanation: `<strong>正确答案：Check-raise 3x</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>JTcc在972有OESD+两个overcards，这是一个强大的check-raise bluff牌型！</div>
                         <p><strong>为什么check-raise？</strong></p>
                         <p>• 你有~45%equity，即使被call也不怕</p>
                         <p>• 这个牌面对手会高频C-bet，你需要fight back</p>
                         <p>• Check-raise让对手fold AK/AQ等overcards</p>
-                        <p><strong>OOP caller需要构建check-raise范围</strong>，强draw是完美的选择。</p>
-                    `
+                        <p><strong>OOP caller需要构建check-raise范围</strong>，强draw是完美的选择。</p>`
                 },
                 {
                     heroPos: 'CO', villainPos: 'BTN',
@@ -1119,17 +1001,13 @@
                     question: '你OOP call 3bet AKs未击中，对手C-bet 66%，你应该？',
                     options: ['Fold', 'Call', 'Check-raise 3x', 'Check-raise全下'],
                     correct: 1,
-                    explanation: `
-                        <strong>正确答案：Call</strong>
-                        <div class="key-point">
-                            <strong>核心逻辑：</strong>AKs有两个overcards+后门花draw，面对C-bet应该call一条街看转牌。
-                        </div>
+                    explanation: `<strong>正确答案：Call</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>AKs有两个overcards+后门花draw，面对C-bet应该call一条街看转牌。</div>
                         <p><strong>为什么call而不是raise？</strong></p>
                         <p>• 你没有击中牌面，check-raise作为bluff太expensive</p>
                         <p>• AK有6张clean outs来击中顶对</p>
                         <p>• 如果转牌来A或K，你可以翻转局面</p>
-                        <p><strong>浮动Call</strong>是AK未击中时的标准打法，保持底池可控。</p>
-                    `
+                        <p><strong>浮动Call</strong>是AK未击中时的标准打法，保持底池可控。</p>`
                 },
                 {
                     heroPos: 'BB', villainPos: 'BTN',
@@ -1140,17 +1018,13 @@
                     question: '你OOP call 3bet 55，这个超不利牌面，对手C-bet，你应该？',
                     options: ['Fold', 'Call', 'Check-raise bluff', 'Donk bet bluff'],
                     correct: 0,
-                    explanation: `
-                        <strong>正确答案：Fold</strong>
-                        <div class="key-point">
-                            <strong>核心逻辑：</strong>55在AKJ牌面完全dead！你几乎没有任何equity来继续。
-                        </div>
+                    explanation: `<strong>正确答案：Fold</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>55在AKJ牌面完全dead！你几乎没有任何equity来继续。</div>
                         <p><strong>为什么必须fold？</strong></p>
                         <p>• 对手的C-bet范围在这里很强（大量Ax/Kx/Jx/QT）</p>
                         <p>• 你只有2张补牌（55），约4%击中</p>
                         <p>• 即使对手是bluff，你也无法call多条街</p>
-                        <p><strong>认输不可耻：</strong>好的玩家知道什么时候放弃，不要跟注到底。</p>
-                    `
+                        <p><strong>认输不可耻：</strong>好的玩家知道什么时候放弃，不要跟注到底。</p>`
                 },
                 {
                     heroPos: 'CO', villainPos: 'BTN',
@@ -1161,18 +1035,14 @@
                     question: '你OOP call 3bet有超强combo draw，对手C-bet 75%，你应该？',
                     options: ['Fold', 'Call', 'Check-raise 3x', 'Check-raise全下'],
                     correct: 3,
-                    explanation: `
-                        <strong>正确答案：Check-raise 全下</strong>
-                        <div class="key-point">
-                            <strong>核心逻辑：</strong>QJdd在T8d3c有OESD(8张)+花draw(9张)+两overcards = 超过50%equity！这是必须全下的怪物draw！
-                        </div>
+                    explanation: `<strong>正确答案：Check-raise 全下</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>QJdd在T8d3c有OESD(8张)+花draw(9张)+两overcards = 超过50%equity！这是必须全下的怪物draw！</div>
                         <p><strong>数学计算：</strong></p>
                         <p>• 花draw: 9张 (~36%到river)</p>
                         <p>• 顺子draw: ~6张额外 (~24%)</p>
                         <p>• 对子: ~6张 (~24%)</p>
                         <p>• 总equity: 约55%，你是favorite！</p>
-                        <p><strong>当你有超强combo draw</strong>，全下是唯一正确的打法，别让对手有任何免费牌。</p>
-                    `
+                        <p><strong>当你有超强combo draw</strong>，全下是唯一正确的打法，别让对手有任何免费牌。</p>`
                 }
             ]
         };
@@ -1180,22 +1050,51 @@
         // ==================== 初始化 ====================
         function init() {
             loadStats();
+            renderScenarioCards();
             generateQuestion();
         }
 
+        // ==================== 渲染场景卡片 ====================
+        function renderScenarioCards() {
+            const grid = document.getElementById('scenarioGrid');
+            if (!grid) return;
+
+            grid.innerHTML = Object.entries(SCENARIOS).map(([key, scenario]) => {
+                const count = QUESTIONS[key]?.length || 0;
+                const isActive = key === currentScenario ? 'active' : '';
+                const badgeClass = scenario.badge === 'ip' ? 'badge-ip' : 'badge-oop';
+                const badgeText = scenario.badge === 'ip' ? '有位置优势' : '位置劣势';
+                
+                return `
+                    <div class="scenario-card ${isActive}" onclick="selectScenario('${key}', this)">
+                        <div class="scenario-header">
+                            <span class="scenario-icon">${scenario.icon}</span>
+                            <span class="scenario-name">${scenario.name}</span>
+                            <span class="scenario-count">(${count}题)</span>
+                        </div>
+                        <div class="scenario-desc">${scenario.desc}</div>
+                        <span class="scenario-badge ${badgeClass}">${badgeText}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
         // ==================== 场景选择 ====================
-        function selectScenario(scenario) {
+        function selectScenario(scenario, element) {
             currentScenario = scenario;
-            document.querySelectorAll('.scenario-card').forEach(card => card.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+            lastQuestionIndex = -1; // 重置题目索引
             
-            const titles = {
-                '3bettor_ip': '3-Bettor IP 训练',
-                '3bettor_oop': '3-Bettor OOP 训练',
-                'caller_ip': 'Caller IP 训练',
-                'caller_oop': 'Caller OOP 训练'
-            };
-            document.getElementById('scenarioTitle').textContent = titles[scenario];
+            // 更新UI
+            document.querySelectorAll('.scenario-card').forEach(card => card.classList.remove('active'));
+            if (element) {
+                element.classList.add('active');
+            }
+            
+            const scenarioInfo = SCENARIOS[scenario];
+            const titleEl = document.getElementById('scenarioTitle');
+            if (titleEl && scenarioInfo) {
+                titleEl.textContent = scenarioInfo.title;
+            }
             
             generateQuestion();
         }
@@ -1205,70 +1104,111 @@
             answered = false;
             
             const questions = QUESTIONS[currentScenario];
-            currentQuestion = questions[Math.floor(Math.random() * questions.length)];
+            if (!questions || questions.length === 0) {
+                console.error('No questions for scenario:', currentScenario);
+                return;
+            }
             
-            // 更新位置
-            document.getElementById('heroPosition').textContent = currentQuestion.heroPos;
-            document.getElementById('villainPosition').textContent = currentQuestion.villainPos;
+            // 【修复】避免连续相同题目
+            let newIndex;
+            if (questions.length === 1) {
+                newIndex = 0;
+            } else {
+                do {
+                    newIndex = Math.floor(Math.random() * questions.length);
+                } while (newIndex === lastQuestionIndex);
+            }
+            lastQuestionIndex = newIndex;
+            currentQuestion = questions[newIndex];
             
-            // 更新牌面
+            // 安全更新DOM
+            safeSetText('heroPosition', currentQuestion.heroPos);
+            safeSetText('villainPosition', currentQuestion.villainPos);
+            safeSetText('boardTexture', currentQuestion.boardTexture);
+            safeSetText('potSize', currentQuestion.pot);
+            safeSetText('spr', currentQuestion.spr);
+            safeSetText('effectiveStack', currentQuestion.stack);
+            
+            // 渲染牌面和手牌
             renderBoard(currentQuestion.board);
-            document.getElementById('boardTexture').textContent = currentQuestion.boardTexture;
-            
-            // 更新手牌
             renderHand('heroHand', currentQuestion.heroHand);
             
-            // 更新信息
-            document.getElementById('potSize').textContent = currentQuestion.pot;
-            document.getElementById('spr').textContent = currentQuestion.spr;
-            document.getElementById('effectiveStack').textContent = currentQuestion.stack;
-            
-            // 更新问题
-            document.getElementById('questionText').innerHTML = currentQuestion.question.replace(
-                /(3-bettor|caller|IP|OOP)/gi, 
-                '<span class="highlight">$1</span>'
-            );
+            // 更新问题（带高亮）
+            const questionEl = document.getElementById('questionText');
+            if (questionEl) {
+                questionEl.innerHTML = escapeHtml(currentQuestion.question).replace(
+                    /(3-bettor|caller|IP|OOP|C-bet|check|raise)/gi, 
+                    '<span class="highlight">$1</span>'
+                );
+            }
             
             // 渲染选项
             renderOptions(currentQuestion.options);
             
             // 隐藏解析和下一题按钮
-            document.getElementById('explanationSection').classList.remove('visible');
-            document.getElementById('nextBtn').classList.remove('visible');
+            const explSection = document.getElementById('explanationSection');
+            const nextBtn = document.getElementById('nextBtn');
+            if (explSection) explSection.classList.remove('visible');
+            if (nextBtn) nextBtn.classList.remove('visible');
+        }
+
+        // ==================== 安全DOM操作 ====================
+        function safeSetText(id, text) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text || '';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         // ==================== 渲染牌面 ====================
         function renderBoard(board) {
             const container = document.getElementById('boardCards');
+            if (!container || !Array.isArray(board)) return;
             container.innerHTML = board.map(card => renderCard(card)).join('');
         }
 
         function renderHand(containerId, hand) {
             const container = document.getElementById(containerId);
+            if (!container || !Array.isArray(hand)) return;
             container.innerHTML = hand.map(card => renderCard(card)).join('');
         }
 
         function renderCard(cardStr) {
+            // 【修复】输入验证
+            if (!cardStr || typeof cardStr !== 'string' || cardStr.length < 2) {
+                return '<div class="card hidden"></div>';
+            }
+            
             const rank = cardStr[0].toUpperCase();
             const suitChar = cardStr[1].toLowerCase();
-            const suitMap = { 's': '♠', 'h': '♥', 'd': '♦', 'c': '♣' };
-            const suit = suitMap[suitChar];
-            const suitClass = SUIT_CLASSES[suit];
+            const suit = SUIT_MAP[suitChar];
             
-            return `<div class="card ${suitClass}"><span>${rank}</span><span class="suit">${suit}</span></div>`;
+            if (!suit) {
+                return '<div class="card hidden"></div>';
+            }
+            
+            const suitClass = SUIT_CLASSES[suit] || 'spades';
+            
+            return `<div class="card ${suitClass}"><span>${escapeHtml(rank)}</span><span class="suit">${suit}</span></div>`;
         }
 
         // ==================== 渲染选项 ====================
         function renderOptions(options) {
             const container = document.getElementById('optionsGrid');
+            if (!container || !Array.isArray(options)) return;
+            
             container.innerHTML = options.map((opt, idx) => 
-                `<button class="option-btn" onclick="selectAnswer(${idx})">${opt}</button>`
+                `<button class="option-btn" onclick="selectAnswer(${idx})">${escapeHtml(opt)}</button>`
             ).join('');
         }
 
         // ==================== 选择答案 ====================
         function selectAnswer(idx) {
-            if (answered) return;
+            if (answered || !currentQuestion) return;
             answered = true;
             
             const buttons = document.querySelectorAll('.option-btn');
@@ -1292,34 +1232,67 @@
             saveStats();
             
             // 显示解析
-            document.getElementById('explanationContent').innerHTML = currentQuestion.explanation;
-            document.getElementById('explanationSection').classList.add('visible');
-            document.getElementById('nextBtn').classList.add('visible');
+            const explContent = document.getElementById('explanationContent');
+            const explSection = document.getElementById('explanationSection');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            if (explContent) explContent.innerHTML = currentQuestion.explanation;
+            if (explSection) explSection.classList.add('visible');
+            if (nextBtn) nextBtn.classList.add('visible');
         }
 
         // ==================== 下一题 ====================
         function nextQuestion() {
             generateQuestion();
-            window.scrollTo({ top: 300, behavior: 'smooth' });
+            // 【修复】滚动兼容性
+            try {
+                window.scrollTo({ top: 300, behavior: 'smooth' });
+            } catch (e) {
+                window.scrollTo(0, 300);
+            }
         }
 
         // ==================== 统计相关 ====================
         function updateStats() {
-            document.getElementById('totalCount').textContent = stats.total;
-            document.getElementById('correctCount').textContent = stats.correct;
-            document.getElementById('wrongCount').textContent = stats.wrong;
+            safeSetText('totalCount', stats.total);
+            safeSetText('correctCount', stats.correct);
+            safeSetText('wrongCount', stats.wrong);
             const accuracy = stats.total > 0 ? Math.round(stats.correct / stats.total * 100) : 0;
-            document.getElementById('accuracy').textContent = accuracy + '%';
+            safeSetText('accuracy', accuracy + '%');
         }
 
         function saveStats() {
-            localStorage.setItem('3bet_pot_stats', JSON.stringify(stats));
+            try {
+                localStorage.setItem('3bet_pot_stats', JSON.stringify(stats));
+            } catch (e) {
+                console.warn('Failed to save stats:', e);
+            }
         }
 
         function loadStats() {
-            const saved = localStorage.getItem('3bet_pot_stats');
-            if (saved) {
-                stats = JSON.parse(saved);
+            try {
+                const saved = localStorage.getItem('3bet_pot_stats');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    // 【修复】验证数据结构
+                    if (typeof parsed.total === 'number' && 
+                        typeof parsed.correct === 'number' && 
+                        typeof parsed.wrong === 'number') {
+                        stats = parsed;
+                    }
+                }
+            } catch (e) {
+                console.warn('Failed to load stats:', e);
+                stats = { total: 0, correct: 0, wrong: 0 };
+            }
+            updateStats();
+        }
+
+        // 【新增】重置统计
+        function resetStats() {
+            if (confirm('确定要清零所有统计数据吗？')) {
+                stats = { total: 0, correct: 0, wrong: 0 };
+                saveStats();
                 updateStats();
             }
         }
@@ -1329,4 +1302,3 @@
     </script>
 </body>
 </html>
-
