@@ -445,6 +445,408 @@ const lagRanges = {
             percentage: '~4%',
             notes: '400BB+超深筹码时，可以考虑用更多牌平跟4-Bet'
         }
+    },
+
+    // ⭐ 新增：Call Open 范围（这是松凶玩家最重要的范围之一！）
+    callOpen: {
+        // BB facing open (盲注位防守)
+        BB: {
+            vsUTG: {
+                range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55', '44', '33', '22',
+                       'AQs', 'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'KQs', 'KJs', 'KTs', 'K9s',
+                       'QJs', 'QTs', 'Q9s',
+                       'JTs', 'J9s', 'J8s',
+                       'T9s', 'T8s',
+                       '98s', '97s',
+                       '87s', '86s',
+                       '76s', '75s',
+                       '65s',
+                       'AQo', 'AJo', 'ATo',
+                       'KQo', 'KJo',
+                       'QJo'],
+                percentage: '32%',
+                potOdds: '3.5:1 (需要防守约23%，我们防守32%)',
+                notes: 'BB vs UTG需要广泛防守。所有对子（setmine价值），所有同花Ace（坚果潜力），同花连牌（隐含赔率）'
+            },
+            vsLJ: {
+                range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55', '44', '33', '22',
+                       'AQs', 'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'KQs', 'KJs', 'KTs', 'K9s', 'K8s',
+                       'QJs', 'QTs', 'Q9s', 'Q8s',
+                       'JTs', 'J9s', 'J8s', 'J7s',
+                       'T9s', 'T8s', 'T7s',
+                       '98s', '97s', '96s',
+                       '87s', '86s', '85s',
+                       '76s', '75s', '74s',
+                       '65s', '64s',
+                       '54s',
+                       'AQo', 'AJo', 'ATo', 'A9o',
+                       'KQo', 'KJo', 'KTo',
+                       'QJo', 'QTo'],
+                percentage: '38%',
+                potOdds: '3.5:1',
+                notes: 'vs LJ扩大范围，增加更多同花连牌和散牌高牌'
+            },
+            vsHJ: {
+                range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55', '44', '33', '22',
+                       'AQs', 'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'KQs', 'KJs', 'KTs', 'K9s', 'K8s', 'K7s',
+                       'QJs', 'QTs', 'Q9s', 'Q8s', 'Q7s',
+                       'JTs', 'J9s', 'J8s', 'J7s', 'J6s',
+                       'T9s', 'T8s', 'T7s', 'T6s',
+                       '98s', '97s', '96s', '95s',
+                       '87s', '86s', '85s',
+                       '76s', '75s', '74s',
+                       '65s', '64s', '63s',
+                       '54s', '53s',
+                       'AQo', 'AJo', 'ATo', 'A9o', 'A8o',
+                       'KQo', 'KJo', 'KTo', 'K9o',
+                       'QJo', 'QTo', 'Q9o',
+                       'JTo', 'J9o'],
+                percentage: '42%',
+                potOdds: '3.5:1',
+                notes: 'vs HJ大幅扩张，几乎所有可玩牌型'
+            },
+            vsCO: {
+                range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55', '44', '33', '22',
+                       'AQs', 'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'KQs', 'KJs', 'KTs', 'K9s', 'K8s', 'K7s', 'K6s', 'K5s', 'K4s',
+                       'QJs', 'QTs', 'Q9s', 'Q8s', 'Q7s', 'Q6s', 'Q5s',
+                       'JTs', 'J9s', 'J8s', 'J7s', 'J6s', 'J5s',
+                       'T9s', 'T8s', 'T7s', 'T6s', 'T5s',
+                       '98s', '97s', '96s', '95s', '94s',
+                       '87s', '86s', '85s', '84s',
+                       '76s', '75s', '74s', '73s',
+                       '65s', '64s', '63s',
+                       '54s', '53s', '52s',
+                       'AQo', 'AJo', 'ATo', 'A9o', 'A8o', 'A7o', 'A6o', 'A5o',
+                       'KQo', 'KJo', 'KTo', 'K9o', 'K8o',
+                       'QJo', 'QTo', 'Q9o', 'Q8o',
+                       'JTo', 'J9o', 'J8o',
+                       'T9o', 'T8o',
+                       '98o', '97o',
+                       '87o'],
+                percentage: '48%',
+                potOdds: '3.5:1',
+                notes: 'vs CO极度宽松，对抗CO偷盲必须用接近50%防守'
+            },
+            vsBTN: {
+                range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55', '44', '33', '22',
+                       'AKs', 'AQs', 'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'KQs', 'KJs', 'KTs', 'K9s', 'K8s', 'K7s', 'K6s', 'K5s', 'K4s', 'K3s', 'K2s',
+                       'QJs', 'QTs', 'Q9s', 'Q8s', 'Q7s', 'Q6s', 'Q5s', 'Q4s', 'Q3s',
+                       'JTs', 'J9s', 'J8s', 'J7s', 'J6s', 'J5s', 'J4s', 'J3s',
+                       'T9s', 'T8s', 'T7s', 'T6s', 'T5s', 'T4s',
+                       '98s', '97s', '96s', '95s', '94s', '93s',
+                       '87s', '86s', '85s', '84s', '83s',
+                       '76s', '75s', '74s', '73s', '72s',
+                       '65s', '64s', '63s', '62s',
+                       '54s', '53s', '52s',
+                       'AKo', 'AQo', 'AJo', 'ATo', 'A9o', 'A8o', 'A7o', 'A6o', 'A5o', 'A4o', 'A3o', 'A2o',
+                       'KQo', 'KJo', 'KTo', 'K9o', 'K8o', 'K7o', 'K6o', 'K5o',
+                       'QJo', 'QTo', 'Q9o', 'Q8o', 'Q7o',
+                       'JTo', 'J9o', 'J8o', 'J7o',
+                       'T9o', 'T8o', 'T7o',
+                       '98o', '97o', '96o',
+                       '87o', '86o',
+                       '76o'],
+                percentage: '55%',
+                potOdds: '3.5:1',
+                notes: 'vs BTN超宽防守！BTN偷盲频率极高，必须用55%+范围对抗，否则被疯狂剥削'
+            },
+            vsSB: {
+                range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55', '44', '33', '22',
+                       'AKs', 'AQs', 'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'KQs', 'KJs', 'KTs', 'K9s', 'K8s', 'K7s', 'K6s',
+                       'QJs', 'QTs', 'Q9s', 'Q8s', 'Q7s', 'Q6s',
+                       'JTs', 'J9s', 'J8s', 'J7s', 'J6s',
+                       'T9s', 'T8s', 'T7s', 'T6s',
+                       '98s', '97s', '96s', '95s',
+                       '87s', '86s', '85s', '84s',
+                       '76s', '75s', '74s',
+                       '65s', '64s', '63s',
+                       '54s', '53s',
+                       'AKo', 'AQo', 'AJo', 'ATo', 'A9o', 'A8o', 'A7o', 'A6o', 'A5o',
+                       'KQo', 'KJo', 'KTo', 'K9o', 'K8o',
+                       'QJo', 'QTo', 'Q9o', 'Q8o',
+                       'JTo', 'J9o', 'J8o',
+                       'T9o', 'T8o',
+                       '98o', '97o',
+                       '87o'],
+                percentage: '45%',
+                potOdds: '2.5:1 (SB已投入1BB)',
+                notes: 'vs SB防守较宽，但不如vs BTN，因为SB范围稍紧'
+            }
+        },
+
+        // SB facing open (小盲位防守)
+        SB: {
+            vsUTG: {
+                range: ['TT', '99', '88', '77', '66', '55', '44', '33', '22',
+                       'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'KQs', 'KJs', 'KTs',
+                       'QJs', 'QTs',
+                       'JTs', 'J9s',
+                       'T9s', 'T8s',
+                       '98s', '97s',
+                       '87s', '86s',
+                       '76s',
+                       'AJo', 'ATo',
+                       'KQo'],
+                percentage: '18%',
+                notes: 'SB vs UTG要紧，因为还有BB在后面。主要是对子（setmine）和同花牌'
+            },
+            vsLJ: {
+                range: ['TT', '99', '88', '77', '66', '55', '44', '33', '22',
+                       'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'KQs', 'KJs', 'KTs', 'K9s',
+                       'QJs', 'QTs', 'Q9s',
+                       'JTs', 'J9s', 'J8s',
+                       'T9s', 'T8s', 'T7s',
+                       '98s', '97s', '96s',
+                       '87s', '86s', '85s',
+                       '76s', '75s',
+                       '65s',
+                       'AJo', 'ATo', 'A9o',
+                       'KQo', 'KJo'],
+                percentage: '22%',
+                notes: 'vs LJ稍微扩张'
+            },
+            vsHJ: {
+                range: ['TT', '99', '88', '77', '66', '55', '44', '33', '22',
+                       'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'KQs', 'KJs', 'KTs', 'K9s', 'K8s',
+                       'QJs', 'QTs', 'Q9s', 'Q8s',
+                       'JTs', 'J9s', 'J8s', 'J7s',
+                       'T9s', 'T8s', 'T7s',
+                       '98s', '97s', '96s',
+                       '87s', '86s', '85s',
+                       '76s', '75s', '74s',
+                       '65s', '64s',
+                       '54s',
+                       'AJo', 'ATo', 'A9o',
+                       'KQo', 'KJo', 'KTo',
+                       'QJo'],
+                percentage: '26%',
+                notes: 'vs HJ继续扩张'
+            },
+            vsCO: {
+                range: ['99', '88', '77', '66', '55', '44', '33', '22',
+                       'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'KJs', 'KTs', 'K9s', 'K8s', 'K7s',
+                       'QJs', 'QTs', 'Q9s', 'Q8s', 'Q7s',
+                       'JTs', 'J9s', 'J8s', 'J7s', 'J6s',
+                       'T9s', 'T8s', 'T7s', 'T6s',
+                       '98s', '97s', '96s', '95s',
+                       '87s', '86s', '85s', '84s',
+                       '76s', '75s', '74s', '73s',
+                       '65s', '64s', '63s',
+                       '54s', '53s',
+                       'ATo', 'A9o', 'A8o',
+                       'KQo', 'KJo', 'KTo',
+                       'QJo', 'QTo'],
+                percentage: '28%',
+                notes: 'vs CO大幅扩张，但仍需谨慎因为OOP'
+            },
+            vsBTN: {
+                range: ['88', '77', '66', '55', '44', '33', '22',
+                       'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'KTs', 'K9s', 'K8s', 'K7s', 'K6s',
+                       'QJs', 'QTs', 'Q9s', 'Q8s', 'Q7s', 'Q6s',
+                       'JTs', 'J9s', 'J8s', 'J7s', 'J6s', 'J5s',
+                       'T9s', 'T8s', 'T7s', 'T6s', 'T5s',
+                       '98s', '97s', '96s', '95s', '94s',
+                       '87s', '86s', '85s', '84s', '83s',
+                       '76s', '75s', '74s', '73s',
+                       '65s', '64s', '63s', '62s',
+                       '54s', '53s', '52s',
+                       'A9o', 'A8o', 'A7o', 'A6o',
+                       'KTo', 'K9o',
+                       'QJo', 'QTo', 'Q9o',
+                       'JTo', 'J9o',
+                       'T9o'],
+                percentage: '32%',
+                notes: 'vs BTN偷盲也要宽防，但因为OOP所以比BB紧一些。优先选择同花牌和投机牌'
+            }
+        },
+
+        // BTN facing open (按钮位平跟)
+        BTN: {
+            vsUTG: {
+                range: ['TT', '99', '88', '77', '66', '55', '44', '33', '22',
+                       'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'KQs', 'KJs', 'KTs', 'K9s',
+                       'QJs', 'QTs', 'Q9s',
+                       'JTs', 'J9s',
+                       'T9s', 'T8s',
+                       '98s', '97s',
+                       '87s', '76s',
+                       'AJo', 'ATo',
+                       'KQo', 'KJo'],
+                percentage: '20%',
+                notes: 'BTN vs UTG：有位置优势，可以宽松跟注。对子+同花牌+部分高牌'
+            },
+            vsLJ: {
+                range: ['TT', '99', '88', '77', '66', '55', '44', '33', '22',
+                       'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'KQs', 'KJs', 'KTs', 'K9s', 'K8s',
+                       'QJs', 'QTs', 'Q9s', 'Q8s',
+                       'JTs', 'J9s', 'J8s',
+                       'T9s', 'T8s', 'T7s',
+                       '98s', '97s', '96s',
+                       '87s', '86s',
+                       '76s', '75s',
+                       '65s',
+                       'AJo', 'ATo', 'A9o',
+                       'KQo', 'KJo', 'KTo',
+                       'QJo'],
+                percentage: '25%',
+                notes: 'vs LJ扩大范围'
+            },
+            vsHJ: {
+                range: ['99', '88', '77', '66', '55', '44', '33', '22',
+                       'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'KJs', 'KTs', 'K9s', 'K8s', 'K7s',
+                       'QJs', 'QTs', 'Q9s', 'Q8s', 'Q7s',
+                       'JTs', 'J9s', 'J8s', 'J7s',
+                       'T9s', 'T8s', 'T7s', 'T6s',
+                       '98s', '97s', '96s',
+                       '87s', '86s', '85s',
+                       '76s', '75s', '74s',
+                       '65s', '64s',
+                       '54s',
+                       'ATo', 'A9o', 'A8o',
+                       'KQo', 'KJo', 'KTo',
+                       'QJo', 'QTo'],
+                percentage: '28%',
+                notes: 'vs HJ大幅扩张投机牌'
+            },
+            vsCO: {
+                range: ['88', '77', '66', '55', '44', '33', '22',
+                       'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'KTs', 'K9s', 'K8s', 'K7s', 'K6s',
+                       'QTs', 'Q9s', 'Q8s', 'Q7s', 'Q6s',
+                       'JTs', 'J9s', 'J8s', 'J7s', 'J6s',
+                       'T9s', 'T8s', 'T7s', 'T6s', 'T5s',
+                       '98s', '97s', '96s', '95s',
+                       '87s', '86s', '85s', '84s',
+                       '76s', '75s', '74s', '73s',
+                       '65s', 'ç64s', '63s',
+                       '54s', '53s', '52s',
+                       'A9o', 'A8o',
+                       'KJo', 'KTo', 'K9o',
+                       'QJo', 'QTo', 'Q9o',
+                       'JTo', 'J9o',
+                       'T9o'],
+                percentage: '30%',
+                notes: 'BTN vs CO：经典BTN平跟spot，大量投机牌'
+            }
+        },
+
+        // CO facing open (CO位平跟)
+        CO: {
+            vsUTG: {
+                range: ['99', '88', '77', '66', '55', '44', '33', '22',
+                       'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'KJs', 'KTs', 'K9s',
+                       'QJs', 'QTs',
+                       'JTs', 'J9s',
+                       'T9s', 'T8s',
+                       '98s', '97s',
+                       '87s', '76s',
+                       'ATo',
+                       'KQo'],
+                percentage: '16%',
+                notes: 'CO vs UTG较紧，还有BTN在后面'
+            },
+            vsLJ: {
+                range: ['99', '88', '77', '66', '55', '44', '33', '22',
+                       'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'KJs', 'KTs', 'K9s', 'K8s',
+                       'QJs', 'QTs', 'Q9s',
+                       'JTs', 'J9s', 'J8s',
+                       'T9s', 'T8s', 'T7s',
+                       '98s', '97s', '96s',
+                       '87s', '86s',
+                       '76s', '75s',
+                       '65s',
+                       'ATo', 'A9o',
+                       'KQo', 'KJo'],
+                percentage: '20%',
+                notes: 'vs LJ适度扩张'
+            },
+            vsHJ: {
+                range: ['88', '77', '66', '55', '44', '33', '22',
+                       'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
+                       'KTs', 'K9s', 'K8s', 'K7s',
+                       'QJs', 'QTs', 'Q9s', 'Q8s',
+                       'JTs', 'J9s', 'J8s', 'J7s',
+                       'T9s', 'T8s', 'T7s', 'T6s',
+                       '98s', '97s', '96s',
+                       '87s', '86s', '85s',
+                       '76s', '75s', '74s',
+                       '65s', '64s',
+                       '54s',
+                       'A9o', 'A8o',
+                       'KJo', 'KTo',
+                       'QJo'],
+                percentage: '24%',
+                notes: 'vs HJ大幅扩张投机牌'
+            }
+        }
+    },
+
+    // ⭐ 新增：Squeeze（挤压）范围
+    squeeze: {
+        BB: {
+            general: {
+                range: ['AA', 'KK', 'QQ', 'JJ', 'TT',
+                       'AKs', 'AQs', 'AJs',
+                       'AKo', 'AQo',
+                       'A5s', 'A4s', 'A3s', 'A2s'],
+                percentage: '7%',
+                sizing: '4-5x原加注',
+                notes: 'BB面对Open+Call时的Squeeze。需要强价值牌+阻断牌诈唬'
+            }
+        },
+        SB: {
+            general: {
+                range: ['AA', 'KK', 'QQ', 'JJ',
+                       'AKs', 'AQs',
+                       'AKo',
+                       'A5s', 'A4s'],
+                percentage: '5%',
+                sizing: '4-5x原加注',
+                notes: 'SB的Squeeze要更紧，因为还有BB在后面'
+            }
+        }
+    },
+
+    // ⭐ 新增：MDF（最小防守频率）计算器
+    mdfCalculator: {
+        facing3Bet: {
+            potOdds: '2.5:1 (典型3-Bet场景)',
+            mdf: '71.4%',
+            notes: '面对3-Bet，底池赔率约2.5:1，需要至少用28.6%范围继续（3-Bet或Call），否则被剥削'
+        },
+        facing4Bet: {
+            potOdds: '1.8:1',
+            mdf: '64.3%',
+            notes: '面对4-Bet，需要用约36%的3-Bet范围继续（4-Bet或Call）'
+        },
+        facingCBet: {
+            halfPot: {
+                potOdds: '3:1',
+                mdf: '66.7%',
+                notes: '面对半池Cbet，需要用66.7%范围继续（加注或跟注）'
+            },
+            twothirdPot: {
+                potOdds: '2.5:1',
+                mdf: '60%',
+                notes: '面对2/3池Cbet，需要用60%范围继续'
+            }
+        }
     }
 };
 
@@ -516,6 +918,28 @@ function highlightRange(position, action, vsPosition = null) {
             <div><span class="highlight">说明：</span>${data.notes}</div>
             <div style="margin-top: 15px;"><span class="highlight">包含手牌：</span>${range.join(', ')}</div>
         `;
+    } else if (action === 'callopen') {
+        // 新增：Call Open范围显示
+        if (vsPosition && lagRanges.callOpen[position] && lagRanges.callOpen[position][vsPosition]) {
+            const data = lagRanges.callOpen[position][vsPosition];
+            range = data.range || [];
+            details = `
+                <div><span class="highlight">位置：</span>${position} Call ${vsPosition.replace('vs', '')} Open</div>
+                <div><span class="highlight">范围：</span>${data.percentage}</div>
+                <div><span class="highlight">底池赔率：</span>${data.potOdds || 'N/A'}</div>
+                <div><span class="highlight">说明：</span>${data.notes}</div>
+                <div style="margin-top: 10px; padding: 10px; background: rgba(255,215,0,0.1); border-radius: 5px;">
+                    <strong>💡 关键概念：</strong>深筹码松凶玩家必须大量使用Call Open来：<br>
+                    1️⃣ 利用隐含赔率（对子成set能赢大底池）<br>
+                    2️⃣ 保持范围平衡（不只是3-Bet或Fold）<br>
+                    3️⃣ 有位置优势时发挥翻后技术<br>
+                    4️⃣ 防守盲注不被疯狂剥削
+                </div>
+                <div style="margin-top: 15px;"><span class="highlight">包含手牌（${range.length}个组合）：</span>${range.slice(0, 30).join(', ')}${range.length > 30 ? '...' : ''}</div>
+            `;
+        } else {
+            details = '<div>请选择对抗位置</div>';
+        }
     } else if (action === '3bet') {
         if (vsPosition && lagRanges.threeBet[position] && lagRanges.threeBet[position][vsPosition]) {
             const data = lagRanges.threeBet[position][vsPosition];
@@ -568,6 +992,22 @@ function highlightRange(position, action, vsPosition = null) {
             <div><span class="highlight">Call 4-Bet范围</span></div>
             <div><span class="highlight">范围：</span>${data.percentage}</div>
             <div><span class="highlight">说明：</span>${data.notes}</div>
+            <div style="margin-top: 15px;"><span class="highlight">包含手牌：</span>${range.join(', ')}</div>
+        `;
+    } else if (action === 'squeeze') {
+        // 新增：Squeeze范围
+        const data = lagRanges.squeeze[position]?.general || lagRanges.squeeze.BB.general;
+        range = data.range || [];
+        details = `
+            <div><span class="highlight">Squeeze（挤压）范围</span></div>
+            <div><span class="highlight">场景：</span>${position} 面对 Open + Call</div>
+            <div><span class="highlight">范围：</span>${data.percentage}</div>
+            <div><span class="highlight">Squeeze大小：</span>${data.sizing}</div>
+            <div><span class="highlight">说明：</span>${data.notes}</div>
+            <div style="margin-top: 10px; padding: 10px; background: rgba(255,69,0,0.1); border-radius: 5px;">
+                <strong>🔥 Squeeze技巧：</strong>当前面有Open和Call时，用强牌价值挤压+阻断牌诈唬。<br>
+                成功率高因为：Original Raiser被夹击，Caller证明自己较弱。
+            </div>
             <div style="margin-top: 15px;"><span class="highlight">包含手牌：</span>${range.join(', ')}</div>
         `;
     }
@@ -846,7 +1286,32 @@ function updateVsPositionSelector(position, action) {
     const vsSelector = document.getElementById('vs-position-selector');
     const vsPositionsDiv = document.getElementById('vs-positions');
     
-    if (action === '3bet' && lagRanges.threeBet[position]) {
+    if (action === 'callopen' && lagRanges.callOpen[position]) {
+        // 新增：Call Open的位置选择
+        vsSelector.style.display = 'block';
+        vsPositionsDiv.innerHTML = '';
+        
+        const vsPositions = Object.keys(lagRanges.callOpen[position]);
+        vsPositions.forEach((vsPos, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'position-btn' + (index === 0 ? ' active' : '');
+            btn.dataset.vsposition = vsPos;
+            btn.textContent = vsPos.replace('vs', '');
+            
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('#vs-positions .position-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                highlightRange(position, action, vsPos);
+            });
+            
+            vsPositionsDiv.appendChild(btn);
+        });
+        
+        // 自动显示第一个
+        if (vsPositions.length > 0) {
+            highlightRange(position, action, vsPositions[0]);
+        }
+    } else if (action === '3bet' && lagRanges.threeBet[position]) {
         vsSelector.style.display = 'block';
         vsPositionsDiv.innerHTML = '';
         

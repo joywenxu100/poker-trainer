@@ -620,11 +620,13 @@
 
             <div class="action-selector">
                 <button class="action-btn active" data-action="open">Open Raise</button>
+                <button class="action-btn" data-action="callopen">Call Open</button>
                 <button class="action-btn" data-action="3bet">3-Bet</button>
                 <button class="action-btn" data-action="4bet">4-Bet</button>
                 <button class="action-btn" data-action="5bet">5-Bet/All-in</button>
                 <button class="action-btn" data-action="call3bet">Call 3-Bet</button>
                 <button class="action-btn" data-action="call4bet">Call 4-Bet</button>
+                <button class="action-btn" data-action="squeeze">Squeeze</button>
             </div>
 
             <div id="vs-position-selector" class="vs-position-selector" style="display: none;">
@@ -693,6 +695,34 @@
                         <li><strong>BTN (48%)</strong>：CO基础 + "任何同花牌, 任何对子, 强Axx"</li>
                         <li><strong>SB (35%)</strong>：对抗BB+Straddle要紧一些，接近CO范围</li>
                     </ul>
+                </div>
+
+                <div class="memory-category" style="background: rgba(0, 217, 255, 0.15); border: 2px solid rgba(0, 217, 255, 0.4);">
+                    <h4 style="color: #00BFFF; margin-bottom: 10px;">⭐ 2B. Call Open记忆法 - 松凶玩家的核心武器！</h4>
+                    <div style="margin-bottom: 15px; padding: 10px; background: rgba(255,69,0,0.1); border-radius: 5px;">
+                        <strong>🎯 为什么Call Open极其重要：</strong><br>
+                        • 60%的决策都是面对Open时做出的<br>
+                        • 防守盲注是盈利的关键<br>
+                        • 深筹码隐含赔率价值巨大<br>
+                        • 平衡你的范围（不只是3-Bet or Fold）
+                    </div>
+                    <ul class="memory-list">
+                        <li><strong>BB vs UTG (32%)</strong>：所有对子（setmine）+ 所有同花Ace + 强同花连牌 + ATo+/KQo</li>
+                        <li><strong>BB vs HJ (42%)</strong>：扩大到几乎所有可玩牌，同花连牌降到64s</li>
+                        <li><strong>BB vs CO (48%)</strong>：对抗CO偷盲必须宽防！同花连牌到52s，散牌到87o</li>
+                        <li><strong>BB vs BTN (55%)</strong>：超宽防守！包括72s这类垃圾同花牌</li>
+                        <li><strong>SB vs UTG (18%)</strong>：SB要紧因为还有BB，主要对子+同花牌</li>
+                        <li><strong>SB vs BTN (32%)</strong>：对抗BTN偷盲也要宽，但比BB紧</li>
+                        <li><strong>BTN vs UTG (20%)</strong>：有位置可宽松跟注，对子+同花牌</li>
+                        <li><strong>BTN vs CO (30%)</strong>：经典spot，大量投机牌</li>
+                    </ul>
+                    <div style="margin-top: 15px; padding: 10px; background: rgba(255,215,0,0.1); border-radius: 5px;">
+                        <strong>💡 快速记忆：</strong><br>
+                        • <strong>盲注位</strong>：必须大量防守（BB 32-55%，SB 18-32%）<br>
+                        • <strong>后位vs前位</strong>：所有对子 + 所有同花牌<br>
+                        • <strong>对手越后，防守越宽</strong>：vs UTG紧，vs BTN极宽<br>
+                        • <strong>有位置优势</strong>：BTN可以用更多牌平跟
+                    </div>
                 </div>
 
                 <div class="memory-category">
@@ -826,6 +856,19 @@
                     <div class="tip-card">
                         <div class="tip-title">2. 主动进攻优于被动跟注</div>
                         <div>松凶玩家的核心是"松"在范围，"凶"在动作。尽可能选择加注而非跟注，这样可以：(1) 立即赢得底池 (2) 获得主动权 (3) 隐藏手牌强度。</div>
+                    </div>
+                    <div class="tip-card" style="background: rgba(0,217,255,0.15); border-left-color: #00BFFF;">
+                        <div class="tip-title" style="color: #00BFFF;">⭐ NEW: MDF（最小防守频率）理论</div>
+                        <div><strong>这是成为世界级玩家的必修课！</strong><br><br>
+                        <strong>核心公式：</strong> MDF = 底池 / (底池 + 下注)<br><br>
+                        <strong>面对3-Bet（7.5BB into 6BB底池）：</strong><br>
+                        • 底池赔率：6 / (6 + 7.5) = 44.4%<br>
+                        • MDF：至少用55.6%的Open范围继续<br>
+                        • 实战：用~30% 4-Bet，~25% Call = 55% 总防守<br><br>
+                        <strong>面对Cbet（半池）：</strong><br>
+                        • MDF = 66.7%（需要用2/3范围继续）<br><br>
+                        <strong>黄金法则：</strong>如果你的弃牌率高于MDF，对手可以用任何两张牌盈利诈唬！
+                        </div>
                     </div>
                     <div class="tip-card">
                         <div class="tip-title">3. 利用隐含赔率</div>
