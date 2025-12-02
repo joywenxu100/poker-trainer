@@ -177,7 +177,6 @@ async function handleSubmit() {
 
     if (imageBase64) {
         // 🖼️ 有图片模式：先让Gemini/Claude识别图片，再把结果给DeepSeek分析
-        console.log('📷 检测到图片，启用串行模式：先识别图片，再深度分析');
         document.getElementById('loadingText').textContent = '🖼️ 第一步：识别图片中...';
         
         // 第一步：并行调用支持图片的模型（Gemini和Claude都通过OpenRouter）
@@ -185,6 +184,15 @@ async function handleSubmit() {
         if (API_KEYS.openrouter) {
             imagePromises.push(callGemini(question, imageBase64));
             imagePromises.push(callClaude(question, imageBase64));
+        }
+        
+        // 🔧 修复：检查imagePromises是否为空
+        if (imagePromises.length === 0) {
+            alert('⚠️ 图片识别需要OpenRouter密钥，请配置');
+            document.getElementById('loading').classList.remove('show');
+            document.getElementById('submitBtn').disabled = false;
+            openSettings();
+            return;
         }
         
         const imageResults = await Promise.allSettled(imagePromises);
@@ -207,7 +215,6 @@ async function handleSubmit() {
                 }
                 const deepseekQuestion = `用户问题：${question || '请分析这张图片'}\n\n图片内容（由AI识别）：\n${geminiContent}\n\n请基于以上信息，进行深度分析和推理。`;
                 
-                console.log('🧠 将Gemini识别结果转发给DeepSeek进行深度分析');
                 const deepseekResult = await callDeepSeekR1(deepseekQuestion, null);
                 deepseekResult.model = 'DeepSeek (深度分析)';
                 results.push({ status: 'fulfilled', value: deepseekResult });
@@ -237,7 +244,6 @@ async function handleSubmit() {
         }
     } else {
         // 📝 纯文字模式：并行调用所有模型
-        console.log('📝 纯文字模式，并行调用所有模型');
         document.getElementById('loadingText').textContent = '📝 正在同时询问三个AI模型...';
         const promises = [];
         
@@ -247,6 +253,14 @@ async function handleSubmit() {
             promises.push(callGemini(question, null));
         }
         if (API_KEYS.deepseek) promises.push(callDeepSeekR1(question, null));
+
+        // 🔧 修复：检查promises是否为空
+        if (promises.length === 0) {
+            alert('⚠️ 没有可用的API密钥');
+            document.getElementById('loading').classList.remove('show');
+            document.getElementById('submitBtn').disabled = false;
+            return;
+        }
 
         results = await Promise.allSettled(promises);
     }
@@ -295,9 +309,6 @@ async function callClaude(question, imageBase64) {
         const apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
         const apiKey = API_KEYS.openrouter;
         
-        console.log('🔑 OpenRouter密钥前10位:', apiKey ? apiKey.substring(0, 10) + '...' : '未配置');
-        console.log('🌐 调用URL:', apiUrl);
-        
         if (!apiKey || !apiKey.startsWith('sk-or-')) {
             throw new Error('OpenRouter密钥未配置或格式不正确，请检查设置');
         }
@@ -320,8 +331,6 @@ async function callClaude(question, imageBase64) {
             text: question || '请描述这张图片的内容'
         });
 
-        console.log('📤 正在通过OpenRouter调用Claude (Sonnet 4.5)...');
-        
         const response = await fetchWithTimeout(apiUrl, {
             method: 'POST',
             headers: {
@@ -340,8 +349,6 @@ async function callClaude(question, imageBase64) {
             })
         });
 
-        console.log('📥 OpenRouter响应状态:', response.status);
-        
         if (!response.ok) {
             let errorMsg = `HTTP ${response.status}`;
             try {
@@ -353,13 +360,12 @@ async function callClaude(question, imageBase64) {
         }
 
         const data = await response.json();
-        console.log('📥 OpenRouter返回成功');
         
         // OpenRouter返回OpenAI格式
         if (!data.choices?.[0]?.message?.content) throw new Error('返回数据格式异常');
         
         return {
-            model: 'Claude Sonnet 4.5',
+            model: 'Claude Sonnet 4',
             icon: 'claude',
             success: true,
             content: data.choices[0].message.content
@@ -380,8 +386,6 @@ async function callGemini(question, imageBase64) {
     try {
         const apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
         const apiKey = API_KEYS.openrouter;
-        
-        console.log('📤 正在通过OpenRouter调用Gemini 3 Pro...');
         
         if (!apiKey || !apiKey.startsWith('sk-or-')) {
             throw new Error('OpenRouter密钥未配置');
@@ -422,8 +426,6 @@ async function callGemini(question, imageBase64) {
             })
         });
 
-        console.log('📥 Gemini(OpenRouter)响应状态:', response.status);
-        
         if (!response.ok) {
             let errorMsg = `HTTP ${response.status}`;
             try {
@@ -435,7 +437,6 @@ async function callGemini(question, imageBase64) {
         }
 
         const data = await response.json();
-        console.log('📥 Gemini(OpenRouter)返回成功');
         
         if (!data.choices?.[0]?.message?.content) throw new Error('返回数据格式异常');
         
@@ -471,8 +472,6 @@ async function callDeepSeekR1(question, imageBase64) {
             finalQuestion = finalQuestion.substring(0, 8000) + '\n...(内容已截断，请精简问题)';
         }
         
-        console.log('📤 DeepSeek请求内容长度:', finalQuestion.length);
-        
         const response = await fetchWithTimeout('https://api.deepseek.com/chat/completions', {
             method: 'POST',
             headers: {
@@ -487,8 +486,6 @@ async function callDeepSeekR1(question, imageBase64) {
             })
         });
 
-        console.log('📥 DeepSeek响应状态:', response.status);
-        
         if (!response.ok) {
             let errorMsg = `HTTP ${response.status}`;
             try {
@@ -502,7 +499,6 @@ async function callDeepSeekR1(question, imageBase64) {
         }
 
         const data = await response.json();
-        console.log('📥 DeepSeek返回数据:', data);
         
         if (!data.choices?.[0]?.message) throw new Error('返回数据格式异常');
         
@@ -528,18 +524,6 @@ async function callDeepSeekR1(question, imageBase64) {
             error: error.message || '请求失败'
         };
     }
-}
-
-// DeepSeek VL视觉模型（当前API不支持，暂时禁用）
-// 注：DeepSeek官方API目前不支持多模态图片输入，仅支持文本
-async function callDeepSeekVL(question, imageBase64) {
-    // 直接返回跳过，因为DeepSeek API当前不支持图片
-    return {
-        model: 'DeepSeek VL',
-        icon: 'deepseek',
-        success: false,
-        error: '跳过：DeepSeek API暂不支持图片'
-    };
 }
 
 // 显示结果
