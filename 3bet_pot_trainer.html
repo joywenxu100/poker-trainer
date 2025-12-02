@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3-Bet Pot 专项训练 | vs Reg</title>
+    <title>3-Bet Pot 专项训练 | 8人桌Straddle+Ante | vs Reg</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -220,6 +220,47 @@
 
         .badge-ip { background: rgba(0, 212, 170, 0.2); color: var(--accent-green); }
         .badge-oop { background: rgba(255, 71, 87, 0.2); color: var(--accent-red); }
+        .badge-advanced { 
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(255, 107, 53, 0.3));
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        /* 游戏结构面板 */
+        .game-structure-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            background: var(--bg-card);
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .structure-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .struct-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .struct-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .struct-value.highlight {
+            color: var(--accent-gold);
+            font-weight: 700;
+        }
 
         .scenario-count {
             font-size: 10px;
@@ -673,8 +714,28 @@
     <div class="container">
         <header class="header">
             <h1 class="title">3-BET POT 训练</h1>
-            <p class="subtitle">专项训练 · 针对 <span>Reg</span> · 深筹码策略</p>
+            <p class="subtitle">8人桌 Straddle+Ante · 针对 <span>Reg</span> · 200BB+深筹码</p>
         </header>
+        
+        <!-- 游戏结构提示 -->
+        <div class="game-structure-panel">
+            <div class="structure-item">
+                <span class="struct-label">盲注结构</span>
+                <span class="struct-value">SB 1BB → BB 2BB → Straddle 4BB</span>
+            </div>
+            <div class="structure-item">
+                <span class="struct-label">Ante</span>
+                <span class="struct-value">每人 1BB (总计 8BB)</span>
+            </div>
+            <div class="structure-item">
+                <span class="struct-label">死钱</span>
+                <span class="struct-value highlight">15BB 起始底池</span>
+            </div>
+            <div class="structure-item">
+                <span class="struct-label">3bet后底池</span>
+                <span class="struct-value highlight">~85-95BB (SPR ≈ 2.5)</span>
+            </div>
+        </div>
 
         <!-- 统计面板 -->
         <div class="stats-panel">
@@ -800,6 +861,65 @@
     </div>
 
     <script>
+        // ==================== 游戏结构配置 ====================
+        const GAME_STRUCTURE = {
+            players: 8,
+            sb: 1,
+            bb: 2,
+            straddle: 4,
+            ante: 1,  // 每人1BB
+            get deadMoney() { return this.sb + this.bb + this.straddle + (this.ante * this.players); }, // 15BB
+            effectiveStack: 200,  // 默认有效筹码
+            openSize: 12,  // 标准开池 = 3x straddle
+            threebet_size_ip: 36,  // IP 3bet = 3x open
+            threebet_size_oop: 42, // OOP 3bet = 3.5x open
+            fourbet_size: 90  // 4bet ≈ 2.5x 3bet
+        };
+        
+        // ==================== 对手类型配置 ====================
+        const OPPONENT_TYPES = {
+            fish: { 
+                name: '鱼', 
+                vpip: '40%+', 
+                pfr: '8-15%',
+                foldTo3bet: '< 50%',
+                cbet: '70%+',
+                adjust: '多打价值，少bluff，用边缘牌打3条街'
+            },
+            nit: { 
+                name: '岩石', 
+                vpip: '< 18%', 
+                pfr: '< 15%',
+                foldTo3bet: '> 70%',
+                cbet: '< 50%',
+                adjust: '高频3bet light，但面对反击要尊重'
+            },
+            tag: { 
+                name: 'TAG', 
+                vpip: '20-28%', 
+                pfr: '18-25%',
+                foldTo3bet: '55-65%',
+                cbet: '55-65%',
+                adjust: '平衡打法，找小漏洞剥削'
+            },
+            lag: { 
+                name: 'LAG', 
+                vpip: '28-38%', 
+                pfr: '22-32%',
+                foldTo3bet: '< 55%',
+                cbet: '65-80%',
+                adjust: '用强牌trap，check-raise频率提高'
+            },
+            reg: { 
+                name: 'Reg', 
+                vpip: '22-30%', 
+                pfr: '20-28%',
+                foldTo3bet: '58-68%',
+                cbet: '55-70%',
+                adjust: '避免直接对抗，找位置优势和边缘spot'
+            }
+        };
+        
         // ==================== 配置 ====================
         const SUIT_CLASSES = { '♠': 'spades', '♥': 'hearts', '♦': 'diamonds', '♣': 'clubs' };
         const SUIT_MAP = { 's': '♠', 'h': '♥', 'd': '♦', 'c': '♣' };
@@ -813,6 +933,19 @@
         let trainingComplete = false; // 训练是否完成
 
         // ==================== 题库 ====================
+        // ==================== 训练模式 ====================
+        const TRAINING_MODES = {
+            standard: { name: '标准模式', icon: '📚', desc: '按自己节奏学习' },
+            timed: { name: '计时挑战', icon: '⏱️', desc: '每题15秒限时' },
+            mistakes: { name: '错题强化', icon: '🎯', desc: '复习做错的题目' },
+            multistreet: { name: '多街规划', icon: '🗺️', desc: '完整一手牌决策' }
+        };
+        
+        let currentMode = 'standard';
+        let timerInterval = null;
+        let timeLeft = 15;
+        let mistakesList = JSON.parse(localStorage.getItem('3bet_mistakes') || '[]');
+        
         const SCENARIOS = {
             '3bettor_ip': {
                 name: '3-Bettor IP',
@@ -841,68 +974,86 @@
                 desc: '你call 3bet，没有位置',
                 badge: 'oop',
                 title: 'Caller OOP 训练'
+            },
+            '4bet_pot': {
+                name: '4-Bet Pot',
+                icon: '💥',
+                desc: '高压力4bet底池决策',
+                badge: 'advanced',
+                title: '4-Bet Pot 训练'
+            },
+            'multistreet': {
+                name: '多街规划',
+                icon: '🗺️',
+                desc: '从翻牌到河牌完整规划',
+                badge: 'advanced',
+                title: '多街规划训练'
             }
         };
 
         const QUESTIONS = {
             '3bettor_ip': [
-                // ===== 高张干燥面（范围优势极大）=====
+                // ===== 【8人桌Straddle+Ante结构】高张干燥面 =====
                 {
                     heroPos: 'BTN', villainPos: 'CO',
                     heroHand: ['Ah', 'Qs'],
                     board: ['As', 'Kh', '7d'],
                     boardTexture: '高张干燥牌面 - 范围优势明显',
-                    pot: '24BB', spr: '8.3', stack: '200BB',
-                    question: '翻牌对手check，你应该？',
-                    options: ['C-bet 33% pot', 'C-bet 66% pot', 'C-bet 100% pot', 'Check back'],
+                    pot: '87BB', spr: '2.6', stack: '200BB',
+                    question: '【Straddle桌】翻牌Reg check，你应该？',
+                    options: ['C-bet 25% pot (~22BB)', 'C-bet 50% pot (~44BB)', 'C-bet 75% pot', 'Check back'],
                     correct: 0,
-                    explanation: `<strong>正确答案：C-bet 33% pot</strong>
-                        <div class="key-point"><strong>核心逻辑：</strong>AK7彩虹牌面，你作为3-bettor有巨大的范围优势。这是一个"高频小注C-bet"的经典牌面。</div>
-                        <p><strong>为什么小注？</strong></p>
-                        <p>• 你的范围中有大量Ax/Kx/强对子，对手很难有足够的强牌反击</p>
-                        <p>• 小注可以让对手弃掉所有空气牌（如67s/89s等）</p>
-                        <p>• 用小注保持你的诈唬范围</p>
-                        <p><strong>🎯 对手类型调整：</strong></p>
-                        <p>• vs 鱼：可以用50%pot，他们会用更多弱牌call</p>
-                        <p>• vs Reg：保持33%，他们会check-raise强牌</p>`
+                    explanation: `<strong>正确答案：C-bet 25% pot (~22BB)</strong>
+                        <div class="key-point"><strong>🎲 Straddle桌结构：</strong>翻牌pot已有87BB（含ante 8BB），SPR仅2.6！</div>
+                        <p><strong>vs Reg核心策略：</strong></p>
+                        <p>• AK7彩虹面你有巨大范围优势</p>
+                        <p>• 小注25%让Reg的check-raise成本更高</p>
+                        <p>• 低SPR意味着你可能需要全押决策</p>
+                        <p><strong>🎯 vs Reg调整：</strong></p>
+                        <p>• Reg会用set/两对check-raise，小注控制损失</p>
+                        <p>• Reg不会用Kx check-raise，只会call</p>
+                        <p>• 如果被raise，AQ顶对可以call看转牌</p>`
                 },
                 {
                     heroPos: 'BTN', villainPos: 'BB',
                     heroHand: ['Kc', 'Kd'],
                     board: ['Ah', '8c', '3s'],
                     boardTexture: 'A高干燥 - KK陷入困境',
-                    pot: '26BB', spr: '7.7', stack: '200BB',
-                    question: '翻牌对手check，你拿KK，应该？',
+                    pot: '90BB', spr: '2.4', stack: '200BB',
+                    question: '【Straddle桌】翻牌Reg check，你拿KK，应该？',
                     options: ['C-bet 25% pot', 'C-bet 50% pot', 'Check back', 'C-bet 75% pot'],
-                    correct: 0,
-                    explanation: `<strong>正确答案：C-bet 25% pot</strong>
-                        <div class="key-point"><strong>核心逻辑：</strong>A高牌面，KK是一个尴尬的牌型 - 可能领先对手范围但怕Ax。</div>
-                        <p><strong>为什么小注？</strong></p>
-                        <p>• 小注让对手弃掉所有空气（78s/JTs等）</p>
-                        <p>• 如果被raise，你可以放弃（对手很可能有Ax）</p>
-                        <p>• 保护你的check范围（有时也会check KK）</p>
-                        <p><strong>🎯 对手类型调整：</strong></p>
-                        <p>• vs 紧玩家：考虑check，他们call意味着有A</p>
-                        <p>• vs 松被动：50%pot打价值，他们用弱牌call</p>`
+                    correct: 2,
+                    explanation: `<strong>正确答案：Check back</strong>
+                        <div class="key-point"><strong>🎲 Straddle桌关键：</strong>SPR只有2.4！KK在A高面是纯摊牌价值。</div>
+                        <p><strong>vs Reg核心策略：</strong></p>
+                        <p>• Reg在A高面check大部分Ax（trap或pot control）</p>
+                        <p>• 如果你bet，Reg只会用Ax call或raise</p>
+                        <p>• Check保护你的showdown value</p>
+                        <p><strong>🎯 vs Reg调整：</strong></p>
+                        <p>• Reg不会用空气bluff A高面</p>
+                        <p>• 如果转牌Reg bet，你可以call down</p>
+                        <p>• 低SPR时，pot control比打价值更重要</p>`
                 },
+                // ===== 【vs Reg】低SPR超对策略 =====
                 {
                     heroPos: 'CO', villainPos: 'BB',
                     heroHand: ['Ac', 'Ac'],
                     board: ['Kd', '7h', '2s'],
                     boardTexture: 'K高干燥 - AA超对',
-                    pot: '24BB', spr: '8.3', stack: '200BB',
-                    question: '翻牌对手check，你拿AA超对，应该？',
+                    pot: '85BB', spr: '2.7', stack: '200BB',
+                    question: '【Straddle桌】AA超对在K高面，Reg check，应该？',
                     options: ['C-bet 25% pot', 'C-bet 50% pot', 'C-bet 75% pot', 'Check (trap)'],
                     correct: 1,
-                    explanation: `<strong>正确答案：C-bet 50% pot</strong>
-                        <div class="key-point"><strong>核心逻辑：</strong>AA在K高面是强超对，需要打价值但也需要保护。</div>
-                        <p><strong>为什么50%？</strong></p>
-                        <p>• K高面对手有很多Kx会跟注</p>
-                        <p>• 50%可以建立底池，为后续街价值做准备</p>
-                        <p>• 太小让太多听牌免费看牌</p>
-                        <p><strong>🎯 对手类型调整：</strong></p>
-                        <p>• vs 跟注站：66%pot榨取最大价值</p>
-                        <p>• vs LAG：可以check引诱bluff，再call down</p>`
+                    explanation: `<strong>正确答案：C-bet 50% pot (~42BB)</strong>
+                        <div class="key-point"><strong>🎲 Straddle桌低SPR：</strong>AA必须打价值，K高面Reg有大量Kx会call。</div>
+                        <p><strong>vs Reg核心策略：</strong></p>
+                        <p>• K高面对Reg有利的牌（他们的call range有大量Kx）</p>
+                        <p>• 50%建立底池，转牌准备全押</p>
+                        <p>• 比25%更能保护你的equity</p>
+                        <p><strong>🎯 多街规划：</strong></p>
+                        <p>• 翻牌50% (~42BB)，剩余~113BB</p>
+                        <p>• 转牌全押 or bet 80%让Reg犯错</p>
+                        <p>• 低SPR不需要考虑太多river decision</p>`
                 },
                 // ===== 中张牌面（对手范围更有利）=====
                 {
@@ -1658,6 +1809,220 @@
                         <p>• Donk打价值同时保护</p>
                         <p><strong>🎯 暗三在湿润面 = 快打！</strong></p>`
                 }
+            ],
+            
+            // ==================== 4-BET POT 场景 ====================
+            '4bet_pot': [
+                // ===== 【8人桌Straddle+Ante】4bet后IP =====
+                {
+                    heroPos: 'BTN', villainPos: 'CO',
+                    heroHand: ['Ac', 'Kc'],
+                    board: ['Kh', '7d', '3s'],
+                    boardTexture: '4bet pot - K高干燥面',
+                    pot: '195BB', spr: '1.0', stack: '200BB',
+                    question: '【4bet pot】你4bet AKs击中顶对，Reg check，SPR=1.0，应该？',
+                    options: ['C-bet 33% pot', 'C-bet 50% pot', 'All-in', 'Check'],
+                    correct: 2,
+                    explanation: `<strong>正确答案：All-in</strong>
+                        <div class="key-point"><strong>🔥 4bet pot关键：</strong>SPR=1.0，几乎任何顶对都应该全押！</div>
+                        <p><strong>vs Reg核心策略：</strong></p>
+                        <p>• 4bet pot SPR极低，AK顶对是nuts级别</p>
+                        <p>• Reg的4bet call范围：JJ+/AK，你打败JJ/QQ</p>
+                        <p>• 全押让Reg用QQ/JJ艰难决策</p>
+                        <p><strong>🎯 4bet pot法则：</strong>SPR<2时，顶对=全押</p>`
+                },
+                {
+                    heroPos: 'CO', villainPos: 'BTN',
+                    heroHand: ['Qc', 'Qd'],
+                    board: ['Ac', '8h', '5s'],
+                    boardTexture: '4bet pot - A高面QQ',
+                    pot: '190BB', spr: '1.1', stack: '200BB',
+                    question: '【4bet pot】你4bet QQ，翻牌A高，Reg check，应该？',
+                    options: ['C-bet 33% pot', 'C-bet 66% pot', 'All-in', 'Check'],
+                    correct: 3,
+                    explanation: `<strong>正确答案：Check</strong>
+                        <div class="key-point"><strong>🔥 4bet pot陷阱：</strong>QQ在A高面变成了bluff catcher！</div>
+                        <p><strong>vs Reg核心策略：</strong></p>
+                        <p>• Reg的4bet call范围有大量AK/AQ</p>
+                        <p>• 你只打败JJ，输给所有Ax</p>
+                        <p>• Check让Reg用JJ bluff，你可以抓</p>
+                        <p><strong>🎯 4bet pot A高：</strong>没A的超对 = pot control</p>`
+                },
+                {
+                    heroPos: 'BTN', villainPos: 'SB',
+                    heroHand: ['Ah', 'Ah'],
+                    board: ['Ks', 'Qh', 'Jc'],
+                    boardTexture: '4bet pot - KQJ连接面AA',
+                    pot: '200BB', spr: '1.0', stack: '200BB',
+                    question: '【4bet pot】你4bet AA，翻牌KQJ连接面，Reg check，应该？',
+                    options: ['C-bet 33% pot', 'C-bet 66% pot', 'All-in', 'Check'],
+                    correct: 2,
+                    explanation: `<strong>正确答案：All-in</strong>
+                        <div class="key-point"><strong>🔥 4bet pot连接面：</strong>AA必须全押保护！</div>
+                        <p><strong>vs Reg核心策略：</strong></p>
+                        <p>• KQJ面对手可能有KK/QQ/JJ/AK击中</p>
+                        <p>• 但你的AA依然领先大部分范围</p>
+                        <p>• 全押不给对手免费牌看T完成顺子</p>
+                        <p><strong>🎯 关键：</strong>4bet pot湿润面，AA必须保护！</p>`
+                },
+                {
+                    heroPos: 'CO', villainPos: 'BB',
+                    heroHand: ['Kd', 'Kh'],
+                    board: ['Ac', 'Qd', '7h'],
+                    boardTexture: '4bet pot - AQ高面KK',
+                    pot: '195BB', spr: '1.0', stack: '200BB',
+                    question: '【4bet pot】你4bet KK，翻牌AQ7，Reg bet 65BB (33%)，应该？',
+                    options: ['Fold', 'Call', 'Raise all-in'],
+                    correct: 1,
+                    explanation: `<strong>正确答案：Call</strong>
+                        <div class="key-point"><strong>🔥 4bet pot被donk：</strong>Reg在4bet pot donk = 极化！</div>
+                        <p><strong>vs Reg核心策略：</strong></p>
+                        <p>• Reg的donk范围：AA/AK/AQ 或 完全空气</p>
+                        <p>• KK打败空气bluff，输给Ax</p>
+                        <p>• Call看转牌，如果Reg继续bet大概率要fold</p>
+                        <p><strong>🎯 关键：</strong>4bet pot被donk，一对call一条街</p>`
+                },
+                {
+                    heroPos: 'BTN', villainPos: 'CO',
+                    heroHand: ['Jc', 'Js'],
+                    board: ['9h', '6c', '2d'],
+                    boardTexture: '4bet pot - 低张干燥面JJ',
+                    pot: '190BB', spr: '1.1', stack: '200BB',
+                    question: '【4bet pot】你4bet JJ，翻牌962干燥，Reg check，应该？',
+                    options: ['C-bet 25% pot', 'C-bet 50% pot', 'All-in', 'Check'],
+                    correct: 2,
+                    explanation: `<strong>正确答案：All-in</strong>
+                        <div class="key-point"><strong>🔥 4bet pot最佳面：</strong>JJ在低张面是nuts！</div>
+                        <p><strong>vs Reg核心策略：</strong></p>
+                        <p>• 962对你极有利，Reg的范围完全miss</p>
+                        <p>• JJ是超对，全押让AK/AQ fold</p>
+                        <p>• 如果被call，你大概率领先</p>
+                        <p><strong>🎯 4bet pot低张：</strong>超对 = 全押！</p>`
+                },
+                {
+                    heroPos: 'CO', villainPos: 'BTN',
+                    heroHand: ['As', 'Ks'],
+                    board: ['7h', '5c', '3d'],
+                    boardTexture: '4bet pot - 低张面AK未击中',
+                    pot: '195BB', spr: '1.0', stack: '200BB',
+                    question: '【4bet pot】你4bet AK，翻牌753完全miss，Reg check，应该？',
+                    options: ['C-bet 33% pot', 'C-bet 66% pot', 'All-in', 'Check'],
+                    correct: 0,
+                    explanation: `<strong>正确答案：C-bet 33% pot</strong>
+                        <div class="key-point"><strong>🔥 4bet pot未击中：</strong>小注C-bet是标准打法！</div>
+                        <p><strong>vs Reg核心策略：</strong></p>
+                        <p>• 753对双方都miss，范围优势在你</p>
+                        <p>• 小注让Reg用JJ/QQ艰难决策</p>
+                        <p>• 被raise你可以放弃，损失小</p>
+                        <p><strong>🎯 4bet pot miss：</strong>小注试探，不要放弃！</p>`
+                }
+            ],
+            
+            // ==================== 多街规划场景 ====================
+            'multistreet': [
+                // ===== 【完整一手牌】翻牌-转牌-河牌 =====
+                {
+                    heroPos: 'BTN', villainPos: 'BB',
+                    heroHand: ['Ac', 'Kc'],
+                    board: ['Kh', '7d', '3s'],
+                    boardTexture: '【第1街】顶对顶踢 - 规划3条街',
+                    pot: '87BB', spr: '2.6', stack: '200BB',
+                    question: '【多街规划】AK顶对，你计划打3条街价值。翻牌bet多少？',
+                    options: ['25% pot (~22BB)', '40% pot (~35BB)', '66% pot (~57BB)', '100% pot'],
+                    correct: 1,
+                    explanation: `<strong>正确答案：40% pot (~35BB)</strong>
+                        <div class="key-point"><strong>🗺️ 3条街规划：</strong>需要合理分配筹码！</div>
+                        <p><strong>多街sizing规划：</strong></p>
+                        <p>• 翻牌40% (~35BB) → pot变122BB，剩余~165BB</p>
+                        <p>• 转牌55% (~67BB) → pot变256BB，剩余~98BB</p>
+                        <p>• 河牌全押 (~98BB) → 恰好3条街打完</p>
+                        <p><strong>🎯 vs Reg：</strong>40%让Reg用Kx弱踢call更多</p>`
+                },
+                {
+                    heroPos: 'BTN', villainPos: 'BB',
+                    heroHand: ['Ac', 'Kc'],
+                    board: ['Kh', '7d', '3s', '5c'],
+                    boardTexture: '【第2街】转牌空白 - 继续价值',
+                    pot: '157BB', spr: '1.5', stack: '200BB',
+                    question: '【多街规划】翻牌bet被call，转牌5c空白。继续多少？',
+                    options: ['Check', '33% pot (~52BB)', '55% pot (~86BB)', 'All-in'],
+                    correct: 2,
+                    explanation: `<strong>正确答案：55% pot (~86BB)</strong>
+                        <div class="key-point"><strong>🗺️ 转牌关键：</strong>继续执行3条街计划！</div>
+                        <p><strong>转牌策略：</strong></p>
+                        <p>• 55%继续打价值，Reg用Kx弱踢/77/33继续call</p>
+                        <p>• 转牌后剩余~79BB，河牌可以全押</p>
+                        <p>• 不要check！Reg会用听牌免费看牌</p>
+                        <p><strong>🎯 vs Reg：</strong>55%是"不给你set价格但逼你用Kx call"的尺度</p>`
+                },
+                {
+                    heroPos: 'BTN', villainPos: 'BB',
+                    heroHand: ['Ac', 'Kc'],
+                    board: ['Kh', '7d', '3s', '5c', 'Jh'],
+                    boardTexture: '【第3街】河牌J - 完成价值',
+                    pot: '329BB', spr: '0.5', stack: '200BB',
+                    question: '【多街规划】转牌bet被call，河牌J。完成3条街？',
+                    options: ['Check', 'Bet 25% (~82BB)', 'All-in (~79BB)', 'Bet 50%'],
+                    correct: 2,
+                    explanation: `<strong>正确答案：All-in (~79BB)</strong>
+                        <div class="key-point"><strong>🗺️ 河牌决策：</strong>完成3条街价值！</div>
+                        <p><strong>河牌策略：</strong></p>
+                        <p>• J是相对空白牌（只完成了J7/J3两对）</p>
+                        <p>• Reg一路call的范围：Kx/77/33/可能的J7s</p>
+                        <p>• 全押让Reg用KQ/KT艰难call</p>
+                        <p><strong>🎯 关键：</strong>计划好的3条街，河牌不能放弃！</p>`
+                },
+                {
+                    heroPos: 'CO', villainPos: 'BB',
+                    heroHand: ['Qh', 'Jh'],
+                    board: ['Th', '8c', '3h'],
+                    boardTexture: '【Draw规划】OESD+花draw',
+                    pot: '85BB', spr: '2.7', stack: '200BB',
+                    question: '【多街规划】QJhh有OESD+花draw (~45%equity)，如何规划？',
+                    options: ['Check-call', 'Bet 33%', 'Bet 66%', 'Check-raise all-in'],
+                    correct: 3,
+                    explanation: `<strong>正确答案：Check-raise all-in</strong>
+                        <div class="key-point"><strong>🗺️ Draw规划：</strong>45%+ equity = 激进！</div>
+                        <p><strong>combo draw策略：</strong></p>
+                        <p>• OESD(8张9/K)+花draw(9张)=15张outs≈45%</p>
+                        <p>• 低SPR时全押是唯一正确打法</p>
+                        <p>• 让Reg用JJ/99/88艰难决策</p>
+                        <p><strong>🎯 核心：</strong>combo draw + 低SPR = all-in！</p>`
+                },
+                {
+                    heroPos: 'BTN', villainPos: 'SB',
+                    heroHand: ['9h', '8h'],
+                    board: ['7h', '6c', '2d'],
+                    boardTexture: '【Draw规划】OESD + 后门花',
+                    pot: '87BB', spr: '2.6', stack: '200BB',
+                    question: '【多街规划】98hh有OESD，Reg C-bet 50%，如何应对？',
+                    options: ['Fold', 'Call', 'Raise 3x', 'All-in'],
+                    correct: 2,
+                    explanation: `<strong>正确答案：Raise 3x</strong>
+                        <div class="key-point"><strong>🗺️ OESD反击规划：</strong>raise给自己两条赢牌路径！</div>
+                        <p><strong>多街规划：</strong></p>
+                        <p>• 翻牌raise 3x (~130BB)让Reg fold QQ/JJ</p>
+                        <p>• 如果被call，转牌hit全押</p>
+                        <p>• 如果miss，转牌可以继续bluff或放弃</p>
+                        <p><strong>🎯 vs Reg：</strong>OESD raise比call更有EV</p>`
+                },
+                {
+                    heroPos: 'BB', villainPos: 'BTN',
+                    heroHand: ['Jc', 'Tc'],
+                    board: ['9h', '7c', '2s'],
+                    boardTexture: '【OOP Draw】卡顺+后门花',
+                    pot: '87BB', spr: '2.6', stack: '200BB',
+                    question: '【多街规划】OOP JTcc有Gutshot+后门花，Reg可能C-bet，你的计划？',
+                    options: ['Check-fold', 'Check-call', 'Check-raise 3x', 'Donk bet'],
+                    correct: 2,
+                    explanation: `<strong>正确答案：Check-raise 3x</strong>
+                        <div class="key-point"><strong>🗺️ OOP Draw规划：</strong>check-raise构建激进形象！</div>
+                        <p><strong>OOP多街策略：</strong></p>
+                        <p>• Check-raise让Reg fold AK/AQ overcards</p>
+                        <p>• 如果被call，转牌hit继续压力</p>
+                        <p>• 如果转牌miss but有后门花，可以继续bluff</p>
+                        <p><strong>🎯 vs Reg：</strong>OOP需要用draw构建check-raise范围！</p>`
+                }
             ]
         };
 
@@ -1676,8 +2041,20 @@
             grid.innerHTML = Object.entries(SCENARIOS).map(([key, scenario]) => {
                 const count = QUESTIONS[key]?.length || 0;
                 const isActive = key === currentScenario ? 'active' : '';
-                const badgeClass = scenario.badge === 'ip' ? 'badge-ip' : 'badge-oop';
-                const badgeText = scenario.badge === 'ip' ? '有位置优势' : '位置劣势';
+                let badgeClass, badgeText;
+                if (scenario.badge === 'ip') {
+                    badgeClass = 'badge-ip';
+                    badgeText = '有位置优势';
+                } else if (scenario.badge === 'oop') {
+                    badgeClass = 'badge-oop';
+                    badgeText = '位置劣势';
+                } else if (scenario.badge === 'advanced') {
+                    badgeClass = 'badge-advanced';
+                    badgeText = '高级场景';
+                } else {
+                    badgeClass = 'badge-ip';
+                    badgeText = scenario.badge;
+                }
                 
                 return `
                     <div class="scenario-card ${isActive}" onclick="selectScenario('${key}', this)">
