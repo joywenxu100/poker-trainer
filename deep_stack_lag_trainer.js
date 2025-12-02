@@ -26,16 +26,16 @@ const lagRanges = {
     // Open Raise 范围 (首次加注)
     openRaise: {
         UTG: {
-            range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66',
+            range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55',
                    'AKs', 'AQs', 'AJs', 'ATs', 'A9s',
                    'KQs', 'KJs', 'KTs',
                    'QJs', 'QTs',
-                   'JTs', 'J9s',
+                   'JTs',
                    'T9s',
                    'AKo', 'AQo', 'AJo', 'KQo'],
-            percentage: '15%',
+            percentage: '13%',
             sizing: '2.5BB (vs BB+Straddle: 3.5-4BB)',
-            notes: 'UTG仍需保持纪律，但比标准TAG稍宽，增加了A9s和部分同花连牌'
+            notes: 'UTG保持纪律性，去掉最小对子和J9s。深筹码300BB+仍需谨慎，太多位置在后面'
         },
         UTG1: {
             range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55',
@@ -808,9 +808,9 @@ const lagRanges = {
                 notes: 'vs CO大幅扩张，但仍需谨慎因为OOP。包含TT进行setmine'
             },
             vsBTN: {
-                range: ['88', '77', '66', '55', '44', '33', '22',
+                range: ['TT', '99', '88', '77', '66', '55', '44', '33', '22',
                        'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
-                       'KTs', 'K9s', 'K8s', 'K7s', 'K6s',
+                       'KTs', 'K9s', 'K8s', 'K7s', 'K6s', 'K5s',
                        'QJs', 'QTs', 'Q9s', 'Q8s', 'Q7s', 'Q6s',
                        'JTs', 'J9s', 'J8s', 'J7s', 'J6s', 'J5s',
                        'T9s', 'T8s', 'T7s', 'T6s', 'T5s',
@@ -819,13 +819,13 @@ const lagRanges = {
                        '76s', '75s', '74s', '73s',
                        '65s', '64s', '63s', '62s',
                        '54s', '53s', '52s',
-                       'A9o', 'A8o', 'A7o', 'A6o',
-                       'KTo', 'K9o',
+                       'A9o', 'A8o', 'A7o', 'A6o', 'A5o',
+                       'KTo', 'K9o', 'K8o',
                        'QJo', 'QTo', 'Q9o',
-                       'JTo', 'J9o',
-                       'T9o'],
-                percentage: '32%',
-                notes: 'vs BTN偷盲也要宽防，但因为OOP所以比BB紧一些。优先选择同花牌和投机牌'
+                       'JTo', 'J9o', 'J8o',
+                       'T9o', 'T8o'],
+                percentage: '38%',
+                notes: 'vs BTN偷盲必须宽防！BTN 52%偷盲，SB已投1BB。新增：TT/99, K6s/K5s, A5o, K8o, J8o, T8o等'
             }
         },
 
@@ -935,7 +935,7 @@ const lagRanges = {
                 notes: 'vs LJ适度扩张'
             },
             vsHJ: {
-                range: ['88', '77', '66', '55', '44', '33', '22',
+                range: ['99', '88', '77', '66', '55', '44', '33', '22',
                        'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
                        'KTs', 'K9s', 'K8s', 'K7s',
                        'QJs', 'QTs', 'Q9s', 'Q8s',
@@ -949,8 +949,8 @@ const lagRanges = {
                        'A9o', 'A8o',
                        'KJo', 'KTo',
                        'QJo'],
-                percentage: '24%',
-                notes: 'vs HJ大幅扩张投机牌'
+                percentage: '25%',
+                notes: 'vs HJ大幅扩张投机牌（新增99，利用位置优势和深筹码）'
             }
         },
 
