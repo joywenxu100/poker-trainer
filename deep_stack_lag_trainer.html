@@ -208,6 +208,11 @@
             border-color: #4682B4;
         }
 
+        .hand-cell.defend {
+            background: rgba(138, 43, 226, 0.8);
+            border-color: #8A2BE2;
+        }
+
         .hand-cell:hover {
             transform: scale(1.1);
             z-index: 10;
@@ -622,11 +627,14 @@
                 <button class="action-btn active" data-action="open">Open Raise</button>
                 <button class="action-btn" data-action="callopen">Call Open</button>
                 <button class="action-btn" data-action="3bet">3-Bet</button>
+                <button class="action-btn" data-action="vs3bet">vs 3-Bet</button>
                 <button class="action-btn" data-action="4bet">4-Bet</button>
+                <button class="action-btn" data-action="vs4bet">vs 4-Bet</button>
                 <button class="action-btn" data-action="5bet">5-Bet/All-in</button>
                 <button class="action-btn" data-action="call3bet">Call 3-Bet</button>
                 <button class="action-btn" data-action="call4bet">Call 4-Bet</button>
                 <button class="action-btn" data-action="squeeze">Squeeze</button>
+                <button class="action-btn" data-action="defend">Defend (总防守)</button>
             </div>
 
             <div id="vs-position-selector" class="vs-position-selector" style="display: none;">
@@ -653,7 +661,11 @@
                 </div>
                 <div class="legend-item">
                     <div class="legend-color" style="background: rgba(70, 130, 180, 0.8);"></div>
-                    <span>Call</span>
+                    <span>Call系列</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: rgba(138, 43, 226, 0.8);"></div>
+                    <span>Defend (防守)</span>
                 </div>
             </div>
 
@@ -861,10 +873,11 @@
                         <div class="tip-title" style="color: #00BFFF;">⭐ NEW: MDF（最小防守频率）理论</div>
                         <div><strong>这是成为世界级玩家的必修课！</strong><br><br>
                         <strong>核心公式：</strong> MDF = 底池 / (底池 + 下注)<br><br>
-                        <strong>面对3-Bet（7.5BB into 6BB底池）：</strong><br>
-                        • 底池赔率：6 / (6 + 7.5) = 44.4%<br>
-                        • MDF：至少用55.6%的Open范围继续<br>
-                        • 实战：用~30% 4-Bet，~25% Call = 55% 总防守<br><br>
+                        <strong>面对3-Bet（7.5BB into 4BB底池）：</strong><br>
+                        • 你需要Call 5BB进入9BB底池<br>
+                        • MDF = 4 / (4 + 5) = 44.4%<br>
+                        • 至少用44%的Open范围继续<br>
+                        • 实战：用~15% 4-Bet，~30% Call = 45% 总防守<br><br>
                         <strong>面对Cbet（半池）：</strong><br>
                         • MDF = 66.7%（需要用2/3范围继续）<br><br>
                         <strong>黄金法则：</strong>如果你的弃牌率高于MDF，对手可以用任何两张牌盈利诈唬！

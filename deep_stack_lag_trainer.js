@@ -1205,7 +1205,7 @@ function highlightRange(position, action, vsPosition = null) {
             <div style="margin-top: 15px;"><span class="highlight">包含手牌：</span>${range.join(', ')}</div>
         `;
     } else if (action === 'squeeze') {
-        // 新增：Squeeze范围
+        // Squeeze范围
         const data = lagRanges.squeeze[position]?.general || lagRanges.squeeze.BB.general;
         range = data.range || [];
         details = `
@@ -1220,6 +1220,86 @@ function highlightRange(position, action, vsPosition = null) {
             </div>
             <div style="margin-top: 15px;"><span class="highlight">包含手牌：</span>${range.join(', ')}</div>
         `;
+    } else if (action === 'vs3bet') {
+        // vs 3-Bet - 面对3-Bet的完整决策
+        details = `
+            <div><span class="highlight">vs 3-Bet 决策树</span></div>
+            <div><span class="highlight">位置：</span>${position}</div>
+            <div style="margin-top: 15px; padding: 15px; background: rgba(255,215,0,0.1); border-radius: 5px;">
+                <strong>📊 面对3-Bet的三种选择：</strong><br><br>
+                <div style="margin: 10px 0;"><span class="highlight">1. 4-Bet (${lagRanges.fourBet.general.percentage})：</span>
+                ${lagRanges.fourBet.general.range.slice(0, 10).join(', ')}...</div>
+                <div style="margin: 10px 0;"><span class="highlight">2. Call 3-Bet (${lagRanges.call3Bet.IP.percentage})：</span>
+                ${lagRanges.call3Bet.IP.range.slice(0, 10).join(', ')}...</div>
+                <div style="margin: 10px 0;"><span class="highlight">3. Fold：</span>所有其他牌</div>
+            </div>
+            <div style="margin-top: 15px; padding: 15px; background: rgba(0,191,255,0.1); border-radius: 5px;">
+                <strong>🎯 MDF理论：</strong>面对3-Bet（7.5BB into 4BB），你的MDF约45%<br>
+                • 4-Bet约15% + Call约30% = 45%总防守<br>
+                • 如果弃牌超过55%，对手可以用任何牌3-Bet盈利！
+            </div>
+        `;
+        // 显示4-Bet + Call 3-Bet的合并范围
+        const fourBetRange = lagRanges.fourBet.general.range || [];
+        const call3BetRange = lagRanges.call3Bet.IP.range || [];
+        range = [...fourBetRange, ...call3BetRange];
+    } else if (action === 'vs4bet') {
+        // vs 4-Bet - 面对4-Bet的完整决策
+        details = `
+            <div><span class="highlight">vs 4-Bet 决策树</span></div>
+            <div><span class="highlight">位置：</span>${position}</div>
+            <div style="margin-top: 15px; padding: 15px; background: rgba(255,215,0,0.1); border-radius: 5px;">
+                <strong>📊 面对4-Bet的三种选择：</strong><br><br>
+                <div style="margin: 10px 0;"><span class="highlight">1. 5-Bet/All-in (${lagRanges.fiveBet.general.percentage})：</span>
+                ${lagRanges.fiveBet.general.range.join(', ')}</div>
+                <div style="margin: 10px 0;"><span class="highlight">2. Call 4-Bet (${lagRanges.call4Bet.general.percentage})：</span>
+                ${lagRanges.call4Bet.general.range.join(', ')}</div>
+                <div style="margin: 10px 0;"><span class="highlight">3. Fold：</span>所有其他牌（包括大部分3-Bet诈唬牌）</div>
+            </div>
+            <div style="margin-top: 15px; padding: 15px; background: rgba(220,20,60,0.1); border-radius: 5px;">
+                <strong>⚡ 深筹码提示：</strong>300BB+时，QQ/JJ可以call 4-Bet<br>
+                但100BB时，通常是5-Bet or Fold（QQ可以5-Bet all-in）
+            </div>
+        `;
+        const fiveBetRange = lagRanges.fiveBet.general.range || [];
+        const call4BetRange = lagRanges.call4Bet.general.range || [];
+        range = [...fiveBetRange, ...call4BetRange];
+    } else if (action === 'defend') {
+        // Defend - 总防守范围（Call + 3-Bet）
+        if (vsPosition && lagRanges.callOpen[position] && lagRanges.callOpen[position][vsPosition] && 
+            lagRanges.threeBet[position] && lagRanges.threeBet[position][vsPosition]) {
+            const callData = lagRanges.callOpen[position][vsPosition];
+            const threeBetData = lagRanges.threeBet[position][vsPosition];
+            const callRange = callData.range || [];
+            const threeBetRange = threeBetData.range || [];
+            range = [...callRange, ...threeBetRange];
+            
+            const callPct = parseInt(callData.percentage) || 0;
+            const threeBetPct = parseInt(threeBetData.percentage) || 0;
+            const totalDefend = callPct + threeBetPct;
+            
+            details = `
+                <div><span class="highlight">总防守范围 (Defend)</span></div>
+                <div><span class="highlight">场景：</span>${position} vs ${vsPosition.replace('vs', '')} Open</div>
+                <div style="margin-top: 15px; padding: 15px; background: rgba(138,43,226,0.1); border-radius: 5px;">
+                    <strong>🛡️ 防守组成：</strong><br><br>
+                    <div style="margin: 10px 0;">
+                        <span class="highlight">• 3-Bet：</span>${threeBetPct}% (${threeBetRange.length}个组合)<br>
+                        <span class="highlight">• Call：</span>${callPct}% (${callRange.length}个组合)<br>
+                        <span class="highlight">• 总防守：</span>${totalDefend}% (${range.length}个组合)
+                    </div>
+                </div>
+                <div style="margin-top: 15px; padding: 15px; background: rgba(0,191,255,0.1); border-radius: 5px;">
+                    <strong>📊 MDF检查：</strong><br>
+                    ${totalDefend >= 70 ? '✅' : '⚠️'} 当前总防守${totalDefend}%
+                    ${totalDefend >= 70 ? '（符合MDF要求！）' : '（可能需要更宽的防守）'}
+                </div>
+                <div style="margin-top: 15px;"><span class="highlight">所有防守牌（${range.length}个组合）：</span>
+                ${range.slice(0, 50).join(', ')}${range.length > 50 ? '...' : ''}</div>
+            `;
+        } else {
+            details = '<div>请选择对抗位置查看总防守范围</div>';
+        }
     }
 
     document.getElementById('combo-details').innerHTML = details || '选择位置和动作查看详细范围...';
@@ -1228,17 +1308,31 @@ function highlightRange(position, action, vsPosition = null) {
     cells.forEach(cell => {
         const hand = cell.dataset.hand;
         if (isInRange(hand, range)) {
-            // 根据action类型添加对应的CSS类
+            // 根据action类型添加对应的CSS类（注意判断顺序！）
             let cssClass = action;
-            if (action === 'callopen') {
-                cssClass = 'call';  // callopen使用call的颜色
-            } else if (action.includes('bet')) {
-                cssClass = action.replace('bet', '-bet');  // 3bet→3-bet, 4bet→4-bet, 5bet→5-bet
-            } else if (action === 'call3bet' || action === 'call4bet') {
-                cssClass = 'call';  // call3bet和call4bet都用call颜色
-            } else if (action === 'squeeze') {
+            
+            // 优先处理特殊的call情况
+            if (action === 'callopen' || action === 'call3bet' || action === 'call4bet') {
+                cssClass = 'call';  // 所有call系列使用蓝色
+            }
+            // defend使用紫色
+            else if (action === 'defend') {
+                cssClass = 'defend';  // defend用紫色显示总防守范围
+            }
+            // vs3bet和vs4bet也用defend颜色（表示防守决策）
+            else if (action === 'vs3bet' || action === 'vs4bet') {
+                cssClass = 'defend';  // 防守决策用紫色
+            }
+            // 然后处理squeeze
+            else if (action === 'squeeze') {
                 cssClass = 'three-bet';  // squeeze用3-bet的橙色
             }
+            // 最后处理普通的bet系列（3bet/4bet/5bet）
+            else if (action.includes('bet')) {
+                cssClass = action.replace('bet', '-bet');  // 3bet→3-bet, 4bet→4-bet, 5bet→5-bet
+            }
+            // open保持不变
+            
             cell.classList.add(cssClass);
         }
     });
