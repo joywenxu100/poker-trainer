@@ -298,7 +298,7 @@ async function callGemini(question, imageBase64) {
         if (parts.length === 0) parts.push({ text: '你好' });
 
         const response = await fetchWithTimeout(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${API_KEYS.gemini}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${API_KEYS.gemini}`,
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
