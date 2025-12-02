@@ -38,7 +38,7 @@ const lagRanges = {
             notes: 'UTG保持纪律性，去掉最小对子和J9s。深筹码300BB+仍需谨慎，太多位置在后面'
         },
         UTG1: {
-            range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55',
+            range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55', '44',
                    'AKs', 'AQs', 'AJs', 'ATs', 'A9s', 'A8s',
                    'KQs', 'KJs', 'KTs', 'K9s',
                    'QJs', 'QTs', 'Q9s',
@@ -46,12 +46,12 @@ const lagRanges = {
                    'T9s', 'T8s',
                    '98s',
                    'AKo', 'AQo', 'AJo', 'ATo', 'KQo', 'KJo'],
-            percentage: '18%',
+            percentage: '19%',
             sizing: '2.5BB (vs BB+Straddle: 3.5BB)',
-            notes: '增加小对子和更多同花牌'
+            notes: 'UTG1比UTG稍宽，增加44对子（setmine价值）和更多同花牌'
         },
         LJ: {
-            range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55', '44',
+            range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55', '44', '33',
                    'AKs', 'AQs', 'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
                    'KQs', 'KJs', 'KTs', 'K9s',
                    'QJs', 'QTs', 'Q9s',
@@ -60,9 +60,9 @@ const lagRanges = {
                    '98s', '97s',
                    '87s',
                    'AKo', 'AQo', 'AJo', 'ATo', 'KQo', 'KJo', 'QJo'],
-            percentage: '22%',
+            percentage: '23%',
             sizing: '2.5BB',
-            notes: 'LJ开始显著扩张，增加所有suited wheel aces和更多连牌'
+            notes: 'LJ开始显著扩张，增加33对子、所有suited wheel aces和更多连牌'
         },
         HJ: {
             range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55', '44', '33', '22',
@@ -236,9 +236,9 @@ const lagRanges = {
                        '98s', '97s',
                        '87s', '86s',
                        '76s', '65s', '54s'],
-                percentage: '16%',
-                sizing: '3x',
-                notes: 'BTN vs SB是经典spot，范围很宽'
+                percentage: '17%',
+                sizing: '3.5x',
+                notes: 'BTN vs SB：经典盲注对抗，范围很宽。88+/AT+价值，大量同花牌诈唬'
             }
         },
         CO: {
@@ -398,9 +398,9 @@ const lagRanges = {
                        'AKo',
                        'A5s', 'A4s', 'A3s', 'A2s',
                        '87s', '76s'],
-                percentage: '6.5%',
+                percentage: '7.5%',
                 sizing: '3.5x',
-                notes: 'BB vs UTG紧而激进'
+                notes: 'BB vs UTG：已投入盲注，比SB略激进。TT+/AJ+价值，Axs阻断牌'
             },
             vsLJ: {
                 range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99',
@@ -458,9 +458,9 @@ const lagRanges = {
                        '98s', '97s',
                        '87s', '86s',
                        '76s', '65s', '54s'],
-                percentage: '14%',
+                percentage: '15%',
                 sizing: '3.5x',
-                notes: 'BB vs BTN大幅扩张，必须防守偷盲'
+                notes: 'BB vs BTN大幅扩张！BTN偷盲52%，必须用15%+ 3-Bet + 55% Call = 70%防守'
             },
             vsSB: {
                 range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77',
@@ -863,7 +863,7 @@ const lagRanges = {
                 notes: 'vs LJ扩大范围'
             },
             vsHJ: {
-                range: ['99', '88', '77', '66', '55', '44', '33', '22',
+                range: ['TT', '99', '88', '77', '66', '55', '44', '33', '22',
                        'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
                        'KJs', 'KTs', 'K9s', 'K8s', 'K7s',
                        'QJs', 'QTs', 'Q9s', 'Q8s', 'Q7s',
@@ -877,11 +877,11 @@ const lagRanges = {
                        'ATo', 'A9o', 'A8o',
                        'KQo', 'KJo', 'KTo',
                        'QJo', 'QTo'],
-                percentage: '28%',
-                notes: 'vs HJ大幅扩张投机牌'
+                percentage: '29%',
+                notes: 'vs HJ大幅扩张投机牌（新增TT，Set Value充足）'
             },
             vsCO: {
-                range: ['88', '77', '66', '55', '44', '33', '22',
+                range: ['TT', '99', '88', '77', '66', '55', '44', '33', '22',
                        'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
                        'KTs', 'K9s', 'K8s', 'K7s', 'K6s',
                        'QTs', 'Q9s', 'Q8s', 'Q7s', 'Q6s',
@@ -897,8 +897,8 @@ const lagRanges = {
                        'QJo', 'QTo', 'Q9o',
                        'JTo', 'J9o',
                        'T9o'],
-                percentage: '30%',
-                notes: 'BTN vs CO：经典BTN平跟spot，大量投机牌'
+                percentage: '31%',
+                notes: 'BTN vs CO：经典BTN平跟spot，大量投机牌（新增TT）'
             }
         },
 
