@@ -26,19 +26,18 @@ const lagRanges = {
     // Open Raise 范围 (首次加注)
     openRaise: {
         UTG: {
-            range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55',
+            range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77',
                    'AKs', 'AQs', 'AJs', 'ATs', 'A9s',
                    'KQs', 'KJs', 'KTs',
                    'QJs', 'QTs',
                    'JTs',
-                   'T9s',
                    'AKo', 'AQo', 'AJo', 'KQo'],
-            percentage: '13%',
+            percentage: '12%',
             sizing: '2.5BB (vs BB+Straddle: 3.5-4BB)',
-            notes: 'UTG保持纪律性，去掉最小对子和J9s。深筹码300BB+仍需谨慎，太多位置在后面'
+            notes: 'UTG最紧位置：77+对子，高档同花牌。300BB+深筹码仍需极度谨慎'
         },
         UTG1: {
-            range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55', '44',
+            range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66',
                    'AKs', 'AQs', 'AJs', 'ATs', 'A9s', 'A8s',
                    'KQs', 'KJs', 'KTs', 'K9s',
                    'QJs', 'QTs', 'Q9s',
@@ -46,23 +45,23 @@ const lagRanges = {
                    'T9s', 'T8s',
                    '98s',
                    'AKo', 'AQo', 'AJo', 'ATo', 'KQo', 'KJo'],
-            percentage: '19%',
+            percentage: '17%',
             sizing: '2.5BB (vs BB+Straddle: 3.5BB)',
-            notes: 'UTG1比UTG稍宽，增加44对子（setmine价值）和更多同花牌'
+            notes: 'UTG1比UTG稍宽：66+对子，增加更多同花牌和T8s/98s连牌'
         },
         LJ: {
-            range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55', '44', '33',
+            range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55', '44',
                    'AKs', 'AQs', 'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
                    'KQs', 'KJs', 'KTs', 'K9s',
                    'QJs', 'QTs', 'Q9s',
                    'JTs', 'J9s', 'J8s',
                    'T9s', 'T8s',
                    '98s', '97s',
-                   '87s',
+                   '87s', '76s',
                    'AKo', 'AQo', 'AJo', 'ATo', 'KQo', 'KJo', 'QJo'],
-            percentage: '23%',
+            percentage: '24%',
             sizing: '2.5BB',
-            notes: 'LJ开始显著扩张，增加33对子、所有suited wheel aces和更多连牌'
+            notes: 'LJ开始显著扩张：44+对子、所有suited wheel aces、连牌到76s'
         },
         HJ: {
             range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55', '44', '33', '22',
