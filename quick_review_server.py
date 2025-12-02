@@ -37,12 +37,18 @@ def _decrypt_key(encoded_key):
 
 # 混淆后的内置密钥
 _GEMINI_KEY_ENCRYPTED = 'Qkt9ZVh/SU1cdDx6Wm03SE5weEk4YE08WlN3dXNreFxscF9IL2VV'
+_DEEPSEEK_KEY_ENCRYPTED = 'dG0waTlsOTg3O2c6PmsyNjs0PGhqOjIzODo5QGdoZWY1az8='
 
 # ==================== 配置 ====================
 PORT = 8899
 # 优先使用环境变量，否则使用内置混淆密钥
-API_KEY = os.environ.get('GEMINI_API_KEY', _decrypt_key(_GEMINI_KEY_ENCRYPTED))
+GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', _decrypt_key(_GEMINI_KEY_ENCRYPTED))
+DEEPSEEK_API_KEY = os.environ.get('DEEPSEEK_API_KEY', _decrypt_key(_DEEPSEEK_KEY_ENCRYPTED))
+
+# API URLs
+API_KEY = GEMINI_API_KEY  # 主要使用Gemini
 API_URL = f'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={API_KEY}'
+DEEPSEEK_API_URL = 'https://api.deepseek.com/chat/completions'
 
 # 代理配置 - 自动检测
 PROXY_CANDIDATES = [
