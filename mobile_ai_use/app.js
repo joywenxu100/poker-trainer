@@ -42,6 +42,10 @@ function initializeKeys() {
         API_KEYS.gemini = _b(_p.g);
         API_KEYS.deepseek = _b(_p.d);
         
+        // 验证密钥格式
+        console.log('🔑 OpenRouter密钥验证:', API_KEYS.openrouter.startsWith('sk-or-v1-') ? '✅格式正确' : '❌格式错误');
+        console.log('🔑 OpenRouter密钥前15位:', API_KEYS.openrouter.substring(0, 15));
+        
         // 保存到localStorage
         localStorage.setItem('apiKeys', JSON.stringify(API_KEYS));
         console.log('✅ 内置API密钥已加载（Claude通过OpenRouter）');
@@ -286,6 +290,17 @@ async function fetchWithTimeout(url, options, timeout = 60000) {
 // 参考: https://openrouter.ai/docs/quickstart
 async function callClaude(question, imageBase64) {
     try {
+        // 确认使用OpenRouter
+        const apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
+        const apiKey = API_KEYS.openrouter;
+        
+        console.log('🔑 OpenRouter密钥前10位:', apiKey ? apiKey.substring(0, 10) + '...' : '未配置');
+        console.log('🌐 调用URL:', apiUrl);
+        
+        if (!apiKey || !apiKey.startsWith('sk-or-')) {
+            throw new Error('OpenRouter密钥未配置或格式不正确，请检查设置');
+        }
+
         // OpenRouter使用OpenAI兼容格式
         const content = [];
 
@@ -304,18 +319,18 @@ async function callClaude(question, imageBase64) {
             text: question || '请描述这张图片的内容'
         });
 
-        console.log('📤 通过OpenRouter调用Claude...');
+        console.log('📤 正在通过OpenRouter调用Claude (Sonnet 3.5)...');
         
-        const response = await fetchWithTimeout('https://openrouter.ai/api/v1/chat/completions', {
+        const response = await fetchWithTimeout(apiUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${API_KEYS.openrouter}`,
+                'Authorization': `Bearer ${apiKey}`,
                 'HTTP-Referer': 'https://joywenxu100.github.io/poker-trainer/',
                 'X-Title': 'Multi-Model AI Assistant'
             },
             body: JSON.stringify({
-                model: 'anthropic/claude-sonnet-4',  // OpenRouter格式的模型名
+                model: 'anthropic/claude-3.5-sonnet',  // 使用3.5 sonnet，更稳定
                 max_tokens: 2000,
                 messages: [{ 
                     role: 'user', 
@@ -330,20 +345,20 @@ async function callClaude(question, imageBase64) {
             let errorMsg = `HTTP ${response.status}`;
             try {
                 const error = await response.json();
-                console.error('❌ OpenRouter错误:', error);
+                console.error('❌ OpenRouter错误详情:', JSON.stringify(error, null, 2));
                 errorMsg = error.error?.message || error.message || errorMsg;
             } catch (e) {}
             throw new Error(errorMsg);
         }
 
         const data = await response.json();
-        console.log('📥 OpenRouter返回:', data);
+        console.log('📥 OpenRouter返回成功');
         
         // OpenRouter返回OpenAI格式
         if (!data.choices?.[0]?.message?.content) throw new Error('返回数据格式异常');
         
         return {
-            model: 'Claude (Sonnet 4)',
+            model: 'Claude (via OpenRouter)',
             icon: 'claude',
             success: true,
             content: data.choices[0].message.content
