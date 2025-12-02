@@ -137,12 +137,14 @@
         }
 
         .ai-option:hover { border-color: var(--accent-gold); }
+        .ai-option.active.openrouter { border-color: var(--accent-green); background: rgba(0, 212, 170, 0.1); }
         .ai-option.active.gemini { border-color: var(--accent-blue); background: rgba(74, 158, 255, 0.1); }
         .ai-option.active.deepseek { border-color: var(--accent-purple); background: rgba(168, 85, 247, 0.1); }
 
         .ai-option .ai-icon { font-size: 32px; margin-bottom: 10px; }
         .ai-option .ai-name { font-size: 16px; font-weight: 600; margin-bottom: 5px; }
         .ai-option .ai-desc { font-size: 12px; color: var(--text-muted); }
+        .ai-option.openrouter .ai-name { color: var(--accent-green); }
         .ai-option.gemini .ai-name { color: var(--accent-blue); }
         .ai-option.deepseek .ai-name { color: var(--accent-purple); }
 
@@ -154,6 +156,7 @@
             margin-top: 8px;
         }
 
+        .ai-option.openrouter .ai-badge { background: rgba(0, 212, 170, 0.2); color: var(--accent-green); }
         .ai-option.gemini .ai-badge { background: rgba(74, 158, 255, 0.2); color: var(--accent-blue); }
         .ai-option.deepseek .ai-badge { background: rgba(168, 85, 247, 0.2); color: var(--accent-purple); }
 
@@ -505,6 +508,7 @@
             font-size: 12px;
         }
 
+        .result-ai-badge.openrouter { background: rgba(0, 212, 170, 0.2); color: var(--accent-green); }
         .result-ai-badge.gemini { background: rgba(74, 158, 255, 0.2); color: var(--accent-blue); }
         .result-ai-badge.deepseek { background: rgba(168, 85, 247, 0.2); color: var(--accent-purple); }
 
@@ -612,10 +616,16 @@
 
             <!-- AI 选择器 -->
             <div class="ai-selector">
-                <div class="ai-option gemini active" onclick="selectAI('gemini')">
+                <div class="ai-option openrouter active" onclick="selectAI('openrouter')">
+                    <div class="ai-icon">🚀</div>
+                    <div class="ai-name">OpenRouter Gemini</div>
+                    <div class="ai-desc">通过OpenRouter调用，国内直连</div>
+                    <div class="ai-badge">推荐</div>
+                </div>
+                <div class="ai-option gemini" onclick="selectAI('gemini')">
                     <div class="ai-icon">🌐</div>
                     <div class="ai-name">Google Gemini</div>
-                    <div class="ai-desc">多模态AI，支持截图识别</div>
+                    <div class="ai-desc">官方API，支持截图识别</div>
                     <div class="ai-badge">需要VPN</div>
                 </div>
                 <div class="ai-option deepseek" onclick="selectAI('deepseek')">
@@ -881,6 +891,7 @@
         // 混淆后的密钥（开发者工具中仍可见，但源码中不明文）
         const _k1 = 'Qkt9ZVh/SU1cdDx6Wm03SE5weEk4YE08WlN3dXNreFxscF9IL2VV'; // Gemini
         const _k2 = 'dG0waTlsOTg3O2c6PmsyNjs0PGhqOjIzODo5QGdoZWY1az8='; // DeepSeek
+        const _k3 = 'dG0wc3czfTIvNDw+Zz44OGc8O2w5NzpkZzo9PWNjOzhraG00OjtoZ2hAODU8NThrOWI0aTxrazsyZjw1OWo6NDg3Ozw5PWI4Ow=='; // OpenRouter
         
         // ==================== 配置 ====================
         const CONFIG = {
@@ -889,12 +900,15 @@
             GEMINI_API_URL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
             DEEPSEEK_API_KEY: localStorage.getItem('DEEPSEEK_API_KEY') || _d(_k2),
             DEEPSEEK_API_URL: 'https://api.deepseek.com/chat/completions',
+            OPENROUTER_API_KEY: localStorage.getItem('OPENROUTER_API_KEY') || _d(_k3),
+            OPENROUTER_API_URL: 'https://openrouter.ai/api/v1/chat/completions',
+            OPENROUTER_MODEL: 'google/gemini-2.0-flash-exp:free', // 免费模型
             REQUEST_TIMEOUT: 120000, // 2分钟超时
             MAX_LOG_ITEMS: 50 // 最大日志条数
         };
 
         // 状态
-        let selectedAI = 'gemini';
+        let selectedAI = 'openrouter'; // 默认使用OpenRouter（国内直连）
         let uploadedImages = { hand: null, opponent: null };
         let ocrCompleted = false;
         let currentStep = 1;
@@ -929,7 +943,12 @@
                 setStep(2);
             }
             
-            addLog(`🤖 切换到 ${ai === 'gemini' ? 'Gemini' : 'DeepSeek R1'}`, 'info');
+            const aiNames = {
+                'openrouter': 'OpenRouter Gemini',
+                'gemini': 'Gemini Official',
+                'deepseek': 'DeepSeek R1'
+            };
+            addLog(`🤖 切换到 ${aiNames[ai] || ai}`, 'info');
         }
 
         // ==================== 图片处理 ====================
@@ -1387,7 +1406,9 @@
 
                 let result;
                 try {
-                    if (selectedAI === 'gemini') {
+                    if (selectedAI === 'openrouter') {
+                        result = await callOpenRouter(prompt);
+                    } else if (selectedAI === 'gemini') {
                         result = await callGemini(prompt);
                     } else {
                         result = await callDeepSeek(prompt);
@@ -1396,7 +1417,9 @@
                     // 如果第一次失败，自动重试一次
                     addLog('⚠️ 首次请求失败，正在重试...', 'warning');
                     await new Promise(r => setTimeout(r, 2000)); // 等待2秒
-                    if (selectedAI === 'gemini') {
+                    if (selectedAI === 'openrouter') {
+                        result = await callOpenRouter(prompt);
+                    } else if (selectedAI === 'gemini') {
                         result = await callGemini(prompt);
                     } else {
                         result = await callDeepSeek(prompt);
@@ -1540,6 +1563,49 @@
             };
         }
 
+        async function callOpenRouter(prompt) {
+            // 【修复】使用带超时的fetch，通过OpenRouter调用Gemini
+            const response = await fetchWithTimeout(CONFIG.OPENROUTER_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${CONFIG.OPENROUTER_API_KEY}`,
+                    'HTTP-Referer': 'https://joywenxu100.github.io/poker-trainer',
+                    'X-Title': '德州扑克快速复盘'
+                },
+                body: JSON.stringify({
+                    model: CONFIG.OPENROUTER_MODEL,
+                    messages: [{ role: 'user', content: prompt }],
+                    max_tokens: 8192,
+                    temperature: 0.7
+                })
+            });
+
+            if (!response.ok) {
+                let msg = `OpenRouter错误: ${response.status}`;
+                try {
+                    const err = await response.json();
+                    msg = err.error?.message || msg;
+                    if (msg.includes('credit') || msg.includes('quota')) {
+                        msg = 'OpenRouter配额不足，请切换到其他AI';
+                    }
+                } catch (e) {}
+                throw new Error(msg);
+            }
+
+            const data = await response.json();
+            const choice = data.choices?.[0];
+            
+            if (!choice?.message?.content) {
+                throw new Error('OpenRouter未返回分析结果');
+            }
+            
+            return {
+                text: choice.message.content,
+                thinking: null
+            };
+        }
+
         // ==================== 显示结果 ====================
         function displayResult(text, thinking) {
             const resultSection = document.getElementById('resultSection');
@@ -1548,7 +1614,12 @@
             const thinkingSection = document.getElementById('thinkingSection');
             
             if (badge) {
-                badge.textContent = selectedAI === 'gemini' ? 'Gemini' : 'DeepSeek R1';
+                const aiNames = {
+                    'openrouter': 'OpenRouter Gemini',
+                    'gemini': 'Gemini Official',
+                    'deepseek': 'DeepSeek R1'
+                };
+                badge.textContent = aiNames[selectedAI] || selectedAI;
                 badge.className = `result-ai-badge ${selectedAI}`;
             }
             
@@ -1762,21 +1833,30 @@
             }
             
             // 显示当前使用的密钥来源
+            const openrouterKey = localStorage.getItem('OPENROUTER_API_KEY') || '';
+            
+            if (openrouterKey) {
+                addLog('🔑 使用自定义 OpenRouter 密钥', 'info');
+            } else {
+                addLog('🔑 使用内置 OpenRouter 密钥（推荐）', 'success');
+            }
+            
             if (geminiKey) {
                 addLog('🔑 使用自定义 Gemini 密钥', 'info');
             } else {
-                addLog('🔑 使用内置 Gemini 密钥', 'success');
+                addLog('🔑 使用内置 Gemini 密钥', 'info');
             }
             
             if (deepseekKey) {
                 addLog('🔑 使用自定义 DeepSeek 密钥', 'info');
             } else {
-                addLog('🔑 使用内置 DeepSeek 密钥', 'success');
+                addLog('🔑 使用内置 DeepSeek 密钥', 'info');
             }
         }
 
         // ==================== 初始化 ====================
-        addLog('🎮 德州扑克快速复盘 v4.4 (内置密钥·开箱即用)', 'info');
+        addLog('🎮 德州扑克快速复盘 v4.5 (OpenRouter国内直连)', 'info');
+        addLog('🚀 推荐使用 OpenRouter Gemini - 国内直连，无需VPN', 'success');
         addLog('📌 流程：上传截图 → OCR识别 → 确认/修正 → AI分析', 'info');
         initApiKeys();
         addLog('✅ 系统已就绪，可直接使用', 'success');

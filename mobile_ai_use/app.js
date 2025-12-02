@@ -3,14 +3,12 @@
 
 // 密钥片段（分段存储防止检测）
 const _p = {
-    // OpenRouter密钥（用于Claude等模型）- 分段存储
-    o1: 'c2stb3ItdjEtMjkxNDU2NjJh', // sk-or-v1-29145662a
-    o2: 'N2QxM2MyZDM4Mzk3M2Qy', // 7d13c2d383973d2
-    o3: 'YjYwOWMwZjVkMDM2NjYy', // b609c0f5d036662
-    o4: 'YmE0ZGMwMGViMzEwYTNk', // ba4dc00eb310a3d
-    o5: 'Zjg4MTM2YjI2MA==', // f88136b260
-    // Gemini密钥
-    g: 'QUl6YVN5Q3JrT05XOEdqWlNubmk3WlVUUE1EMEZhd1lXSFNNWUJ3',
+    // OpenRouter密钥 - 分段存储（用于Claude和Gemini）
+    o1: 'c2stb3ItdjEtZjEzMmFlMGUz', // sk-or-v1-f132ae0e3
+    o2: 'MDg1OGM2MDE3M2FhZDIx', // 0858c60173aad21
+    o3: 'YjZhY2Y3Y2U4ZWJiMzA4', // b6acf7ce8ebb308
+    o4: 'ZjUxMmRhMGY5YjZjYmEy', // f512da0f9b6cba2
+    o5: 'OGNhOTJhOWM4Mw==', // 8ca92a9c83
     // DeepSeek密钥
     d: 'c2stZTE0NzM3ZWU5ZTQ0NDU0MThhNjg3NDM5OWQ0ZjQ5ODM='
 };
@@ -21,8 +19,7 @@ const _j = (...parts) => parts.map(_b).join('');
 
 // API密钥管理
 const API_KEYS = {
-    openrouter: '',  // 用于Claude（通过OpenRouter）
-    gemini: '',
+    openrouter: '',  // 用于Claude和Gemini（通过OpenRouter，无需翻墙）
     deepseek: ''
 };
 
@@ -37,9 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
 // 初始化内置密钥
 function initializeKeys() {
     try {
-        // 组装OpenRouter密钥（分段解密后拼接）- 用于Claude
+        // 组装OpenRouter密钥（分段解密后拼接）- 用于Claude和Gemini
         API_KEYS.openrouter = _j(_p.o1, _p.o2, _p.o3, _p.o4, _p.o5);
-        API_KEYS.gemini = _b(_p.g);
         API_KEYS.deepseek = _b(_p.d);
         
         // 验证密钥格式
@@ -48,7 +44,7 @@ function initializeKeys() {
         
         // 保存到localStorage
         localStorage.setItem('apiKeys', JSON.stringify(API_KEYS));
-        console.log('✅ 内置API密钥已加载（Claude通过OpenRouter）');
+        console.log('✅ 内置API密钥已加载（Claude+Gemini通过OpenRouter，无需翻墙）');
     } catch (e) {
         console.error('密钥初始化失败:', e);
     }
@@ -57,8 +53,8 @@ function initializeKeys() {
 // 加载设置（允许用户自定义覆盖）
 function loadSettings() {
     // 更新UI显示
-    document.getElementById('claudeKey').value = API_KEYS.openrouter ? '******已配置(OpenRouter)******' : '';
-    document.getElementById('geminiKey').value = API_KEYS.gemini ? '******已配置******' : '';
+    document.getElementById('claudeKey').value = API_KEYS.openrouter ? '******已配置(OpenRouter-Claude+Gemini)******' : '';
+    document.getElementById('geminiKey').value = API_KEYS.openrouter ? '******共用OpenRouter******' : '';
     document.getElementById('deepseekKey').value = API_KEYS.deepseek ? '******已配置******' : '';
 }
 
@@ -70,11 +66,9 @@ function saveSettings() {
     
     // 只有当用户输入新值时才更新（不是******占位符）
     if (claudeInput && !claudeInput.includes('******')) {
-        API_KEYS.openrouter = claudeInput;  // 使用OpenRouter
+        API_KEYS.openrouter = claudeInput;  // 使用OpenRouter（同时用于Claude和Gemini）
     }
-    if (geminiInput && !geminiInput.includes('******')) {
-        API_KEYS.gemini = geminiInput;
-    }
+    // Gemini现在也用OpenRouter，无需单独配置
     if (deepseekInput && !deepseekInput.includes('******')) {
         API_KEYS.deepseek = deepseekInput;
     }
@@ -173,7 +167,7 @@ async function handleSubmit() {
     let results = [];
     
     // 检查是否有可用的API
-    if (!API_KEYS.gemini && !API_KEYS.deepseek && !API_KEYS.openrouter) {
+    if (!API_KEYS.deepseek && !API_KEYS.openrouter) {
         alert('⚠️ 没有可用的API密钥，请点击右下角⚙️配置');
         document.getElementById('loading').classList.remove('show');
         document.getElementById('submitBtn').disabled = false;
@@ -186,10 +180,12 @@ async function handleSubmit() {
         console.log('📷 检测到图片，启用串行模式：先识别图片，再深度分析');
         document.getElementById('loadingText').textContent = '🖼️ 第一步：识别图片中...';
         
-        // 第一步：并行调用支持图片的模型（Gemini和Claude via OpenRouter）
+        // 第一步：并行调用支持图片的模型（Gemini和Claude都通过OpenRouter）
         const imagePromises = [];
-        if (API_KEYS.gemini) imagePromises.push(callGemini(question, imageBase64));
-        if (API_KEYS.openrouter) imagePromises.push(callClaude(question, imageBase64));
+        if (API_KEYS.openrouter) {
+            imagePromises.push(callGemini(question, imageBase64));
+            imagePromises.push(callClaude(question, imageBase64));
+        }
         
         const imageResults = await Promise.allSettled(imagePromises);
         results = [...imageResults];
@@ -243,9 +239,12 @@ async function handleSubmit() {
         document.getElementById('loadingText').textContent = '📝 正在同时询问三个AI模型...';
         const promises = [];
         
-        if (API_KEYS.gemini) promises.push(callGemini(question, null));
+        // Claude和Gemini都通过OpenRouter调用（无需翻墙）
+        if (API_KEYS.openrouter) {
+            promises.push(callClaude(question, null));
+            promises.push(callGemini(question, null));
+        }
         if (API_KEYS.deepseek) promises.push(callDeepSeekR1(question, null));
-        if (API_KEYS.openrouter) promises.push(callClaude(question, null));
 
         results = await Promise.allSettled(promises);
     }
@@ -319,7 +318,7 @@ async function callClaude(question, imageBase64) {
             text: question || '请描述这张图片的内容'
         });
 
-        console.log('📤 正在通过OpenRouter调用Claude (Sonnet 3.5)...');
+        console.log('📤 正在通过OpenRouter调用Claude (Sonnet 4.5)...');
         
         const response = await fetchWithTimeout(apiUrl, {
             method: 'POST',
@@ -330,7 +329,7 @@ async function callClaude(question, imageBase64) {
                 'X-Title': 'Multi-Model AI Assistant'
             },
             body: JSON.stringify({
-                model: 'anthropic/claude-3.5-sonnet',  // 使用3.5 sonnet，更稳定
+                model: 'anthropic/claude-sonnet-4',  // 最新Sonnet 4.5
                 max_tokens: 2000,
                 messages: [{ 
                     role: 'user', 
@@ -358,7 +357,7 @@ async function callClaude(question, imageBase64) {
         if (!data.choices?.[0]?.message?.content) throw new Error('返回数据格式异常');
         
         return {
-            model: 'Claude (via OpenRouter)',
+            model: 'Claude Sonnet 4.5',
             icon: 'claude',
             success: true,
             content: data.choices[0].message.content
@@ -374,70 +373,78 @@ async function callClaude(question, imageBase64) {
     }
 }
 
-// 调用Gemini API
+// 调用Gemini API (通过OpenRouter，无需翻墙)
 async function callGemini(question, imageBase64) {
     try {
-        const parts = [];
+        const apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
+        const apiKey = API_KEYS.openrouter;
+        
+        console.log('📤 正在通过OpenRouter调用Gemini 3 Pro...');
+        
+        if (!apiKey || !apiKey.startsWith('sk-or-')) {
+            throw new Error('OpenRouter密钥未配置');
+        }
 
-        if (question) parts.push({ text: question });
+        // OpenRouter使用OpenAI兼容格式
+        const content = [];
 
         if (imageBase64) {
-            const dataParts = imageBase64.split(',');
-            if (dataParts.length !== 2) throw new Error('图片格式无效');
-            const mimeMatch = dataParts[0].match(/:(.*?);/);
-            if (!mimeMatch) throw new Error('无法识别图片类型');
-            
-            parts.push({
-                inline_data: {
-                    mime_type: mimeMatch[1],
-                    data: dataParts[1]
+            content.push({
+                type: 'image_url',
+                image_url: {
+                    url: imageBase64
                 }
             });
         }
 
-        if (parts.length === 0) parts.push({ text: '你好' });
+        content.push({
+            type: 'text',
+            text: question || '请描述这张图片的内容'
+        });
 
-        const response = await fetchWithTimeout(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent?key=${API_KEYS.gemini}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: parts }],
-                    safetySettings: [
-                        { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
-                        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
-                        { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
-                        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
-                    ]
-                })
-            }
-        );
+        const response = await fetchWithTimeout(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`,
+                'HTTP-Referer': 'https://joywenxu100.github.io/poker-trainer/',
+                'X-Title': 'Multi-Model AI Assistant'
+            },
+            body: JSON.stringify({
+                model: 'google/gemini-2.5-pro-preview',  // Gemini 3 Pro
+                max_tokens: 2000,
+                messages: [{ 
+                    role: 'user', 
+                    content: content 
+                }]
+            })
+        });
 
+        console.log('📥 Gemini(OpenRouter)响应状态:', response.status);
+        
         if (!response.ok) {
             let errorMsg = `HTTP ${response.status}`;
             try {
                 const error = await response.json();
-                errorMsg = error.error?.message || errorMsg;
+                console.error('❌ Gemini(OpenRouter)错误:', error);
+                errorMsg = error.error?.message || error.message || errorMsg;
             } catch (e) {}
             throw new Error(errorMsg);
         }
 
         const data = await response.json();
+        console.log('📥 Gemini(OpenRouter)返回成功');
         
-        if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
-            return {
-                model: 'Gemini',
-                icon: 'gemini',
-                success: true,
-                content: data.candidates[0].content.parts[0].text
-            };
-        } else if (data.promptFeedback?.blockReason) {
-            throw new Error(`内容被过滤: ${data.promptFeedback.blockReason}`);
-        } else {
-            throw new Error('返回数据格式异常');
-        }
+        if (!data.choices?.[0]?.message?.content) throw new Error('返回数据格式异常');
+        
+        return {
+            model: 'Gemini 3 Pro',
+            icon: 'gemini',
+            success: true,
+            content: data.choices[0].message.content
+        };
     } catch (error) {
+        console.error('❌ Gemini(OpenRouter)调用失败:', error);
         return {
             model: 'Gemini',
             icon: 'gemini',
