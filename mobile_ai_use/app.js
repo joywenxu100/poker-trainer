@@ -201,13 +201,17 @@ async function handleSubmit() {
             );
             
             if (geminiResult) {
-                // 构造给DeepSeek的提问：用户原问题 + Gemini的图片识别结果
-                const geminiContent = geminiResult.value.content;
-                const deepseekQuestion = `用户问题：${question || '请分析这张图片'}\n\n图片内容（由Gemini识别）：\n${geminiContent}\n\n请基于以上信息，进行深度分析和推理。`;
+                // 构造给DeepSeek的提问：用户原问题 + Gemini的图片识别结果（限制长度）
+                let geminiContent = geminiResult.value.content;
+                // 限制Gemini内容长度，避免超过DeepSeek的token限制
+                if (geminiContent.length > 3000) {
+                    geminiContent = geminiContent.substring(0, 3000) + '...(内容已截断)';
+                }
+                const deepseekQuestion = `用户问题：${question || '请分析这张图片'}\n\n图片内容（由AI识别）：\n${geminiContent}\n\n请基于以上信息，进行深度分析和推理。`;
                 
-                console.log('🧠 将Gemini识别结果转发给DeepSeek R1进行深度分析');
+                console.log('🧠 将Gemini识别结果转发给DeepSeek进行深度分析');
                 const deepseekResult = await callDeepSeekR1(deepseekQuestion, null);
-                deepseekResult.model = 'DeepSeek R1 (深度分析)';
+                deepseekResult.model = 'DeepSeek (深度分析)';
                 results.push({ status: 'fulfilled', value: deepseekResult });
             } else {
                 // Gemini失败了，尝试用Claude的结果
@@ -216,15 +220,18 @@ async function handleSubmit() {
                 );
                 
                 if (claudeResult) {
-                    const claudeContent = claudeResult.value.content;
-                    const deepseekQuestion = `用户问题：${question || '请分析这张图片'}\n\n图片内容（由Claude识别）：\n${claudeContent}\n\n请基于以上信息，进行深度分析和推理。`;
+                    let claudeContent = claudeResult.value.content;
+                    if (claudeContent.length > 3000) {
+                        claudeContent = claudeContent.substring(0, 3000) + '...(内容已截断)';
+                    }
+                    const deepseekQuestion = `用户问题：${question || '请分析这张图片'}\n\n图片内容（由AI识别）：\n${claudeContent}\n\n请基于以上信息，进行深度分析和推理。`;
                     const deepseekResult = await callDeepSeekR1(deepseekQuestion, null);
-                    deepseekResult.model = 'DeepSeek R1 (深度分析)';
+                    deepseekResult.model = 'DeepSeek (深度分析)';
                     results.push({ status: 'fulfilled', value: deepseekResult });
                 } else {
                     // Claude也失败了，只能用文字问题
                     const deepseekResult = await callDeepSeekR1(question || '请帮我分析问题', null);
-                    deepseekResult.model = 'DeepSeek R1';
+                    deepseekResult.model = 'DeepSeek';
                     results.push({ status: 'fulfilled', value: deepseekResult });
                 }
             }
@@ -235,9 +242,9 @@ async function handleSubmit() {
         document.getElementById('loadingText').textContent = '📝 正在同时询问三个AI模型...';
         const promises = [];
         
-        if (API_KEYS.gemini) promises.push(callGemini(question, imageBase64));
-        if (API_KEYS.deepseek) promises.push(callDeepSeekR1(question, imageBase64));
-        if (API_KEYS.claude) promises.push(callClaude(question, imageBase64));
+        if (API_KEYS.gemini) promises.push(callGemini(question, null));
+        if (API_KEYS.deepseek) promises.push(callDeepSeekR1(question, null));
+        if (API_KEYS.claude) promises.push(callClaude(question, null));
 
         results = await Promise.allSettled(promises);
     }
@@ -420,15 +427,22 @@ async function callGemini(question, imageBase64) {
     }
 }
 
-// 调用DeepSeek R1推理模型（深度思考，不支持图片）
+// 调用DeepSeek推理模型（深度思考，不支持图片）
 async function callDeepSeekR1(question, imageBase64) {
     try {
         let finalQuestion = question || '你好';
         
         // 如果有图片但没有文字问题，提示用户
         if (imageBase64 && !question) {
-            finalQuestion = '请分析这个问题（注：R1推理模型不支持图片，仅处理文字）';
+            finalQuestion = '请分析这个问题';
         }
+        
+        // 限制问题长度，避免token超限
+        if (finalQuestion.length > 8000) {
+            finalQuestion = finalQuestion.substring(0, 8000) + '\n...(内容已截断，请精简问题)';
+        }
+        
+        console.log('📤 DeepSeek请求内容长度:', finalQuestion.length);
         
         const response = await fetchWithTimeout('https://api.deepseek.com/chat/completions', {
             method: 'POST',
@@ -437,40 +451,49 @@ async function callDeepSeekR1(question, imageBase64) {
                 'Authorization': `Bearer ${API_KEYS.deepseek}`
             },
             body: JSON.stringify({
-                model: 'deepseek-reasoner',
+                model: 'deepseek-chat',  // 使用deepseek-chat，兼容性更好
                 messages: [{ role: 'user', content: finalQuestion }],
-                max_tokens: 4000
+                max_tokens: 4000,
+                temperature: 0.7
             })
         });
 
+        console.log('📥 DeepSeek响应状态:', response.status);
+        
         if (!response.ok) {
             let errorMsg = `HTTP ${response.status}`;
             try {
                 const error = await response.json();
+                console.error('❌ DeepSeek错误详情:', error);
                 errorMsg = error.error?.message || error.message || errorMsg;
-            } catch (e) {}
+            } catch (e) {
+                console.error('❌ 无法解析错误响应');
+            }
             throw new Error(errorMsg);
         }
 
         const data = await response.json();
+        console.log('📥 DeepSeek返回数据:', data);
+        
         if (!data.choices?.[0]?.message) throw new Error('返回数据格式异常');
         
         let content = data.choices[0].message.content;
         
-        // 如果有推理过程，也显示出来
+        // 如果有推理过程，也显示出来（deepseek-reasoner模型才有）
         if (data.choices[0].message.reasoning_content) {
             content = '🧠 **推理过程：**\n' + data.choices[0].message.reasoning_content + '\n\n📝 **结论：**\n' + content;
         }
         
         return {
-            model: 'DeepSeek R1',
+            model: 'DeepSeek',
             icon: 'deepseek',
             success: true,
             content: content
         };
     } catch (error) {
+        console.error('❌ DeepSeek调用失败:', error);
         return {
-            model: 'DeepSeek R1',
+            model: 'DeepSeek',
             icon: 'deepseek',
             success: false,
             error: error.message || '请求失败'
