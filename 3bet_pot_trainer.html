@@ -933,19 +933,6 @@
         let trainingComplete = false; // 训练是否完成
 
         // ==================== 题库 ====================
-        // ==================== 训练模式 ====================
-        const TRAINING_MODES = {
-            standard: { name: '标准模式', icon: '📚', desc: '按自己节奏学习' },
-            timed: { name: '计时挑战', icon: '⏱️', desc: '每题15秒限时' },
-            mistakes: { name: '错题强化', icon: '🎯', desc: '复习做错的题目' },
-            multistreet: { name: '多街规划', icon: '🗺️', desc: '完整一手牌决策' }
-        };
-        
-        let currentMode = 'standard';
-        let timerInterval = null;
-        let timeLeft = 15;
-        let mistakesList = JSON.parse(localStorage.getItem('3bet_mistakes') || '[]');
-        
         const SCENARIOS = {
             '3bettor_ip': {
                 name: '3-Bettor IP',
@@ -2168,7 +2155,9 @@
         // ==================== 重新训练 ====================
         function restartTraining() {
             completedQuestions = [];
+            // 【修复】重置统计并保存，防止刷新后数据不一致
             stats = { total: 0, correct: 0, wrong: 0 };
+            saveStats();
             updateStats();
             
             const completeSection = document.getElementById('completeSection');
