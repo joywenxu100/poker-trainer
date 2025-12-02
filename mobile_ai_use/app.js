@@ -193,8 +193,9 @@ async function handleSubmit() {
         // 第二步：获取Gemini的识别结果，转发给DeepSeek R1深度分析
         if (API_KEYS.deepseek) {
             document.getElementById('loadingText').textContent = '🧠 第二步：DeepSeek R1 深度分析中...';
+            // 🔧 修复：使用includes匹配模型名称（支持 'Gemini 3 Pro' 等变体）
             let geminiResult = imageResults.find(r => 
-                r.status === 'fulfilled' && r.value?.model === 'Gemini' && r.value?.success
+                r.status === 'fulfilled' && r.value?.model?.includes('Gemini') && r.value?.success
             );
             
             if (geminiResult) {
@@ -212,8 +213,9 @@ async function handleSubmit() {
                 results.push({ status: 'fulfilled', value: deepseekResult });
             } else {
                 // Gemini失败了，尝试用Claude的结果
+                // 🔧 修复：使用includes匹配模型名称（支持 'Claude Sonnet 4.5' 等变体）
                 let claudeResult = imageResults.find(r => 
-                    r.status === 'fulfilled' && r.value?.model === 'Claude' && r.value?.success
+                    r.status === 'fulfilled' && r.value?.model?.includes('Claude') && r.value?.success
                 );
                 
                 if (claudeResult) {
@@ -264,8 +266,8 @@ function fileToBase64(file) {
     });
 }
 
-// 带超时的fetch
-async function fetchWithTimeout(url, options, timeout = 60000) {
+// 带超时的fetch（增加到120秒，避免复杂问题超时）
+async function fetchWithTimeout(url, options, timeout = 120000) {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
     
@@ -279,7 +281,7 @@ async function fetchWithTimeout(url, options, timeout = 60000) {
     } catch (error) {
         clearTimeout(id);
         if (error.name === 'AbortError') {
-            throw new Error('请求超时（60秒），请检查网络或VPN');
+            throw new Error('请求超时（120秒），请检查网络连接');
         }
         throw error;
     }
@@ -330,7 +332,7 @@ async function callClaude(question, imageBase64) {
             },
             body: JSON.stringify({
                 model: 'anthropic/claude-sonnet-4',  // 最新Sonnet 4.5
-                max_tokens: 2000,
+                max_tokens: 8192,  // 🔧 增加到8192，避免回答被截断
                 messages: [{ 
                     role: 'user', 
                     content: content 
@@ -411,8 +413,8 @@ async function callGemini(question, imageBase64) {
                 'X-Title': 'Multi-Model AI Assistant'
             },
             body: JSON.stringify({
-                model: 'google/gemini-2.5-pro-preview',  // Gemini 3 Pro
-                max_tokens: 2000,
+                model: 'google/gemini-2.5-pro-preview',  // Gemini 2.5 Pro
+                max_tokens: 8192,  // 🔧 增加到8192，避免回答被截断
                 messages: [{ 
                     role: 'user', 
                     content: content 
@@ -545,7 +547,7 @@ function displayResults(results) {
     const resultsContainer = document.getElementById('results');
     
     if (!results || results.length === 0) {
-        resultsContainer.innerHTML = '<div class="model-result"><div class="error-message">❌ 没有收到任何回答<br><br>💡 提示：请检查是否已开启VPN（不支持香港节点）</div></div>';
+        resultsContainer.innerHTML = '<div class="model-result"><div class="error-message">❌ 没有收到任何回答<br><br>💡 提示：请检查网络连接是否正常</div></div>';
         return;
     }
     
@@ -560,11 +562,11 @@ function displayResults(results) {
     // 检查是否所有请求都失败了（排除跳过的）
     const allFailed = filteredResults.length > 0 && filteredResults.every(r => r.status === 'rejected' || (r.value && !r.value.success));
     if (allFailed) {
-        // 在结果前添加VPN提示
-        const vpnTip = document.createElement('div');
-        vpnTip.className = 'vpn-tip';
-        vpnTip.innerHTML = '⚠️ <strong>所有模型请求失败</strong><br>请检查：1️⃣ 是否已开启VPN 2️⃣ VPN节点是否可用（不支持香港） 3️⃣ 网络连接是否正常';
-        resultsContainer.appendChild(vpnTip);
+        // 在结果前添加网络提示（现在用OpenRouter，无需VPN）
+        const networkTip = document.createElement('div');
+        networkTip.className = 'vpn-tip';
+        networkTip.innerHTML = '⚠️ <strong>所有模型请求失败</strong><br>请检查：1️⃣ 网络连接是否正常 2️⃣ API密钥是否有效 3️⃣ 账户额度是否充足';
+        resultsContainer.appendChild(networkTip);
     }
     
     filteredResults.forEach((result, index) => {
@@ -610,15 +612,17 @@ function displayResults(results) {
         if (data.success && data.content) {
             contentDiv.textContent = data.content;
         } else {
-            // 添加VPN提示
+            // 添加错误提示（使用OpenRouter，无需VPN）
             let errorHint = '';
             const err = (data.error || '').toLowerCase();
             if (err.includes('failed to fetch') || err.includes('network') || err.includes('timeout') || err.includes('cors') || err.includes('http 0')) {
-                errorHint = '<br><br>💡 <strong>可能原因：</strong>未开启VPN或VPN节点不可用（不支持香港）';
-            } else if (err.includes('401') || err.includes('403') || err.includes('invalid')) {
+                errorHint = '<br><br>💡 <strong>可能原因：</strong>网络连接异常，请检查网络';
+            } else if (err.includes('401') || err.includes('403') || err.includes('invalid') || err.includes('unauthorized')) {
                 errorHint = '<br><br>💡 <strong>可能原因：</strong>API密钥无效或已过期';
-            } else if (err.includes('429') || err.includes('rate') || err.includes('quota')) {
-                errorHint = '<br><br>💡 <strong>可能原因：</strong>请求太频繁或额度已用完';
+            } else if (err.includes('429') || err.includes('rate') || err.includes('quota') || err.includes('credit') || err.includes('balance')) {
+                errorHint = '<br><br>💡 <strong>可能原因：</strong>请求太频繁或账户额度不足';
+            } else if (err.includes('model') || err.includes('not found') || err.includes('unavailable')) {
+                errorHint = '<br><br>💡 <strong>可能原因：</strong>模型暂时不可用，请稍后重试';
             }
             contentDiv.innerHTML = `<div class="error-message">❌ ${escapeHtml(data.error || '未知错误')}${errorHint}</div>`;
         }
