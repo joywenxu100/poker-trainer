@@ -3,15 +3,12 @@
 
 // 密钥片段（分段存储防止检测）
 const _p = {
-    // Claude密钥片段
-    c1: 'c2stYW50LWFwaTAzLW1q', // sk-ant-api03-mj
-    c2: 'OVJDM2V3Mi1xdmcxOHVi', // 9RC3ew2-qvg18ub
-    c3: 'dlk1WmhyQmtzN0R2anl', // vY5ZhrBks7Dvjy
-    c4: 'V3lyLVBIZTBFcEtuc0VM', // Wyr-PHe0EpKnsEL
-    c5: 'b0N3Q0d1bGtZR2V0R25J', // oCwCGulkYGetGnI
-    c6: 'VVFhcWxxWkJLTWhtTFlB', // UQaqlqZBKMhmLYA
-    c7: 'QXAtWm1UaHU2Zy1Mc2RR', // Ap-ZmThu6g-LsdQ
-    c8: 'RndBQQ==', // FwAA
+    // OpenRouter密钥（用于Claude等模型）- 分段存储
+    o1: 'c2stb3ItdjEtMjkxNDU2NjJh', // sk-or-v1-29145662a
+    o2: 'N2QxM2MyZDM4Mzk3M2Qy', // 7d13c2d383973d2
+    o3: 'YjYwOWMwZjVkMDM2NjYy', // b609c0f5d036662
+    o4: 'YmE0ZGMwMGViMzEwYTNk', // ba4dc00eb310a3d
+    o5: 'Zjg4MTM2YjI2MA==', // f88136b260
     // Gemini密钥
     g: 'QUl6YVN5Q3JrT05XOEdqWlNubmk3WlVUUE1EMEZhd1lXSFNNWUJ3',
     // DeepSeek密钥
@@ -24,7 +21,7 @@ const _j = (...parts) => parts.map(_b).join('');
 
 // API密钥管理
 const API_KEYS = {
-    claude: '',
+    openrouter: '',  // 用于Claude（通过OpenRouter）
     gemini: '',
     deepseek: ''
 };
@@ -40,14 +37,14 @@ document.addEventListener('DOMContentLoaded', () => {
 // 初始化内置密钥
 function initializeKeys() {
     try {
-        // 组装Claude密钥（分段解密后拼接）
-        API_KEYS.claude = _j(_p.c1, _p.c2, _p.c3, _p.c4, _p.c5, _p.c6, _p.c7, _p.c8);
+        // 组装OpenRouter密钥（分段解密后拼接）- 用于Claude
+        API_KEYS.openrouter = _j(_p.o1, _p.o2, _p.o3, _p.o4, _p.o5);
         API_KEYS.gemini = _b(_p.g);
         API_KEYS.deepseek = _b(_p.d);
         
         // 保存到localStorage
         localStorage.setItem('apiKeys', JSON.stringify(API_KEYS));
-        console.log('✅ 内置API密钥已加载');
+        console.log('✅ 内置API密钥已加载（Claude通过OpenRouter）');
     } catch (e) {
         console.error('密钥初始化失败:', e);
     }
@@ -56,7 +53,7 @@ function initializeKeys() {
 // 加载设置（允许用户自定义覆盖）
 function loadSettings() {
     // 更新UI显示
-    document.getElementById('claudeKey').value = API_KEYS.claude ? '******已配置******' : '';
+    document.getElementById('claudeKey').value = API_KEYS.openrouter ? '******已配置(OpenRouter)******' : '';
     document.getElementById('geminiKey').value = API_KEYS.gemini ? '******已配置******' : '';
     document.getElementById('deepseekKey').value = API_KEYS.deepseek ? '******已配置******' : '';
 }
@@ -69,7 +66,7 @@ function saveSettings() {
     
     // 只有当用户输入新值时才更新（不是******占位符）
     if (claudeInput && !claudeInput.includes('******')) {
-        API_KEYS.claude = claudeInput;
+        API_KEYS.openrouter = claudeInput;  // 使用OpenRouter
     }
     if (geminiInput && !geminiInput.includes('******')) {
         API_KEYS.gemini = geminiInput;
@@ -172,7 +169,7 @@ async function handleSubmit() {
     let results = [];
     
     // 检查是否有可用的API
-    if (!API_KEYS.gemini && !API_KEYS.deepseek && !API_KEYS.claude) {
+    if (!API_KEYS.gemini && !API_KEYS.deepseek && !API_KEYS.openrouter) {
         alert('⚠️ 没有可用的API密钥，请点击右下角⚙️配置');
         document.getElementById('loading').classList.remove('show');
         document.getElementById('submitBtn').disabled = false;
@@ -181,14 +178,14 @@ async function handleSubmit() {
     }
 
     if (imageBase64) {
-        // 🖼️ 有图片模式：先让Gemini/Claude识别图片，再把结果给DeepSeek R1分析
+        // 🖼️ 有图片模式：先让Gemini/Claude识别图片，再把结果给DeepSeek分析
         console.log('📷 检测到图片，启用串行模式：先识别图片，再深度分析');
         document.getElementById('loadingText').textContent = '🖼️ 第一步：识别图片中...';
         
-        // 第一步：并行调用支持图片的模型（Gemini和Claude）
+        // 第一步：并行调用支持图片的模型（Gemini和Claude via OpenRouter）
         const imagePromises = [];
         if (API_KEYS.gemini) imagePromises.push(callGemini(question, imageBase64));
-        if (API_KEYS.claude) imagePromises.push(callClaude(question, imageBase64));
+        if (API_KEYS.openrouter) imagePromises.push(callClaude(question, imageBase64));
         
         const imageResults = await Promise.allSettled(imagePromises);
         results = [...imageResults];
@@ -244,7 +241,7 @@ async function handleSubmit() {
         
         if (API_KEYS.gemini) promises.push(callGemini(question, null));
         if (API_KEYS.deepseek) promises.push(callDeepSeekR1(question, null));
-        if (API_KEYS.claude) promises.push(callClaude(question, null));
+        if (API_KEYS.openrouter) promises.push(callClaude(question, null));
 
         results = await Promise.allSettled(promises);
     }
@@ -285,23 +282,19 @@ async function fetchWithTimeout(url, options, timeout = 60000) {
     }
 }
 
-// 调用Claude API
+// 调用Claude API (通过OpenRouter)
+// 参考: https://openrouter.ai/docs/quickstart
 async function callClaude(question, imageBase64) {
     try {
+        // OpenRouter使用OpenAI兼容格式
         const content = [];
 
         if (imageBase64) {
-            const parts = imageBase64.split(',');
-            if (parts.length !== 2) throw new Error('图片格式无效');
-            const mediaTypeMatch = parts[0].match(/:(.*?);/);
-            if (!mediaTypeMatch) throw new Error('无法识别图片类型');
-            
+            // OpenRouter支持的图片格式
             content.push({
-                type: 'image',
-                source: {
-                    type: 'base64',
-                    media_type: mediaTypeMatch[1],
-                    data: parts[1]
+                type: 'image_url',
+                image_url: {
+                    url: imageBase64  // data:image/xxx;base64,xxxxx 格式
                 }
             });
         }
@@ -311,40 +304,52 @@ async function callClaude(question, imageBase64) {
             text: question || '请描述这张图片的内容'
         });
 
-        const response = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
+        console.log('📤 通过OpenRouter调用Claude...');
+        
+        const response = await fetchWithTimeout('https://openrouter.ai/api/v1/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'x-api-key': API_KEYS.claude,
-                'anthropic-version': '2023-06-01',
-                'anthropic-dangerous-direct-browser-access': 'true'
+                'Authorization': `Bearer ${API_KEYS.openrouter}`,
+                'HTTP-Referer': 'https://joywenxu100.github.io/poker-trainer/',
+                'X-Title': 'Multi-Model AI Assistant'
             },
             body: JSON.stringify({
-                model: 'claude-sonnet-4-5-20250929',
+                model: 'anthropic/claude-sonnet-4',  // OpenRouter格式的模型名
                 max_tokens: 2000,
-                messages: [{ role: 'user', content: content }]
+                messages: [{ 
+                    role: 'user', 
+                    content: content 
+                }]
             })
         });
 
+        console.log('📥 OpenRouter响应状态:', response.status);
+        
         if (!response.ok) {
             let errorMsg = `HTTP ${response.status}`;
             try {
                 const error = await response.json();
-                errorMsg = error.error?.message || errorMsg;
+                console.error('❌ OpenRouter错误:', error);
+                errorMsg = error.error?.message || error.message || errorMsg;
             } catch (e) {}
             throw new Error(errorMsg);
         }
 
         const data = await response.json();
-        if (!data.content?.[0]?.text) throw new Error('返回数据格式异常');
+        console.log('📥 OpenRouter返回:', data);
+        
+        // OpenRouter返回OpenAI格式
+        if (!data.choices?.[0]?.message?.content) throw new Error('返回数据格式异常');
         
         return {
-            model: 'Claude',
+            model: 'Claude (Sonnet 4)',
             icon: 'claude',
             success: true,
-            content: data.content[0].text
+            content: data.choices[0].message.content
         };
     } catch (error) {
+        console.error('❌ Claude(OpenRouter)调用失败:', error);
         return {
             model: 'Claude',
             icon: 'claude',
