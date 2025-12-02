@@ -52,7 +52,7 @@ const lagRanges = {
         },
         LJ: {
             range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55', '44',
-                   'AKs', 'AQs', 'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A5s', 'A4s',
+                   'AKs', 'AQs', 'AJs', 'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
                    'KQs', 'KJs', 'KTs', 'K9s',
                    'QJs', 'QTs', 'Q9s',
                    'JTs', 'J9s', 'J8s',
@@ -62,7 +62,7 @@ const lagRanges = {
                    'AKo', 'AQo', 'AJo', 'ATo', 'KQo', 'KJo', 'QJo'],
             percentage: '22%',
             sizing: '2.5BB',
-            notes: 'LJ开始显著扩张，增加suited wheel aces和更多连牌'
+            notes: 'LJ开始显著扩张，增加所有suited wheel aces和更多连牌'
         },
         HJ: {
             range: ['AA', 'KK', 'QQ', 'JJ', 'TT', '99', '88', '77', '66', '55', '44', '33', '22',
@@ -632,7 +632,7 @@ const lagRanges = {
                 notes: 'vs HJ继续扩张'
             },
             vsCO: {
-                range: ['99', '88', '77', '66', '55', '44', '33', '22',
+                range: ['TT', '99', '88', '77', '66', '55', '44', '33', '22',
                        'ATs', 'A9s', 'A8s', 'A7s', 'A6s', 'A5s', 'A4s', 'A3s', 'A2s',
                        'KJs', 'KTs', 'K9s', 'K8s', 'K7s',
                        'QJs', 'QTs', 'Q9s', 'Q8s', 'Q7s',
@@ -647,7 +647,7 @@ const lagRanges = {
                        'KQo', 'KJo', 'KTo',
                        'QJo', 'QTo'],
                 percentage: '28%',
-                notes: 'vs CO大幅扩张，但仍需谨慎因为OOP'
+                notes: 'vs CO大幅扩张，但仍需谨慎因为OOP。包含TT进行setmine'
             },
             vsBTN: {
                 range: ['88', '77', '66', '55', '44', '33', '22',
@@ -732,7 +732,7 @@ const lagRanges = {
                        '98s', '97s', '96s', '95s',
                        '87s', '86s', '85s', '84s',
                        '76s', '75s', '74s', '73s',
-                       '65s', 'ç64s', '63s',
+                       '65s', '64s', '63s',
                        '54s', '53s', '52s',
                        'A9o', 'A8o',
                        'KJo', 'KTo', 'K9o',
@@ -828,7 +828,7 @@ const lagRanges = {
         facing3Bet: {
             potOdds: '2.5:1 (典型3-Bet场景)',
             mdf: '71.4%',
-            notes: '面对3-Bet，底池赔率约2.5:1，需要至少用28.6%范围继续（3-Bet或Call），否则被剥削'
+            notes: '面对3-Bet，底池赔率约2.5:1，MDF=71.4%。意味着你的弃牌率不能超过28.6%，否则对手用任何牌诈唬都能盈利。实战中用~30% 4-Bet + ~25% Call = 55%防守（略低于MDF但可接受）'
         },
         facing4Bet: {
             potOdds: '1.8:1',
@@ -1036,8 +1036,8 @@ function generateQuestion() {
     const positions = ['UTG', 'UTG1', 'LJ', 'HJ', 'CO', 'BTN', 'SB'];
     const position = positions[Math.floor(Math.random() * positions.length)];
     
-    // 随机选择场景类型
-    const scenarioTypes = ['open', '3bet', 'vs3bet', '4bet'];
+    // 随机选择场景类型 - 增加callopen场景
+    const scenarioTypes = ['open', 'callopen', '3bet', 'vs3bet', '4bet'];
     const scenarioType = scenarioTypes[Math.floor(Math.random() * scenarioTypes.length)];
     
     // 随机生成一手牌
@@ -1050,6 +1050,37 @@ function generateQuestion() {
         const openRange = lagRanges.openRaise[position]?.range || [];
         correctAnswer = isInRange(hand, openRange) ? 'raise' : 'fold';
         situation = `你在 ${position} 位，前面都弃牌`;
+    } else if (scenarioType === 'callopen') {
+        // 新增：Call Open场景测试
+        const defensivePositions = ['BB', 'SB', 'BTN', 'CO'];
+        const defPosition = defensivePositions[Math.floor(Math.random() * defensivePositions.length)];
+        
+        if (lagRanges.callOpen[defPosition]) {
+            const vsPositions = Object.keys(lagRanges.callOpen[defPosition]);
+            const vsPos = vsPositions[Math.floor(Math.random() * vsPositions.length)];
+            const callRange = lagRanges.callOpen[defPosition][vsPos]?.range || [];
+            
+            // 检查3-Bet范围
+            const threeBetRange = lagRanges.threeBet[defPosition]?.[vsPos]?.range || [];
+            
+            if (isInRange(hand, threeBetRange)) {
+                correctAnswer = '3bet';
+            } else if (isInRange(hand, callRange)) {
+                correctAnswer = 'call';
+            } else {
+                correctAnswer = 'fold';
+            }
+            
+            const raiserPos = vsPos.replace('vs', '');
+            situation = `你在 ${defPosition} 位，${raiserPos} Open到 2.5BB`;
+            return {
+                hand,
+                position: defPosition,
+                situation,
+                correctAnswer,
+                scenarioType: 'callopen'
+            };
+        }
     } else if (scenarioType === '3bet') {
         const vsPositions = ['UTG', 'LJ', 'HJ', 'CO'];
         const vsPos = vsPositions[Math.floor(Math.random() * vsPositions.length)];
