@@ -173,7 +173,12 @@ async function handleSubmit() {
     const promises = [];
     
     if (API_KEYS.gemini) promises.push(callGemini(question, imageBase64));
-    if (API_KEYS.deepseek) promises.push(callDeepSeek(question, imageBase64));
+    if (API_KEYS.deepseek) {
+        promises.push(callDeepSeekR1(question, imageBase64)); // R1推理模型
+        if (imageBase64) {
+            promises.push(callDeepSeekVL(question, imageBase64)); // VL视觉模型（仅有图片时）
+        }
+    }
     if (API_KEYS.claude) promises.push(callClaude(question, imageBase64));
 
     // 检查是否有可用的API
@@ -365,14 +370,16 @@ async function callGemini(question, imageBase64) {
     }
 }
 
-// 调用DeepSeek API（不支持图片）
-async function callDeepSeek(question, imageBase64) {
+// 调用DeepSeek R1推理模型（深度思考，不支持图片）
+async function callDeepSeekR1(question, imageBase64) {
     try {
         let finalQuestion = question || '你好';
+        
+        // 如果有图片但没有文字问题，提示用户
         if (imageBase64 && !question) {
-            finalQuestion = '（您上传了图片，但DeepSeek暂不支持图片分析，请用文字描述您的问题）';
+            finalQuestion = '请分析这个问题（注：R1推理模型不支持图片，仅处理文字）';
         }
-
+        
         const response = await fetchWithTimeout('https://api.deepseek.com/chat/completions', {
             method: 'POST',
             headers: {
@@ -380,10 +387,9 @@ async function callDeepSeek(question, imageBase64) {
                 'Authorization': `Bearer ${API_KEYS.deepseek}`
             },
             body: JSON.stringify({
-                model: 'deepseek-chat',
+                model: 'deepseek-reasoner',
                 messages: [{ role: 'user', content: finalQuestion }],
-                max_tokens: 2000,
-                temperature: 0.7
+                max_tokens: 4000
             })
         });
 
@@ -400,19 +406,96 @@ async function callDeepSeek(question, imageBase64) {
         if (!data.choices?.[0]?.message) throw new Error('返回数据格式异常');
         
         let content = data.choices[0].message.content;
+        
+        // 如果有推理过程，也显示出来
+        if (data.choices[0].message.reasoning_content) {
+            content = '🧠 **推理过程：**\n' + data.choices[0].message.reasoning_content + '\n\n📝 **结论：**\n' + content;
+        }
+        
+        // 如果有图片，提示R1不支持图片
         if (imageBase64) {
-            content = '⚠️ DeepSeek不支持图片分析，以下仅针对文字问题回答：\n\n' + content;
+            content = '⚠️ R1推理模型不支持图片，以下仅针对文字问题回答：\n\n' + content;
         }
         
         return {
-            model: 'DeepSeek',
+            model: 'DeepSeek R1',
             icon: 'deepseek',
             success: true,
             content: content
         };
     } catch (error) {
         return {
-            model: 'DeepSeek',
+            model: 'DeepSeek R1',
+            icon: 'deepseek',
+            success: false,
+            error: error.message || '请求失败'
+        };
+    }
+}
+
+// 调用DeepSeek VL视觉模型（支持图片）
+async function callDeepSeekVL(question, imageBase64) {
+    try {
+        if (!imageBase64) {
+            // 没有图片时不调用VL模型
+            return {
+                model: 'DeepSeek VL',
+                icon: 'deepseek',
+                success: false,
+                error: '未上传图片，跳过视觉模型'
+            };
+        }
+        
+        const messages = [{
+            role: 'user',
+            content: [
+                {
+                    type: 'image_url',
+                    image_url: {
+                        url: imageBase64
+                    }
+                },
+                {
+                    type: 'text',
+                    text: question || '请描述这张图片的内容'
+                }
+            ]
+        }];
+
+        const response = await fetchWithTimeout('https://api.deepseek.com/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${API_KEYS.deepseek}`
+            },
+            body: JSON.stringify({
+                model: 'deepseek-vl',
+                messages: messages,
+                max_tokens: 2000
+            })
+        });
+
+        if (!response.ok) {
+            let errorMsg = `HTTP ${response.status}`;
+            try {
+                const error = await response.json();
+                errorMsg = error.error?.message || error.message || errorMsg;
+            } catch (e) {}
+            throw new Error(errorMsg);
+        }
+
+        const data = await response.json();
+        if (!data.choices?.[0]?.message) throw new Error('返回数据格式异常');
+        
+        return {
+            model: 'DeepSeek VL',
+            icon: 'deepseek',
+            success: true,
+            content: data.choices[0].message.content
+        };
+    } catch (error) {
+        return {
+            model: 'DeepSeek VL',
             icon: 'deepseek',
             success: false,
             error: error.message || '请求失败'
@@ -429,8 +512,16 @@ function displayResults(results) {
         return;
     }
     
-    // 检查是否所有请求都失败了
-    const allFailed = results.every(r => r.status === 'rejected' || (r.value && !r.value.success));
+    // 过滤掉"跳过"类型的结果
+    const filteredResults = results.filter(r => {
+        if (r.status === 'fulfilled' && r.value && r.value.error && r.value.error.includes('跳过')) {
+            return false; // 跳过这个结果
+        }
+        return true;
+    });
+    
+    // 检查是否所有请求都失败了（排除跳过的）
+    const allFailed = filteredResults.length > 0 && filteredResults.every(r => r.status === 'rejected' || (r.value && !r.value.success));
     if (allFailed) {
         // 在结果前添加VPN提示
         const vpnTip = document.createElement('div');
@@ -439,7 +530,7 @@ function displayResults(results) {
         resultsContainer.appendChild(vpnTip);
     }
     
-    results.forEach((result, index) => {
+    filteredResults.forEach((result, index) => {
         const data = result.status === 'fulfilled' ? result.value : {
             model: `模型${index + 1}`,
             icon: 'claude',
