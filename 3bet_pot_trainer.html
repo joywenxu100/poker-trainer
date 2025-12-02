@@ -569,6 +569,101 @@
             color: var(--accent-orange);
             text-decoration: none;
         }
+
+        /* 进度显示 */
+        .progress-text {
+            font-size: 12px;
+            color: var(--accent-gold);
+            margin-left: 15px;
+            padding: 4px 10px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        /* 训练完成界面 */
+        .complete-section {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 50px 30px;
+            margin-bottom: 25px;
+            border: 2px solid var(--accent-gold);
+            text-align: center;
+        }
+
+        .complete-content .complete-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .complete-content h2 {
+            font-size: 28px;
+            color: var(--accent-gold);
+            margin-bottom: 30px;
+        }
+
+        .complete-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .complete-stats .stat-item {
+            text-align: center;
+        }
+
+        .complete-stats .stat-num {
+            display: block;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--accent-gold);
+        }
+
+        .complete-stats .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .complete-comment {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+        }
+
+        .complete-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .action-btn.restart {
+            background: var(--gradient-fire);
+            color: #000;
+        }
+
+        .action-btn.next-scenario {
+            background: var(--gradient-purple);
+            color: #fff;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body>
@@ -613,12 +708,16 @@
             </div>
         </div>
 
+        <!-- 训练完成界面 -->
+        <div id="completeSection" class="complete-section" style="display: none;"></div>
+
         <!-- 训练面板 -->
-        <div class="training-panel">
+        <div class="training-panel" id="trainingPanel">
             <div class="panel-header">
                 <div class="panel-title">
                     <span class="icon">🃏</span>
                     <span id="scenarioTitle">3-Bettor IP 训练</span>
+                    <span id="progressText" class="progress-text"></span>
                 </div>
                 <div class="position-badges">
                     <span class="pos-badge pos-hero" id="heroPosition">BTN</span>
@@ -709,8 +808,9 @@
         let currentScenario = '3bettor_ip';
         let stats = { total: 0, correct: 0, wrong: 0 };
         let currentQuestion = null;
-        let lastQuestionIndex = -1; // 【修复】避免连续相同题目
+        let completedQuestions = []; // 已完成的题目索引
         let answered = false;
+        let trainingComplete = false; // 训练是否完成
 
         // ==================== 题库 ====================
         const SCENARIOS = {
@@ -746,6 +846,7 @@
 
         const QUESTIONS = {
             '3bettor_ip': [
+                // ===== 高张干燥面（范围优势极大）=====
                 {
                     heroPos: 'BTN', villainPos: 'CO',
                     heroHand: ['Ah', 'Qs'],
@@ -761,8 +862,49 @@
                         <p>• 你的范围中有大量Ax/Kx/强对子，对手很难有足够的强牌反击</p>
                         <p>• 小注可以让对手弃掉所有空气牌（如67s/89s等）</p>
                         <p>• 用小注保持你的诈唬范围</p>
-                        <p><strong>AQo在这里：</strong>顶对+第二踢脚，属于价值下注范围的中间部分</p>`
+                        <p><strong>🎯 对手类型调整：</strong></p>
+                        <p>• vs 鱼：可以用50%pot，他们会用更多弱牌call</p>
+                        <p>• vs Reg：保持33%，他们会check-raise强牌</p>`
                 },
+                {
+                    heroPos: 'BTN', villainPos: 'BB',
+                    heroHand: ['Kc', 'Kd'],
+                    board: ['Ah', '8c', '3s'],
+                    boardTexture: 'A高干燥 - KK陷入困境',
+                    pot: '26BB', spr: '7.7', stack: '200BB',
+                    question: '翻牌对手check，你拿KK，应该？',
+                    options: ['C-bet 25% pot', 'C-bet 50% pot', 'Check back', 'C-bet 75% pot'],
+                    correct: 0,
+                    explanation: `<strong>正确答案：C-bet 25% pot</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>A高牌面，KK是一个尴尬的牌型 - 可能领先对手范围但怕Ax。</div>
+                        <p><strong>为什么小注？</strong></p>
+                        <p>• 小注让对手弃掉所有空气（78s/JTs等）</p>
+                        <p>• 如果被raise，你可以放弃（对手很可能有Ax）</p>
+                        <p>• 保护你的check范围（有时也会check KK）</p>
+                        <p><strong>🎯 对手类型调整：</strong></p>
+                        <p>• vs 紧玩家：考虑check，他们call意味着有A</p>
+                        <p>• vs 松被动：50%pot打价值，他们用弱牌call</p>`
+                },
+                {
+                    heroPos: 'CO', villainPos: 'BB',
+                    heroHand: ['Ac', 'Ac'],
+                    board: ['Kd', '7h', '2s'],
+                    boardTexture: 'K高干燥 - AA超对',
+                    pot: '24BB', spr: '8.3', stack: '200BB',
+                    question: '翻牌对手check，你拿AA超对，应该？',
+                    options: ['C-bet 25% pot', 'C-bet 50% pot', 'C-bet 75% pot', 'Check (trap)'],
+                    correct: 1,
+                    explanation: `<strong>正确答案：C-bet 50% pot</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>AA在K高面是强超对，需要打价值但也需要保护。</div>
+                        <p><strong>为什么50%？</strong></p>
+                        <p>• K高面对手有很多Kx会跟注</p>
+                        <p>• 50%可以建立底池，为后续街价值做准备</p>
+                        <p>• 太小让太多听牌免费看牌</p>
+                        <p><strong>🎯 对手类型调整：</strong></p>
+                        <p>• vs 跟注站：66%pot榨取最大价值</p>
+                        <p>• vs LAG：可以check引诱bluff，再call down</p>`
+                },
+                // ===== 中张牌面（对手范围更有利）=====
                 {
                     heroPos: 'BTN', villainPos: 'BB',
                     heroHand: ['Kd', 'Jd'],
@@ -773,12 +915,14 @@
                     options: ['C-bet 33% pot', 'C-bet 75% pot', 'Check back', 'C-bet全下'],
                     correct: 2,
                     explanation: `<strong>正确答案：Check back</strong>
-                        <div class="key-point"><strong>核心逻辑：</strong>Q94牌面对BB的防守范围更有利！BB会有很多Qx/99/44/Q9等，而你的3bet范围中Qx并不多。</div>
+                        <div class="key-point"><strong>核心逻辑：</strong>Q94牌面对BB的防守范围更有利！BB会有很多Qx/99/44/Q9等。</div>
                         <p><strong>为什么check？</strong></p>
-                        <p>• KJdd只有两个高张+后门方块花，没有击中牌面</p>
-                        <p>• 这个牌面对手会有很高的check-raise频率</p>
-                        <p>• Check保护了showdown value，也让你在转牌可以bluff catch</p>
-                        <p><strong>3-bettor不是每个牌面都要C-bet！</strong>识别对手范围更有利的牌面是关键技能。</p>`
+                        <p>• KJdd有两个高张+后门方块花，但没有击中</p>
+                        <p>• 这个牌面对手check-raise频率高</p>
+                        <p>• Check保留showdown value，转牌可以bluff catch或改进</p>
+                        <p><strong>🎯 对手类型调整：</strong></p>
+                        <p>• vs 鱼：可以33%c-bet，他们不会check-raise</p>
+                        <p>• vs TAG：必须check，他们会惩罚你的诈唬</p>`
                 },
                 {
                     heroPos: 'CO', villainPos: 'UTG',
@@ -790,13 +934,16 @@
                     options: ['C-bet 33% pot', 'C-bet 66% pot', 'Check back', '全下'],
                     correct: 1,
                     explanation: `<strong>正确答案：C-bet 66% pot</strong>
-                        <div class="key-point"><strong>核心逻辑：</strong>T73彩虹牌面，你的JJ是一个强超对。这个牌面需要较大的下注尺寸来保护你的权益。</div>
+                        <div class="key-point"><strong>核心逻辑：</strong>T73彩虹牌面，JJ是强超对，需要保护和打价值。</div>
                         <p><strong>为什么大注？</strong></p>
-                        <p>• JJ在这里是明确的价值手牌</p>
-                        <p>• 牌面有很多听牌组合（98/J9/86等）需要让对手付出代价</p>
-                        <p>• UTG的range有TT/77/33，但你不怕check-raise，因为JJ很强</p>
-                        <p><strong>较大尺寸</strong>可以建立底池，为后续街的价值下注做准备。</p>`
+                        <p>• JJ是明确的价值手牌</p>
+                        <p>• 牌面有很多听牌（98/J9/86）需要付费</p>
+                        <p>• 66%建立底池，准备后续街打价值</p>
+                        <p><strong>🎯 对手类型调整：</strong></p>
+                        <p>• vs 紧被动：可以check引诱bluff</p>
+                        <p>• vs 松凶：75%保护，他们会用很多听牌call</p>`
                 },
+                // ===== 高张连接面（极端不利）=====
                 {
                     heroPos: 'BTN', villainPos: 'CO',
                     heroHand: ['9s', '9h'],
@@ -807,13 +954,31 @@
                     options: ['C-bet 25% pot', 'C-bet 50% pot', 'Check back', 'C-bet 75% pot'],
                     correct: 2,
                     explanation: `<strong>正确答案：Check back</strong>
-                        <div class="key-point"><strong>核心逻辑：</strong>AKQ三高张连接！虽然你是3-bettor，但99在这个牌面完全无法继续激进。</div>
+                        <div class="key-point"><strong>核心逻辑：</strong>AKQ三高张连接！99在这个牌面完全死亡。</div>
                         <p><strong>为什么必须check？</strong></p>
-                        <p>• 对手CO call 3bet的范围有大量AK/AQ/KQ/JT等击中牌面的牌</p>
-                        <p>• 你的99只有showdown value，C-bet会被频繁raise</p>
-                        <p>• 如果下注被call，转牌河牌几乎无法继续</p>
-                        <p><strong>低对子在高张连接面</strong>应该进入pot control模式，不要主动膨胀底池。</p>`
+                        <p>• 对手范围有大量AK/AQ/KQ/JT击中牌面</p>
+                        <p>• 99只有showdown value，C-bet会被频繁raise</p>
+                        <p>• 下注被call，后续街无法继续</p>
+                        <p><strong>关键认知：</strong>低对子在高张连接面 = pot control模式</p>`
                 },
+                {
+                    heroPos: 'BTN', villainPos: 'BB',
+                    heroHand: ['Th', 'Tc'],
+                    board: ['Js', 'Ts', '9c'],
+                    boardTexture: '湿润连接面 - 你有中暗三',
+                    pot: '26BB', spr: '7.7', stack: '200BB',
+                    question: '翻牌对手check，你中了暗三，应该？',
+                    options: ['C-bet 33% pot', 'C-bet 75% pot', 'C-bet 100% pot', 'Check (慢打)'],
+                    correct: 2,
+                    explanation: `<strong>正确答案：C-bet 100% pot</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>JT9是超湿润牌面，暗三不能慢打！</div>
+                        <p><strong>为什么大注？</strong></p>
+                        <p>• 牌面有大量听牌（KQ/Q8/87/同花draw）</p>
+                        <p>• 让听牌付出最大代价</p>
+                        <p>• 你的暗三有重draw被反超的风险</p>
+                        <p><strong>🎯 关键原则：</strong>湿润面的强牌 = 快打保护！</p>`
+                },
+                // ===== 低张牌面 =====
                 {
                     heroPos: 'BTN', villainPos: 'BB',
                     heroHand: ['6h', '6d'],
@@ -824,225 +989,674 @@
                     options: ['C-bet 25% pot', 'C-bet 50% pot', 'Check back', 'C-bet全部范围'],
                     correct: 0,
                     explanation: `<strong>正确答案：C-bet 25% pot</strong>
-                        <div class="key-point"><strong>核心逻辑：</strong>K72彩虹是经典的"高频小注C-bet"牌面。</div>
+                        <div class="key-point"><strong>核心逻辑：</strong>K72彩虹是经典"高频小注C-bet"牌面。</div>
                         <p><strong>两种思路都可接受：</strong></p>
-                        <p>• <strong>小注思路：</strong>用25% pot可以让对手fold很多空气，66有一些SDV</p>
-                        <p>• <strong>Check思路：</strong>66是你check范围中最强的牌之一，可以抓对手的诈唬</p>
-                        <p><strong>GTO解：</strong>这类边缘牌型可以混合策略，但在较低级别小注C-bet是更简单的选择。</p>`
+                        <p>• <strong>小注：</strong>让对手fold空气，66有SDV</p>
+                        <p>• <strong>Check：</strong>66是check范围最强牌之一</p>
+                        <p><strong>🎯 对手类型调整：</strong></p>
+                        <p>• vs 松被动：小注打薄价值</p>
+                        <p>• vs TAG：check抓诈唬更好</p>`
+                },
+                {
+                    heroPos: 'CO', villainPos: 'BB',
+                    heroHand: ['As', 'Kh'],
+                    board: ['8c', '5d', '2s'],
+                    boardTexture: '低张干燥 - 你完全错过',
+                    pot: '24BB', spr: '8.3', stack: '200BB',
+                    question: '翻牌对手check，AK完全错过，应该？',
+                    options: ['C-bet 33% pot', 'C-bet 66% pot', 'Check back', 'C-bet 100% pot'],
+                    correct: 0,
+                    explanation: `<strong>正确答案：C-bet 33% pot</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>852低张面，虽然你miss但对手也很难有强牌。</div>
+                        <p><strong>为什么小注C-bet？</strong></p>
+                        <p>• 你有范围优势（对手的range也大多miss）</p>
+                        <p>• 小注让对手fold 76s/T9s等空气</p>
+                        <p>• AK有6张overcards补牌</p>
+                        <p><strong>🎯 关键：</strong>低张面高频小注C-bet，不需要击中也能盈利</p>`
+                },
+                // ===== 转牌决策 =====
+                {
+                    heroPos: 'BTN', villainPos: 'BB',
+                    heroHand: ['Ah', 'Kh'],
+                    board: ['Kc', '7d', '3s', '2h'],
+                    boardTexture: '转牌空白 - 你有顶对顶踢',
+                    pot: '45BB', spr: '4.2', stack: '200BB',
+                    question: '翻牌C-bet被call，转牌空白2h，对手check，你应该？',
+                    options: ['Check', 'Bet 33% pot', 'Bet 66% pot', 'Bet 100% pot'],
+                    correct: 2,
+                    explanation: `<strong>正确答案：Bet 66% pot</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>顶对顶踢，转牌继续打价值是标准打法。</div>
+                        <p><strong>为什么66%？</strong></p>
+                        <p>• 对手翻牌call说明有一定牌力（Kx弱踢/77/33/听牌）</p>
+                        <p>• 66%继续榨取Kx弱踢的价值</p>
+                        <p>• 转牌2h无威胁，你依然很强</p>
+                        <p><strong>🎯 多街规划：</strong>准备河牌继续bet 50-70%完成3条街价值</p>`
+                },
+                {
+                    heroPos: 'BTN', villainPos: 'CO',
+                    heroHand: ['Qc', 'Jc'],
+                    board: ['Kh', '9c', '5c', 'Tc'],
+                    boardTexture: '转牌完成坚果花',
+                    pot: '48BB', spr: '4.0', stack: '200BB',
+                    question: '翻牌你C-bet后门花draw被call，转牌完成坚果花！对手check，应该？',
+                    options: ['Check (慢打)', 'Bet 33% pot', 'Bet 75% pot', 'All-in'],
+                    correct: 2,
+                    explanation: `<strong>正确答案：Bet 75% pot</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>完成坚果花，但牌面已经有3张同花，需要平衡下注。</div>
+                        <p><strong>为什么75%？</strong></p>
+                        <p>• 对手可能有Kx/9x/Tx会付钱</p>
+                        <p>• 如果对手有小同花，他可能raise你反而更好</p>
+                        <p>• 75%建立大底池，河牌可以继续价值bet或check</p>
+                        <p><strong>🎯 不要all-in：</strong>只有更好的同花会call，不如分两条街打</p>`
+                },
+                // ===== 面对check-raise =====
+                {
+                    heroPos: 'BTN', villainPos: 'BB',
+                    heroHand: ['As', 'Qs'],
+                    board: ['Ah', '7c', '3d'],
+                    boardTexture: 'A高干燥 - 被check-raise',
+                    pot: '52BB', spr: '5.8', stack: '200BB',
+                    question: '你C-bet 33%被对手check-raise到3x，AQ顶对应该？',
+                    options: ['Fold', 'Call', '3-bet小注', '3-bet all-in'],
+                    correct: 1,
+                    explanation: `<strong>正确答案：Call</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>AQ顶对第二踢脚太强不能fold，但也不适合3-bet。</div>
+                        <p><strong>为什么call？</strong></p>
+                        <p>• 对手的check-raise范围包括：AA/77/33/A7/AK/AJ以及诈唬</p>
+                        <p>• AQ打败AJ/AT，输给AA/77/33/AK</p>
+                        <p>• Call后根据转牌和对手行动再做决定</p>
+                        <p><strong>🎯 对手类型调整：</strong></p>
+                        <p>• vs 紧玩家：考虑fold，他们很少bluff check-raise</p>
+                        <p>• vs 松凶：call下来，他们有很多诈唬</p>`
+                },
+                // ===== 河牌决策 =====
+                {
+                    heroPos: 'BTN', villainPos: 'BB',
+                    heroHand: ['Kd', 'Qd'],
+                    board: ['Kh', '8c', '3s', '5d', 'Jd'],
+                    boardTexture: '河牌 - 你有顶对好踢',
+                    pot: '85BB', spr: '2.4', stack: '200BB',
+                    question: '你bet翻牌转牌都被call，河牌J来了，对手check，应该？',
+                    options: ['Check', 'Bet 33% pot', 'Bet 66% pot', 'All-in'],
+                    correct: 1,
+                    explanation: `<strong>正确答案：Bet 33% pot</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>河牌J是一张overcard，需要谨慎薄价值。</div>
+                        <p><strong>为什么33%薄价值？</strong></p>
+                        <p>• 对手一路call可能有JJ/J8s/J3s击中两对</p>
+                        <p>• 33%小注可以被K弱踢/88/55跟注</p>
+                        <p>• 如果被raise，你可以放弃</p>
+                        <p><strong>🎯 关键：</strong>river不利牌面 = 薄价值或check</p>`
                 }
             ],
 
             '3bettor_oop': [
+                // ===== 超对打法 =====
                 {
                     heroPos: 'BB', villainPos: 'BTN',
                     heroHand: ['Qs', 'Qh'],
                     board: ['Jc', '8h', '4d'],
                     boardTexture: '中张偏干牌面',
                     pot: '26BB', spr: '7.7', stack: '200BB',
-                    question: '你OOP 3bet后，翻牌你应该？',
+                    question: '你OOP 3bet后拿QQ超对，应该？',
                     options: ['Check', 'C-bet 33% pot', 'C-bet 66% pot', 'C-bet全下'],
                     correct: 2,
                     explanation: `<strong>正确答案：C-bet 66% pot</strong>
-                        <div class="key-point"><strong>核心逻辑：</strong>QQ在J84牌面是明确的超对，OOP时需要用较大尺寸保护。</div>
-                        <p><strong>为什么不check？</strong></p>
-                        <p>• 给对手免费牌太危险，89/T9/67等有很多补牌</p>
-                        <p>• QQ是你范围中的强牌，需要榨取价值</p>
-                        <p><strong>OOP 3-bettor策略：</strong>在中低张面用较大尺寸C-bet强牌，check一些弱对子和抓诈范围。</p>`
+                        <div class="key-point"><strong>核心逻辑：</strong>QQ在J84是明确超对，OOP需要较大尺寸保护。</div>
+                        <p><strong>为什么66%？</strong></p>
+                        <p>• 给对手免费牌太危险（89/T9/67有补牌）</p>
+                        <p>• QQ需要榨取价值</p>
+                        <p><strong>🎯 OOP 3-bettor核心：</strong>强牌大注保护，弱牌进check范围</p>`
                 },
+                {
+                    heroPos: 'SB', villainPos: 'CO',
+                    heroHand: ['Kc', 'Kd'],
+                    board: ['Qh', '7c', '3s'],
+                    boardTexture: 'Q高干燥 - KK面对overcard',
+                    pot: '28BB', spr: '6.9', stack: '200BB',
+                    question: '你OOP 3bet拿KK，翻牌来Q，应该？',
+                    options: ['Check', 'C-bet 33% pot', 'C-bet 66% pot', 'C-bet全下'],
+                    correct: 2,
+                    explanation: `<strong>正确答案：C-bet 66% pot</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>KK在Q高面依然很强，需要打价值同时保护。</div>
+                        <p><strong>为什么66%？</strong></p>
+                        <p>• 对手的Qx会跟注（你打败Q弱踢）</p>
+                        <p>• 保护免受A高牌免费看牌</p>
+                        <p><strong>🎯 对手类型调整：</strong></p>
+                        <p>• vs 紧玩家：如果被raise，需要考虑fold</p>
+                        <p>• vs 松凶：准备call下来</p>`
+                },
+                // ===== 未击中的处理 =====
                 {
                     heroPos: 'SB', villainPos: 'BTN',
                     heroHand: ['Ac', 'Kc'],
                     board: ['Qc', '9h', '5s'],
                     boardTexture: '未击中的中高张面',
                     pot: '28BB', spr: '6.9', stack: '200BB',
-                    question: '你OOP 3bet AKs未击中，翻牌你应该？',
+                    question: '你OOP 3bet AKs未击中，应该？',
                     options: ['Check', 'C-bet 33% pot', 'C-bet 75% pot', 'C-bet全下'],
                     correct: 1,
                     explanation: `<strong>正确答案：C-bet 33% pot</strong>
-                        <div class="key-point"><strong>核心逻辑：</strong>AKcc有两个高张overcards+后门梅花花draw，是很好的小注bluff牌型。</div>
+                        <div class="key-point"><strong>核心逻辑：</strong>AKcc有overcards+后门梅花，适合小注bluff。</div>
                         <p><strong>策略要点：</strong></p>
-                        <p>• 小注给自己留下转牌继续施压的空间</p>
-                        <p>• 可能击中A/K获得顶对，或转牌来梅花增加补牌</p>
-                        <p>• 33% pot被raise时可以轻松放弃</p>
-                        <p><strong>不要check：</strong>AK有太多equity放弃，也有blockers（阻挡了对手的AQ/KQ）</p>`
+                        <p>• 小注留空间给转牌继续施压</p>
+                        <p>• 可能击中A/K或转牌来梅花</p>
+                        <p>• 被raise可以轻松fold</p>
+                        <p><strong>🎯 AK的blockers：</strong>阻挡了AQ/KQ，对手更少有强牌</p>`
                 },
                 {
                     heroPos: 'BB', villainPos: 'CO',
-                    heroHand: ['Th', 'Ts'],
-                    board: ['As', 'Kd', '7c'],
-                    boardTexture: '双高张干燥面 - 3bettor范围优势',
-                    pot: '24BB', spr: '8.3', stack: '200BB',
-                    question: '你OOP 3bet，翻牌你应该？',
-                    options: ['Check', 'C-bet 25% pot', 'C-bet 66% pot', 'C-bet全下'],
+                    heroHand: ['Jd', 'Jh'],
+                    board: ['As', 'Qd', '6c'],
+                    boardTexture: 'AQ高 - JJ陷入困境',
+                    pot: '26BB', spr: '7.7', stack: '200BB',
+                    question: '你OOP 3bet拿JJ，翻牌AQ6，应该？',
+                    options: ['Check', 'C-bet 25% pot', 'C-bet 50% pot', 'C-bet 75% pot'],
                     correct: 0,
                     explanation: `<strong>正确答案：Check</strong>
-                        <div class="key-point"><strong>核心逻辑：</strong>虽然AK7是3-bettor范围优势的牌面，但TT作为中对应该放入check范围。</div>
+                        <div class="key-point"><strong>核心逻辑：</strong>AQ6对caller范围极有利，JJ变成了纯showdown value。</div>
                         <p><strong>为什么check？</strong></p>
-                        <p>• TT有SDV，但面对raise非常尴尬</p>
-                        <p>• 你需要一些check范围来保护，TT是完美的选择</p>
-                        <p>• 对手不太可能用air大力bluff AK7牌面</p>
-                        <p><strong>OOP时</strong>即使有范围优势，也需要构建check范围，不能只C-bet。</p>`
+                        <p>• 对手的range有大量Ax/Qx/AQ</p>
+                        <p>• C-bet会被频繁call或raise</p>
+                        <p>• Check后如果对手bet，可以考虑fold</p>
+                        <p><strong>🎯 关键认知：</strong>中对在高张对手有利面 = 放弃激进</p>`
                 },
+                // ===== 强Draw处理 =====
                 {
                     heroPos: 'BB', villainPos: 'BTN',
                     heroHand: ['Ah', 'Jh'],
                     board: ['Th', '6h', '2c'],
                     boardTexture: '坚果花draw + overcards',
                     pot: '26BB', spr: '7.7', stack: '200BB',
-                    question: '你OOP 3bet有坚果花draw，翻牌你应该？',
+                    question: '你OOP 3bet有坚果花draw，应该？',
                     options: ['Check', 'C-bet 33% pot', 'C-bet 75% pot', 'Check-raise all in'],
                     correct: 2,
                     explanation: `<strong>正确答案：C-bet 75% pot</strong>
-                        <div class="key-point"><strong>核心逻辑：</strong>AJhh有坚果花draw(9张补牌)+两个overcards(6张)+后门顺子可能性，这是一个强大的半诈唬牌型！</div>
-                        <p><strong>为什么大注C-bet？</strong></p>
-                        <p>• 你有~45%的equity，不怕被call</p>
-                        <p>• 大注可以让对手fold很多小对子和弱draws</p>
-                        <p>• 构建大底池，准备在转牌hit时获得巨额价值</p>
-                        <p><strong>强draw + position aggression</strong> = 激进下注，不要被动打法！</p>`
+                        <div class="key-point"><strong>核心逻辑：</strong>AJhh有坚果花draw(9张)+overcards(6张)+后门顺，约45%equity！</div>
+                        <p><strong>为什么大注？</strong></p>
+                        <p>• 约45%equity，不怕被call</p>
+                        <p>• 大注让对手fold小对子/弱draw</p>
+                        <p>• 构建大底池，hit时获得巨额价值</p>
+                        <p><strong>🎯 核心原则：</strong>强draw = 激进下注！</p>`
+                },
+                {
+                    heroPos: 'SB', villainPos: 'BTN',
+                    heroHand: ['Ks', 'Qs'],
+                    board: ['Js', 'Ts', '3c'],
+                    boardTexture: '皇家同花听牌！',
+                    pot: '28BB', spr: '6.9', stack: '200BB',
+                    question: '你OOP 3bet有皇家同花听牌+OESD，应该？',
+                    options: ['Check', 'C-bet 50% pot', 'C-bet 100% pot', 'All-in'],
+                    correct: 2,
+                    explanation: `<strong>正确答案：C-bet 100% pot</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>KQss有OESD(8张)+皇家同花draw(9张)+overcards = 超过50%equity！</div>
+                        <p><strong>为什么100%pot？</strong></p>
+                        <p>• 你是favorite，不怕被call</p>
+                        <p>• 让对手为他们的made hand付费</p>
+                        <p>• 构建全押潜力的大底池</p>
+                        <p><strong>🎯 关键：</strong>combo draw = 极度激进！</p>`
+                },
+                // ===== Check范围构建 =====
+                {
+                    heroPos: 'BB', villainPos: 'CO',
+                    heroHand: ['Th', 'Ts'],
+                    board: ['As', 'Kd', '7c'],
+                    boardTexture: '双高张干燥面',
+                    pot: '24BB', spr: '8.3', stack: '200BB',
+                    question: '你OOP 3bet拿TT，AK7牌面应该？',
+                    options: ['Check', 'C-bet 25% pot', 'C-bet 66% pot', 'C-bet全下'],
+                    correct: 0,
+                    explanation: `<strong>正确答案：Check</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>AK7是3-bettor范围优势面，但TT应该进check范围。</div>
+                        <p><strong>为什么check？</strong></p>
+                        <p>• TT有SDV，但面对raise尴尬</p>
+                        <p>• 需要check范围保护，TT完美</p>
+                        <p>• 对手不太会bluff AK7面</p>
+                        <p><strong>🎯 OOP策略：</strong>即使有范围优势，也需要check范围！</p>`
+                },
+                {
+                    heroPos: 'BB', villainPos: 'BTN',
+                    heroHand: ['8c', '8d'],
+                    board: ['Kh', 'Qc', '5s'],
+                    boardTexture: 'KQ高 - 88需要保护范围',
+                    pot: '26BB', spr: '7.7', stack: '200BB',
+                    question: '你OOP 3bet拿88，KQ5牌面应该？',
+                    options: ['Check', 'C-bet 25% pot', 'C-bet 50% pot', 'C-bet 75% pot'],
+                    correct: 0,
+                    explanation: `<strong>正确答案：Check</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>KQ5对BTN caller有利，88只有showdown value。</div>
+                        <p><strong>为什么check？</strong></p>
+                        <p>• 对手有大量Kx/Qx/KQ</p>
+                        <p>• 88是你check范围中最强的牌之一</p>
+                        <p>• 可以check-call抓对手的bluff</p>
+                        <p><strong>🎯 关键：</strong>中对在高张不利面 = 纯防守模式</p>`
+                },
+                // ===== 转牌决策 =====
+                {
+                    heroPos: 'BB', villainPos: 'BTN',
+                    heroHand: ['Ad', 'Qd'],
+                    board: ['Kh', '7c', '3s', 'Qh'],
+                    boardTexture: '转牌击中第二大对',
+                    pot: '48BB', spr: '4.0', stack: '200BB',
+                    question: '翻牌你check，对手bet 50%你call。转牌Q，现在应该？',
+                    options: ['Check-fold', 'Check-call', 'Check-raise', 'Donk bet 75%'],
+                    correct: 2,
+                    explanation: `<strong>正确答案：Check-raise</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>转牌击中Q，AQ现在是强价值牌，用check-raise榨取价值！</div>
+                        <p><strong>为什么check-raise？</strong></p>
+                        <p>• 对手翻牌bet会在转牌继续bet</p>
+                        <p>• Check-raise可以从Kx榨取大量价值</p>
+                        <p>• 也可以让对手fold诈唬</p>
+                        <p><strong>🎯 关键：</strong>改进后的牌用check-raise反击！</p>`
+                },
+                // ===== 河牌决策 =====
+                {
+                    heroPos: 'SB', villainPos: 'BTN',
+                    heroHand: ['As', 'As'],
+                    board: ['Kh', '7c', '3s', '2d', 'Jc'],
+                    boardTexture: '河牌 - AA超对',
+                    pot: '95BB', spr: '2.1', stack: '200BB',
+                    question: '你bet翻牌转牌都被call，河牌J，对手check，应该？',
+                    options: ['Check', 'Bet 33% pot', 'Bet 66% pot', 'All-in'],
+                    correct: 2,
+                    explanation: `<strong>正确答案：Bet 66% pot</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>AA在河牌依然很可能领先，继续打价值。</div>
+                        <p><strong>为什么66%？</strong></p>
+                        <p>• 对手一路call可能是Kx/77/33</p>
+                        <p>• 河牌J可能完成JJ，但概率低</p>
+                        <p>• 66%可以被Kx跟注</p>
+                        <p><strong>🎯 关键：</strong>AA在无明显危险的河牌继续价值bet！</p>`
                 }
             ],
 
             'caller_ip': [
+                // ===== 中对抓诈 =====
                 {
                     heroPos: 'BTN', villainPos: 'SB',
                     heroHand: ['9c', '9s'],
                     board: ['Ks', '7h', '3d'],
-                    boardTexture: '高张干燥面 - 3bettor范围优势',
+                    boardTexture: '高张干燥面 - 中对抓诈',
                     pot: '26BB', spr: '7.7', stack: '200BB',
-                    question: '你call 3bet IP，对手C-bet 33%，你应该？',
+                    question: '你call 3bet IP，对手C-bet 33%，应该？',
                     options: ['Fold', 'Call', 'Raise 3x', 'Raise全下'],
                     correct: 1,
                     explanation: `<strong>正确答案：Call</strong>
-                        <div class="key-point"><strong>核心逻辑：</strong>99在K高牌面是一个中等强度的抓诈牌。Call是唯一正确的选择。</div>
+                        <div class="key-point"><strong>核心逻辑：</strong>99在K高面是中等强度抓诈牌。</div>
                         <p><strong>为什么call？</strong></p>
-                        <p>• 对手用小注C-bet这种牌面是标准打法</p>
-                        <p>• 99打败对手的AQ/AJ/JJ等诈唬和弱牌</p>
-                        <p>• Raise会fold掉所有比你差的牌，只被更好的牌call</p>
-                        <p><strong>作为caller</strong>在这种牌面保持被动，用位置优势在后续街获取信息。</p>`
+                        <p>• 小注C-bet是标准打法，对手经常miss</p>
+                        <p>• 99打败AQ/AJ/JJ等</p>
+                        <p>• Raise只会被更好的牌call</p>
+                        <p><strong>🎯 IP优势：</strong>后续街可以根据对手行动调整</p>`
                 },
+                {
+                    heroPos: 'BTN', villainPos: 'BB',
+                    heroHand: ['Th', 'Tc'],
+                    board: ['Ah', '8c', '3d'],
+                    boardTexture: 'A高干燥 - TT面对overcard',
+                    pot: '26BB', spr: '7.7', stack: '200BB',
+                    question: '你call 3bet IP拿TT，对手C-bet 50%，应该？',
+                    options: ['Fold', 'Call', 'Raise 2.5x', 'Raise全下'],
+                    correct: 1,
+                    explanation: `<strong>正确答案：Call</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>TT在A高面是边缘抓诈牌，call一条街看转牌。</div>
+                        <p><strong>为什么call？</strong></p>
+                        <p>• 对手的bluff范围包括KQ/KJ/QJ</p>
+                        <p>• 你有位置优势，可以控制底池</p>
+                        <p>• 如果转牌对手继续大bet，可以考虑fold</p>
+                        <p><strong>🎯 关键：</strong>一条街call是标准，不要主动膨胀底池</p>`
+                },
+                // ===== 顶对处理 =====
                 {
                     heroPos: 'CO', villainPos: 'BB',
                     heroHand: ['As', 'Jd'],
                     board: ['Ac', 'Ts', '4h'],
                     boardTexture: '击中顶对中踢',
                     pot: '28BB', spr: '6.9', stack: '200BB',
-                    question: '你call 3bet IP，对手C-bet 66%，你应该？',
+                    question: '你call 3bet IP击中顶对，对手C-bet 66%，应该？',
                     options: ['Fold', 'Call', 'Raise 2.5x', 'Raise全下'],
                     correct: 1,
                     explanation: `<strong>正确答案：Call</strong>
-                        <div class="key-point"><strong>核心逻辑：</strong>顶对J踢脚是一个强但不是极强的牌，应该call而不是raise。</div>
+                        <div class="key-point"><strong>核心逻辑：</strong>顶对J踢是强牌但不是nuts，call控制底池。</div>
                         <p><strong>为什么不raise？</strong></p>
-                        <p>• Raise会让对手的AK/AQ继续，fold掉AJ以下</p>
-                        <p>• 你在IP，可以控制底池大小</p>
-                        <p>• 如果对手有AA/TT/44，raise只会让你陷入更大的麻烦</p>
-                        <p><strong>Call-down策略：</strong>这种牌通常call三条街，但不要主动膨胀底池。</p>`
+                        <p>• Raise让AK/AQ继续，fold掉AJ以下</p>
+                        <p>• 你在IP可以控制底池大小</p>
+                        <p>• 如果对手有AA/TT/44，raise会陷入麻烦</p>
+                        <p><strong>🎯 Call-down策略：</strong>准备call三条街，但不主动膨胀</p>`
                 },
+                {
+                    heroPos: 'BTN', villainPos: 'SB',
+                    heroHand: ['Kc', 'Qh'],
+                    board: ['Kd', '9h', '5c'],
+                    boardTexture: '击中顶对好踢',
+                    pot: '26BB', spr: '7.7', stack: '200BB',
+                    question: '你call 3bet IP击中KQ顶对，对手C-bet 50%，应该？',
+                    options: ['Fold', 'Call', 'Raise 2.5x', 'Raise全下'],
+                    correct: 1,
+                    explanation: `<strong>正确答案：Call</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>KQ顶对好踢，call打下去比raise更有价值。</div>
+                        <p><strong>为什么call？</strong></p>
+                        <p>• 对手会继续用AK bet，你输给他</p>
+                        <p>• 对手的诈唬（AQ/AJ/QJ）会继续bluff</p>
+                        <p>• Raise只被更好的牌call</p>
+                        <p><strong>🎯 关键：</strong>IP caller用顶对好踢call down三条街</p>`
+                },
+                // ===== 听牌处理 =====
                 {
                     heroPos: 'BTN', villainPos: 'BB',
                     heroHand: ['7h', '6h'],
                     board: ['8s', '5c', '2d'],
                     boardTexture: '低张干燥 + OESD',
                     pot: '26BB', spr: '7.7', stack: '200BB',
-                    question: '你call 3bet IP有OESD，对手C-bet 75%，你应该？',
+                    question: '你call 3bet IP有OESD，对手C-bet 75%，应该？',
                     options: ['Fold', 'Call', 'Raise小注', 'Raise全下'],
                     correct: 1,
                     explanation: `<strong>正确答案：Call</strong>
-                        <div class="key-point"><strong>核心逻辑：</strong>76s有8张顺子补牌，面对一个大注C-bet正好有足够的odds来call。</div>
+                        <div class="key-point"><strong>核心逻辑：</strong>76s有8张补牌，大注C-bet正好够odds call。</div>
                         <p><strong>数学分析：</strong></p>
-                        <p>• 你需要call ~20BB到~46BB的底池 = 约30%赔率</p>
+                        <p>• 需要call ~20BB到~46BB底池 = 约30%赔率</p>
                         <p>• OESD有~32%击中率，刚好够call</p>
-                        <p>• 还有隐含赔率：hit后可能赢得更多</p>
-                        <p><strong>不要raise：</strong>76s没有什么fold equity，对手很少会fold AA/KK/AK等。</p>`
+                        <p>• 还有隐含赔率</p>
+                        <p><strong>🎯 不raise：</strong>76s没有fold equity</p>`
                 },
                 {
                     heroPos: 'BTN', villainPos: 'SB',
                     heroHand: ['Kd', 'Qd'],
                     board: ['Jc', 'Ts', '3h'],
-                    boardTexture: '有顺子draw的中高张面',
+                    boardTexture: '有OESD+两高张',
                     pot: '26BB', spr: '7.7', stack: '200BB',
-                    question: '你call 3bet IP有OESD+两高张，对手C-bet 50%，你应该？',
+                    question: '你call 3bet IP有OESD+两高张，对手C-bet 50%，应该？',
                     options: ['Fold', 'Call', 'Raise 3x', 'Raise全下'],
                     correct: 2,
                     explanation: `<strong>正确答案：Raise 3x</strong>
-                        <div class="key-point"><strong>核心逻辑：</strong>KQo在JT3有OESD(8张)+两个overcards，这是一个绝佳的半诈唬raise机会！</div>
+                        <div class="key-point"><strong>核心逻辑：</strong>KQ在JT3有OESD(8张)+overcards，绝佳半诈唬机会！</div>
                         <p><strong>为什么raise？</strong></p>
-                        <p>• 你有~47%的equity对抗对手的C-bet范围</p>
-                        <p>• Raise可以让对手的AK/AQ等高张fold</p>
-                        <p>• 你block了QQ/KK，对手更少有强牌</p>
-                        <p>• 如果被call，转牌任何A/K/Q/9都让你很强</p>
-                        <p><strong>这是典型的IP float raise机会！</strong></p>`
+                        <p>• 约47%equity对抗C-bet范围</p>
+                        <p>• Raise让AK/AQ fold</p>
+                        <p>• Block了QQ/KK</p>
+                        <p><strong>🎯 IP float raise：</strong>强draw + blockers = 激进！</p>`
+                },
+                {
+                    heroPos: 'BTN', villainPos: 'BB',
+                    heroHand: ['Ah', '5h'],
+                    board: ['Kh', '9h', '3c'],
+                    boardTexture: '坚果花draw',
+                    pot: '26BB', spr: '7.7', stack: '200BB',
+                    question: '你call 3bet IP有坚果花draw，对手C-bet 66%，应该？',
+                    options: ['Fold', 'Call', 'Raise 3x', 'Raise全下'],
+                    correct: 1,
+                    explanation: `<strong>正确答案：Call</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>A5hh坚果花draw，call看便宜牌是标准打法。</div>
+                        <p><strong>为什么call不raise？</strong></p>
+                        <p>• 你有隐含赔率：hit后可以大赢</p>
+                        <p>• Raise没有足够fold equity</p>
+                        <p>• IP保持被动让对手继续bluff</p>
+                        <p><strong>🎯 关键：</strong>纯花draw用call更好，combo draw才raise</p>`
+                },
+                // ===== 面对check =====
+                {
+                    heroPos: 'BTN', villainPos: 'BB',
+                    heroHand: ['Qc', 'Jc'],
+                    board: ['Ah', '8d', '3s'],
+                    boardTexture: 'A高 - 对手check',
+                    pot: '26BB', spr: '7.7', stack: '200BB',
+                    question: '你call 3bet IP，对手意外check A高面，应该？',
+                    options: ['Check back', 'Bet 33% pot', 'Bet 66% pot', 'Bet 100% pot'],
+                    correct: 0,
+                    explanation: `<strong>正确答案：Check back</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>对手check A高面可能是trap，QJ没有hit不要bluff。</div>
+                        <p><strong>为什么check？</strong></p>
+                        <p>• 对手可能用AA/AK慢打</p>
+                        <p>• QJ没有击中，bluff容易被抓</p>
+                        <p>• 免费看转牌可能改进</p>
+                        <p><strong>🎯 IP策略：</strong>对手check高张面时要警惕trap</p>`
+                },
+                {
+                    heroPos: 'CO', villainPos: 'BB',
+                    heroHand: ['8c', '8d'],
+                    board: ['6h', '5c', '2s'],
+                    boardTexture: '低张 - 对手check',
+                    pot: '26BB', spr: '7.7', stack: '200BB',
+                    question: '你call 3bet IP拿88超对，对手check低张面，应该？',
+                    options: ['Check back', 'Bet 33% pot', 'Bet 66% pot', 'Bet 100% pot'],
+                    correct: 2,
+                    explanation: `<strong>正确答案：Bet 66% pot</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>88在652是超对，对手check说明他miss了，打价值！</div>
+                        <p><strong>为什么66%？</strong></p>
+                        <p>• 你是超对，需要保护</p>
+                        <p>• 对手可能有overcards会call一条街</p>
+                        <p>• 建立底池准备后续街打价值</p>
+                        <p><strong>🎯 关键：</strong>对手check低张面 = 他们miss了，激进！</p>`
+                },
+                // ===== 转牌决策 =====
+                {
+                    heroPos: 'BTN', villainPos: 'SB',
+                    heroHand: ['Jh', 'Jc'],
+                    board: ['Ks', '8c', '3d', '2h'],
+                    boardTexture: '转牌空白',
+                    pot: '52BB', spr: '4.8', stack: '200BB',
+                    question: '翻牌call C-bet，转牌空白2h，对手再bet 66%，应该？',
+                    options: ['Fold', 'Call', 'Raise 2.5x', 'Raise全下'],
+                    correct: 1,
+                    explanation: `<strong>正确答案：Call</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>JJ是抓诈牌，转牌继续call down。</div>
+                        <p><strong>为什么call？</strong></p>
+                        <p>• 对手可能用AQ/AJ double barrel bluff</p>
+                        <p>• 转牌2h无威胁，你依然打败很多bluff</p>
+                        <p>• 准备河牌继续call（如果合理）</p>
+                        <p><strong>🎯 关键：</strong>中对在IP call down是标准策略</p>`
+                },
+                // ===== 河牌决策 =====
+                {
+                    heroPos: 'BTN', villainPos: 'BB',
+                    heroHand: ['Ac', 'Qc'],
+                    board: ['As', '7h', '4d', '2c', 'Kc'],
+                    boardTexture: '河牌 - 顶对好踢',
+                    pot: '85BB', spr: '2.4', stack: '200BB',
+                    question: '你call两条街，河牌K，对手all-in，应该？',
+                    options: ['Fold', 'Call', '再考虑'],
+                    correct: 0,
+                    explanation: `<strong>正确答案：Fold</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>河牌K来了对手全押，AQ很可能被AK反超。</div>
+                        <p><strong>为什么fold？</strong></p>
+                        <p>• 对手3bet范围有大量AK</p>
+                        <p>• 河牌全押是极强line</p>
+                        <p>• AQ只是bluff catcher，但这里bluff概率低</p>
+                        <p><strong>🎯 关键：</strong>不利河牌+大bet = 尊重对手的强牌</p>`
                 }
             ],
 
             'caller_oop': [
+                // ===== Check-raise策略 =====
                 {
                     heroPos: 'BB', villainPos: 'BTN',
                     heroHand: ['Jc', 'Tc'],
                     board: ['9c', '7d', '2s'],
-                    boardTexture: '中低张 + 卡顺draw + 后门花',
+                    boardTexture: '中低张 + Gutshot + 后门花',
                     pot: '26BB', spr: '7.7', stack: '200BB',
-                    question: '你OOP call 3bet有顺子draw，对手可能C-bet，你应该？',
+                    question: '你OOP call 3bet有Gutshot+后门花，对手可能C-bet，应该？',
                     options: ['Check-fold', 'Check-call', 'Check-raise 3x', 'Donk bet 50%'],
                     correct: 2,
                     explanation: `<strong>正确答案：Check-raise 3x</strong>
-                        <div class="key-point"><strong>核心逻辑：</strong>JTcc在9c72有Gutshot(需要8成7-8-9-T-J)+两个overcards(J/T)+后门梅花花draw，这是一个可以激进的牌型！</div>
+                        <div class="key-point"><strong>核心逻辑：</strong>JTcc有Gutshot(4张8)+overcards(J/T)+后门花，约35%equity，适合激进！</div>
                         <p><strong>为什么check-raise？</strong></p>
-                        <p>• 你有4张顺子补牌+6张高张补牌+后门花，约35%equity</p>
-                        <p>• 这个牌面对手会高频C-bet，你需要fight back</p>
-                        <p>• Check-raise让对手fold AK/AQ等overcards</p>
-                        <p><strong>OOP caller需要构建check-raise范围</strong>，带补牌的牌型是好的选择。</p>`
+                        <p>• 对手会高频C-bet这种牌面</p>
+                        <p>• Check-raise让AK/AQ fold</p>
+                        <p>• 构建check-raise范围是OOP caller必须的</p>
+                        <p><strong>🎯 关键：</strong>有补牌的牌型是check-raise的好选择</p>`
                 },
+                {
+                    heroPos: 'BB', villainPos: 'CO',
+                    heroHand: ['9h', '8h'],
+                    board: ['7h', '6c', '2d'],
+                    boardTexture: 'OESD + 后门花',
+                    pot: '26BB', spr: '7.7', stack: '200BB',
+                    question: '你OOP call 3bet有OESD+后门花，对手C-bet 50%，应该？',
+                    options: ['Fold', 'Call', 'Check-raise 3x', 'Check-raise全下'],
+                    correct: 2,
+                    explanation: `<strong>正确答案：Check-raise 3x</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>98hh有OESD(8张5或T)+后门红桃，约35%equity，check-raise！</div>
+                        <p><strong>为什么check-raise？</strong></p>
+                        <p>• 你有strong draw，不想给对手免费牌</p>
+                        <p>• 对手在低张面会高频C-bet</p>
+                        <p>• Check-raise可以拿下底池或者build pot</p>
+                        <p><strong>🎯 OESD是经典的check-raise牌型</strong></p>`
+                },
+                // ===== 浮动Call策略 =====
                 {
                     heroPos: 'CO', villainPos: 'BTN',
                     heroHand: ['As', 'Ks'],
                     board: ['Qs', '8c', '3d'],
-                    boardTexture: '未击中的高张面 + 后门黑桃',
+                    boardTexture: '未击中 + 后门黑桃',
                     pot: '28BB', spr: '6.9', stack: '200BB',
-                    question: '你OOP call 3bet AKs未击中，对手C-bet 66%，你应该？',
+                    question: '你OOP call 3bet AKs未击中，对手C-bet 66%，应该？',
                     options: ['Fold', 'Call', 'Check-raise 3x', 'Check-raise全下'],
                     correct: 1,
                     explanation: `<strong>正确答案：Call</strong>
-                        <div class="key-point"><strong>核心逻辑：</strong>AKss有两个overcards+后门黑桃花draw，面对C-bet应该call一条街看转牌。</div>
-                        <p><strong>为什么call而不是raise？</strong></p>
-                        <p>• 你没有击中牌面，check-raise作为bluff太expensive</p>
-                        <p>• AK有6张clean outs来击中顶对，后门黑桃增加equity</p>
-                        <p>• 如果转牌来A或K或黑桃，你可以翻转局面</p>
-                        <p><strong>浮动Call</strong>是AK未击中时的标准打法，保持底池可控。</p>`
+                        <div class="key-point"><strong>核心逻辑：</strong>AKss有overcards+后门黑桃，float call看转牌。</div>
+                        <p><strong>为什么call？</strong></p>
+                        <p>• 未击中check-raise太贵</p>
+                        <p>• 6张clean outs (A/K)</p>
+                        <p>• 后门花增加equity</p>
+                        <p><strong>🎯 浮动Call：</strong>AK未击中的标准打法</p>`
                 },
+                {
+                    heroPos: 'BB', villainPos: 'BTN',
+                    heroHand: ['Kh', 'Jh'],
+                    board: ['Ah', '9c', '5h'],
+                    boardTexture: '坚果花draw + overcard',
+                    pot: '26BB', spr: '7.7', stack: '200BB',
+                    question: '你OOP call 3bet有坚果花draw，对手C-bet 50%，应该？',
+                    options: ['Fold', 'Call', 'Check-raise 3x', 'Check-raise全下'],
+                    correct: 1,
+                    explanation: `<strong>正确答案：Call</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>KJhh坚果花draw，call看便宜牌比check-raise更好。</div>
+                        <p><strong>为什么call不raise？</strong></p>
+                        <p>• 纯花draw没有足够fold equity</p>
+                        <p>• Call有隐含赔率</p>
+                        <p>• 如果hit，可以从对手榨取大量价值</p>
+                        <p><strong>🎯 纯花draw = call，combo draw = raise</strong></p>`
+                },
+                // ===== 必须Fold =====
                 {
                     heroPos: 'BB', villainPos: 'BTN',
                     heroHand: ['5h', '5d'],
                     board: ['Ac', 'Kd', 'Jh'],
-                    boardTexture: '三高张连接',
+                    boardTexture: '三高张连接 - 完全死亡',
                     pot: '26BB', spr: '7.7', stack: '200BB',
-                    question: '你OOP call 3bet 55，这个超不利牌面，对手C-bet，你应该？',
+                    question: '你OOP call 3bet 55，AKJ面对手C-bet，应该？',
                     options: ['Fold', 'Call', 'Check-raise bluff', 'Donk bet bluff'],
                     correct: 0,
                     explanation: `<strong>正确答案：Fold</strong>
-                        <div class="key-point"><strong>核心逻辑：</strong>55在AKJ牌面完全dead！你几乎没有任何equity来继续。</div>
-                        <p><strong>为什么必须fold？</strong></p>
-                        <p>• 对手的C-bet范围在这里很强（大量Ax/Kx/Jx/QT）</p>
-                        <p>• 你只有2张补牌（55），约4%击中</p>
-                        <p>• 即使对手是bluff，你也无法call多条街</p>
-                        <p><strong>认输不可耻：</strong>好的玩家知道什么时候放弃，不要跟注到底。</p>`
+                        <div class="key-point"><strong>核心逻辑：</strong>55在AKJ完全dead！只有2张补牌，约4%击中。</div>
+                        <p><strong>为什么fold？</strong></p>
+                        <p>• 对手范围在这里极强</p>
+                        <p>• 你几乎没有equity</p>
+                        <p>• 即使bluff，对手不会fold</p>
+                        <p><strong>🎯 认输不可耻：</strong>知道何时放弃是关键技能</p>`
                 },
+                {
+                    heroPos: 'BB', villainPos: 'CO',
+                    heroHand: ['7c', '6c'],
+                    board: ['As', 'Kh', 'Qs'],
+                    boardTexture: '三Broadway牌面',
+                    pot: '26BB', spr: '7.7', stack: '200BB',
+                    question: '你OOP call 3bet 76s，AKQ面对手C-bet 75%，应该？',
+                    options: ['Fold', 'Call', 'Check-raise bluff', 'Donk bet bluff'],
+                    correct: 0,
+                    explanation: `<strong>正确答案：Fold</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>76cc在AKQ无任何补牌，彻底死亡。</div>
+                        <p><strong>为什么fold？</strong></p>
+                        <p>• 0%equity提升可能</p>
+                        <p>• 这种牌面对手不会fold任何牌</p>
+                        <p>• 大注C-bet说明对手有牌</p>
+                        <p><strong>🎯 低张同花连张在高张面 = 直接放弃</strong></p>`
+                },
+                // ===== Combo Draw全下 =====
                 {
                     heroPos: 'CO', villainPos: 'BTN',
                     heroHand: ['Qd', 'Jd'],
                     board: ['Td', '8d', '3c'],
-                    boardTexture: '卡顺 + 坚果花draw',
+                    boardTexture: 'Gutshot + 坚果花draw',
                     pot: '28BB', spr: '6.9', stack: '200BB',
-                    question: '你OOP call 3bet有强combo draw，对手C-bet 75%，你应该？',
+                    question: '你OOP call 3bet有强combo draw，对手C-bet 75%，应该？',
                     options: ['Fold', 'Call', 'Check-raise 3x', 'Check-raise全下'],
                     correct: 3,
                     explanation: `<strong>正确答案：Check-raise 全下</strong>
-                        <div class="key-point"><strong>核心逻辑：</strong>QJdd在T8d3c有Gutshot(4张9成8-9-T-J-Q)+坚果花draw(9张)+两overcards = 约46%equity，足够全下！</div>
+                        <div class="key-point"><strong>核心逻辑：</strong>QJdd有Gutshot(4张9)+坚果花draw(9张)+overcards = 约46%equity！</div>
                         <p><strong>数学计算：</strong></p>
-                        <p>• 花draw: 9张方块 (~36%到river)</p>
-                        <p>• 顺子draw: 4张9（减去9d已算在花里）= 3张额外</p>
-                        <p>• 高张补牌: Q/J各3张 = 6张</p>
-                        <p>• 总补牌约15张 ≈ 46%equity</p>
-                        <p><strong>当你有坚果花draw + 额外补牌</strong>，全下是唯一正确的打法，别让对手有任何免费牌。</p>`
+                        <p>• 花draw: 9张方块 (~36%)</p>
+                        <p>• 顺子: 3张额外9</p>
+                        <p>• 高张: 6张Q/J</p>
+                        <p><strong>🎯 约46%equity = 全下是唯一正确打法！</strong></p>`
+                },
+                {
+                    heroPos: 'BB', villainPos: 'BTN',
+                    heroHand: ['Th', '9h'],
+                    board: ['Jh', '8h', '2c'],
+                    boardTexture: 'OESD + 花draw = 超强combo',
+                    pot: '26BB', spr: '7.7', stack: '200BB',
+                    question: '你OOP call 3bet有OESD+花draw，对手C-bet 66%，应该？',
+                    options: ['Fold', 'Call', 'Check-raise 3x', 'Check-raise全下'],
+                    correct: 3,
+                    explanation: `<strong>正确答案：Check-raise 全下</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>T9hh有OESD(8张Q或7)+花draw(9张) = 约55%equity，你是favorite！</div>
+                        <p><strong>为什么全下？</strong></p>
+                        <p>• 你有15+补牌</p>
+                        <p>• 全下让对手被动接受或fold</p>
+                        <p>• 不给对手任何免费牌</p>
+                        <p><strong>🎯 combo draw = 极度激进！</strong></p>`
+                },
+                // ===== 转牌决策 =====
+                {
+                    heroPos: 'BB', villainPos: 'BTN',
+                    heroHand: ['Kc', 'Qc'],
+                    board: ['Jc', '7d', '3s', 'Tc'],
+                    boardTexture: '转牌完成OESD+花draw',
+                    pot: '52BB', spr: '4.8', stack: '200BB',
+                    question: '翻牌call，转牌完成OESD+花draw，对手bet 66%，应该？',
+                    options: ['Fold', 'Call', 'Check-raise all-in'],
+                    correct: 2,
+                    explanation: `<strong>正确答案：Check-raise all-in</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>KQcc现在有OESD(8张A或9)+坚果花draw(9张) = 约50%equity！</div>
+                        <p><strong>为什么全下？</strong></p>
+                        <p>• 你是favorite或接近50-50</p>
+                        <p>• 对手可能fold JJ以下对子</p>
+                        <p>• 不给对手免费河牌</p>
+                        <p><strong>🎯 转牌完成强draw = 激进反击！</strong></p>`
+                },
+                // ===== Donk策略 =====
+                {
+                    heroPos: 'BB', villainPos: 'BTN',
+                    heroHand: ['9c', '9d'],
+                    board: ['9h', '5c', '2s'],
+                    boardTexture: '中了暗三！',
+                    pot: '26BB', spr: '7.7', stack: '200BB',
+                    question: '你OOP call 3bet中了暗三！对手可能check behind，应该？',
+                    options: ['Check (trap)', 'Donk 33% pot', 'Donk 66% pot', 'Donk all-in'],
+                    correct: 0,
+                    explanation: `<strong>正确答案：Check (trap)</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>暗三在干燥低张面，check trap是最佳选择！</div>
+                        <p><strong>为什么check？</strong></p>
+                        <p>• 对手会高频C-bet这种牌面</p>
+                        <p>• 你可以在翻牌call或check-raise</p>
+                        <p>• Donk bet会吓跑对手的bluff</p>
+                        <p><strong>🎯 暗三在干燥面 = 慢打！</strong></p>`
+                },
+                {
+                    heroPos: 'BB', villainPos: 'CO',
+                    heroHand: ['8c', '8d'],
+                    board: ['8h', 'Jc', 'Ts'],
+                    boardTexture: '暗三在湿润面',
+                    pot: '26BB', spr: '7.7', stack: '200BB',
+                    question: '你OOP call 3bet中了暗三，但牌面很湿润，应该？',
+                    options: ['Check (trap)', 'Donk 50% pot', 'Donk 75% pot', 'Donk all-in'],
+                    correct: 2,
+                    explanation: `<strong>正确答案：Donk 75% pot</strong>
+                        <div class="key-point"><strong>核心逻辑：</strong>88暗三在JT8湿润面，需要快打保护！</div>
+                        <p><strong>为什么donk？</strong></p>
+                        <p>• 牌面有大量听牌（Q9/K9/97）</p>
+                        <p>• 对手可能check behind保护</p>
+                        <p>• Donk打价值同时保护</p>
+                        <p><strong>🎯 暗三在湿润面 = 快打！</strong></p>`
                 }
             ]
         };
@@ -1082,7 +1696,14 @@
         // ==================== 场景选择 ====================
         function selectScenario(scenario, element) {
             currentScenario = scenario;
-            lastQuestionIndex = -1; // 重置题目索引
+            completedQuestions = []; // 重置已完成题目
+            trainingComplete = false;
+            
+            // 隐藏完成界面
+            const completeSection = document.getElementById('completeSection');
+            const trainingPanel = document.getElementById('trainingPanel');
+            if (completeSection) completeSection.style.display = 'none';
+            if (trainingPanel) trainingPanel.style.display = 'block';
             
             // 更新UI
             document.querySelectorAll('.scenario-card').forEach(card => card.classList.remove('active'));
@@ -1098,10 +1719,105 @@
             
             generateQuestion();
         }
+        
+        // ==================== 更新进度 ====================
+        function updateProgress(current, total) {
+            const progressEl = document.getElementById('progressText');
+            if (progressEl) {
+                progressEl.textContent = `题目 ${current}/${total}`;
+            }
+        }
+        
+        // ==================== 显示训练完成 ====================
+        function showTrainingComplete() {
+            trainingComplete = true;
+            const trainingPanel = document.getElementById('trainingPanel');
+            const completeSection = document.getElementById('completeSection');
+            
+            if (trainingPanel) trainingPanel.style.display = 'none';
+            if (completeSection) {
+                const questions = QUESTIONS[currentScenario];
+                const accuracy = stats.total > 0 ? Math.round(stats.correct / stats.total * 100) : 0;
+                
+                let grade = '🌟';
+                let comment = '';
+                if (accuracy >= 90) {
+                    grade = '🏆 大师级';
+                    comment = '你已经完全掌握了这个场景的策略！';
+                } else if (accuracy >= 75) {
+                    grade = '⭐ 优秀';
+                    comment = '很好！但仍有提升空间，建议复习错题。';
+                } else if (accuracy >= 60) {
+                    grade = '📚 良好';
+                    comment = '基础不错，但需要更多练习来巩固。';
+                } else {
+                    grade = '💪 需要加强';
+                    comment = '建议先阅读策略提示，然后重新训练。';
+                }
+                
+                completeSection.innerHTML = `
+                    <div class="complete-content">
+                        <div class="complete-icon">${grade}</div>
+                        <h2>训练完成！</h2>
+                        <div class="complete-stats">
+                            <div class="stat-item">
+                                <span class="stat-num">${questions.length}</span>
+                                <span class="stat-label">总题数</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-num" style="color: var(--accent-green);">${stats.correct}</span>
+                                <span class="stat-label">正确</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-num" style="color: var(--accent-red);">${stats.wrong}</span>
+                                <span class="stat-label">错误</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-num" style="color: var(--accent-blue);">${accuracy}%</span>
+                                <span class="stat-label">正确率</span>
+                            </div>
+                        </div>
+                        <p class="complete-comment">${comment}</p>
+                        <div class="complete-actions">
+                            <button class="action-btn restart" onclick="restartTraining()">🔄 重新训练</button>
+                            <button class="action-btn next-scenario" onclick="nextScenario()">➡️ 下一场景</button>
+                        </div>
+                    </div>
+                `;
+                completeSection.style.display = 'block';
+            }
+        }
+        
+        // ==================== 重新训练 ====================
+        function restartTraining() {
+            completedQuestions = [];
+            stats = { total: 0, correct: 0, wrong: 0 };
+            updateStats();
+            
+            const completeSection = document.getElementById('completeSection');
+            const trainingPanel = document.getElementById('trainingPanel');
+            if (completeSection) completeSection.style.display = 'none';
+            if (trainingPanel) trainingPanel.style.display = 'block';
+            
+            generateQuestion();
+        }
+        
+        // ==================== 下一场景 ====================
+        function nextScenario() {
+            const scenarios = Object.keys(SCENARIOS);
+            const currentIdx = scenarios.indexOf(currentScenario);
+            const nextIdx = (currentIdx + 1) % scenarios.length;
+            const nextKey = scenarios[nextIdx];
+            
+            // 找到对应的卡片元素
+            const cards = document.querySelectorAll('.scenario-card');
+            selectScenario(nextKey, cards[nextIdx]);
+        }
 
         // ==================== 生成题目 ====================
         function generateQuestion() {
             answered = false;
+            trainingComplete = false;
             
             const questions = QUESTIONS[currentScenario];
             if (!questions || questions.length === 0) {
@@ -1109,17 +1825,28 @@
                 return;
             }
             
-            // 【修复】避免连续相同题目
-            let newIndex;
-            if (questions.length === 1) {
-                newIndex = 0;
-            } else {
-                do {
-                    newIndex = Math.floor(Math.random() * questions.length);
-                } while (newIndex === lastQuestionIndex);
+            // 检查是否所有题目都做完了
+            const availableIndices = [];
+            for (let i = 0; i < questions.length; i++) {
+                if (!completedQuestions.includes(i)) {
+                    availableIndices.push(i);
+                }
             }
-            lastQuestionIndex = newIndex;
+            
+            // 如果没有可用题目，显示完成界面
+            if (availableIndices.length === 0) {
+                showTrainingComplete();
+                return;
+            }
+            
+            // 随机选择一个未完成的题目
+            const randomIdx = Math.floor(Math.random() * availableIndices.length);
+            const newIndex = availableIndices[randomIdx];
             currentQuestion = questions[newIndex];
+            currentQuestion._index = newIndex; // 记录索引用于标记完成
+            
+            // 更新进度显示
+            updateProgress(questions.length - availableIndices.length + 1, questions.length);
             
             // 安全更新DOM
             safeSetText('heroPosition', currentQuestion.heroPos);
@@ -1211,6 +1938,11 @@
             if (answered || !currentQuestion) return;
             answered = true;
             
+            // 标记题目为已完成
+            if (currentQuestion._index !== undefined && !completedQuestions.includes(currentQuestion._index)) {
+                completedQuestions.push(currentQuestion._index);
+            }
+            
             const buttons = document.querySelectorAll('.option-btn');
             buttons.forEach((btn, i) => {
                 btn.disabled = true;
@@ -1238,7 +1970,18 @@
             
             if (explContent) explContent.innerHTML = currentQuestion.explanation;
             if (explSection) explSection.classList.add('visible');
-            if (nextBtn) nextBtn.classList.add('visible');
+            
+            // 检查是否还有剩余题目
+            const questions = QUESTIONS[currentScenario];
+            const remaining = questions.length - completedQuestions.length;
+            if (nextBtn) {
+                if (remaining > 0) {
+                    nextBtn.textContent = `下一题 (剩余${remaining}题) →`;
+                } else {
+                    nextBtn.textContent = '查看训练结果 🏆';
+                }
+                nextBtn.classList.add('visible');
+            }
         }
 
         // ==================== 下一题 ====================
