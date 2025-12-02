@@ -331,8 +331,8 @@ async function callClaude(question, imageBase64) {
                 'X-Title': 'Multi-Model AI Assistant'
             },
             body: JSON.stringify({
-                model: 'anthropic/claude-sonnet-4',  // 最新Sonnet 4.5
-                max_tokens: 8192,  // 🔧 增加到8192，避免回答被截断
+                model: 'anthropic/claude-sonnet-4',  // Claude Sonnet 4
+                max_tokens: 16384,  // 🔧 增加到16384，确保完整回答
                 messages: [{ 
                     role: 'user', 
                     content: content 
@@ -381,7 +381,7 @@ async function callGemini(question, imageBase64) {
         const apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
         const apiKey = API_KEYS.openrouter;
         
-        console.log('📤 正在通过OpenRouter调用Gemini 3 Pro...');
+        console.log('📤 正在通过OpenRouter调用Gemini 2.5 Flash...');
         
         if (!apiKey || !apiKey.startsWith('sk-or-')) {
             throw new Error('OpenRouter密钥未配置');
@@ -413,8 +413,8 @@ async function callGemini(question, imageBase64) {
                 'X-Title': 'Multi-Model AI Assistant'
             },
             body: JSON.stringify({
-                model: 'google/gemini-2.5-pro-preview',  // Gemini 2.5 Pro
-                max_tokens: 8192,  // 🔧 增加到8192，避免回答被截断
+                model: 'google/gemini-2.5-flash-preview-05-20',  // Gemini 2.5 Flash（更快更稳定）
+                max_tokens: 16384,  // 🔧 增加到16384，确保完整回答
                 messages: [{ 
                     role: 'user', 
                     content: content 
@@ -440,7 +440,7 @@ async function callGemini(question, imageBase64) {
         if (!data.choices?.[0]?.message?.content) throw new Error('返回数据格式异常');
         
         return {
-            model: 'Gemini 3 Pro',
+            model: 'Gemini 2.5 Flash',
             icon: 'gemini',
             success: true,
             content: data.choices[0].message.content
