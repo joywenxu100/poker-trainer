@@ -618,8 +618,8 @@
             <div class="ai-selector">
                 <div class="ai-option openrouter active" onclick="selectAI('openrouter')">
                     <div class="ai-icon">🚀</div>
-                    <div class="ai-name">OpenRouter Gemini</div>
-                    <div class="ai-desc">通过OpenRouter调用，国内直连</div>
+                    <div class="ai-name">Gemini 3 Pro Preview</div>
+                    <div class="ai-desc">OpenRouter国内直连，最强模型</div>
                     <div class="ai-badge">推荐</div>
                 </div>
                 <div class="ai-option gemini" onclick="selectAI('gemini')">
@@ -891,7 +891,7 @@
         // 混淆后的密钥（开发者工具中仍可见，但源码中不明文）
         const _k1 = 'Qkt9ZVh/SU1cdDx6Wm03SE5weEk4YE08WlN3dXNreFxscF9IL2VV'; // Gemini
         const _k2 = 'dG0waTlsOTg3O2c6PmsyNjs0PGhqOjIzODo5QGdoZWY1az8='; // DeepSeek
-        const _k3 = 'dG0wc3czfTIvNDw+Zz44OGc8O2w5NzpkZzo9PWNjOzhraG00OjtoZ2hAODU8NThrOWI0aTxrazsyZjw1OWo6NDg3Ozw5PWI4Ow=='; // OpenRouter
+        const _k3 = 'dG0wc3czfTIvZGppN0A2ODNqPjs7OmQ2aTk+PjkzOD04OzdjNmQ6aGppMWMzNDU2bDQ3ODo7a2tjYzNlOWc6ZjhoPD47bGc0Zg=='; // OpenRouter (new)
         
         // ==================== 配置 ====================
         const CONFIG = {
@@ -902,7 +902,7 @@
             DEEPSEEK_API_URL: 'https://api.deepseek.com/chat/completions',
             OPENROUTER_API_KEY: localStorage.getItem('OPENROUTER_API_KEY') || _d(_k3),
             OPENROUTER_API_URL: 'https://openrouter.ai/api/v1/chat/completions',
-            OPENROUTER_MODEL: 'mistralai/mistral-7b-instruct:free', // 免费模型，稳定可用
+            OPENROUTER_MODEL: 'google/gemini-3-pro-preview', // Gemini 3 Pro Preview 🚀
             REQUEST_TIMEOUT: 120000, // 2分钟超时
             MAX_LOG_ITEMS: 50 // 最大日志条数
         };
