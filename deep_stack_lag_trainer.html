@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深筹码松凶玩家训练器 - 300BB+ LAG Training</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #aaa;
+            margin-top: 10px;
+        }
+
+        .game-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+        }
+
+        .info-item {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .info-label {
+            font-size: 0.9em;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1.3em;
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #000;
+        }
+
+        .training-area {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .position-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .position-btn {
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .position-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #FFD700;
+        }
+
+        .position-btn.active {
+            background: #FFD700;
+            color: #000;
+            border-color: #FFD700;
+        }
+
+        .range-display {
+            margin: 30px 0;
+        }
+
+        .range-grid {
+            display: grid;
+            grid-template-columns: repeat(13, 1fr);
+            gap: 3px;
+            margin: 20px 0;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hand-cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            font-size: 0.9em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .hand-cell.pair {
+            background: rgba(255, 99, 71, 0.3);
+        }
+
+        .hand-cell.suited {
+            background: rgba(0, 191, 255, 0.3);
+        }
+
+        .hand-cell.offsuit {
+            background: rgba(144, 238, 144, 0.3);
+        }
+
+        .hand-cell.open {
+            background: rgba(50, 205, 50, 0.8);
+            border-color: #32CD32;
+        }
+
+        .hand-cell.three-bet {
+            background: rgba(255, 165, 0, 0.8);
+            border-color: #FFA500;
+        }
+
+        .hand-cell.four-bet {
+            background: rgba(255, 69, 0, 0.8);
+            border-color: #FF4500;
+        }
+
+        .hand-cell.five-bet {
+            background: rgba(220, 20, 60, 0.9);
+            border-color: #DC143C;
+        }
+
+        .hand-cell.call {
+            background: rgba(70, 130, 180, 0.8);
+            border-color: #4682B4;
+        }
+
+        .hand-cell:hover {
+            transform: scale(1.1);
+            z-index: 10;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .action-selector {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 12px 25px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            font-size: 1em;
+        }
+
+        .action-btn.active {
+            border-color: #FFD700;
+            background: rgba(255, 215, 0, 0.2);
+            color: #FFD700;
+        }
+
+        .vs-position-selector {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+        }
+
+        .memory-aid {
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+
+        .memory-aid h3 {
+            color: #FFD700;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .memory-list {
+            list-style-position: inside;
+            line-height: 1.8;
+            font-size: 1.05em;
+        }
+
+        .memory-list li {
+            margin: 10px 0;
+            padding-left: 10px;
+        }
+
+        .memory-category {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .stats-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-label {
+            color: #aaa;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            color: #FFD700;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .quiz-mode {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .question-display {
+            background: rgba(255, 215, 0, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .question-text {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #FFD700;
+        }
+
+        .hand-display {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+            letter-spacing: 5px;
+        }
+
+        .answer-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .answer-btn {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            min-width: 120px;
+        }
+
+        .answer-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .answer-btn.correct {
+            background: rgba(50, 205, 50, 0.8);
+            border-color: #32CD32;
+            animation: correctPulse 0.5s;
+        }
+
+        .answer-btn.incorrect {
+            background: rgba(220, 20, 60, 0.8);
+            border-color: #DC143C;
+            animation: shake 0.5s;
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .feedback {
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 1.1em;
+            text-align: center;
+        }
+
+        .feedback.correct {
+            background: rgba(50, 205, 50, 0.2);
+            border: 2px solid #32CD32;
+            color: #32CD32;
+        }
+
+        .feedback.incorrect {
+            background: rgba(220, 20, 60, 0.2);
+            border: 2px solid #DC143C;
+            color: #DC143C;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .strategy-tips {
+            background: rgba(0, 191, 255, 0.1);
+            border: 2px solid rgba(0, 191, 255, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+
+        .strategy-tips h3 {
+            color: #00BFFF;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .tip-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #00BFFF;
+        }
+
+        .tip-title {
+            color: #00BFFF;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #000;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #32CD32, #FFD700);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .range-grid {
+                gap: 2px;
+            }
+
+            .hand-cell {
+                font-size: 0.7em;
+            }
+
+            .mode-selector, .action-selector, .answer-buttons {
+                flex-direction: column;
+            }
+
+            .tips-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .combo-display {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .combo-text {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #ddd;
+        }
+
+        .highlight {
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        .insurance-note {
+            background: rgba(255, 69, 0, 0.1);
+            border: 2px solid rgba(255, 69, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 0.95em;
+        }
+
+        .insurance-note strong {
+            color: #FF4500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 深筹码松凶玩家训练器</h1>
+            <div class="subtitle">300BB+ LAG Style Preflop Master Training System</div>
+            <div class="game-info">
+                <div class="info-item">
+                    <div class="info-label">盲注结构</div>
+                    <div class="info-value">SB/BB/Straddle/Anti</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">盲注大小</div>
+                    <div class="info-value">1BB/2BB/4BB/1BB</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">有效筹码</div>
+                    <div class="info-value">300BB+</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">游戏风格</div>
+                    <div class="info-value">LAG (松凶)</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">保险选项</div>
+                    <div class="info-value">✓ 可用</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="mode-selector">
+            <button class="mode-btn active" data-mode="ranges">📊 范围学习</button>
+            <button class="mode-btn" data-mode="memory">🧠 记忆辅助</button>
+            <button class="mode-btn" data-mode="quiz">🎮 实战测试</button>
+            <button class="mode-btn" data-mode="strategy">📚 策略指南</button>
+        </div>
+
+        <!-- 范围学习模式 -->
+        <div id="ranges-mode" class="training-area">
+            <h2 style="text-align: center; margin-bottom: 20px;">翻前范围图表</h2>
+            
+            <div class="position-selector">
+                <button class="position-btn active" data-position="UTG">UTG</button>
+                <button class="position-btn" data-position="UTG1">UTG+1</button>
+                <button class="position-btn" data-position="LJ">LJ</button>
+                <button class="position-btn" data-position="HJ">HJ</button>
+                <button class="position-btn" data-position="CO">CO</button>
+                <button class="position-btn" data-position="BTN">BTN</button>
+                <button class="position-btn" data-position="SB">SB</button>
+                <button class="position-btn" data-position="BB">BB</button>
+                <button class="position-btn" data-position="STRADDLE">Straddle</button>
+            </div>
+
+            <div class="action-selector">
+                <button class="action-btn active" data-action="open">Open Raise</button>
+                <button class="action-btn" data-action="3bet">3-Bet</button>
+                <button class="action-btn" data-action="4bet">4-Bet</button>
+                <button class="action-btn" data-action="5bet">5-Bet/All-in</button>
+                <button class="action-btn" data-action="call3bet">Call 3-Bet</button>
+                <button class="action-btn" data-action="call4bet">Call 4-Bet</button>
+            </div>
+
+            <div id="vs-position-selector" class="vs-position-selector" style="display: none;">
+                <h3 style="margin-bottom: 15px; text-align: center;">对抗位置选择</h3>
+                <div class="position-selector" id="vs-positions"></div>
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: rgba(50, 205, 50, 0.8);"></div>
+                    <span>Open Raise</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: rgba(255, 165, 0, 0.8);"></div>
+                    <span>3-Bet</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: rgba(255, 69, 0, 0.8);"></div>
+                    <span>4-Bet</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: rgba(220, 20, 60, 0.9);"></div>
+                    <span>5-Bet/All-in</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: rgba(70, 130, 180, 0.8);"></div>
+                    <span>Call</span>
+                </div>
+            </div>
+
+            <div class="range-display">
+                <div class="range-grid" id="range-grid"></div>
+            </div>
+
+            <div class="combo-display">
+                <h3 style="color: #FFD700; margin-bottom: 15px;">当前范围详情</h3>
+                <div id="combo-details" class="combo-text">
+                    选择位置和动作查看详细范围...
+                </div>
+            </div>
+        </div>
+
+        <!-- 记忆辅助模式 -->
+        <div id="memory-mode" class="training-area" style="display: none;">
+            <h2 style="text-align: center; margin-bottom: 30px;">🧠 松凶玩家范围记忆法</h2>
+            
+            <div class="memory-aid">
+                <h3>📌 核心记忆原则</h3>
+                <div class="memory-category">
+                    <h4 style="color: #FFD700; margin-bottom: 10px;">1. 深筹码松凶的四大支柱</h4>
+                    <ul class="memory-list">
+                        <li><strong>宽度优势</strong>：比标准范围宽20-30%，利用深筹码的隐含赔率</li>
+                        <li><strong>位置激进</strong>：后位更加频繁施压，前位保持平衡</li>
+                        <li><strong>主动进攻</strong>：优先选择加注/再加注，减少跟注</li>
+                        <li><strong>弹性调整</strong>：根据对手类型动态调整范围宽度</li>
+                    </ul>
+                </div>
+
+                <div class="memory-category">
+                    <h4 style="color: #FFD700; margin-bottom: 10px;">2. Open Raise记忆法</h4>
+                    <ul class="memory-list">
+                        <li><strong>UTG (15%)</strong>：记住"66+, ATs+, KJs+, QJs, AJo+, KQo" - 核心牌力</li>
+                        <li><strong>LJ (20%)</strong>：UTG基础 + "A9s+, KTs+, QTs+, J9s+, 98s, ATo+"</li>
+                        <li><strong>HJ (27%)</strong>：LJ基础 + "A2s+, K9s+, Q9s+, J8s+, T8s+, 97s+, A9o+"</li>
+                        <li><strong>CO (35%)</strong>：HJ基础 + "K8s+, Q8s+, J7s+, T7s+, 96s+, 87s, 76s"</li>
+                        <li><strong>BTN (48%)</strong>：CO基础 + "任何同花牌, 任何对子, 强Axx"</li>
+                        <li><strong>SB (35%)</strong>：对抗BB+Straddle要紧一些，接近CO范围</li>
+                    </ul>
+                </div>
+
+                <div class="memory-category">
+                    <h4 style="color: #FFD700; margin-bottom: 10px;">3. 3-Bet记忆法 - "两极化+"策略</h4>
+                    <ul class="memory-list">
+                        <li><strong>价值层 (Value Tier)</strong>：JJ+, AQs+, AKo - 始终3-Bet</li>
+                        <li><strong>诈唬层 (Bluff Tier)</strong>：同花连牌 (87s-54s), 阻断牌Ax (A5s-A2s)</li>
+                        <li><strong>位置调整</strong>：后位3-Bet频率+8-12%，增加suited broadways</li>
+                        <li><strong>vs前位</strong>：收紧诈唬层，加强价值层</li>
+                        <li><strong>vs后位</strong>：扩大诈唬层，平衡价值层</li>
+                    </ul>
+                </div>
+
+                <div class="memory-category">
+                    <h4 style="color: #FFD700; margin-bottom: 10px;">4. 4-Bet记忆法 - "紧凶平衡"</h4>
+                    <ul class="memory-list">
+                        <li><strong>核心范围</strong>：QQ+, AK (约3%)</li>
+                        <li><strong>诈唬选择</strong>：A5s-A2s (阻断AA/AK), 部分suited connectors</li>
+                        <li><strong>4-Bet频率</strong>：面对3-Bet约12-15%的手牌进行4-Bet</li>
+                        <li><strong>位置因素</strong>：OOP更紧 (8-10%), IP更松 (15-18%)</li>
+                    </ul>
+                </div>
+
+                <div class="memory-category">
+                    <h4 style="color: #FFD700; margin-bottom: 10px;">5. 快速决策树</h4>
+                    <ul class="memory-list">
+                        <li>🔴 <strong>看到对子</strong> → 22-55跟注/偷盲，66+总是进池</li>
+                        <li>🔵 <strong>看到Ace</strong> → 同花A总是玩，散牌看第二张+位置</li>
+                        <li>🟢 <strong>看到同花高牌</strong> → KQ/KJ/QJ类总是进，位置越后越松</li>
+                        <li>🟡 <strong>看到连牌</strong> → 同花连牌激进玩，散牌连牌看位置</li>
+                        <li>🟣 <strong>3-Bet时</strong> → JJ+/AK价值，Axs/同花连牌诈唬</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="memory-aid" style="background: rgba(0, 191, 255, 0.1); border-color: rgba(0, 191, 255, 0.3);">
+                <h3 style="color: #00BFFF;">💡 深筹码特殊考虑</h3>
+                <div class="memory-category">
+                    <h4 style="color: #00BFFF; margin-bottom: 10px;">隐含赔率放大效应</h4>
+                    <ul class="memory-list">
+                        <li>小对子 (22-66)：300BB+时价值巨大，可以更激进地跟注3-Bet</li>
+                        <li>同花连牌 (98s, 87s, 76s)：成手后极易堆叠对手</li>
+                        <li>Suited Aces (A5s-A2s)：坚果同花+轮子听牌潜力</li>
+                    </ul>
+                </div>
+                <div class="memory-category">
+                    <h4 style="color: #00BFFF; margin-bottom: 10px;">SPR管理原则</h4>
+                    <ul class="memory-list">
+                        <li>目标SPR 8-12：适合投机牌和高对展开游戏</li>
+                        <li>避免SPR 3-5：容易陷入困难决策</li>
+                        <li>控制底池：非坚果范围考虑控池打法</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="insurance-note">
+                <strong>⚠️ 保险功能考虑：</strong> 在300BB+深筹码游戏中，当你持有强牌 (顶对顶踢脚+, 两对+, 听花/听顺) 面对全压时，保险可以降低波动。建议在以下情况考虑买保险：
+                <ul style="margin-top: 10px; padding-left: 20px;">
+                    <li>你拿着超对面对对手可能的听牌全压 (买30-50%保险)</li>
+                    <li>你在听同花/顺子，对手可能已成牌 (买20-40%保险)</li>
+                    <li>资金管理：当底池超过100BB且你胜率在40-65%之间时考虑</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 实战测试模式 -->
+        <div id="quiz-mode" class="training-area" style="display: none;">
+            <h2 style="text-align: center; margin-bottom: 30px;">🎮 实战决策测试</h2>
+            
+            <div class="stats-display">
+                <div class="stat-card">
+                    <div class="stat-label">总题数</div>
+                    <div class="stat-value" id="total-questions">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">正确率</div>
+                    <div class="stat-value" id="accuracy">0%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">连对数</div>
+                    <div class="stat-value" id="streak">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">最高连对</div>
+                    <div class="stat-value" id="best-streak">0</div>
+                </div>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%">0%</div>
+            </div>
+
+            <div class="quiz-mode">
+                <div class="question-display">
+                    <div class="question-text" id="question-text">点击"开始测试"开始训练</div>
+                    <div class="hand-display" id="hand-display">--</div>
+                    <div id="situation-info" style="font-size: 1.1em; color: #aaa; margin-top: 15px;"></div>
+                </div>
+
+                <div class="answer-buttons" id="answer-buttons">
+                    <button class="answer-btn" data-answer="fold">❌ Fold</button>
+                    <button class="answer-btn" data-answer="call">📞 Call</button>
+                    <button class="answer-btn" data-answer="raise">⬆️ Raise</button>
+                    <button class="answer-btn" data-answer="3bet">🔥 3-Bet</button>
+                    <button class="answer-btn" data-answer="4bet">💥 4-Bet</button>
+                    <button class="answer-btn" data-answer="5bet">⚡ 5-Bet/AI</button>
+                </div>
+
+                <div id="feedback" class="feedback" style="display: none;"></div>
+
+                <div class="controls">
+                    <button class="control-btn" id="start-quiz">🎮 开始测试</button>
+                    <button class="control-btn" id="next-question" style="display: none;">➡️ 下一题</button>
+                    <button class="control-btn" id="reset-stats">🔄 重置统计</button>
+                    <button class="control-btn" id="show-explanation">💡 查看解析</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 策略指南模式 -->
+        <div id="strategy-mode" class="training-area" style="display: none;">
+            <h2 style="text-align: center; margin-bottom: 30px;">📚 深筹码松凶策略指南</h2>
+            
+            <div class="strategy-tips">
+                <h3>🎯 基础策略原则</h3>
+                <div class="tips-grid">
+                    <div class="tip-card">
+                        <div class="tip-title">1. 位置就是金钱</div>
+                        <div>在深筹码游戏中，位置的价值被放大。按钮位可以游戏接近50%的手牌，而UTG应该保持在15%左右。记住：每向后移动一个位置，范围扩大3-5%。</div>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-title">2. 主动进攻优于被动跟注</div>
+                        <div>松凶玩家的核心是"松"在范围，"凶"在动作。尽可能选择加注而非跟注，这样可以：(1) 立即赢得底池 (2) 获得主动权 (3) 隐藏手牌强度。</div>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-title">3. 利用隐含赔率</div>
+                        <div>300BB+筹码深度下，小对子和同花连牌的价值大增。22在正确情况下可以跟注3-Bet，因为击中暗三可能赢得对手全部筹码。</div>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-title">4. 两极化3-Bet</div>
+                        <div>3-Bet范围应该包含：(1) 强价值牌 (JJ+, AQs+) (2) 诈唬牌 (A2s-A5s, 同花连牌)。避免用KQo这类"尴尬"牌3-Bet。</div>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-title">5. 对手类型调整</div>
+                        <div>对抗紧弱玩家：加大偷盲和诈唬频率。对抗松凶玩家：收紧价值范围，减少诈唬。对抗紧凶玩家：扩大跟注范围，减少4-Bet诈唬。</div>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-title">6. SPR意识</div>
+                        <div>深筹码游戏的关键是管理SPR (Stack to Pot Ratio)。目标是创造8-12的SPR，这个范围最适合松凶玩法，既能施压又能灵活放弃。</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="strategy-tips" style="background: rgba(255, 165, 0, 0.1); border-color: rgba(255, 165, 0, 0.3);">
+                <h3 style="color: #FFA500;">⚡ 进阶技巧</h3>
+                <div class="tips-grid">
+                    <div class="tip-card">
+                        <div class="tip-title">Straddle局的调整</div>
+                        <div>当有Straddle时，整体范围应收紧约10%，因为(1) 底池已经变大 (2) 还有Straddle位置在后面 (3) 相对筹码深度降低。但按钮和CO仍可保持激进。</div>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-title">Anti的影响</div>
+                        <div>1BB Anti使底池从3BB变为4BB，增加了偷盲价值。这意味着CO和BTN应该更频繁地开池，范围可以各扩大2-3%。</div>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-title">多人底池策略</div>
+                        <div>面对多个跟注者时，收紧持续下注范围，更多check-call/check-fold。深筹码多人底池极易失控，优先考虑位置和成手牌力。</div>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-title">4-Bet底池游戏</div>
+                        <div>4-Bet底池的SPR通常在2-4之间，应该采用更直接的打法。顶对及以上通常是全压，错过完全弃牌，减少复杂操作。</div>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-title">平衡你的范围</div>
+                        <div>松凶不等于无脑激进。确保你的每个动作都有合理的价值/诈唬比例：Open有强牌，3-Bet有坚果和诈唬，4-Bet有QQ+和A5s。</div>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-title">桌面形象管理</div>
+                        <div>展示1-2次强牌激进玩法后，可以增加诈唬频率。如果被抓到诈唬，随后几手应该收紧。观察对手对你的调整，反向利用。</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="memory-aid" style="background: rgba(220, 20, 60, 0.1); border-color: rgba(220, 20, 60, 0.3);">
+                <h3 style="color: #DC143C;">⚠️ 常见错误避免</h3>
+                <div class="tips-grid">
+                    <div class="tip-card" style="border-left-color: #DC143C;">
+                        <div class="tip-title">❌ 错误1：过度激进</div>
+                        <div>松凶≠每手都加注。应该有选择性地激进，避免在不利位置用边缘牌4-Bet或5-Bet。记住：激进要有目的。</div>
+                    </div>
+                    <div class="tip-card" style="border-left-color: #DC143C;">
+                        <div class="tip-title">❌ 错误2：忽视对手调整</div>
+                        <div>如果对手开始频繁4-Bet你，收紧3-Bet范围。如果对手总是弃牌，增加诈唬。不调整=送钱。</div>
+                    </div>
+                    <div class="tip-card" style="border-left-color: #DC143C;">
+                        <div class="tip-title">❌ 错误3：位置不当扩张</div>
+                        <div>很多人在UTG/LJ过度扩张范围。前位的松凶仍要保持纪律，宁可紧凶也不要松弱。</div>
+                    </div>
+                    <div class="tip-card" style="border-left-color: #DC143C;">
+                        <div class="tip-title">❌ 错误4：忽视筹码深度变化</div>
+                        <div>当有效筹码降到150BB以下时，应该开始收紧范围，减少投机牌。100BB时基本回归GTO打法。</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="combo-display">
+                <h3 style="color: #FFD700; margin-bottom: 15px;">📊 推荐学习路径</h3>
+                <div class="combo-text">
+                    <p style="margin-bottom: 15px;"><span class="highlight">第一周：</span>熟记各位置Open Range，每天100次测试，正确率达到90%+</p>
+                    <p style="margin-bottom: 15px;"><span class="highlight">第二周：</span>掌握3-Bet范围，重点记忆"价值层+诈唬层"结构，对抗不同位置的调整</p>
+                    <p style="margin-bottom: 15px;"><span class="highlight">第三周：</span>学习4-Bet和Call 3-Bet决策，理解什么时候平跟3-Bet</p>
+                    <p style="margin-bottom: 15px;"><span class="highlight">第四周：</span>综合实战模拟，快速决策训练，目标3秒内做出正确决策</p>
+                    <p style="margin-bottom: 15px;"><span class="highlight">持续进阶：</span>每打10小时复习一次范围，根据实战情况微调，记录特殊spot</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="deep_stack_lag_trainer.js"></script>
+</body>
+</html>
+
