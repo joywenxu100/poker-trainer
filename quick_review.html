@@ -903,7 +903,7 @@
             OPENROUTER_API_KEY: localStorage.getItem('OPENROUTER_API_KEY') || _d(_k3),
             OPENROUTER_API_URL: 'https://openrouter.ai/api/v1/chat/completions',
             OPENROUTER_MODEL: 'google/gemini-3-pro-preview', // Gemini 3 Pro Preview 🚀
-            REQUEST_TIMEOUT: 120000, // 2分钟超时
+            REQUEST_TIMEOUT: 180000, // 3分钟超时（支持长输出）
             MAX_LOG_ITEMS: 50 // 最大日志条数
         };
 
@@ -1227,7 +1227,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: [{ parts }],
-                    generationConfig: { temperature: 0.1, maxOutputTokens: 2048 }
+                    generationConfig: { temperature: 0.1, maxOutputTokens: 4096 }
                 })
             });
 
@@ -1451,7 +1451,7 @@
                     contents: [{ parts: [{ text: prompt }] }],
                     generationConfig: { 
                         temperature: 0.7, 
-                        maxOutputTokens: 8192,
+                        maxOutputTokens: 16384, // 增加到16K，确保完整输出
                         topP: 0.95
                     }
                 })
@@ -1537,7 +1537,7 @@
                 body: JSON.stringify({
                     model: 'deepseek-reasoner',
                     messages: [{ role: 'user', content: prompt }],
-                    max_tokens: 8192
+                    max_tokens: 16384 // 增加到16K，确保完整输出
                 })
             });
 
@@ -1576,7 +1576,7 @@
                 body: JSON.stringify({
                     model: CONFIG.OPENROUTER_MODEL,
                     messages: [{ role: 'user', content: prompt }],
-                    max_tokens: 8192,
+                    max_tokens: 16384, // 增加到16K，确保完整输出
                     temperature: 0.7
                 })
             });
@@ -1594,14 +1594,34 @@
             }
 
             const data = await response.json();
+            
+            // 详细的响应解析和错误处理
+            console.log('OpenRouter response:', JSON.stringify(data, null, 2));
+            
             const choice = data.choices?.[0];
             
-            if (!choice?.message?.content) {
-                throw new Error('OpenRouter未返回分析结果');
+            if (!choice) {
+                throw new Error('OpenRouter未返回任何结果');
+            }
+            
+            // 检查完成原因
+            const finishReason = choice.finish_reason;
+            if (finishReason === 'length') {
+                addLog('⚠️ 输出被截断（达到最大长度），已返回部分结果', 'warning');
+                console.warn('Output truncated due to max_tokens limit');
+            } else if (finishReason === 'content_filter') {
+                addLog('⚠️ 内容被过滤', 'warning');
+                throw new Error('内容被安全过滤，请修改描述后重试');
+            }
+            
+            const content = choice.message?.content;
+            if (!content) {
+                addLog(`⚠️ 响应异常: finish_reason=${finishReason}`, 'warning');
+                throw new Error(`OpenRouter返回空结果 (${finishReason || 'unknown'})`);
             }
             
             return {
-                text: choice.message.content,
+                text: content,
                 thinking: null
             };
         }
