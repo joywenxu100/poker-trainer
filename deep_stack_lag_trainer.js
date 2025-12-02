@@ -826,9 +826,9 @@ const lagRanges = {
     // ⭐ 新增：MDF（最小防守频率）计算器
     mdfCalculator: {
         facing3Bet: {
-            potOdds: '2.5:1 (典型3-Bet场景)',
-            mdf: '71.4%',
-            notes: '面对3-Bet，底池赔率约2.5:1，MDF=71.4%。意味着你的弃牌率不能超过28.6%，否则对手用任何牌诈唬都能盈利。实战中用~30% 4-Bet + ~25% Call = 55%防守（略低于MDF但可接受）'
+            potOdds: '约2.2:1 (典型3-Bet场景)',
+            mdf: '约45%',
+            notes: '面对3-Bet，假设你Open 2.5BB，对手3-Bet到7.5BB，底池约4BB(盲注+你的Open)，你需要Call 5BB。MDF = 4/(4+5) ≈ 44%。意味着你至少用44%的Open范围继续，否则对手可以用任何牌3-Bet诈唬盈利。实战中用~15% 4-Bet + ~30% Call = 45%防守'
         },
         facing4Bet: {
             potOdds: '1.8:1',
@@ -1033,11 +1033,8 @@ let quizState = {
 };
 
 function generateQuestion() {
-    const positions = ['UTG', 'UTG1', 'LJ', 'HJ', 'CO', 'BTN', 'SB'];
-    const position = positions[Math.floor(Math.random() * positions.length)];
-    
-    // 随机选择场景类型 - 增加callopen场景
-    const scenarioTypes = ['open', 'callopen', '3bet', 'vs3bet', '4bet'];
+    // 随机选择场景类型 - 增加callopen场景权重(最重要)
+    const scenarioTypes = ['open', 'callopen', 'callopen', '3bet', 'vs3bet', '4bet']; // callopen出现2次，提高概率
     const scenarioType = scenarioTypes[Math.floor(Math.random() * scenarioTypes.length)];
     
     // 随机生成一手牌
@@ -1045,23 +1042,39 @@ function generateQuestion() {
     
     let correctAnswer;
     let situation = '';
+    let position;
     
     if (scenarioType === 'open') {
+        const positions = ['UTG', 'UTG1', 'LJ', 'HJ', 'CO', 'BTN', 'SB'];
+        position = positions[Math.floor(Math.random() * positions.length)];
         const openRange = lagRanges.openRaise[position]?.range || [];
         correctAnswer = isInRange(hand, openRange) ? 'raise' : 'fold';
         situation = `你在 ${position} 位，前面都弃牌`;
-    } else if (scenarioType === 'callopen') {
-        // 新增：Call Open场景测试
-        const defensivePositions = ['BB', 'SB', 'BTN', 'CO'];
-        const defPosition = defensivePositions[Math.floor(Math.random() * defensivePositions.length)];
         
-        if (lagRanges.callOpen[defPosition]) {
-            const vsPositions = Object.keys(lagRanges.callOpen[defPosition]);
+    } else if (scenarioType === 'callopen') {
+        // Call Open场景测试 - 最重要的场景
+        const defensivePositions = ['BB', 'SB', 'BTN', 'CO'];
+        position = defensivePositions[Math.floor(Math.random() * defensivePositions.length)];
+        
+        // 确保该位置有callOpen数据
+        if (!lagRanges.callOpen[position]) {
+            // 如果没有数据，fallback到BB
+            position = 'BB';
+        }
+        
+        const vsPositions = Object.keys(lagRanges.callOpen[position]);
+        if (vsPositions.length === 0) {
+            // 如果还是没有数据，生成一个简单的open场景
+            position = 'UTG';
+            const openRange = lagRanges.openRaise['UTG'].range;
+            correctAnswer = isInRange(hand, openRange) ? 'raise' : 'fold';
+            situation = `你在 UTG 位，前面都弃牌`;
+        } else {
             const vsPos = vsPositions[Math.floor(Math.random() * vsPositions.length)];
-            const callRange = lagRanges.callOpen[defPosition][vsPos]?.range || [];
+            const callRange = lagRanges.callOpen[position][vsPos]?.range || [];
             
             // 检查3-Bet范围
-            const threeBetRange = lagRanges.threeBet[defPosition]?.[vsPos]?.range || [];
+            const threeBetRange = lagRanges.threeBet[position]?.[vsPos]?.range || [];
             
             if (isInRange(hand, threeBetRange)) {
                 correctAnswer = '3bet';
@@ -1072,30 +1085,47 @@ function generateQuestion() {
             }
             
             const raiserPos = vsPos.replace('vs', '');
-            situation = `你在 ${defPosition} 位，${raiserPos} Open到 2.5BB`;
-            return {
-                hand,
-                position: defPosition,
-                situation,
-                correctAnswer,
-                scenarioType: 'callopen'
-            };
+            situation = `你在 ${position} 位，${raiserPos} Open到 2.5BB`;
         }
-    } else if (scenarioType === '3bet') {
-        const vsPositions = ['UTG', 'LJ', 'HJ', 'CO'];
-        const vsPos = vsPositions[Math.floor(Math.random() * vsPositions.length)];
-        const threeBetKey = `vs${vsPos}`;
-        const threeBetRange = lagRanges.threeBet[position]?.[threeBetKey]?.range || [];
         
-        if (isInRange(hand, threeBetRange)) {
-            correctAnswer = '3bet';
-        } else {
-            // 检查是否在call范围
-            const callRange = lagRanges.call3Bet.IP?.range || [];
-            correctAnswer = isInRange(hand, callRange) ? 'call' : 'fold';
+    } else if (scenarioType === '3bet') {
+        // 3-Bet场景 - 确保位置有3-Bet数据
+        const positions3bet = ['BTN', 'CO', 'SB', 'BB']; // 只选择有3-Bet数据的位置
+        position = positions3bet[Math.floor(Math.random() * positions3bet.length)];
+        
+        // 确保该位置有3-Bet数据
+        if (!lagRanges.threeBet[position]) {
+            position = 'BTN'; // fallback
         }
-        situation = `你在 ${position} 位，${vsPos} 加注到 2.5BB`;
+        
+        const availableVsPositions = Object.keys(lagRanges.threeBet[position] || {});
+        if (availableVsPositions.length === 0) {
+            // 如果没有3-Bet数据，生成open场景
+            position = 'CO';
+            const openRange = lagRanges.openRaise[position].range;
+            correctAnswer = isInRange(hand, openRange) ? 'raise' : 'fold';
+            situation = `你在 ${position} 位，前面都弃牌`;
+        } else {
+            const vsPos = availableVsPositions[Math.floor(Math.random() * availableVsPositions.length)];
+            const threeBetKey = vsPos; // 已经是 vsUTG 格式
+            const threeBetRange = lagRanges.threeBet[position][threeBetKey]?.range || [];
+            
+            if (isInRange(hand, threeBetRange)) {
+                correctAnswer = '3bet';
+            } else {
+                // 检查是否在call范围
+                const callRange = lagRanges.call3Bet.IP?.range || [];
+                correctAnswer = isInRange(hand, callRange) ? 'call' : 'fold';
+            }
+            const raiserPos = vsPos.replace('vs', '');
+            situation = `你在 ${position} 位，${raiserPos} 加注到 2.5BB`;
+        }
+        
     } else if (scenarioType === 'vs3bet') {
+        // 面对3-Bet场景
+        const positions = ['UTG', 'LJ', 'HJ', 'CO', 'BTN'];
+        position = positions[Math.floor(Math.random() * positions.length)];
+        
         const fourBetRange = lagRanges.fourBet.general.range;
         const callRange = lagRanges.call3Bet.IP.range;
         
@@ -1107,7 +1137,12 @@ function generateQuestion() {
             correctAnswer = 'fold';
         }
         situation = `你在 ${position} Open，BTN 3-Bet 到 7.5BB`;
+        
     } else if (scenarioType === '4bet') {
+        // 面对4-Bet场景
+        const positions = ['UTG', 'LJ', 'HJ', 'CO', 'BTN'];
+        position = positions[Math.floor(Math.random() * positions.length)];
+        
         const fiveBetRange = lagRanges.fiveBet.general.range;
         const callRange = lagRanges.call4Bet.general.range;
         
@@ -1119,6 +1154,18 @@ function generateQuestion() {
             correctAnswer = 'fold';
         }
         situation = `你 3-Bet，对手 4-Bet 到 25BB`;
+    }
+    
+    // 最终安全检查：确保所有必需字段都存在
+    if (!correctAnswer || !situation || !position) {
+        // 如果任何字段缺失，返回一个安全的默认场景
+        return {
+            hand,
+            position: 'UTG',
+            situation: '你在 UTG 位，前面都弃牌',
+            correctAnswer: isInRange(hand, lagRanges.openRaise.UTG.range) ? 'raise' : 'fold',
+            scenarioType: 'open'
+        };
     }
     
     return {
@@ -1134,9 +1181,28 @@ function displayQuestion() {
     quizState.currentQuestion = generateQuestion();
     quizState.answered = false;
     
-    document.getElementById('question-text').textContent = quizState.currentQuestion.situation;
-    document.getElementById('hand-display').textContent = quizState.currentQuestion.hand;
-    document.getElementById('situation-info').textContent = `有效筹码：${300 + Math.floor(Math.random() * 200)}BB`;
+    // 安全检查：确保问题生成成功
+    if (!quizState.currentQuestion || !quizState.currentQuestion.hand) {
+        console.error('Failed to generate question');
+        alert('生成问题失败，请重试');
+        return;
+    }
+    
+    const questionTextEl = document.getElementById('question-text');
+    const handDisplayEl = document.getElementById('hand-display');
+    const situationInfoEl = document.getElementById('situation-info');
+    
+    if (questionTextEl) {
+        questionTextEl.textContent = quizState.currentQuestion.situation;
+    }
+    
+    if (handDisplayEl) {
+        handDisplayEl.textContent = quizState.currentQuestion.hand;
+    }
+    
+    if (situationInfoEl) {
+        situationInfoEl.textContent = `有效筹码：${300 + Math.floor(Math.random() * 200)}BB`;
+    }
     
     // 重置答案按钮
     document.querySelectorAll('.answer-btn').forEach(btn => {
@@ -1144,12 +1210,25 @@ function displayQuestion() {
         btn.disabled = false;
     });
     
-    document.getElementById('feedback').style.display = 'none';
-    document.getElementById('next-question').style.display = 'none';
+    const feedbackEl = document.getElementById('feedback');
+    if (feedbackEl) {
+        feedbackEl.style.display = 'none';
+    }
+    
+    const nextBtn = document.getElementById('next-question');
+    if (nextBtn) {
+        nextBtn.style.display = 'none';
+    }
 }
 
 function checkAnswer(userAnswer) {
     if (quizState.answered) return;
+    
+    // 安全检查：确保currentQuestion存在
+    if (!quizState.currentQuestion || !quizState.currentQuestion.correctAnswer) {
+        console.error('No current question found');
+        return;
+    }
     
     quizState.answered = true;
     quizState.totalQuestions++;
@@ -1167,19 +1246,33 @@ function checkAnswer(userAnswer) {
         feedbackEl.className = 'feedback correct';
         feedbackEl.textContent = '✓ 正确！这是最优决策。';
         
-        document.querySelector(`[data-answer="${userAnswer}"]`).classList.add('correct');
+        const userBtn = document.querySelector(`[data-answer="${userAnswer}"]`);
+        if (userBtn) {
+            userBtn.classList.add('correct');
+        }
     } else {
         quizState.currentStreak = 0;
         
         feedbackEl.className = 'feedback incorrect';
         feedbackEl.textContent = `✗ 不正确。正确答案是：${getAnswerText(quizState.currentQuestion.correctAnswer)}`;
         
-        document.querySelector(`[data-answer="${userAnswer}"]`).classList.add('incorrect');
-        document.querySelector(`[data-answer="${quizState.currentQuestion.correctAnswer}"]`).classList.add('correct');
+        const userBtn = document.querySelector(`[data-answer="${userAnswer}"]`);
+        if (userBtn) {
+            userBtn.classList.add('incorrect');
+        }
+        
+        const correctBtn = document.querySelector(`[data-answer="${quizState.currentQuestion.correctAnswer}"]`);
+        if (correctBtn) {
+            correctBtn.classList.add('correct');
+        }
     }
     
     feedbackEl.style.display = 'block';
-    document.getElementById('next-question').style.display = 'inline-block';
+    
+    const nextBtn = document.getElementById('next-question');
+    if (nextBtn) {
+        nextBtn.style.display = 'inline-block';
+    }
     
     // 禁用所有按钮
     document.querySelectorAll('.answer-btn').forEach(btn => {
@@ -1202,17 +1295,36 @@ function getAnswerText(answer) {
 }
 
 function updateStats() {
-    document.getElementById('total-questions').textContent = quizState.totalQuestions;
+    const totalEl = document.getElementById('total-questions');
+    const accuracyEl = document.getElementById('accuracy');
+    const streakEl = document.getElementById('streak');
+    const bestStreakEl = document.getElementById('best-streak');
+    const progressFillEl = document.getElementById('progress-fill');
+    
+    if (totalEl) {
+        totalEl.textContent = quizState.totalQuestions;
+    }
+    
     const accuracy = quizState.totalQuestions > 0 
         ? Math.round((quizState.correctAnswers / quizState.totalQuestions) * 100)
         : 0;
-    document.getElementById('accuracy').textContent = accuracy + '%';
-    document.getElementById('streak').textContent = quizState.currentStreak;
-    document.getElementById('best-streak').textContent = quizState.bestStreak;
     
-    const progress = accuracy;
-    document.getElementById('progress-fill').style.width = progress + '%';
-    document.getElementById('progress-fill').textContent = progress + '%';
+    if (accuracyEl) {
+        accuracyEl.textContent = accuracy + '%';
+    }
+    
+    if (streakEl) {
+        streakEl.textContent = quizState.currentStreak;
+    }
+    
+    if (bestStreakEl) {
+        bestStreakEl.textContent = quizState.bestStreak;
+    }
+    
+    if (progressFillEl) {
+        progressFillEl.style.width = accuracy + '%';
+        progressFillEl.textContent = accuracy + '%';
+    }
 }
 
 // 事件监听器
@@ -1264,41 +1376,62 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // 测试按钮
-    document.getElementById('start-quiz').addEventListener('click', () => {
-        displayQuestion();
-    });
+    const startQuizBtn = document.getElementById('start-quiz');
+    if (startQuizBtn) {
+        startQuizBtn.addEventListener('click', () => {
+            displayQuestion();
+        });
+    }
     
-    document.getElementById('next-question').addEventListener('click', () => {
-        displayQuestion();
-    });
+    const nextQuestionBtn = document.getElementById('next-question');
+    if (nextQuestionBtn) {
+        nextQuestionBtn.addEventListener('click', () => {
+            displayQuestion();
+        });
+    }
     
-    document.getElementById('reset-stats').addEventListener('click', () => {
-        if (confirm('确定要重置所有统计数据吗？')) {
-            quizState = {
-                totalQuestions: 0,
-                correctAnswers: 0,
-                currentStreak: 0,
-                bestStreak: 0,
-                currentQuestion: null,
-                answered: false
-            };
-            updateStats();
-        }
-    });
+    const resetStatsBtn = document.getElementById('reset-stats');
+    if (resetStatsBtn) {
+        resetStatsBtn.addEventListener('click', () => {
+            if (confirm('确定要重置所有统计数据吗？')) {
+                quizState = {
+                    totalQuestions: 0,
+                    correctAnswers: 0,
+                    currentStreak: 0,
+                    bestStreak: 0,
+                    currentQuestion: null,
+                    answered: false
+                };
+                updateStats();
+            }
+        });
+    }
     
-    document.getElementById('show-explanation').addEventListener('click', () => {
-        if (!quizState.currentQuestion) {
-            alert('请先开始测试');
-            return;
-        }
-        
-        const q = quizState.currentQuestion;
-        let explanation = `手牌：${q.hand}\n位置：${q.position}\n场景：${q.situation}\n\n`;
-        explanation += `最优动作：${getAnswerText(q.correctAnswer)}\n\n`;
-        explanation += `解析：根据松凶深筹码策略，这手牌在此场景下应该${getAnswerText(q.correctAnswer)}。`;
-        
-        alert(explanation);
-    });
+    const showExplanationBtn = document.getElementById('show-explanation');
+    if (showExplanationBtn) {
+        showExplanationBtn.addEventListener('click', () => {
+            if (!quizState.currentQuestion) {
+                alert('请先开始测试');
+                return;
+            }
+            
+            const q = quizState.currentQuestion;
+            let explanation = `手牌：${q.hand}\n位置：${q.position}\n场景：${q.situation}\n\n`;
+            explanation += `最优动作：${getAnswerText(q.correctAnswer)}\n\n`;
+            explanation += `解析：根据松凶深筹码策略，这手牌在此场景下应该${getAnswerText(q.correctAnswer)}。`;
+            
+            // 添加更详细的解析
+            if (q.scenarioType === 'callopen') {
+                explanation += `\n\n💡 Call Open决策：在深筹码游戏中，防守盲注和利用位置优势是盈利关键。`;
+            } else if (q.scenarioType === 'open') {
+                explanation += `\n\n💡 Open Raise决策：松凶玩家需要在合适位置积极开池，建立主动权。`;
+            } else if (q.scenarioType === '3bet') {
+                explanation += `\n\n💡 3-Bet决策：采用两极化策略，用强牌价值+阻断牌诈唬。`;
+            }
+            
+            alert(explanation);
+        });
+    }
     
     // 答案按钮
     document.querySelectorAll('.answer-btn').forEach(btn => {
@@ -1419,19 +1552,43 @@ function updateVsPositionSelector(position, action) {
     }
 }
 
-// 保存进度到localStorage
+// 保存进度到localStorage (带错误处理)
 function saveProgress() {
-    localStorage.setItem('lagTrainerStats', JSON.stringify(quizState));
+    try {
+        const dataToSave = {
+            totalQuestions: quizState.totalQuestions || 0,
+            correctAnswers: quizState.correctAnswers || 0,
+            bestStreak: quizState.bestStreak || 0,
+            lastSaved: new Date().toISOString()
+        };
+        localStorage.setItem('lagTrainerStats', JSON.stringify(dataToSave));
+    } catch (error) {
+        console.error('Failed to save progress:', error);
+        // localStorage可能被禁用或已满，静默失败
+    }
 }
 
 function loadProgress() {
-    const saved = localStorage.getItem('lagTrainerStats');
-    if (saved) {
-        const parsed = JSON.parse(saved);
-        quizState.totalQuestions = parsed.totalQuestions || 0;
-        quizState.correctAnswers = parsed.correctAnswers || 0;
-        quizState.bestStreak = parsed.bestStreak || 0;
-        updateStats();
+    try {
+        const saved = localStorage.getItem('lagTrainerStats');
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            // 验证数据有效性
+            if (typeof parsed.totalQuestions === 'number' && parsed.totalQuestions >= 0) {
+                quizState.totalQuestions = parsed.totalQuestions;
+            }
+            if (typeof parsed.correctAnswers === 'number' && parsed.correctAnswers >= 0) {
+                quizState.correctAnswers = parsed.correctAnswers;
+            }
+            if (typeof parsed.bestStreak === 'number' && parsed.bestStreak >= 0) {
+                quizState.bestStreak = parsed.bestStreak;
+            }
+            updateStats();
+            console.log('Progress loaded:', parsed.lastSaved);
+        }
+    } catch (error) {
+        console.error('Failed to load progress:', error);
+        // JSON解析失败或数据损坏，使用默认值
     }
 }
 
