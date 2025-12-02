@@ -169,20 +169,10 @@ async function handleSubmit() {
         }
     }
 
-    // 并行调用所有模型
-    const promises = [];
+    let results = [];
     
-    if (API_KEYS.gemini) promises.push(callGemini(question, imageBase64));
-    if (API_KEYS.deepseek) {
-        promises.push(callDeepSeekR1(question, imageBase64)); // R1推理模型
-        if (imageBase64) {
-            promises.push(callDeepSeekVL(question, imageBase64)); // VL视觉模型（仅有图片时）
-        }
-    }
-    if (API_KEYS.claude) promises.push(callClaude(question, imageBase64));
-
     // 检查是否有可用的API
-    if (promises.length === 0) {
+    if (!API_KEYS.gemini && !API_KEYS.deepseek && !API_KEYS.claude) {
         alert('⚠️ 没有可用的API密钥，请点击右下角⚙️配置');
         document.getElementById('loading').classList.remove('show');
         document.getElementById('submitBtn').disabled = false;
@@ -190,7 +180,53 @@ async function handleSubmit() {
         return;
     }
 
-    const results = await Promise.allSettled(promises);
+    if (imageBase64) {
+        // 🖼️ 有图片模式：先让Gemini/Claude识别图片，再把结果给DeepSeek R1分析
+        console.log('📷 检测到图片，启用串行模式：先识别图片，再深度分析');
+        document.getElementById('loadingText').textContent = '🖼️ 第一步：识别图片中...';
+        
+        // 第一步：并行调用支持图片的模型（Gemini和Claude）
+        const imagePromises = [];
+        if (API_KEYS.gemini) imagePromises.push(callGemini(question, imageBase64));
+        if (API_KEYS.claude) imagePromises.push(callClaude(question, imageBase64));
+        
+        const imageResults = await Promise.allSettled(imagePromises);
+        results = [...imageResults];
+        
+        // 第二步：获取Gemini的识别结果，转发给DeepSeek R1深度分析
+        if (API_KEYS.deepseek) {
+            document.getElementById('loadingText').textContent = '🧠 第二步：DeepSeek R1 深度分析中...';
+            let geminiResult = imageResults.find(r => 
+                r.status === 'fulfilled' && r.value?.model === 'Gemini' && r.value?.success
+            );
+            
+            if (geminiResult) {
+                // 构造给DeepSeek的提问：用户原问题 + Gemini的图片识别结果
+                const geminiContent = geminiResult.value.content;
+                const deepseekQuestion = `用户问题：${question || '请分析这张图片'}\n\n图片内容（由Gemini识别）：\n${geminiContent}\n\n请基于以上信息，进行深度分析和推理。`;
+                
+                console.log('🧠 将Gemini识别结果转发给DeepSeek R1进行深度分析');
+                const deepseekResult = await callDeepSeekR1(deepseekQuestion, null);
+                deepseekResult.model = 'DeepSeek R1 (深度分析)';
+                results.push({ status: 'fulfilled', value: deepseekResult });
+            } else {
+                // Gemini失败了，直接用原问题调用DeepSeek
+                const deepseekResult = await callDeepSeekR1(question, imageBase64);
+                results.push({ status: 'fulfilled', value: deepseekResult });
+            }
+        }
+    } else {
+        // 📝 纯文字模式：并行调用所有模型
+        console.log('📝 纯文字模式，并行调用所有模型');
+        document.getElementById('loadingText').textContent = '📝 正在同时询问三个AI模型...';
+        const promises = [];
+        
+        if (API_KEYS.gemini) promises.push(callGemini(question, imageBase64));
+        if (API_KEYS.deepseek) promises.push(callDeepSeekR1(question, imageBase64));
+        if (API_KEYS.claude) promises.push(callClaude(question, imageBase64));
+
+        results = await Promise.allSettled(promises);
+    }
 
     document.getElementById('loading').classList.remove('show');
     document.getElementById('submitBtn').disabled = false;
