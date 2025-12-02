@@ -1224,10 +1224,22 @@ function highlightRange(position, action, vsPosition = null) {
 
     document.getElementById('combo-details').innerHTML = details || '选择位置和动作查看详细范围...';
 
+    // 高亮显示范围内的手牌
     cells.forEach(cell => {
         const hand = cell.dataset.hand;
         if (isInRange(hand, range)) {
-            cell.classList.add(action.replace('bet', '-bet'));
+            // 根据action类型添加对应的CSS类
+            let cssClass = action;
+            if (action === 'callopen') {
+                cssClass = 'call';  // callopen使用call的颜色
+            } else if (action.includes('bet')) {
+                cssClass = action.replace('bet', '-bet');  // 3bet→3-bet, 4bet→4-bet, 5bet→5-bet
+            } else if (action === 'call3bet' || action === 'call4bet') {
+                cssClass = 'call';  // call3bet和call4bet都用call颜色
+            } else if (action === 'squeeze') {
+                cssClass = 'three-bet';  // squeeze用3-bet的橙色
+            }
+            cell.classList.add(cssClass);
         }
     });
 }
