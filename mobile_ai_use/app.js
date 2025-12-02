@@ -433,74 +433,16 @@ async function callDeepSeekR1(question, imageBase64) {
     }
 }
 
-// 调用DeepSeek VL视觉模型（支持图片）
+// DeepSeek VL视觉模型（当前API不支持，暂时禁用）
+// 注：DeepSeek官方API目前不支持多模态图片输入，仅支持文本
 async function callDeepSeekVL(question, imageBase64) {
-    try {
-        if (!imageBase64) {
-            // 没有图片时不调用VL模型
-            return {
-                model: 'DeepSeek VL',
-                icon: 'deepseek',
-                success: false,
-                error: '未上传图片，跳过视觉模型'
-            };
-        }
-        
-        const messages = [{
-            role: 'user',
-            content: [
-                {
-                    type: 'image_url',
-                    image_url: {
-                        url: imageBase64
-                    }
-                },
-                {
-                    type: 'text',
-                    text: question || '请描述这张图片的内容'
-                }
-            ]
-        }];
-
-        const response = await fetchWithTimeout('https://api.deepseek.com/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${API_KEYS.deepseek}`
-            },
-            body: JSON.stringify({
-                model: 'deepseek-vl',
-                messages: messages,
-                max_tokens: 2000
-            })
-        });
-
-        if (!response.ok) {
-            let errorMsg = `HTTP ${response.status}`;
-            try {
-                const error = await response.json();
-                errorMsg = error.error?.message || error.message || errorMsg;
-            } catch (e) {}
-            throw new Error(errorMsg);
-        }
-
-        const data = await response.json();
-        if (!data.choices?.[0]?.message) throw new Error('返回数据格式异常');
-        
-        return {
-            model: 'DeepSeek VL',
-            icon: 'deepseek',
-            success: true,
-            content: data.choices[0].message.content
-        };
-    } catch (error) {
-        return {
-            model: 'DeepSeek VL',
-            icon: 'deepseek',
-            success: false,
-            error: error.message || '请求失败'
-        };
-    }
+    // 直接返回跳过，因为DeepSeek API当前不支持图片
+    return {
+        model: 'DeepSeek VL',
+        icon: 'deepseek',
+        success: false,
+        error: '跳过：DeepSeek API暂不支持图片'
+    };
 }
 
 // 显示结果
