@@ -1,0 +1,1623 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C-bet Mastery Trainer - LAG核心武器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: #667eea;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .question-card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+            margin-bottom: 30px;
+        }
+
+        .scenario-tag {
+            display: inline-block;
+            padding: 8px 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .hand-info {
+            background: #f7f9fc;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .hand-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+
+        .hand-label {
+            font-weight: bold;
+            color: #667eea;
+            min-width: 120px;
+        }
+
+        .hand-value {
+            color: #333;
+            flex: 1;
+        }
+
+        .cards {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 5px;
+        }
+
+        .card {
+            padding: 8px 12px;
+            background: white;
+            border-radius: 8px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .card.hearts, .card.diamonds {
+            color: #e74c3c;
+        }
+
+        .card.clubs, .card.spades {
+            color: #2c3e50;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .option-btn {
+            padding: 18px 25px;
+            font-size: 1rem;
+            border: 3px solid #e0e0e0;
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .option-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+
+        .option-btn.correct {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: white;
+            border-color: #00b894;
+            animation: correctPulse 0.6s ease;
+        }
+
+        .option-btn.wrong {
+            background: linear-gradient(135deg, #d63031, #ff7675);
+            color: white;
+            border-color: #d63031;
+            animation: wrongShake 0.5s ease;
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes wrongShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .explanation {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 25px;
+            border-left: 5px solid #667eea;
+            display: none;
+        }
+
+        .explanation.show {
+            display: block;
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .explanation h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .explanation-content {
+            color: #333;
+            line-height: 1.8;
+            white-space: pre-line;
+        }
+
+        .next-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        .next-btn.show {
+            display: block;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00b894, #00cec9);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .completion-screen {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+            display: none;
+        }
+
+        .completion-screen.show {
+            display: block;
+            animation: slideDown 0.5s ease;
+        }
+
+        .completion-screen h2 {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .final-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .final-stat {
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+        }
+
+        .final-stat .label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .final-stat .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .action-btn {
+            padding: 15px 30px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .action-btn.secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 12px 30px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .question-card {
+                padding: 20px;
+            }
+
+            .options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 C-bet Mastery Trainer</h1>
+            <p>掌握LAG玩家最核心的武器 - 持续下注</p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-card">
+                <h3>完成进度</h3>
+                <div class="value" id="progressText">0/20</div>
+            </div>
+            <div class="stat-card">
+                <h3>正确率</h3>
+                <div class="value" id="accuracy">0%</div>
+            </div>
+            <div class="stat-card">
+                <h3>当前连胜</h3>
+                <div class="value" id="streak">0</div>
+            </div>
+        </div>
+
+        <div class="question-card" id="questionCard">
+            <div class="scenario-tag" id="scenarioTag"></div>
+            <div class="question-text" id="questionText"></div>
+            
+            <div class="hand-info" id="handInfo"></div>
+
+            <div class="options" id="optionsContainer"></div>
+
+            <div class="explanation" id="explanation">
+                <h4>📚 详细解析</h4>
+                <div class="explanation-content" id="explanationContent"></div>
+            </div>
+
+            <button class="next-btn" id="nextBtn" onclick="nextQuestion()">下一题 →</button>
+        </div>
+
+        <div class="completion-screen" id="completionScreen">
+            <h2>🎉 恭喜完成C-bet Mastery训练！</h2>
+            <div class="final-stats" id="finalStats"></div>
+            <div class="action-buttons">
+                <button class="action-btn primary" onclick="restartTraining()">重新训练</button>
+                <button class="action-btn secondary" onclick="window.location.href='lag_training_hub.html'">返回LAG训练中心</button>
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="lag_training_hub.html" class="back-link">← 返回LAG训练中心</a>
+        </div>
+    </div>
+
+    <script>
+        const QUESTIONS = [
+            // Dry Board C-bet (5题)
+            {
+                scenario: "Dry Board C-bet",
+                question: "8人桌，CO open 4BB，BTN call，你在BB用A♠K♠ 3bet到18BB，只有CO call。Flop: 9♣5♥2♦ (pot 41BB)，你先行动，有效筹码280BB，应该如何决策？",
+                handInfo: {
+                    position: "BB vs CO",
+                    hand: ["A♠", "K♠"],
+                    board: ["9♣", "5♥", "2♦"],
+                    pot: "41BB",
+                    effectiveStack: "280BB",
+                    SPR: "6.8"
+                },
+                options: ["Check", "Bet 14BB (1/3 pot)", "Bet 20BB (1/2 pot)", "Bet 30BB (3/4 pot)"],
+                correctIndex: 1,
+                explanation: `正确答案：Bet 14BB (1/3 pot)
+
+核心理由：
+1. **极干燥牌面** - 9♣5♥2♦ rainbow，对手很难击中
+2. **强大的3bet range优势** - 你代表AA-JJ, AK-AQ
+3. **对手防守range弱** - CO call 3bet主要是中对、小对、AJ-AT
+4. **小尺寸高效** - 1/3 pot就能让对手大部分未击中牌弃牌
+
+C-bet sizing原则：
+• Dry board → 小尺寸 (1/4 - 1/3 pot)
+• Wet board → 大尺寸 (2/3 - 3/4 pot)
+• 对抗Reg → 可以偏小，他们会尊重你的range
+• 对抗Fish → 需要bet大一些，他们不容易弃牌
+
+后续计划：
+• Turn继续开火频率：70%（除非对手show strength）
+• Triple barrel频率：40-50%（river根据对手类型调整）`
+            },
+            {
+                scenario: "Dry Board C-bet",
+                question: "6人桌，UTG open 4BB，你在CO用Q♦J♦ call，BB也call。Flop: K♠7♣3♥ (pot 13BB)，BB check，UTG check，你有220BB，应该如何决策？",
+                handInfo: {
+                    position: "CO (3-way pot)",
+                    hand: ["Q♦", "J♦"],
+                    board: ["K♠", "7♣", "3♥"],
+                    pot: "13BB",
+                    effectiveStack: "220BB",
+                    action: "BB check, UTG check"
+                },
+                options: ["Check behind", "Bet 6BB (1/2 pot)", "Bet 9BB (3/4 pot)", "Bet 13BB (pot)"],
+                correctIndex: 1,
+                explanation: `正确答案：Bet 6BB (1/2 pot) - Probe Bet（探测下注）
+
+核心理由：
+1. **双方都show weakness** - UTG和BB都check，很可能没有K
+2. **位置优势** - 你在最后行动，信息最多
+3. **有效的bluff spot** - K高牌面，你代表Kx很合理
+4. **即使被call也有outs** - QJ有6张outs（3张Q+3张J）
+
+Probe Bet策略：
+• 当翻牌圈前面玩家都check，你在position可以bet
+• 尺寸：1/2 - 2/3 pot最有效
+• 频率：vs Reg约60%，vs Fish约40%
+• 最佳牌面：高牌翻牌面（K-high, A-high）
+
+风险控制：
+• 如果遇到check-raise → 立即弃牌
+• 如果被call → Turn再次evaluate，如果对手再check，继续barrel
+• 不要对同一对手连续probe bet（容易被exploited）`
+            },
+            {
+                scenario: "Dry Board C-bet",
+                question: "8人桌+Straddle，你在HJ open 12BB用8♠8♣，只有CO call。Flop: A♦7♠2♣ (pot 29BB)，有效筹码240BB，应该如何决策？",
+                handInfo: {
+                    position: "HJ vs CO",
+                    hand: ["8♠", "8♣"],
+                    board: ["A♦", "7♠", "2♣"],
+                    pot: "29BB",
+                    effectiveStack: "240BB",
+                    SPR: "8.3"
+                },
+                options: ["Check", "Bet 10BB (1/3 pot)", "Bet 20BB (2/3 pot)", "Bet 29BB (pot)"],
+                correctIndex: 1,
+                explanation: `正确答案：Bet 10BB (1/3 pot)
+
+核心理由：
+1. **极有利的A-high牌面** - 作为preflop aggressor，你代表Ax最合理
+2. **对手range弱** - CO flat call范围主要是: 77-JJ, AJ-AT, suited connectors
+3. **88仍有showdown value** - 如果对手没有A，你可能是最好的牌
+4. **小尺寸C-bet实现多重目标**：
+   - 让未击中的hands弃牌（QQ-99没有A）
+   - 便宜地控制pot size
+   - 保持自己range平衡
+
+深筹码A-high牌面策略：
+• C-bet频率：80-90%（非常高）
+• 尺寸：1/4 - 1/3 pot（因为range优势极大）
+• Turn策略：
+  - 如果被call，Turn根据牌面decide是否double barrel
+  - 如果Turn是safe card（2-6），可以check behind控制pot
+  - 如果Turn是scary card（K, Q, J），可以继续小bet
+
+对抗不同对手：
+• vs Reg：小C-bet即可，他们会respect
+• vs Fish：可以bet略大（1/2 pot），他们不容易弃Ax
+• vs LAG：小心check-raise，准备好弃牌`
+            },
+            {
+                scenario: "Dry Board C-bet",
+                question: "8人桌，MP open 4BB，你在BTN用A♥Q♥ 3bet到16BB，SB和MP都call。Flop: J♠6♦3♣ (pot 49BB)，SB check，MP check，你有260BB，应该如何决策？",
+                handInfo: {
+                    position: "BTN (3-way pot)",
+                    hand: ["A♥", "Q♥"],
+                    board: ["J♠", "6♦", "3♣"],
+                    pot: "49BB",
+                    effectiveStack: "260BB",
+                    action: "SB check, MP check"
+                },
+                options: ["Check behind", "Bet 16BB (1/3 pot)", "Bet 25BB (1/2 pot)", "Bet 37BB (3/4 pot)"],
+                correctIndex: 2,
+                explanation: `正确答案：Bet 25BB (1/2 pot)
+
+核心理由：
+1. **3-way pot需要更大sizing** - 要同时让2个对手弃牌
+2. **J-high牌面中等威胁** - 不如A-high干燥，需要更多压力
+3. **你的range优势明显** - 3bettor代表AA-TT, AK-AJ
+4. **Ace-high有showdown value** - 不能过于保守
+
+多人底池C-bet调整：
+• 尺寸要增大20-30%
+• Heads-up: 1/3 pot → 3-way: 1/2 pot
+• 频率要降低10-15%（更多玩家=更大概率有人击中）
+
+后续计划：
+• 如果1个call，1个fold：Turn evaluation
+  - Turn是A/Q → 继续bet
+  - Turn是blank → 可以check behind（控制pot）
+• 如果2个都call：Turn通常check behind
+  - 除非turn是A（变成top pair）
+• 如果遇到check-raise：通常弃牌（3-way pot，很少是bluff）
+
+关键概念：
+**多人底池要更紧缩和谨慎** - LAG不等于送钱！`
+            },
+            {
+                scenario: "Dry Board C-bet",
+                question: "8人桌+Straddle+Ante，你在CO open 14BB用K♣Q♠，只有BTN（已知TAG）call。Flop: T♥4♦2♠ (pot 37BB)，有效筹码270BB，应该如何决策？",
+                handInfo: {
+                    position: "CO vs BTN(TAG)",
+                    hand: ["K♣", "Q♠"],
+                    board: ["T♥", "4♦", "2♠"],
+                    pot: "37BB",
+                    effectiveStack: "270BB",
+                    SPR: "7.3",
+                    opponentType: "TAG"
+                },
+                options: ["Check", "Bet 12BB (1/3 pot)", "Bet 19BB (1/2 pot)", "Bet 28BB (3/4 pot)"],
+                correctIndex: 1,
+                explanation: `正确答案：Bet 12BB (1/3 pot)
+
+核心理由：
+1. **对抗TAG的最优策略** - 他们会respect preflop aggressor的range
+2. **T-high相对干燥** - TAG的calling range主要是pocket pairs和suited connectors
+3. **小尺寸C-bet高效** - TAG fold to C-bet频率通常60-70%
+4. **保留弹药** - 如果被call，你还有充足筹码double barrel
+
+对抗TAG的C-bet策略：
+• 尺寸：偏小（1/4 - 1/3 pot）
+• 频率：偏高（75-85%）
+• 他们很少check-raise bluff
+• 如果他们call，通常有pair或draw
+
+Turn计划：
+• 如果BTN call Flop C-bet，Turn策略：
+  - Turn是K/Q → Value bet（变成top pair）
+  - Turn是blank（2-7） → Double barrel约50%频率
+  - Turn是J/9/8 → Check behind（这些牌帮助对手太多）
+
+对比其他对手类型：
+• vs Fish：需要bet 1/2 - 2/3 pot（他们call太loose）
+• vs LAG：准备面对float和check-raise
+• vs Nit：可以bet 1/4 pot或直接check（他们fold too much）
+
+记住：**Small bet is not weak bet** - 小下注是深筹码LAG的精髓！`
+            },
+
+            // Wet Board C-bet (5题)
+            {
+                scenario: "Wet Board C-bet",
+                question: "8人桌，你在BTN open 4BB用A♠K♣，只有BB call。Flop: Q♠J♠10♦ (pot 9BB)，BB check，有效筹码250BB，应该如何决策？",
+                handInfo: {
+                    position: "BTN vs BB",
+                    hand: ["A♠", "K♣"],
+                    board: ["Q♠", "J♠", "10♦"],
+                    pot: "9BB",
+                    effectiveStack: "250BB",
+                    handStrength: "坚果顺子"
+                },
+                options: ["Check behind", "Bet 3BB (1/3 pot)", "Bet 6BB (2/3 pot)", "Bet 9BB (pot)"],
+                correctIndex: 2,
+                explanation: `正确答案：Bet 6BB (2/3 pot)
+
+核心理由：
+1. **你有坚果顺子** - 这是value bet，不是bluff
+2. **极wet的牌面** - 大量顺子、两对、set、flush draw可能
+3. **必须保护你的牌** - 如果check，对手可能免费看到dangerous turn/river
+4. **2/3 pot是最优value sizing** - 既能build pot，又不会吓跑弱牌
+
+Wet board value betting策略：
+• 有坚果牌或准坚果 → Bet 2/3 - 3/4 pot
+• 对手range极wide → 他们经常击中某些牌
+• 不要slow play（除非对手极aggressive）
+
+Turn/River计划：
+• Turn任何牌都继续bet - 你有坚果
+• River：
+  - 如果board pair → Value bet（对手可能有full house，你能收到value）
+  - 如果出现4th flush card → 谨慎（需要evaluate对手action）
+  - Blank river → 大尺寸value bet（pot size or over-bet）
+
+常见错误：
+❌ Check behind想"set trap" → 错！给对手免费看牌
+❌ Bet too small（1/3 pot）→ 给draw太好的odds
+❌ Over-bet（pot size+）→ 只有better hands会call
+
+**在wet board，坚果牌要打出value，不要fancy play！**`
+            },
+            {
+                scenario: "Wet Board C-bet",
+                question: "8人桌+Straddle，MP open 12BB，你在CO用 9♦8♦ call，BTN也call。Flop: 7♠6♥3♦ (pot 41BB)，MP check，你有240BB，应该如何决策？",
+                handInfo: {
+                    position: "CO (3-way pot)",
+                    hand: ["9♦", "8♦"],
+                    board: ["7♠", "6♥", "3♦"],
+                    pot: "41BB",
+                    effectiveStack: "240BB",
+                    handStrength: "OESD + backdoor flush"
+                },
+                options: ["Check", "Bet 14BB (1/3 pot)", "Bet 27BB (2/3 pot)", "Bet 41BB (pot)"],
+                correctIndex: 1,
+                explanation: `正确答案：Bet 14BB (1/3 pot)
+
+核心理由：
+1. **Semi-bluff with equity** - OESD给你8张outs（~32% turn equity）
+2. **MP show weakness** - Preflop raiser check通常代表没有击中
+3. **不需要大尺寸** - 你的目标是fold equity + draw equity
+4. **保护后续行动** - 如果BTN call，你还能在turn继续战斗
+
+Wet board semi-bluff策略：
+• 有8+ outs → 可以积极bet
+• Preflop aggressor check → 是你偷锅的信号
+• 尺寸：1/3 - 1/2 pot（平衡）
+
+Turn计划：
+• 如果hit straight（5或T） → Value bet
+• 如果turn是blank：
+  - BTN fold → 继续double barrel（~60%频率）
+  - BTN call → Check behind（控制pot，river看免费牌）
+• 如果turn是第二张diamond → 继续bet（增加了flush draw）
+
+对抗BTN call的思考：
+• BTN在3-way pot call你的bet → 他可能有pair或draw
+• 不要盲目triple barrel → 深筹码控制pot很重要
+
+风险控制：
+• 如果遇到check-raise → 通常弃牌（你只是draw）
+• 如果BTN raise → 弃牌（3-way pot，raise很少是bluff）`
+            },
+            {
+                scenario: "Wet Board C-bet",
+                question: "8人桌，UTG open 4BB，你在MP用Q♣Q♠ 3bet到16BB，只有UTG call。Flop: K♠J♠9♦ (pot 33BB)，UTG check，有效筹码260BB，应该如何决策？",
+                handInfo: {
+                    position: "MP vs UTG",
+                    hand: ["Q♣", "Q♠"],
+                    board: ["K♠", "J♠", "9♦"],
+                    pot: "33BB",
+                    effectiveStack: "260BB",
+                    SPR: "7.9"
+                },
+                options: ["Check behind", "Bet 11BB (1/3 pot)", "Bet 22BB (2/3 pot)", "Bet 33BB (pot)"],
+                correctIndex: 2,
+                explanation: `正确答案：Bet 22BB (2/3 pot)
+
+核心理由：
+1. **虽然是overpair但极危险的牌面** - KJs是噩梦牌面
+2. **必须C-bet保护手牌** - 如果check，太多bad turns（任何A, T, 8, 7, spade）
+3. **大尺寸迫使对手做困难决定** - Draws必须付出昂贵代价
+4. **Range优势** - 作为3bettor，你代表AA-TT, AK-AQ
+
+Dangerous flop的C-bet策略：
+• 有strong hand但vulnerable → Bet大（2/3 - 3/4 pot）
+• 目标：**保护而非value**
+• 即使被raise也可能是draw在raise
+
+Turn计划：
+• 如果UTG call，turn策略：
+  - Turn是blank（2-6）→ Check behind（pot control）
+  - Turn是T（你完成straight）→ Value bet
+  - Turn是A/K/spade → Check behind（放弃）
+
+如果被check-raise：
+• **这是关键决定点！**
+• UTG check-raise range：Sets, two pairs, KQ, JT, strong draws（QT♠, T8♠）
+• 你的QQ只beat draws和部分bluffs
+• **正确决策：Fold** - 深筹码，不值得冒险全部筹码
+
+对抗Fish vs Reg的差异：
+• vs Fish：可以bet小一些，他们不会用draw check-raise
+• vs Reg：大尺寸+准备fold to check-raise
+• vs LAG：预期更高频率的check-raise，做好心理准备
+
+**记住：LAG不是不会弃牌，而是在正确的时机弃牌！**`
+            },
+            {
+                scenario: "Wet Board C-bet",
+                question: "8人桌+Straddle+Ante，你在HJ open 14BB用A♦J♦，CO（已知Reg）call，BTN（已知LAG）也call。Flop: K♦9♦4♠ (pot 53BB)，有效筹码最短是CO 230BB，应该如何决策？",
+                handInfo: {
+                    position: "HJ (3-way pot)",
+                    hand: ["A♦", "J♦"],
+                    board: ["K♦", "9♦", "4♠"],
+                    pot: "53BB",
+                    effectiveStack: "230BB",
+                    handStrength: "Nut flush draw + Ace overcard",
+                    opponents: "CO(Reg) + BTN(LAG)"
+                },
+                options: ["Check", "Bet 18BB (1/3 pot)", "Bet 35BB (2/3 pot)", "Bet 53BB (pot)"],
+                correctIndex: 2,
+                explanation: `正确答案：Bet 35BB (2/3 pot)
+
+核心理由：
+1. **强大的equity** - Nut flush draw（9张outs）+ Ace overcard（3张outs）= ~50% equity
+2. **3-way pot需要大尺寸** - 要迫使两个对手做困难决定
+3. **Semi-bluff最优spot** - 即使被call，你有接近50%赢率
+4. **对抗Reg+LAG组合** - 大尺寸让Reg犹豫，LAG可能raise（欢迎！）
+
+多人底池的强Draw策略：
+• Nut flush draw在3-way pot是最强的semi-bluff手牌
+• Sizing：2/3 - 3/4 pot（不要怕！）
+• 如果遇到raise（especially来自LAG）→ 可以call或3bet all-in
+
+Turn计划：
+• 如果hit flush → Value bet（可能over-bet）
+• 如果turn是Ace → 仍然value bet（可能是top pair）
+• 如果turn是blank：
+  - 只剩heads-up → 继续barrel（你有50% equity）
+  - 仍然3-way → Check（控制pot）
+
+面对不同反应：
+1. **CO fold, BTN call** → Perfect！你在position，有nuts draw
+2. **CO call, BTN fold** → OK，heads-up在position
+3. **Both call** → Turn根据牌evaluate
+4. **CO/BTN raise** → 
+   - 来自Reg → 可能有set/two pair，但你有50% equity，可以call
+   - 来自LAG → 可能是draw或bluff，可以3bet all-in！
+
+**关键概念：强大的draw要像strong hand一样打 - 大胆、有侵略性！**`
+            },
+            {
+                scenario: "Wet Board C-bet",
+                question: "8人桌，CO open 4BB，你在BTN用7♠6♠ call，BB也call。Flop: 8♠5♠2♣ (pot 13BB)，BB check，CO check，你有245BB，应该如何决策？",
+                handInfo: {
+                    position: "BTN (3-way pot)",
+                    hand: ["7♠", "6♠"],
+                    board: ["8♠", "5♠", "2♣"],
+                    pot: "13BB",
+                    effectiveStack: "245BB",
+                    handStrength: "OESD + flush draw = MONSTER DRAW"
+                },
+                options: ["Check behind", "Bet 7BB (1/2 pot)", "Bet 10BB (3/4 pot)", "Bet 13BB (pot)"],
+                correctIndex: 2,
+                explanation: `正确答案：Bet 10BB (3/4 pot)
+
+核心理由：
+1. **COMBO DRAW = 准坚果！** - 8张straight outs + 9张flush outs = 15张outs！
+2. **~54% equity vs any made hand** - 你其实是favorite！
+3. **双方都show weakness** - CO和BB都check
+4. **3/4 pot bet既是value也是semi-bluff**
+
+Combo Draw策略（扑克中最被低估的手牌）：
+• OESD + flush draw = 15 outs = 你是favorite vs除了set以外的所有牌！
+• 打法：**像nuts一样打 - 激进、大尺寸**
+• 不要slow play - 你需要build pot，因为你会经常hit
+
+Turn计划：
+• Hit straight or flush → **可以check back！**（slow play）
+  - 你的draw太明显（board有2 spades或3张顺牌）
+  - Check后river再value bet，对手会支付你
+• Turn blank：
+  - 如果只剩heads-up → **可以check behind**（你有15 outs to river）
+  - River再decide是否bluff（看position和对手）
+
+面对raise：
+• 如果任何人raise → **立即all-in！**
+• 你有54% equity，是数学上正确的决定
+• 很多时候对手只是top pair或set，你仍是favorite
+
+Combo draw是深筹码最赚钱的手牌之一：
+• 隐蔽性强（对手看不出你有这么强的draw）
+• Equity巨大（经常55%+）
+• 灵活性好（可以bluff，可以value bet，可以slow play）
+
+**记住：不要把combo draw当作draw来打，要当作strong hand来打！**`
+            },
+
+            // Double Barrel (5题)
+            {
+                scenario: "Double Barrel",
+                question: "8人桌，你在CO open 4BB用A♣J♠，只有BTN call。Flop: K♦7♠3♥ (pot 9BB)，你C-bet 3BB，BTN call。Turn: 2♣ (pot 15BB)，有效筹码240BB，应该如何决策？",
+                handInfo: {
+                    position: "CO vs BTN",
+                    hand: ["A♣", "J♠"],
+                    board: ["K♦", "7♠", "3♥", "2♣"],
+                    pot: "15BB",
+                    effectiveStack: "240BB",
+                    previousAction: "你Flop C-bet 3BB，BTN call"
+                },
+                options: ["Check", "Bet 7BB (1/2 pot)", "Bet 10BB (2/3 pot)", "Bet 15BB (pot)"],
+                correctIndex: 1,
+                explanation: `正确答案：Bet 7BB (1/2 pot) - Double Barrel
+
+核心理由：
+1. **极好的2nd barrel spot** - Turn是blank (2♣)，没有帮助任何人
+2. **BTN range很弱** - 他Flop call你的C-bet，主要是：
+   - 中小对子（88-77，33）
+   - 弱Kx（KT, KJ不会只是call，会raise）
+   - Backdoor draws（已经错失）
+3. **你仍然代表strong range** - KQ-KJ, 77, 33, over-pairs
+4. **1/2 pot sizing有效** - 不需要太大，因为他range弱
+
+Double Barrel时机（什么时候要开第二枪）：
+✅ Turn是blank（2-6，不连接board）
+✅ 对手Flop只是call（不是raise）
+✅ 你有position
+✅ 深筹码（可以继续给压力）
+
+Double Barrel sizing指南：
+• Dry turn → 1/2 pot
+• Wet turn → 2/3 pot
+• 对抗Fish → 略大（2/3 pot）
+• 对抗Reg/Nit → 可以小（1/3 - 1/2 pot）
+
+River计划：
+• 如果BTN fold → Great！
+• 如果BTN call turn，river：
+  - River是A → Check behind（你击中了，有showdown value）
+  - River是blank → Triple barrel约30-40%（看对手类型）
+  - River是K/7/3/2 → Check behind（board pair了，危险）
+
+常见错误：
+❌ Check turn → 给对手免费看河牌，失去fold equity
+❌ Bet too big（pot size）→ 只有strong hands call，bluff太贵
+❌ Give up too early → LAG要持续给压力，不能Flop bet一次就放弃
+
+**Double barrel是LAG的核心武器 - 70%的pot是在Turn赢的！**`
+            },
+            {
+                scenario: "Double Barrel",
+                question: "8人桌+Straddle，HJ open 12BB，你在BTN用Q♦J♦ call，SB也call。Flop: A♠9♥5♦ (pot 39BB)，SB check，HJ bet 13BB，你call，SB fold。Turn: 8♦ (pot 65BB)，HJ check，有效筹码220BB，应该如何决策？",
+                handInfo: {
+                    position: "BTN vs HJ",
+                    hand: ["Q♦", "J♦"],
+                    board: ["A♠", "9♥", "5♦", "8♦"],
+                    pot: "65BB",
+                    effectiveStack: "220BB",
+                    handStrength: "Flush draw + Gutshot",
+                    previousAction: "HJ bet flop，你call，turn HJ check"
+                },
+                options: ["Check behind", "Bet 22BB (1/3 pot)", "Bet 43BB (2/3 pot)", "Bet 65BB (pot)"],
+                correctIndex: 2,
+                explanation: `正确答案：Bet 43BB (2/3 pot)
+
+核心理由：
+1. **HJ的check是weakness信号** - 他Flop bet然后turn check = 通常是弱Ax或failed c-bet
+2. **你有强大的equity** - Flush draw（9 outs）+ Gutshot（4 outs = T）= 13 outs！
+3. **Turn是diamond** - 增加了你的flush draw威胁，board变得更scary
+4. **2/3 pot bet平衡pressure和equity** - 既给fold equity，又保护你的draw
+
+Delayed Aggression（延迟进攻）策略：
+• 什么时候使用：
+  - Flop你call了对手的bet
+  - Turn对手check（show weakness）
+  - 你有position + decent equity
+• Sizing：2/3 - 3/4 pot（要credible）
+• 频率：vs Reg 60-70%，vs Fish 40-50%
+
+你的手牌特殊性：
+• QJdd on A985dd - 你有13张outs (~45% equity vs Ax)
+• 这不仅是bluff，也是semi-bluff with huge equity
+• 即使被call，你turn到river还有45%赢率
+
+River计划：
+• 如果HJ fold → Perfect！
+• 如果HJ call，river：
+  - River是diamond（hit flush）→ Value bet（可以over-bet）
+  - River是T（hit straight）→ Value bet
+  - River是blank：
+    - Pot大小：**Check behind**（不要triple barrel，pot太大）
+    - 如果HJ bet → Fold
+
+对抗不同对手：
+• vs Reg：这个bet非常有效，他们能fold掉Ax
+• vs Fish：他们可能call with any Ace，但你有45% equity，仍然profitable
+• vs Nit：他们会fold除了strong Ax外的所有牌
+
+**延迟进攻是LAG的高级技巧 - 让对手以为你有strong hand！**`
+            },
+            {
+                scenario: "Double Barrel",
+                question: "8人桌，你在MP open 4BB用K♥K♣，CO（已知TAG）call。Flop: Q♠J♣4♦ (pot 9BB)，你bet 6BB，CO call。Turn: 9♠ (pot 21BB)，有效筹码235BB，应该如何决策？",
+                handInfo: {
+                    position: "MP vs CO(TAG)",
+                    hand: ["K♥", "K♣"],
+                    board: ["Q♠", "J♣", "4♦", "9♠"],
+                    pot: "21BB",
+                    effectiveStack: "235BB",
+                    opponentType: "TAG"
+                },
+                options: ["Check", "Bet 7BB (1/3 pot)", "Bet 14BB (2/3 pot)", "Bet 21BB (pot)"],
+                correctIndex: 2,
+                explanation: `正确答案：Bet 14BB (2/3 pot)
+
+核心理由：
+1. **你仍然有strong hand** - KK在QJ94是overpair
+2. **Turn 9♠是dangerous但不致命** - 完成了部分straights（KT, T8）
+3. **必须bet保护手牌** - 太多bad rivers（K, T, 8, spade）
+4. **对抗TAG** - 如果他有你beat的牌，他会告诉你（raise）
+
+Semi-wet turn的持续bet策略：
+• 有vulnerable strong hand → 必须继续bet
+• Sizing：2/3 pot（标准持续bet尺寸）
+• 不要害怕被raise - 如果被raise，你可以evaluate
+
+TAG的calling range分析：
+• Flop call你的C-bet → 可能有：
+  - QJ, JJ, 44（你被beat）
+  - QT, JT（top/mid pair + draw）
+  - 88-77（pocket pairs）
+  - KT, T8（OESD）
+• 如果turn他有two pair/set/straight，他很可能raise
+• 如果他只是call → 他很可能是one pair或draw
+
+面对不同反应：
+1. **TAG fold** → Perfect
+2. **TAG call** → River evaluation：
+   - River是safe card（2-7，非spade）→ Value bet 1/2 pot
+   - River是K/T/8/spade → Check behind（pot control）
+3. **TAG raise** → 这是difficult spot：
+   - TAG不会轻易raise turn
+   - 你的KK只beat JT, QT和bluffs
+   - **Correct play：Call**（你有pot odds，他可能在draw）
+   - 如果river再被bet large → Fold
+
+错误玩法：
+❌ Check turn → 放弃太多equity，给对手免费卡
+❌ Bet pot or over-bet → 只有better hands call，你没有得到value
+❌ Automatically fold to raise → TAG也会用draws raise
+
+**深筹码overpair：要打出value，但要ready to get away如果面对massive aggression**`
+            },
+            {
+                scenario: "Double Barrel",
+                question: "8人桌+Straddle+Ante，CO open 14BB，你在BTN用A♠5♠ 3bet到46BB，只有CO call。Flop: K♣7♠3♠ (pot 101BB)，你bet 34BB，CO call。Turn: 2♦ (pot 169BB)，有效筹码200BB，应该如何决策？",
+                handInfo: {
+                    position: "BTN vs CO",
+                    hand: ["A♠", "5♠"],
+                    board: ["K♣", "7♠", "3♠", "2♦"],
+                    pot: "169BB",
+                    effectiveStack: "200BB",
+                    SPR: "剩余只有1.2 SPR",
+                    handStrength: "Nut flush draw + Wheel draw"
+                },
+                options: ["Check", "Bet 50BB", "Bet 100BB", "All-in 200BB"],
+                correctIndex: 3,
+                explanation: `正确答案：All-in 200BB
+
+核心理由：
+1. **你有巨大equity** - Nut flush draw（9 outs）+ Wheel draw（4 outs = 4）= 13 outs
+2. **SPR极低** - 只剩1.2 SPR，已经committed to pot
+3. **你代表极强range** - 3bettor在K-high board，你could have AA-KK, AK
+4. **即使被call，你有~45-50% equity**
+
+低SPR下的All-in决策：
+• SPR < 2 → 通常应该commit（尤其是你有equity）
+• 公式：剩余筹码 ÷ 底池 < 2 → All-in is standard
+• 你的情况：200BB ÷ 169BB = 1.18 SPR
+
+数学分析：
+• Pot = 169BB
+• Your remaining stack = 200BB
+• Your equity vs range = ~45%
+• 即使CO call with set或two pair，你仍有~40% equity
+• 这是数学上profitable的shove
+
+CO的可能反应：
+1. **Fold** (~60%) - 他可能只是KQ, KJ, QQ-JJ, 或77，会fold
+2. **Call** (~40%) - 他可能有KK, 77, 33, AK，但你有40-45% equity
+
+为什么不是小额bet？
+❌ Bet 50BB → 让对手有pot odds call with worse hands，而且你还要面对river困境
+❌ Bet 100BB → 几乎等于all-in，不如直接shove
+✅ All-in → 最大化fold equity + 简化决策 + 数学上correct
+
+**Low SPR + Strong draw = SHOVE！不要fancy play！**
+
+深筹码LAG的核心原则：
+• Pre-flop aggression + strong draw + low SPR = Commit to pot
+• 不要害怕all-in，如果数学支持
+• Calculated aggression > Random bluffing`
+            },
+            {
+                scenario: "Double Barrel",
+                question: "8人桌，BTN open 4BB，你在BB用 8♦7♦ call。Flop: J♠9♣5♦ (pot 9BB)，你check，BTN bet 3BB，你call。Turn: 6♠ (pot 15BB)，有效筹码240BB，应该如何决策？",
+                handInfo: {
+                    position: "BB vs BTN",
+                    hand: ["8♦", "7♦"],
+                    board: ["J♠", "9♣", "5♦", "6♠"],
+                    pot: "15BB",
+                    effectiveStack: "240BB",
+                    handStrength: "你完成了straight！(5-6-7-8-9)"
+                },
+                options: ["Check", "Bet 5BB (1/3 pot)", "Bet 10BB (2/3 pot)", "Bet 15BB (pot)"],
+                correctIndex: 0,
+                explanation: `正确答案：Check（Set trap for river）
+
+核心理由：
+1. **你有nuts（或准nuts）** - 5-9 straight
+2. **Out of position** - 如果你现在lead，BTN可能fold很多牌
+3. **Turn不是明显的scare card** - 6♠看起来是blank
+4. **Check-call line更deceptive** - BTN会继续bet他的range
+
+Check-call策略（Trap line）：
+• 什么时候使用：
+  - OOP突然击中了strong hand
+  - Turn看起来是blank card
+  - 对手likely会continue betting
+• 目标：Build bigger pot + hide hand strength
+
+BTN likely betting range on turn：
+• Over-pairs（QQ-AA）
+• Top pairs（AJ, KJ）
+• Flush draws（如果他有2 spades）
+• Air（he's BTN，会继续blast你）
+
+River计划：
+• **如果BTN bet turn** → Call
+• **River** → 根据river card和BTN的action：
+  - 如果BTN又bet → Raise！（he's pot committed）
+  - 如果BTN check → Bet 2/3 pot（看起来像delayed bluff）
+
+为什么不是现在lead bet？
+❌ Donk bet（lead into preflop aggressor）：
+  - BTN会警觉，可能fold medium hands
+  - 你的line变得obvious（突然show strength）
+  - 错失river的更大value
+
+River sizing具体方案：
+• 如果BTN bet turn和river → Check-raise to 2.5x his bet
+• 如果BTN bet turn，check river → Bet 2/3 pot
+• 如果BTN check turn → Bet 1/2 pot（他会疑惑，可能call）
+
+对手可能的nuts：
+• T8s, T7s（更高的straight）
+• 但这些hands他pre-flop可能会3bet或fold
+• 你的87s是非常隐蔽的nuts
+
+**OOP击中nuts → Slow play one street是最优策略（除非board太wet）**`
+            },
+
+            // Triple Barrel (5题)
+            {
+                scenario: "Triple Barrel",
+                question: "8人桌，你在HJ open 4BB用A♥Q♦，只有BB call。Flop: K♠7♣3♥ (pot 9BB)，BB check，你bet 3BB，BB call。Turn: 2♠ (pot 15BB)，BB check，你bet 8BB，BB call。River: 5♦ (pot 31BB)，BB check，有效筹码225BB，应该如何决策？",
+                handInfo: {
+                    position: "HJ vs BB",
+                    hand: ["A♥", "Q♦"],
+                    board: ["K♠", "7♣", "3♥", "2♠", "5♦"],
+                    pot: "31BB",
+                    effectiveStack: "225BB",
+                    previousAction: "你Flop bet 3BB，Turn bet 8BB，BB两次call"
+                },
+                options: ["Check behind", "Bet 10BB (1/3 pot)", "Bet 21BB (2/3 pot)", "Bet 31BB (pot)"],
+                correctIndex: 1,
+                explanation: `正确答案：Bet 10BB (1/3 pot) - Triple Barrel Bluff
+
+核心理由：
+1. **BB两次call后仍然check river** - 他很可能是weak Kx（K9, KT, KJ）或中对
+2. **River是完美的blank** - 5♦不帮助任何人
+3. **你的line极credible** - 你代表AK, KQ, over-pairs
+4. **小尺寸Triple barrel最有效** - 只需要25-30% fold equity就profit
+
+Triple Barrel时机判断：
+✅ 对手两次call但没有raise（代表他不是nuts）
+✅ River是blank card
+✅ 你的story一致（你可以credibly代表value hand）
+✅ 对抗Reg或Nit（他们能fold medium strength）
+
+Sizing策略：
+• **1/3 pot是最优bluff sizing**：
+  - Risk: 10BB to win 31BB
+  - 需要fold equity: 10/(10+31) = 24.4%
+  - BB会fold：88-77, 33, A7, weak Kx（~40-50%）
+
+BB的可能range：
+• 如果他有KK, 77, 33 → 他早就raise了
+• 如果他有Ax → 他可能已经fold turn
+• 他most likely：K9-KJ, 88-JJ, 77（担心你有AK）
+
+对抗不同对手：
+• vs Reg/TAG：Triple barrel非常有效（~60% success）
+• vs Nit：更高成功率（~70-80%）
+• vs Fish：**不要triple barrel**（他们是calling stations）
+• vs LAG：准备好面对check-raise bluff
+
+如果被call：
+• 你输掉10BB
+• 但这是calculated risk
+• Long-term，这个play是+EV的
+
+常见错误：
+❌ Bet too large（2/3 pot or pot）→ 只有strong hands call，bluff too expensive
+❌ Check behind → 放弃fold equity，你的AQ几乎没有showdown value
+❌ 对所有对手都triple barrel → 要根据对手类型调整
+
+**Triple barrel是LAG的终极武器 - 但要selective使用！**`
+            },
+            {
+                scenario: "Triple Barrel",
+                question: "8人桌+Straddle，CO open 12BB，你在BTN用 9♠8♠ call。Flop: A♦6♣2♠ (pot 29BB)，CO bet 10BB，你call。Turn: 5♠ (pot 49BB)，CO bet 25BB，你call。River: K♠ (pot 99BB)，CO check，有效筹码195BB，应该如何决策？",
+                handInfo: {
+                    position: "BTN vs CO",
+                    hand: ["9♠", "8♠"],
+                    board: ["A♦", "6♣", "2♠", "5♠", "K♠"],
+                    pot: "99BB",
+                    effectiveStack: "195BB",
+                    handStrength: "你完成了flush！"
+                },
+                options: ["Check behind", "Bet 33BB (1/3 pot)", "Bet 66BB (2/3 pot)", "Bet 100BB (pot+)"],
+                correctIndex: 2,
+                explanation: `正确答案：Bet 66BB (2/3 pot)
+
+核心理由：
+1. **你有nuts flush** - K♠高花在board上，你的9♠高花足够好
+2. **CO check river显示weakness** - 他可能是Ax害怕flush
+3. **2/3 pot sizing最优** - 看起来像bluff（因为第三张spade出现），但其实是value
+4. **CO很可能call** - 他用Ax或KK可能会"hero call"
+
+River value betting策略：
+• 有nuts或准nuts → Bet for value
+• Sizing要考虑：
+  - 对手的可能calling range
+  - Board texture（是否obvious draw completed）
+  - 你的line（你前面只是call，现在突然bet）
+
+为什么2/3 pot最优？
+• **太小（1/3 pot）** → 得到的value不够，对手call range太wide
+• **太大（pot+）** → 看起来太像value，只有better hands call
+• **2/3 pot perfect** → 看起来像"fuck it, I'm bluffing the flush"
+
+CO的思维过程：
+• 他Flop和Turn都bet，河牌check → 他有weak Ax or KK
+• 第三张spade出现，他害怕
+• 你突然bet 2/3 pot → 他会想"他在bluff flush吗？"
+• 很多时候他会call with Ax（不相信你有flush）
+
+对抗不同对手：
+• vs Reg：2/3 pot perfect
+• vs Fish：可以bet稍大（3/4 pot），他们是calling stations
+• vs Nit：可以bet小一点（1/2 pot），他们fold too much
+• vs LAG：准备好面对check-raise bluff（你可以call或re-raise）
+
+如果CO raise：
+• 这极少发生（他check-raise river with what？As high flush？KK for full house？）
+• 如果他真的raise → 你可以fold（你只是9高花）
+
+常见错误：
+❌ Check behind → 错失巨大value
+❌ Bet too small → Value不够
+❌ Bet pot or over-bet → 只有better hands call，吓走Ax
+
+**当你完成了draw并且对手show weakness → Value bet，不要slow play！**`
+            },
+            {
+                scenario: "Triple Barrel",
+                question: "8人桌，MP open 4BB，你在CO用J♣T♣ 3bet到16BB，只有MP call。Flop: A♠9♦4♣ (pot 33BB)，MP check，你bet 11BB，MP call。Turn: 2♥ (pot 55BB)，MP check，你bet 28BB，MP call。River: 7♠ (pot 111BB)，MP check，有效筹码205BB，应该如何决策？",
+                handInfo: {
+                    position: "CO vs MP",
+                    hand: ["J♣", "T♣"],
+                    board: ["A♠", "9♦", "4♣", "2♥", "7♠"],
+                    pot: "111BB",
+                    effectiveStack: "205BB",
+                    previousAction: "你Flop bet 11BB，Turn bet 28BB，MP两次call"
+                },
+                options: ["Check behind", "Bet 37BB (1/3 pot)", "Bet 74BB (2/3 pot)", "Bet 111BB (pot)"],
+                correctIndex: 0,
+                explanation: `正确答案：Check behind
+
+核心理由：
+1. **MP两次call非常strong action** - 他很可能有real hand（Ax至少）
+2. **你的bluff line太贵了** - 已经投入39BB，river再bluff太expensive
+3. **MP的range太strong** - 他call 3bet preflop + call两次postflop = 不会轻易fold
+4. **你没有任何equity** - JT high几乎0% showdown value
+
+什么时候**不要**triple barrel：
+❌ 对手两次call你的large bet（他committed了）
+❌ Pot已经很大（>100BB）
+❌ 你的bluff会非常expensive
+❌ 对手是Fish或Calling Station
+
+MP可能的range：
+• Ax（AT-AK）- most likely
+• 99, 44（他会慢打）
+• TT-KK（弱overpairs）
+• 如果他有两对或set，他可能已经raise了
+
+数学分析：
+• Bet 37BB（1/3 pot）需要 37/148 = 25% fold equity
+• Bet 74BB（2/3 pot）需要 74/185 = 40% fold equity
+• MP fold掉Ax的概率：< 10%（他已经call了39BB）
+• **这个bluff是-EV的！**
+
+正确的Triple barrel时机：
+✅ River是scare card（不是blank）
+✅ 对手range wide（不是committed）
+✅ 小尺寸bluff（1/4 - 1/3 pot）
+✅ 对抗Reg或Nit（能fold medium strength）
+
+这手牌的教训：
+• **不是所有故事都要讲到底！**
+• 3bet line + 两次bet已经投入很多，但river要认输
+• LAG ≠ 盲目aggressive
+• **知道何时放弃是LAG高手的标志**
+
+如果你真的要bluff：
+• 最小尺寸（1/4 pot = 28BB）可能acceptable
+• 但成功率仍然很低（< 15%）
+• Risk/Reward不合适
+
+**深筹码LAG的黄金法则：Triple barrel要extremely selective - 需要perfect storm！**`
+            },
+            {
+                scenario: "Triple Barrel",
+                question: "8人桌+Straddle+Ante，你在BTN open 14BB用A♣K♦，只有BB call。Flop: Q♥J♠6♦ (pot 37BB)，BB check，你bet 12BB，BB call。Turn: 3♣ (pot 61BB)，BB check，你bet 31BB，BB call。River: 4♠ (pot 123BB)，BB check，有效筹码183BB，应该如何决策？",
+                handInfo: {
+                    position: "BTN vs BB",
+                    hand: ["A♣", "K♦"],
+                    board: ["Q♥", "J♠", "6♦", "3♣", "4♠"],
+                    pot: "123BB",
+                    effectiveStack: "183BB",
+                    previousAction: "你Flop bet 12BB，Turn bet 31BB，BB两次call"
+                },
+                options: ["Check behind", "Bet 41BB (1/3 pot)", "Bet 82BB (2/3 pot)", "All-in 183BB"],
+                correctIndex: 1,
+                explanation: `正确答案：Bet 41BB (1/3 pot) - Triple Barrel Bluff
+
+核心理由：
+1. **与前面JT bluff不同，这里你有AK** - 代表KT, AT也合理
+2. **BB的calling range分析**：
+   - QJ, JJ, 66（强牌会raise）
+   - Qx（QT, Q9）- most likely
+   - JJ-88（中对担心overcard）
+3. **River完全blank** - 4♠不帮助任何人
+4. **小尺寸bluff最有效** - 只需要25% fold equity
+
+为什么这个Triple barrel是好的？
+✅ 你有blockers（AK block AQ, KJ这些强Qx和Jx）
+✅ BB只是call（不是raise），他不是nuts
+✅ River blank让他的range更弱
+✅ 小尺寸让他更难call with marginal hands
+
+数学分析：
+• Pot = 123BB
+• Your bet = 41BB
+• Total pot if call = 164BB
+• 你需要fold equity: 41/164 = 25%
+• BB fold掉 weak Qx, 99-88的概率：~35-40%
+• **这个bluff是+EV的！**
+
+BB的困境：
+• 他已经call了43BB
+• 但river又被bet 41BB（pot相比已经很大）
+• 如果他只是Qx（没有good kicker），他很难call
+• 他会想"villain bet三条街，可能有KT（straight）or strong Qx"
+
+对比JT bluff的区别：
+| Aspect | JT bluff (fold) | AK bluff (bet) |
+|--------|----------------|----------------|
+| 你的equity | 0% | 0% |
+| Blockers | 无 | AK（block强牌）|
+| Pot size | 111BB（大） | 123BB（更大） |
+| BB投入 | 39BB | 43BB |
+| Sizing | 要bet大 | 可以bet小 |
+| Fold equity | <10% | ~35% |
+
+后续：
+• 如果BB call → 你输掉41BB，但这是calculated risk
+• 如果BB raise → **立即fold**（他不会bluff，你beat不了任何value）
+
+**Triple barrel的艺术：有blockers + 小尺寸 + credible story = Profitable bluff**`
+            },
+            {
+                scenario: "Triple Barrel",
+                question: "8人桌，UTG open 4BB，你在MP用 6♥6♦ call，CO也call。Flop: A♣K♦9♠ (pot 13BB)，UTG bet 9BB，你call，CO fold。Turn: 6♠ (pot 31BB)，UTG check，你bet 16BB，UTG call。River: 2♥ (pot 63BB)，UTG check，有效筹码211BB，应该如何决策？",
+                handInfo: {
+                    position: "MP vs UTG",
+                    hand: ["6♥", "6♦"],
+                    board: ["A♣", "K♦", "9♠", "6♠", "2♥"],
+                    pot: "63BB",
+                    effectiveStack: "211BB",
+                    handStrength: "Set（暗三条）",
+                    previousAction: "Flop UTG bet，你call；Turn UTG check，你bet，UTG call"
+                },
+                options: ["Check behind", "Bet 21BB (1/3 pot)", "Bet 42BB (2/3 pot)", "Bet 63BB (pot)"],
+                correctIndex: 2,
+                explanation: `正确答案：Bet 42BB (2/3 pot) - Value Bet
+
+核心理由：
+1. **你有强牌（set）** - 这不是bluff，是value bet！
+2. **UTG check-call turn显示medium strength** - 可能是Kx, 9x, or AJ-AT
+3. **你的line看起来像bluff** - Turn UTG check，你突然bet，看起来像steal
+4. **2/3 pot sizing提取最大value** - 既能让弱牌call，又build大pot
+
+Value betting的艺术：
+• 不是所有triple barrel都是bluff！
+• 当你真的有strong hand，你的aggressive line反而deceptive
+• 对手会认为你在bluff（因为AK9吓人牌面）
+
+UTG的可能range：
+• Flop他bet → 可能有Kx, Ax, 99
+• Turn他check-call → 他降级到medium strength
+  - Kx（KQ, KJ）most likely
+  - Weak Ax（AJ, AT）
+  - 如果他有AK, KK, AA, 99，他可能turn bet或raise你
+• River他check → 仍然是medium strength，等你行动
+
+为什么2/3 pot？
+• **太小（1/3）** → 失去value，他所有Kx和Ax都会call anyway
+• **太大（pot）** → 可能吓走Kx（虽然Ax会call）
+• **2/3 pot perfect** → 
+  - Kx会思考但可能call（你看起来像bluff）
+  - Ax会call（他们不信你有set）
+  - 你提取maximum value
+
+对手的思维：
+• "这个家伙Flop call了AK9，turn突然bet when checked to"
+• "他看起来是在steal，可能有QJ, JT, flush draw missed"
+• "我的KQ可能是good，我call"
+• **然后你show down set，他会很surprised！**
+
+常见错误：
+❌ Check behind（想"trap"）→ 错！对手会check behind，你失去value
+❌ Bet too small → 失去value
+❌ Over-bet → 只有better hands call（虽然你是set，但board有straight可能）
+
+**Value betting的黄金法则：当你的strong hand看起来像bluff时 - BET BIG！**`
+            }
+        ];
+
+        let currentQuestionIndex = -1;
+        let completedQuestions = [];
+        let stats = {
+            correct: 0,
+            total: 0,
+            streak: 0,
+            maxStreak: 0
+        };
+
+        function loadStats() {
+            const saved = localStorage.getItem('cbet_mastery_stats');
+            if (saved) {
+                try {
+                    stats = JSON.parse(saved);
+                } catch(e) {
+                    console.error('Failed to parse stats:', e);
+                }
+            }
+        }
+
+        function saveStats() {
+            localStorage.setItem('cbet_mastery_stats', JSON.stringify(stats));
+        }
+
+        function updateStatsDisplay() {
+            document.getElementById('progressText').textContent = `${completedQuestions.length}/${QUESTIONS.length}`;
+            document.getElementById('accuracy').textContent = stats.total > 0 ? 
+                Math.round((stats.correct / stats.total) * 100) + '%' : '0%';
+            document.getElementById('streak').textContent = stats.streak;
+            
+            const progress = (completedQuestions.length / QUESTIONS.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function getNextQuestion() {
+            const availableIndices = QUESTIONS.map((_, index) => index)
+                .filter(index => !completedQuestions.includes(index));
+            
+            if (availableIndices.length === 0) {
+                showCompletionScreen();
+                return null;
+            }
+
+            // 随机选择一个未完成的题目
+            const randomIndex = Math.floor(Math.random() * availableIndices.length);
+            return availableIndices[randomIndex];
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function renderQuestion() {
+            const nextIndex = getNextQuestion();
+            if (nextIndex === null) return;
+
+            currentQuestionIndex = nextIndex;
+            const q = QUESTIONS[currentQuestionIndex];
+
+            document.getElementById('scenarioTag').textContent = q.scenario;
+            document.getElementById('questionText').textContent = q.question;
+
+            // Render hand info
+            const handInfoHtml = `
+                <div class="hand-row">
+                    <span class="hand-label">位置：</span>
+                    <span class="hand-value">${escapeHtml(q.handInfo.position)}</span>
+                </div>
+                ${q.handInfo.opponentType ? `
+                <div class="hand-row">
+                    <span class="hand-label">对手类型：</span>
+                    <span class="hand-value">${escapeHtml(q.handInfo.opponentType)}</span>
+                </div>
+                ` : ''}
+                <div class="hand-row">
+                    <span class="hand-label">你的手牌：</span>
+                    <div class="cards">${q.handInfo.hand.map(c => renderCard(c)).join('')}</div>
+                </div>
+                <div class="hand-row">
+                    <span class="hand-label">公共牌：</span>
+                    <div class="cards">${q.handInfo.board.map(c => renderCard(c)).join('')}</div>
+                </div>
+                ${q.handInfo.handStrength ? `
+                <div class="hand-row">
+                    <span class="hand-label">牌力：</span>
+                    <span class="hand-value">${escapeHtml(q.handInfo.handStrength)}</span>
+                </div>
+                ` : ''}
+                <div class="hand-row">
+                    <span class="hand-label">底池：</span>
+                    <span class="hand-value">${escapeHtml(q.handInfo.pot)}</span>
+                </div>
+                <div class="hand-row">
+                    <span class="hand-label">有效筹码：</span>
+                    <span class="hand-value">${escapeHtml(q.handInfo.effectiveStack)}</span>
+                </div>
+                ${q.handInfo.SPR ? `
+                <div class="hand-row">
+                    <span class="hand-label">SPR：</span>
+                    <span class="hand-value">${escapeHtml(q.handInfo.SPR)}</span>
+                </div>
+                ` : ''}
+                ${q.handInfo.previousAction ? `
+                <div class="hand-row">
+                    <span class="hand-label">之前动作：</span>
+                    <span class="hand-value">${escapeHtml(q.handInfo.previousAction)}</span>
+                </div>
+                ` : ''}
+                ${q.handInfo.action ? `
+                <div class="hand-row">
+                    <span class="hand-label">前面动作：</span>
+                    <span class="hand-value">${escapeHtml(q.handInfo.action)}</span>
+                </div>
+                ` : ''}
+            `;
+            document.getElementById('handInfo').innerHTML = handInfoHtml;
+
+            // Render options
+            const optionsHtml = q.options.map((opt, index) => 
+                `<button class="option-btn" onclick="selectOption(${index})">${escapeHtml(opt)}</button>`
+            ).join('');
+            document.getElementById('optionsContainer').innerHTML = optionsHtml;
+
+            // Reset explanation and next button
+            document.getElementById('explanation').classList.remove('show');
+            document.getElementById('nextBtn').classList.remove('show');
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderCard(cardStr) {
+            if (!cardStr || cardStr.length < 2) return '';
+            const rank = cardStr.slice(0, -1);
+            const suit = cardStr.slice(-1);
+            
+            const suitSymbols = {
+                '♠': 'spades', '♣': 'clubs', '♥': 'hearts', '♦': 'diamonds',
+                's': 'spades', 'c': 'clubs', 'h': 'hearts', 'd': 'diamonds'
+            };
+            
+            const suitClass = suitSymbols[suit] || 'spades';
+            const suitSymbol = ['♠','s'].includes(suit) ? '♠' : 
+                             ['♣','c'].includes(suit) ? '♣' :
+                             ['♥','h'].includes(suit) ? '♥' : '♦';
+            
+            return `<div class="card ${suitClass}">${escapeHtml(rank)}${suitSymbol}</div>`;
+        }
+
+        function selectOption(index) {
+            const q = QUESTIONS[currentQuestionIndex];
+            const buttons = document.querySelectorAll('.option-btn');
+            
+            // Disable all buttons
+            buttons.forEach(btn => btn.style.pointerEvents = 'none');
+
+            stats.total++;
+            const isCorrect = index === q.correctIndex;
+
+            if (isCorrect) {
+                stats.correct++;
+                stats.streak++;
+                stats.maxStreak = Math.max(stats.maxStreak, stats.streak);
+                buttons[index].classList.add('correct');
+            } else {
+                stats.streak = 0;
+                buttons[index].classList.add('wrong');
+                buttons[q.correctIndex].classList.add('correct');
+            }
+
+            completedQuestions.push(currentQuestionIndex);
+            saveStats();
+            updateStatsDisplay();
+
+            // Show explanation
+            document.getElementById('explanationContent').textContent = q.explanation;
+            document.getElementById('explanation').classList.add('show');
+            document.getElementById('nextBtn').classList.add('show');
+        }
+
+        function nextQuestion() {
+            if (completedQuestions.length >= QUESTIONS.length) {
+                showCompletionScreen();
+            } else {
+                renderQuestion();
+            }
+        }
+
+        function showCompletionScreen() {
+            document.getElementById('questionCard').style.display = 'none';
+            const finalStatsHtml = `
+                <div class="final-stat">
+                    <div class="label">总题数</div>
+                    <div class="value">${stats.total}</div>
+                </div>
+                <div class="final-stat">
+                    <div class="label">正确数</div>
+                    <div class="value">${stats.correct}</div>
+                </div>
+                <div class="final-stat">
+                    <div class="label">正确率</div>
+                    <div class="value">${stats.total > 0 ? Math.round((stats.correct/stats.total)*100) : 0}%</div>
+                </div>
+                <div class="final-stat">
+                    <div class="label">最高连胜</div>
+                    <div class="value">${stats.maxStreak}</div>
+                </div>
+            `;
+            document.getElementById('finalStats').innerHTML = finalStatsHtml;
+            document.getElementById('completionScreen').classList.add('show');
+        }
+
+        function restartTraining() {
+            completedQuestions = [];
+            stats = { correct: 0, total: 0, streak: 0, maxStreak: 0 };
+            saveStats();
+            updateStatsDisplay();
+            document.getElementById('questionCard').style.display = 'block';
+            document.getElementById('completionScreen').classList.remove('show');
+            renderQuestion();
+        }
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            loadStats();
+            updateStatsDisplay();
+            renderQuestion();
+        });
+    </script>
+</body>
+</html>
+
