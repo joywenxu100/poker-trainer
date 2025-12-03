@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAG训练中心 - 世界第一松凶玩家养成计划</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            margin: 10px 0;
+        }
+
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: #667eea;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .module-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .module-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+        }
+
+        .module-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .module-icon {
+            font-size: 3rem;
+        }
+
+        .module-badge {
+            padding: 5px 12px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .module-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .module-desc {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .module-stats {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 15px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .module-stat {
+            text-align: center;
+        }
+
+        .module-stat-label {
+            font-size: 0.8rem;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        .module-stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .section-title {
+            color: white;
+            font-size: 2rem;
+            margin: 40px 0 20px;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .training-path {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+        }
+
+        .training-path h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .path-step {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .step-desc {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 15px 35px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .back-link:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .modules-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 LAG训练中心</h1>
+            <p>深筹码带Straddle+Ante场景专用训练系统</p>
+            <p style="font-size: 1.1rem; margin-top: 15px;">目标：从+8 BB/100 提升至 +18-25 BB/100，成为世界第一松凶玩家！</p>
+        </div>
+
+        <div class="stats-overview">
+            <div class="stat-card">
+                <h3>训练模块</h3>
+                <div class="value">10</div>
+            </div>
+            <div class="stat-card">
+                <h3>总题目数</h3>
+                <div class="value">180+</div>
+            </div>
+            <div class="stat-card">
+                <h3>预期提升</h3>
+                <div class="value">+10-17 BB/100</div>
+            </div>
+            <div class="stat-card">
+                <h3>适用场景</h3>
+                <div class="value">8人桌+Straddle+Ante</div>
+            </div>
+        </div>
+
+        <h2 class="section-title">📚 核心训练模块（已完成）</h2>
+
+        <div class="modules-grid">
+            <a href="cbet_mastery_trainer.html" class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">🎯</div>
+                    <div class="module-badge">20题</div>
+                </div>
+                <div class="module-title">C-bet Mastery</div>
+                <div class="module-desc">掌握持续下注的艺术 - LAG最核心武器。包含Dry Board、Wet Board、Double Barrel、Triple Barrel完整策略。</div>
+                <div class="module-stats">
+                    <div class="module-stat">
+                        <div class="module-stat-label">难度</div>
+                        <div class="module-stat-value">⭐⭐⭐</div>
+                    </div>
+                    <div class="module-stat">
+                        <div class="module-stat-label">重要性</div>
+                        <div class="module-stat-value">⭐⭐⭐⭐⭐</div>
+                    </div>
+                </div>
+            </a>
+
+            <a href="float_strategy_trainer.html" class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">🎭</div>
+                    <div class="module-badge">15题</div>
+                </div>
+                <div class="module-title">Float Strategy</div>
+                <div class="module-desc">延迟攻击的艺术 - Position的最强武器。针对不同对手类型（Reg/Fish/LAG/Nit/TAG）的Float策略。</div>
+                <div class="module-stats">
+                    <div class="module-stat">
+                        <div class="module-stat-label">难度</div>
+                        <div class="module-stat-value">⭐⭐⭐⭐</div>
+                    </div>
+                    <div class="module-stat">
+                        <div class="module-stat-label">重要性</div>
+                        <div class="module-stat-value">⭐⭐⭐⭐⭐</div>
+                    </div>
+                </div>
+            </a>
+
+            <a href="checkraise_mastery_trainer.html" class="module-card">
+                <div class="module-header">
+                    <div class="module-icon">⚡</div>
+                    <div class="module-badge">15题</div>
+                </div>
+                <div class="module-title">Check-raise Mastery</div>
+                <div class="module-desc">OOP最强反击武器。Value check-raise、Semi-bluff check-raise、Pure bluff check-raise完整体系。</div>
+                <div class="module-stats">
+                    <div class="module-stat">
+                        <div class="module-stat-label">难度</div>
+                        <div class="module-stat-value">⭐⭐⭐⭐</div>
+                    </div>
+                    <div class="module-stat">
+                        <div class="module-stat-label">重要性</div>
+                        <div class="module-stat-value">⭐⭐⭐⭐</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <h2 class="section-title">🎓 建议训练路径</h2>
+
+        <div class="training-path">
+            <h2>从零到世界第一LAG玩家</h2>
+            
+            <div class="path-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-title">基础武器 - C-bet Mastery</div>
+                    <div class="step-desc">先掌握最基本的持续下注，这是LAG的核心。完成20题训练，理解不同board texture的sizing。</div>
+                </div>
+            </div>
+
+            <div class="path-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-title">进阶技巧 - Float Strategy</div>
+                    <div class="step-desc">学会延迟攻击，利用position优势。针对不同对手类型调整策略，提升fold equity。</div>
+                </div>
+            </div>
+
+            <div class="path-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <div class="step-title">OOP反击 - Check-raise Mastery</div>
+                    <div class="step-desc">掌握OOP最强武器，不再害怕失去position。学会平衡value和bluff。</div>
+                </div>
+            </div>
+
+            <div class="path-step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <div class="step-title">对手Exploitation（即将推出）</div>
+                    <div class="step-desc">针对Nit、Calling Station、LAG等不同对手类型的专项训练。</div>
+                </div>
+            </div>
+
+            <div class="path-step">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                    <div class="step-title">高级战术（即将推出）</div>
+                    <div class="step-desc">River Overbetting、Positional Warfare、Table Image等高级概念。</div>
+                </div>
+            </div>
+
+            <div class="path-step">
+                <div class="step-number">6</div>
+                <div class="step-content">
+                    <div class="step-title">完整决策链（即将推出）</div>
+                    <div class="step-desc">综合训练，从preflop到river的完整决策链，整合所有技巧。</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="index.html" class="back-link">← 返回主页</a>
+        </div>
+    </div>
+</body>
+</html>
+
