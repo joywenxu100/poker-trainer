@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎓 筹码深度过渡大师 - 完整训练系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0612;
+            --bg-card: #150d1f;
+            --gold: #ffd700;
+            --green: #2ecc71;
+            --red: #e74c3c;
+            --orange: #ff8c00;
+            --purple: #9b59b6;
+            --blue: #3498db;
+            --text: #f0f0f0;
+            --text-dim: #8a8a9a;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark), #1a0f2e);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(155, 89, 182, 0.2);
+            border: 1px solid rgba(155, 89, 182, 0.5);
+            color: var(--purple);
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        header {
+            text-align: center;
+            margin: 60px 0 50px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--gold), var(--orange), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            font-weight: 900;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: var(--text-dim);
+            margin-bottom: 15px;
+        }
+
+        .master-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--gold), var(--orange));
+            color: #000;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: 900;
+            margin-top: 15px;
+        }
+
+        .roadmap-section {
+            background: linear-gradient(135deg, var(--bg-card), #1e1430);
+            border-radius: 25px;
+            padding: 40px;
+            margin-bottom: 40px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .roadmap-section h2 {
+            color: var(--gold);
+            font-size: 2rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .roadmap-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .depth-node {
+            flex: 1;
+            min-width: 200px;
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .depth-node:hover {
+            transform: translateY(-5px);
+            border-color: var(--gold);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .depth-node h3 {
+            color: var(--gold);
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+
+        .depth-node .bb-range {
+            font-size: 1.1rem;
+            color: var(--orange);
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .depth-node .style {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+        }
+
+        .arrow-icon {
+            font-size: 2.5rem;
+            color: var(--gold);
+            align-self: center;
+        }
+
+        .transition-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .transition-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .transition-card:hover {
+            border-color: var(--orange);
+            transform: translateY(-3px);
+        }
+
+        .transition-card h3 {
+            color: var(--orange);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .difficulty-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .difficulty-easy {
+            background: rgba(50, 205, 50, 0.2);
+            color: var(--green);
+            border: 1px solid var(--green);
+        }
+
+        .difficulty-medium {
+            background: rgba(255, 140, 0, 0.2);
+            color: var(--orange);
+            border: 1px solid var(--orange);
+        }
+
+        .difficulty-hard {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--red);
+            border: 1px solid var(--red);
+        }
+
+        .quick-access {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .access-card {
+            background: linear-gradient(135deg, var(--bg-card), #1e1430);
+            border-radius: 18px;
+            padding: 30px;
+            text-align: center;
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .access-card:hover {
+            border-color: var(--gold);
+            transform: scale(1.03);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+        }
+
+        .access-icon {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+        }
+
+        .access-card h3 {
+            color: var(--gold);
+            margin-bottom: 12px;
+            font-size: 1.4rem;
+        }
+
+        .access-btn {
+            background: linear-gradient(135deg, var(--gold), var(--orange));
+            color: #000;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        .access-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .master-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+        }
+
+        .master-table th,
+        .master-table td {
+            padding: 18px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        .master-table th {
+            background: rgba(255, 215, 0, 0.1);
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .master-table td {
+            color: var(--text);
+        }
+
+        .warning-section {
+            background: rgba(231, 76, 60, 0.15);
+            border: 2px solid var(--red);
+            border-radius: 20px;
+            padding: 35px;
+            margin: 40px 0;
+        }
+
+        .warning-section h2 {
+            color: var(--red);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            .roadmap-flow { flex-direction: column; }
+            .arrow-icon { transform: rotate(90deg); }
+        }
+    </style>
+</head>
+<body>
+    <a href="unified_training_hub.html" class="back-btn">← 返回训练中心</a>
+
+    <div class="container">
+        <header>
+            <h1>🎓 筹码深度过渡大师</h1>
+            <p class="subtitle">300BB → 60BB 完整训练系统 · 5个关键过渡点 · 世界级适应能力</p>
+            <div class="master-badge">MASTER LEVEL TRAINING</div>
+        </header>
+
+        <!-- 完整路线图 -->
+        <div class="roadmap-section">
+            <h2>🗺️ 完整筹码深度路线图</h2>
+            <div class="roadmap-flow">
+                <div class="depth-node" onclick="window.location.href='deep_stack_lag_trainer.html'">
+                    <h3>300BB</h3>
+                    <div class="bb-range">SUPER DEEP</div>
+                    <div class="style">Full LAG</div>
+                    <div style="margin-top: 10px; font-size: 0.9rem; color: var(--green);">✅ 已完成训练</div>
+                </div>
+
+                <div class="arrow-icon">→</div>
+
+                <div class="depth-node" onclick="window.location.href='stack_150bb_trainer.html'">
+                    <h3>150BB</h3>
+                    <div class="bb-range">DEEP</div>
+                    <div class="style">LAG 80%</div>
+                    <div style="margin-top: 10px; font-size: 0.9rem; color: var(--green);">✅ 已完成训练</div>
+                </div>
+
+                <div class="arrow-icon">→</div>
+
+                <div class="depth-node" onclick="window.location.href='stack_100bb_trainer.html'">
+                    <h3>100BB</h3>
+                    <div class="bb-range">COMFORTABLE</div>
+                    <div class="style">TAG+</div>
+                    <div style="margin-top: 10px; font-size: 0.9rem; color: var(--red);">⭐ 最难过渡</div>
+                </div>
+
+                <div class="arrow-icon">→</div>
+
+                <div class="depth-node" onclick="window.location.href='stack_60bb_trainer.html'">
+                    <h3>60BB</h3>
+                    <div class="bb-range">STANDARD</div>
+                    <div class="style">TAG</div>
+                    <div style="margin-top: 10px; font-size: 0.9rem; color: var(--orange);">⚠️ ICM重要</div>
+                </div>
+
+                <div class="arrow-icon">→</div>
+
+                <div class="depth-node" onclick="window.location.href='wsop_short_stack.html'">
+                    <h3>40BB</h3>
+                    <div class="bb-range">SHORT</div>
+                    <div class="style">Push/Fold</div>
+                    <div style="margin-top: 10px; font-size: 0.9rem; color: var(--purple);">🎯 WSOP训练</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5大关键过渡 -->
+        <div class="roadmap-section">
+            <h2>🔀 5大关键过渡点详解</h2>
+            <div class="transition-grid">
+                
+                <!-- 过渡1 -->
+                <div class="transition-card">
+                    <span class="difficulty-badge difficulty-easy">难度：EASY ⭐</span>
+                    <h3>过渡1: 300BB → 150BB</h3>
+                    <p style="color: var(--text-dim); line-height: 1.8; margin-bottom: 15px;">
+                        <strong>调整：</strong>稍微收紧，减少极端诈唬<br>
+                        <strong>挑战：</strong>识别何时停止triple barrel bluff<br>
+                        <strong>训练：</strong>50手过渡期模拟
+                    </p>
+                    <div style="background: rgba(50,205,50,0.1); padding: 15px; border-radius: 10px; border-left: 3px solid var(--green);">
+                        <strong style="color: var(--green);">关键：</strong>保持LAG心态，只是稍微降低风险。
+                    </div>
+                </div>
+
+                <!-- 过渡2 -->
+                <div class="transition-card">
+                    <span class="difficulty-badge difficulty-medium">难度：MEDIUM ⭐⭐⭐</span>
+                    <h3>过渡2: 150BB → 100BB</h3>
+                    <p style="color: var(--text-dim); line-height: 1.8; margin-bottom: 15px;">
+                        <strong>调整：</strong>明显收紧，减少fancy play<br>
+                        <strong>挑战：</strong>从LAG心态开始向TAG转变<br>
+                        <strong>训练：</strong>TAG+范围练习，pot control训练
+                    </p>
+                    <div style="background: rgba(255,140,0,0.1); padding: 15px; border-radius: 10px; border-left: 3px solid var(--orange);">
+                        <strong style="color: var(--orange);">关键：</strong>心态开始转变，但还不是完全TAG。
+                    </div>
+                </div>
+
+                <!-- 过渡3 -->
+                <div class="transition-card">
+                    <span class="difficulty-badge difficulty-hard">难度：HARD ⭐⭐⭐⭐⭐</span>
+                    <h3>过渡3: 100BB → 60BB</h3>
+                    <p style="color: var(--text-dim); line-height: 1.8; margin-bottom: 15px;">
+                        <strong>调整：</strong>从LAG彻底切换到TAG<br>
+                        <strong>挑战：</strong>心态转变！最难！<br>
+                        <strong>训练：</strong>需要大量练习，心态调整训练
+                    </p>
+                    <div style="background: rgba(231,76,60,0.1); padding: 15px; border-radius: 10px; border-left: 3px solid var(--red);">
+                        <strong style="color: var(--red);">⚠️ 最关键！</strong>90%的LAG玩家在这里失败！
+                    </div>
+                </div>
+
+                <!-- 过渡4 -->
+                <div class="transition-card">
+                    <span class="difficulty-badge difficulty-medium">难度：MEDIUM ⭐⭐</span>
+                    <h3>过渡4: 60BB → 40BB</h3>
+                    <p style="color: var(--text-dim); line-height: 1.8; margin-bottom: 15px;">
+                        <strong>调整：</strong>开始考虑all-in，ICM压力增加<br>
+                        <strong>挑战：</strong>学习short-stack ranges和ICM决策<br>
+                        <strong>训练：</strong>Short-stack训练，ICM计算
+                    </p>
+                    <div style="background: rgba(255,140,0,0.1); padding: 15px; border-radius: 10px; border-left: 3px solid var(--orange);">
+                        <strong style="color: var(--orange);">关键：</strong>ICM开始主导决策。
+                    </div>
+                </div>
+
+                <!-- 过渡5 -->
+                <div class="transition-card">
+                    <span class="difficulty-badge difficulty-easy">难度：EASY ⭐</span>
+                    <h3>过渡5: 40BB → 20BB</h3>
+                    <p style="color: var(--text-dim); line-height: 1.8; margin-bottom: 15px;">
+                        <strong>调整：</strong>切换到Push/Fold<br>
+                        <strong>挑战：</strong>学习Push/Fold chart<br>
+                        <strong>训练：</strong>Push/Fold trainer，Nash equilibrium
+                    </p>
+                    <div style="background: rgba(50,205,50,0.1); padding: 15px; border-radius: 10px; border-left: 3px solid var(--green);">
+                        <strong style="color: var(--green);">关键：</strong>简化策略，严格按chart执行。
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 完整对比表 -->
+        <div class="roadmap-section">
+            <h2>📊 完整策略对比表</h2>
+            <table class="master-table">
+                <thead>
+                    <tr>
+                        <th>指标</th>
+                        <th>300BB</th>
+                        <th>150BB</th>
+                        <th>100BB</th>
+                        <th>60BB</th>
+                        <th>40BB</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>风格</strong></td>
+                        <td>Full LAG</td>
+                        <td>LAG 80%</td>
+                        <td>TAG+</td>
+                        <td>TAG</td>
+                        <td>Push/Fold</td>
+                    </tr>
+                    <tr>
+                        <td><strong>VPIP</strong></td>
+                        <td>32-38%</td>
+                        <td>28-34%</td>
+                        <td>24-30%</td>
+                        <td>20-26%</td>
+                        <td>16-22%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PFR</strong></td>
+                        <td>28-34%</td>
+                        <td>24-30%</td>
+                        <td>20-26%</td>
+                        <td>17-23%</td>
+                        <td>14-20%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>3-Bet</strong></td>
+                        <td>14-18%</td>
+                        <td>12-16%</td>
+                        <td>10-14%</td>
+                        <td>8-12%</td>
+                        <td>All-in频繁</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cbet</strong></td>
+                        <td>70-75%</td>
+                        <td>65-72%</td>
+                        <td>60-68%</td>
+                        <td>55-65%</td>
+                        <td>Rare</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SPR</strong></td>
+                        <td>15-25</td>
+                        <td>8-15</td>
+                        <td>5-10</td>
+                        <td>3-7</td>
+                        <td>2-4</td>
+                    </tr>
+                    <tr>
+                        <td><strong>风险</strong></td>
+                        <td>高</td>
+                        <td>中高</td>
+                        <td>中</td>
+                        <td>中低</td>
+                        <td>All-in频繁</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ICM</strong></td>
+                        <td>不考虑</td>
+                        <td>极少考虑</td>
+                        <td>开始考虑</td>
+                        <td>重要因素</td>
+                        <td>主导因素</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Fancy Play</strong></td>
+                        <td>经常</td>
+                        <td>Selective</td>
+                        <td>Rare</td>
+                        <td>Never</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Focus</strong></td>
+                        <td>Max chip</td>
+                        <td>Chip + Risk管理</td>
+                        <td>平衡</td>
+                        <td>Solid play</td>
+                        <td>Survival</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 快速访问 -->
+        <div class="roadmap-section">
+            <h2>🚀 快速访问训练模块</h2>
+            <div class="quick-access">
+                
+                <div class="access-card" onclick="window.location.href='deep_stack_lag_trainer.html'">
+                    <div class="access-icon">💰</div>
+                    <h3>300BB训练</h3>
+                    <p style="color: var(--text-dim); margin-bottom: 15px;">完整LAG策略<br>8大防守模块</p>
+                    <button class="access-btn">开始训练</button>
+                </div>
+
+                <div class="access-card" onclick="window.location.href='stack_150bb_trainer.html'">
+                    <div class="access-icon">📊</div>
+                    <h3>150BB训练</h3>
+                    <p style="color: var(--text-dim); margin-bottom: 15px;">LAG 80%<br>风险管理</p>
+                    <button class="access-btn">开始训练</button>
+                </div>
+
+                <div class="access-card" onclick="window.location.href='stack_100bb_trainer.html'">
+                    <div class="access-icon">🎯</div>
+                    <h3>100BB训练</h3>
+                    <p style="color: var(--text-dim); margin-bottom: 15px;">LAG→TAG<br>最难过渡！</p>
+                    <button class="access-btn">开始训练</button>
+                </div>
+
+                <div class="access-card" onclick="window.location.href='stack_60bb_trainer.html'">
+                    <div class="access-icon">⚡</div>
+                    <h3>60BB训练</h3>
+                    <p style="color: var(--text-dim); margin-bottom: 15px;">Tight TAG<br>ICM重要</p>
+                    <button class="access-btn">开始训练</button>
+                </div>
+
+                <div class="access-card" onclick="window.location.href='wsop_short_stack.html'">
+                    <div class="access-icon">🎯</div>
+                    <h3>40BB训练</h3>
+                    <p style="color: var(--text-dim); margin-bottom: 15px;">Short Stack<br>Push/Fold</p>
+                    <button class="access-btn">开始训练</button>
+                </div>
+
+                <div class="access-card" onclick="window.location.href='wsop_push_fold.html'">
+                    <div class="access-icon">🚀</div>
+                    <h3>20BB训练</h3>
+                    <p style="color: var(--text-dim); margin-bottom: 15px;">Pure Push/Fold<br>Nash equilibrium</p>
+                    <button class="access-btn">开始训练</button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 致命错误警告 -->
+        <div class="warning-section">
+            <h2>🚨 筹码深度过渡致命错误</h2>
+            <ol style="line-height: 2.5; margin-left: 20px; font-size: 1.05rem;">
+                <li>
+                    <strong style="color: var(--red);">心态没调整：</strong>
+                    筹码深度变化但打法不变 → 在100BB还想300BB的LAG → 失败！
+                </li>
+                <li>
+                    <strong style="color: var(--red);">过渡太慢：</strong>
+                    从150BB降到100BB，还在用150BB策略 → 晚了！需要立即调整！
+                </li>
+                <li>
+                    <strong style="color: var(--red);">过渡太快：</strong>
+                    在150BB就用100BB的ultra-tight策略 → 错失chip accumulation机会！
+                </li>
+                <li>
+                    <strong style="color: var(--red);">忽略SPR：</strong>
+                    不考虑SPR变化，build大底池without strong hand → 被迫all-in！
+                </li>
+                <li>
+                    <strong style="color: var(--red);">忽略ICM：</strong>
+                    在60BB+泡沫期还不考虑ICM → chip EV ≠ $ EV，错误决策！
+                </li>
+                <li>
+                    <strong style="color: var(--red);">Ego问题：</strong>
+                    "我是LAG玩家，不想收紧" → Ego毁灭你的tournament！
+                </li>
+                <li>
+                    <strong style="color: var(--red);">不练习过渡：</strong>
+                    只练300BB和40BB，中间没练 → 实战时手足无措！
+                </li>
+            </ol>
+        </div>
+
+        <!-- 成功路径 -->
+        <div class="roadmap-section">
+            <h2 style="color: var(--green); margin-bottom: 25px;">✅ 世界级过渡能力养成路径</h2>
+            <div style="background: rgba(50,205,50,0.1); padding: 30px; border-radius: 15px; border: 2px solid var(--green);">
+                <ol style="line-height: 2.5; margin-left: 20px; font-size: 1.05rem;">
+                    <li>
+                        <strong style="color: var(--green);">第1步：</strong>
+                        完成所有5个筹码深度训练模块（300/150/100/60/40BB）
+                    </li>
+                    <li>
+                        <strong style="color: var(--green);">第2步：</strong>
+                        针对性练习5个过渡点，特别是100BB→60BB（最难）
+                    </li>
+                    <li>
+                        <strong style="color: var(--green);">第3步：</strong>
+                        模拟完整锦标赛（从300BB play到决赛桌），实战过渡
+                    </li>
+                    <li>
+                        <strong style="color: var(--green);">第4步：</strong>
+                        Review自己的hand history，识别过渡失败spot
+                    </li>
+                    <li>
+                        <strong style="color: var(--green);">第5步：</strong>
+                        持续练习直到每个过渡点都100%掌握
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- 底部链接 -->
+        <div style="text-align: center; margin: 60px 0; padding-top: 40px; border-top: 2px solid rgba(255,215,0,0.3);">
+            <p style="font-size: 1.2rem; color: var(--text-dim); margin-bottom: 25px;">
+                掌握了筹码深度过渡，你就掌握了锦标赛成功的关键！
+            </p>
+            <a href="unified_training_hub.html" style="color: var(--gold); text-decoration: none; font-size: 1.2rem; margin: 0 20px;">
+                ← 返回训练中心
+            </a>
+            <a href="wsop_tournament_hub.html" style="color: var(--gold); text-decoration: none; font-size: 1.2rem; margin: 0 20px;">
+                WSOP训练 →
+            </a>
+        </div>
+    </div>
+
+    <script src="stack_depth_adapter.js"></script>
+    <script>
+        // 页面加载动画
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.depth-node, .transition-card, .access-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 80);
+            });
+        });
+    </script>
+</body>
+</html>
+
