@@ -580,5 +580,7 @@ const LINE_SCENARIOS = {
 // 导出
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { LINE_SCENARIOS };
+} else if (typeof window !== 'undefined') {
+    window.LINE_SCENARIOS = LINE_SCENARIOS;
 }
 

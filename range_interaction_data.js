@@ -557,5 +557,7 @@ const RANGE_SCENARIOS = {
 // 导出供HTML使用
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { RANGE_SCENARIOS };
+} else if (typeof window !== 'undefined') {
+    window.RANGE_SCENARIOS = RANGE_SCENARIOS;
 }
 

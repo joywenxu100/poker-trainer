@@ -420,7 +420,8 @@ function calculateSizing(pot, strength, stack, street, opponent) {
 // 导出
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { SIZING_DATA, calculateSizing };
-} else {
+} else if (typeof window !== 'undefined') {
+    window.SIZING_DATA = SIZING_DATA;
     window.calculateSizing = calculateSizing;
 }
 
