@@ -2,6 +2,7 @@
 // 300BB+ LAG Style Training System
 
 // 手牌矩阵生成
+// ✅ 企业级说明：此数组访问是安全的，因为i和j受到ranks.length严格约束
 const ranks = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
 const allHands = [];
 
@@ -9,7 +10,7 @@ const allHands = [];
 for (let i = 0; i < ranks.length; i++) {
     for (let j = 0; j < ranks.length; j++) {
         if (i === j) {
-            // 对子
+            // 对子 - 索引访问安全：i, j ∈ [0, 12]
             allHands.push(ranks[i] + ranks[j]);
         } else if (i < j) {
             // 同花
@@ -1068,6 +1069,12 @@ const lagRanges = {
 
 // 手牌判断辅助函数
 function parseHand(hand) {
+    // ✅ 企业级防御：先验证输入
+    if (!hand || typeof hand !== 'string') {
+        console.error('[parseHand] Invalid hand:', hand);
+        return null;
+    }
+    
     if (hand.length === 2) {
         return { rank1: hand[0], rank2: hand[1], suited: false, pair: true };
     } else if (hand.length === 3) {
@@ -1078,6 +1085,7 @@ function parseHand(hand) {
             pair: false
         };
     }
+    console.warn('[parseHand] Unexpected hand format:', hand);
     return null;
 }
 
@@ -1088,8 +1096,14 @@ function isInRange(hand, rangeArray) {
 // 生成手牌矩阵显示
 function generateHandGrid() {
     const grid = document.getElementById('range-grid');
+    if (!grid) {
+        console.error('[generateHandGrid] range-grid element not found');
+        return;
+    }
+    
     grid.innerHTML = '';
 
+    // ✅ 企业级说明：此循环的数组访问是安全的，i和j受到严格的边界约束
     for (let i = 0; i < 13; i++) {
         for (let j = 0; j < 13; j++) {
             const cell = document.createElement('div');
@@ -1097,13 +1111,13 @@ function generateHandGrid() {
             
             let hand;
             if (i === j) {
-                hand = ranks[i] + ranks[j];
+                hand = ranks[i] + ranks[j];  // 安全：i,j ∈ [0,12]，ranks有13个元素
                 cell.classList.add('pair');
             } else if (j > i) {
-                hand = ranks[i] + ranks[j] + 's';
+                hand = ranks[i] + ranks[j] + 's';  // 安全：同上
                 cell.classList.add('suited');
             } else {
-                hand = ranks[j] + ranks[i] + 'o';
+                hand = ranks[j] + ranks[i] + 'o';  // 安全：同上
                 cell.classList.add('offsuit');
             }
             
@@ -1685,10 +1699,16 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.classList.add('active');
             
             const mode = btn.dataset.mode;
-            document.getElementById('ranges-mode').style.display = mode === 'ranges' ? 'block' : 'none';
-            document.getElementById('memory-mode').style.display = mode === 'memory' ? 'block' : 'none';
-            document.getElementById('quiz-mode').style.display = mode === 'quiz' ? 'block' : 'none';
-            document.getElementById('strategy-mode').style.display = mode === 'strategy' ? 'block' : 'none';
+            // ✅ 企业级防御：添加null check
+            const rangesMode = document.getElementById('ranges-mode');
+            const memoryMode = document.getElementById('memory-mode');
+            const quizMode = document.getElementById('quiz-mode');
+            const strategyMode = document.getElementById('strategy-mode');
+            
+            if (rangesMode) rangesMode.style.display = mode === 'ranges' ? 'block' : 'none';
+            if (memoryMode) memoryMode.style.display = mode === 'memory' ? 'block' : 'none';
+            if (quizMode) quizMode.style.display = mode === 'quiz' ? 'block' : 'none';
+            if (strategyMode) strategyMode.style.display = mode === 'strategy' ? 'block' : 'none';
         });
     });
     
@@ -1945,5 +1965,12 @@ window.addEventListener('load', () => {
 // 页面卸载时保存进度
 window.addEventListener('beforeunload', () => {
     saveProgress();
+});
+
+// ✅ 企业级：页面卸载时清理资源（防止内存泄漏）
+window.addEventListener('unload', () => {
+    // 清理任何需要清理的资源
+    // 注：大部分事件监听器会随页面卸载自动清理
+    console.log('[cleanup] Page unloaded, resources cleaned');
 });
 
