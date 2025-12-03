@@ -38,10 +38,6 @@ function initializeKeys() {
         API_KEYS.openrouter = _j(_p.o1, _p.o2, _p.o3, _p.o4, _p.o5);
         API_KEYS.deepseek = _b(_p.d);
         
-        // 验证密钥格式
-        console.log('🔑 OpenRouter密钥验证:', API_KEYS.openrouter.startsWith('sk-or-v1-') ? '✅格式正确' : '❌格式错误');
-        console.log('🔑 OpenRouter密钥前15位:', API_KEYS.openrouter.substring(0, 15));
-        
         // 保存到localStorage
         localStorage.setItem('apiKeys', JSON.stringify(API_KEYS));
         console.log('✅ 内置API密钥已加载（Claude+Gemini通过OpenRouter，无需翻墙）');
@@ -110,13 +106,16 @@ function setupEventListeners() {
             }
             
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = (event) => {
                 const preview = document.getElementById('imagePreview');
-                preview.src = e.target.result;
+                preview.src = event.target.result;
                 preview.classList.add('show');
                 document.getElementById('clearImageBtn').style.display = 'inline-flex';
             };
-            reader.onerror = () => alert('⚠️ 图片读取失败');
+            reader.onerror = () => {
+                alert('⚠️ 图片读取失败');
+                e.target.value = '';
+            };
             reader.readAsDataURL(file);
         }
     });
@@ -136,7 +135,14 @@ function setupEventListeners() {
 }
 
 // 处理提交
+let isSubmitting = false; // 🔧 防止并发提交
+
 async function handleSubmit() {
+    // 🔧 并发保护
+    if (isSubmitting) {
+        return;
+    }
+    
     const question = document.getElementById('questionInput').value.trim();
     const imageInput = document.getElementById('imageInput');
     const imageFile = imageInput.files[0];
@@ -147,6 +153,7 @@ async function handleSubmit() {
     }
 
     // 显示加载状态
+    isSubmitting = true;
     document.getElementById('submitBtn').disabled = true;
     document.getElementById('loading').classList.add('show');
     document.getElementById('results').innerHTML = '';
@@ -160,6 +167,7 @@ async function handleSubmit() {
             alert('⚠️ 图片处理失败');
             document.getElementById('loading').classList.remove('show');
             document.getElementById('submitBtn').disabled = false;
+            isSubmitting = false;
             return;
         }
     }
@@ -171,6 +179,7 @@ async function handleSubmit() {
         alert('⚠️ 没有可用的API密钥，请点击右下角⚙️配置');
         document.getElementById('loading').classList.remove('show');
         document.getElementById('submitBtn').disabled = false;
+        isSubmitting = false;
         openSettings();
         return;
     }
@@ -191,6 +200,7 @@ async function handleSubmit() {
             alert('⚠️ 图片识别需要OpenRouter密钥，请配置');
             document.getElementById('loading').classList.remove('show');
             document.getElementById('submitBtn').disabled = false;
+            isSubmitting = false;
             openSettings();
             return;
         }
@@ -259,6 +269,7 @@ async function handleSubmit() {
             alert('⚠️ 没有可用的API密钥');
             document.getElementById('loading').classList.remove('show');
             document.getElementById('submitBtn').disabled = false;
+            isSubmitting = false;
             return;
         }
 
@@ -267,6 +278,7 @@ async function handleSubmit() {
 
     document.getElementById('loading').classList.remove('show');
     document.getElementById('submitBtn').disabled = false;
+    isSubmitting = false;
     displayResults(results);
 }
 
@@ -353,9 +365,10 @@ async function callClaude(question, imageBase64) {
             let errorMsg = `HTTP ${response.status}`;
             try {
                 const error = await response.json();
-                console.error('❌ OpenRouter错误详情:', JSON.stringify(error, null, 2));
                 errorMsg = error.error?.message || error.message || errorMsg;
-            } catch (e) {}
+            } catch (e) {
+                // 解析错误响应失败，使用状态码
+            }
             throw new Error(errorMsg);
         }
 
@@ -371,7 +384,6 @@ async function callClaude(question, imageBase64) {
             content: data.choices[0].message.content
         };
     } catch (error) {
-        console.error('❌ Claude(OpenRouter)调用失败:', error);
         return {
             model: 'Claude',
             icon: 'claude',
@@ -430,9 +442,10 @@ async function callGemini(question, imageBase64) {
             let errorMsg = `HTTP ${response.status}`;
             try {
                 const error = await response.json();
-                console.error('❌ Gemini(OpenRouter)错误:', error);
                 errorMsg = error.error?.message || error.message || errorMsg;
-            } catch (e) {}
+            } catch (e) {
+                // 解析错误响应失败
+            }
             throw new Error(errorMsg);
         }
 
@@ -447,7 +460,6 @@ async function callGemini(question, imageBase64) {
             content: data.choices[0].message.content
         };
     } catch (error) {
-        console.error('❌ Gemini(OpenRouter)调用失败:', error);
         return {
             model: 'Gemini',
             icon: 'gemini',
@@ -490,10 +502,9 @@ async function callDeepSeekR1(question, imageBase64) {
             let errorMsg = `HTTP ${response.status}`;
             try {
                 const error = await response.json();
-                console.error('❌ DeepSeek错误详情:', error);
                 errorMsg = error.error?.message || error.message || errorMsg;
             } catch (e) {
-                console.error('❌ 无法解析错误响应');
+                // 解析错误响应失败
             }
             throw new Error(errorMsg);
         }
@@ -505,8 +516,9 @@ async function callDeepSeekR1(question, imageBase64) {
         let content = data.choices[0].message.content;
         
         // 如果有推理过程，也显示出来（deepseek-reasoner模型才有）
-        if (data.choices[0].message.reasoning_content) {
-            content = '🧠 **推理过程：**\n' + data.choices[0].message.reasoning_content + '\n\n📝 **结论：**\n' + content;
+        const reasoningContent = data.choices[0].message.reasoning_content;
+        if (reasoningContent && reasoningContent.trim()) {
+            content = '🧠 **推理过程：**\n' + reasoningContent + '\n\n📝 **结论：**\n' + content;
         }
         
         return {
@@ -516,7 +528,6 @@ async function callDeepSeekR1(question, imageBase64) {
             content: content
         };
     } catch (error) {
-        console.error('❌ DeepSeek调用失败:', error);
         return {
             model: 'DeepSeek',
             icon: 'deepseek',
