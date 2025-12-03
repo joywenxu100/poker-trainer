@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>范围互动大师 - Range Interaction Master</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            color: #b0b0b0;
+            margin-bottom: 15px;
+        }
+
+        .back-nav {
+            display: inline-block;
+            padding: 10px 20px;
+            background: rgba(102, 126, 234, 0.2);
+            border: 2px solid #667eea;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .back-nav:hover {
+            background: rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .mode-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .mode-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-5px);
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .mode-card.active {
+            border-color: #00ff00;
+            background: rgba(0, 255, 0, 0.1);
+        }
+
+        .mode-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .mode-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .mode-desc {
+            color: #b0b0b0;
+            line-height: 1.6;
+        }
+
+        .training-area {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 30px;
+            min-height: 500px;
+        }
+
+        .scenario-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border-left: 5px solid #667eea;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .scenario-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        .game-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 0.85em;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .range-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .range-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .range-header {
+            font-size: 1.2em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .hero-range {
+            border: 2px solid #00ff00;
+        }
+
+        .villain-range {
+            border: 2px solid #ff4444;
+        }
+
+        .range-hands {
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            line-height: 1.8;
+            color: #d0d0d0;
+        }
+
+        .advantage-analysis {
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .advantage-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #FFD700;
+            margin-bottom: 15px;
+        }
+
+        .advantage-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .advantage-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #FFD700;
+        }
+
+        .advantage-label {
+            font-weight: 700;
+            color: #FFD700;
+            margin-bottom: 8px;
+        }
+
+        .multistreet-plan {
+            background: rgba(102, 126, 234, 0.1);
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .street-plan {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .street-name {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .action-options {
+            display: grid;
+            gap: 10px;
+        }
+
+        .action-option {
+            display: flex;
+            align-items: start;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            border-left: 3px solid #00ff00;
+        }
+
+        .action-freq {
+            font-weight: 700;
+            color: #00ff00;
+            margin-right: 10px;
+            min-width: 50px;
+        }
+
+        .action-desc {
+            color: #d0d0d0;
+            line-height: 1.6;
+        }
+
+        .question-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .question-text {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(102, 126, 234, 0.2);
+            border-radius: 8px;
+            border-left: 5px solid #667eea;
+        }
+
+        .answer-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .answer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .answer-reveal {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0, 255, 0, 0.1);
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .answer-reveal.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .insight-box {
+            background: rgba(138, 43, 226, 0.1);
+            border: 2px solid #8a2be2;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .insight-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #9370db;
+            margin-bottom: 15px;
+        }
+
+        .insight-content {
+            line-height: 1.8;
+            color: #d0d0d0;
+        }
+
+        .navigation-btns {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .range-display {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .mode-selection {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 范围互动大师</h1>
+            <p class="subtitle">Range Interaction Master - 世界级深筹码策略训练</p>
+            <p style="color: #888; margin: 10px 0;">Range vs Range思维 | 牌面纹理分析 | 多街规划</p>
+            <a href="index.html?v=7" class="back-nav">← 返回导航</a>
+        </header>
+
+        <!-- 模式选择 -->
+        <div class="mode-selection" id="mode-selection">
+            <div class="mode-card" onclick="selectMode('beginner')">
+                <div class="mode-icon">🌱</div>
+                <div class="mode-title">基础范围互动</div>
+                <div class="mode-desc">学习如何分析双方范围，理解范围优势的基本概念</div>
+            </div>
+            <div class="mode-card" onclick="selectMode('intermediate')">
+                <div class="mode-icon">🔥</div>
+                <div class="mode-title">中级牌面分析</div>
+                <div class="mode-desc">深入分析不同牌面纹理对双方范围的影响</div>
+            </div>
+            <div class="mode-card" onclick="selectMode('advanced')">
+                <div class="mode-icon">⚡</div>
+                <div class="mode-title">高级多街规划</div>
+                <div class="mode-desc">掌握3条街的完整策略规划和范围演变</div>
+            </div>
+            <div class="mode-card" onclick="selectMode('master')">
+                <div class="mode-icon">👑</div>
+                <div class="mode-title">大师级实战</div>
+                <div class="mode-desc">世界顶级玩家的范围互动思维和决策过程</div>
+            </div>
+        </div>
+
+        <!-- 训练区域 -->
+        <div class="training-area" id="training-area" style="display: none;">
+            <div id="scenario-content">
+                <!-- 场景内容将由JavaScript动态生成 -->
+            </div>
+            
+            <div class="navigation-btns">
+                <button class="nav-btn" onclick="previousScenario()" id="prev-btn">← 上一个场景</button>
+                <button class="nav-btn" onclick="nextScenario()" id="next-btn">下一个场景 →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="range_interaction_data.js"></script>
+    <script>
+        let currentMode = null;
+        let currentScenarioIndex = 0;
+        let currentScenarios = [];
+
+        function selectMode(mode) {
+            currentMode = mode;
+            currentScenarioIndex = 0;
+            currentScenarios = window.RANGE_SCENARIOS[mode] || [];
+            
+            document.getElementById('mode-selection').style.display = 'none';
+            document.getElementById('training-area').style.display = 'block';
+            
+            renderScenario();
+        }
+
+        function renderScenario() {
+            const scenario = currentScenarios[currentScenarioIndex];
+            if (!scenario) return;
+
+            const content = `
+                <div class="scenario-card">
+                    <div class="scenario-title">${scenario.title}</div>
+                    
+                    <div class="game-info">
+                        <div class="info-item">
+                            <span class="info-label">游戏结构</span>
+                            <span class="info-value">${scenario.game_info.structure}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">筹码深度</span>
+                            <span class="info-value">${scenario.game_info.stack}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">翻前动作</span>
+                            <span class="info-value">${scenario.game_info.preflop_action}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">翻牌牌面</span>
+                            <span class="info-value">${scenario.game_info.flop}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">当前底池</span>
+                            <span class="info-value">${scenario.game_info.pot}</span>
+                        </div>
+                    </div>
+
+                    <div class="range-display">
+                        <div class="range-box hero-range">
+                            <div class="range-header">🟢 你的范围 (Hero)</div>
+                            <div class="range-hands">${scenario.ranges.hero}</div>
+                        </div>
+                        <div class="range-box villain-range">
+                            <div class="range-header">🔴 对手范围 (Villain)</div>
+                            <div class="range-hands">${scenario.ranges.villain}</div>
+                        </div>
+                    </div>
+
+                    <div class="advantage-analysis">
+                        <div class="advantage-title">⚔️ 范围优势分析</div>
+                        <div class="advantage-grid">
+                            <div class="advantage-item">
+                                <div class="advantage-label">🎯 范围优势 (Range Advantage)</div>
+                                <div>${scenario.analysis.range_advantage}</div>
+                            </div>
+                            <div class="advantage-item">
+                                <div class="advantage-label">💎 坚果优势 (Nut Advantage)</div>
+                                <div>${scenario.analysis.nut_advantage}</div>
+                            </div>
+                            <div class="advantage-item">
+                                <div class="advantage-label">🃏 牌面纹理 (Board Texture)</div>
+                                <div>${scenario.analysis.board_texture}</div>
+                            </div>
+                            <div class="advantage-item">
+                                <div class="advantage-label">📊 平均胜率 (Average Equity)</div>
+                                <div>${scenario.analysis.equity}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="question-section">
+                        <div class="question-text">❓ ${scenario.question}</div>
+                        <button class="answer-btn" onclick="revealAnswer(${currentScenarioIndex})">点击查看专业分析</button>
+                        <div class="answer-reveal" id="answer-${currentScenarioIndex}">
+                            ${renderAnswer(scenario.answer)}
+                        </div>
+                    </div>
+
+                    ${scenario.insight ? `
+                        <div class="insight-box">
+                            <div class="insight-title">💡 世界级洞察</div>
+                            <div class="insight-content">${scenario.insight}</div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+
+            document.getElementById('scenario-content').innerHTML = content;
+            updateNavigationButtons();
+        }
+
+        function renderAnswer(answer) {
+            let html = '';
+            
+            if (answer.strategy) {
+                html += `
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="color: #00ff00; margin-bottom: 10px;">✅ 推荐策略</h3>
+                        <div style="padding: 15px; background: rgba(0, 0, 0, 0.3); border-radius: 8px;">
+                            ${answer.strategy}
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (answer.multistreet_plan) {
+                html += `
+                    <div class="multistreet-plan">
+                        <h3 style="color: #667eea; margin-bottom: 15px;">📋 多街规划 (Multi-Street Plan)</h3>
+                `;
+                
+                for (const [street, plan] of Object.entries(answer.multistreet_plan)) {
+                    html += `
+                        <div class="street-plan">
+                            <div class="street-name">${getStreetName(street)}</div>
+                            <div class="action-options">
+                    `;
+                    
+                    if (Array.isArray(plan)) {
+                        plan.forEach(action => {
+                            html += `
+                                <div class="action-option">
+                                    <span class="action-freq">${action.frequency}</span>
+                                    <span class="action-desc">${action.action}</span>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        html += `<div style="color: #d0d0d0;">${plan}</div>`;
+                    }
+                    
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                html += `</div>`;
+            }
+
+            if (answer.key_points) {
+                html += `
+                    <div style="margin-top: 20px;">
+                        <h3 style="color: #FFD700; margin-bottom: 10px;">🔑 关键要点</h3>
+                        <ul style="padding-left: 20px; line-height: 1.8;">
+                `;
+                answer.key_points.forEach(point => {
+                    html += `<li style="color: #d0d0d0; margin-bottom: 8px;">${point}</li>`;
+                });
+                html += `</ul></div>`;
+            }
+
+            return html;
+        }
+
+        function getStreetName(street) {
+            const names = {
+                'flop': '🎴 翻牌圈 (Flop)',
+                'turn': '🎯 转牌圈 (Turn)',
+                'river': '💰 河牌圈 (River)'
+            };
+            return names[street] || street;
+        }
+
+        function revealAnswer(index) {
+            const answerDiv = document.getElementById(`answer-${index}`);
+            if (answerDiv) {
+                answerDiv.classList.add('show');
+            }
+        }
+
+        function previousScenario() {
+            if (currentScenarioIndex > 0) {
+                currentScenarioIndex--;
+                renderScenario();
+            }
+        }
+
+        function nextScenario() {
+            if (currentScenarioIndex < currentScenarios.length - 1) {
+                currentScenarioIndex++;
+                renderScenario();
+            }
+        }
+
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            
+            prevBtn.disabled = currentScenarioIndex === 0;
+            nextBtn.disabled = currentScenarioIndex === currentScenarios.length - 1;
+        }
+    </script>
+</body>
+</html>
+

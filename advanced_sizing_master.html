@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>高级Sizing大师 - Advanced Sizing Mastery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, #134e5e 0%, #71b280 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            color: #b0b0b0;
+            margin-bottom: 15px;
+        }
+
+        .back-nav {
+            display: inline-block;
+            padding: 10px 20px;
+            background: rgba(56, 239, 125, 0.2);
+            border: 2px solid #38ef7d;
+            color: #38ef7d;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .back-nav:hover {
+            background: rgba(56, 239, 125, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .category-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .category-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            border-color: #38ef7d;
+            background: rgba(56, 239, 125, 0.1);
+        }
+
+        .category-icon {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+        }
+
+        .category-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .category-desc {
+            color: #b0b0b0;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        .training-area {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        .sizing-concept {
+            background: linear-gradient(135deg, rgba(17, 153, 142, 0.1) 0%, rgba(56, 239, 125, 0.1) 100%);
+            border-left: 5px solid #38ef7d;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .concept-header {
+            font-size: 1.6em;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        .concept-description {
+            font-size: 1.1em;
+            color: #d0d0d0;
+            line-height: 1.8;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        .examples-grid {
+            display: grid;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .example-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .example-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(56, 239, 125, 0.3);
+        }
+
+        .example-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #38ef7d;
+        }
+
+        .sizing-value {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #FFD700;
+        }
+
+        .example-situation {
+            background: rgba(56, 239, 125, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .situation-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .situation-row:last-child {
+            border-bottom: none;
+        }
+
+        .situation-label {
+            color: #888;
+            font-weight: 600;
+        }
+
+        .situation-value {
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .sizing-rationale {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-left: 3px solid #FFD700;
+            border-radius: 5px;
+        }
+
+        .rationale-title {
+            font-weight: 700;
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+
+        .rationale-content {
+            color: #d0d0d0;
+            line-height: 1.7;
+        }
+
+        .comparison-table {
+            margin: 20px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .comparison-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 3fr;
+            gap: 15px;
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .comparison-row:first-child {
+            background: rgba(56, 239, 125, 0.2);
+            font-weight: 700;
+        }
+
+        .comparison-row:last-child {
+            border-bottom: none;
+        }
+
+        .wrong-way {
+            background: rgba(255, 0, 0, 0.1);
+            border: 2px solid #ff4444;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .wrong-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #ff4444;
+            margin-bottom: 10px;
+        }
+
+        .right-way {
+            background: rgba(0, 255, 0, 0.1);
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .right-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #00ff00;
+            margin-bottom: 10px;
+        }
+
+        .pro-insight {
+            background: rgba(138, 43, 226, 0.1);
+            border: 2px solid #8a2be2;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+
+        .insight-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #9370db;
+            margin-bottom: 15px;
+        }
+
+        .insight-content {
+            color: #d0d0d0;
+            line-height: 1.8;
+            font-size: 1.05em;
+        }
+
+        .calculator-tool {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid #38ef7d;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .calculator-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #38ef7d;
+            margin-bottom: 20px;
+        }
+
+        .calculator-input-group {
+            margin: 15px 0;
+        }
+
+        .input-label {
+            display: block;
+            color: #b0b0b0;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1.1em;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(56, 239, 125, 0.4);
+        }
+
+        .result-display {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(56, 239, 125, 0.1);
+            border: 2px solid #38ef7d;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .result-display.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .category-selector {
+                grid-template-columns: 1fr;
+            }
+            
+            .comparison-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>💰 高级Sizing大师</h1>
+            <p class="subtitle">Advanced Sizing Mastery - 下注尺寸的艺术与科学</p>
+            <p style="color: #888; margin: 10px 0;">Geometric | Polarized | Merged | Denial</p>
+            <a href="index.html?v=7" class="back-nav">← 返回导航</a>
+        </header>
+
+        <!-- 分类选择 -->
+        <div class="category-selector" id="category-selector">
+            <div class="category-card" onclick="selectCategory('geometric')">
+                <div class="category-icon">📐</div>
+                <div class="category-title">几何Sizing</div>
+                <div class="category-desc">多街价值提取的数学艺术</div>
+            </div>
+            <div class="category-card" onclick="selectCategory('polarized')">
+                <div class="category-icon">⚡</div>
+                <div class="category-title">极化Sizing</div>
+                <div class="category-desc">Nuts和Air的两极化下注</div>
+            </div>
+            <div class="category-card" onclick="selectCategory('merged')">
+                <div class="category-icon">🎯</div>
+                <div class="category-title">融合Sizing</div>
+                <div class="category-desc">平衡所有牌力的中等下注</div>
+            </div>
+            <div class="category-card" onclick="selectCategory('denial')">
+                <div class="category-icon">🛡️</div>
+                <div class="category-title">拒绝Sizing</div>
+                <div class="category-desc">拒绝对手Equity实现</div>
+            </div>
+            <div class="category-card" onclick="selectCategory('exploitative')">
+                <div class="category-icon">🎭</div>
+                <div class="category-title">剥削性Sizing</div>
+                <div class="category-desc">针对对手弱点调整尺寸</div>
+            </div>
+            <div class="category-card" onclick="selectCategory('calculator')">
+                <div class="category-icon">🧮</div>
+                <div class="category-title">Sizing计算器</div>
+                <div class="category-desc">实时计算最优下注尺寸</div>
+            </div>
+        </div>
+
+        <!-- 训练区域 -->
+        <div class="training-area" id="training-area" style="display: none;">
+            <div id="content-area">
+                <!-- 内容将由JavaScript动态生成 -->
+            </div>
+            
+            <div style="margin-top: 30px; text-align: center;">
+                <button onclick="backToCategories()" style="padding: 15px 40px; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; border: none; border-radius: 8px; font-size: 1.1em; font-weight: 700; cursor: pointer;">
+                    ← 返回分类选择
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="advanced_sizing_data.js"></script>
+    <script>
+        let currentCategory = null;
+
+        function selectCategory(category) {
+            currentCategory = category;
+            document.getElementById('category-selector').style.display = 'none';
+            document.getElementById('training-area').style.display = 'block';
+            
+            if (category === 'calculator') {
+                renderCalculator();
+            } else {
+                renderCategory(category);
+            }
+        }
+
+        function renderCategory(category) {
+            const data = window.SIZING_DATA[category];
+            if (!data) return;
+
+            let html = `
+                <div class="sizing-concept">
+                    <div class="concept-header">${data.title}</div>
+                    <div class="concept-description">${data.description}</div>
+                    
+                    ${data.formula ? `
+                        <div style="background: rgba(255, 215, 0, 0.1); padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #FFD700;">
+                            <strong style="color: #FFD700;">📐 核心公式:</strong>
+                            <div style="color: #fff; font-size: 1.2em; font-weight: 700; margin-top: 10px; font-family: 'Courier New', monospace;">
+                                ${data.formula}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+
+                <h3 style="color: #38ef7d; font-size: 1.5em; margin: 25px 0 15px 0;">📚 实战案例</h3>
+                
+                <div class="examples-grid">
+            `;
+
+            data.examples.forEach(example => {
+                html += renderExample(example);
+            });
+
+            html += `</div>`;
+
+            if (data.comparison) {
+                html += `
+                    <h3 style="color: #38ef7d; font-size: 1.5em; margin: 30px 0 15px 0;">⚖️ 不同Sizing对比</h3>
+                    <div class="comparison-table">
+                        <div class="comparison-row">
+                            <div>Sizing</div>
+                            <div>尺寸</div>
+                            <div>效果</div>
+                        </div>
+                `;
+                
+                data.comparison.forEach(row => {
+                    html += `
+                        <div class="comparison-row">
+                            <div style="color: #d0d0d0;">${row.type}</div>
+                            <div style="color: #FFD700; font-weight: 700;">${row.size}</div>
+                            <div style="color: #b0b0b0;">${row.effect}</div>
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+            }
+
+            if (data.world_class_insight) {
+                html += `
+                    <div class="pro-insight">
+                        <div class="insight-title">💡 世界级洞察</div>
+                        <div class="insight-content">${data.world_class_insight}</div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('content-area').innerHTML = html;
+        }
+
+        function renderExample(example) {
+            return `
+                <div class="example-card">
+                    <div class="example-header">
+                        <div class="example-title">${example.title}</div>
+                        <div class="sizing-value">${example.sizing}</div>
+                    </div>
+                    
+                    <div class="example-situation">
+                        <div class="situation-row">
+                            <span class="situation-label">你的手牌:</span>
+                            <span class="situation-value">${example.hand}</span>
+                        </div>
+                        <div class="situation-row">
+                            <span class="situation-label">牌面:</span>
+                            <span class="situation-value">${example.board}</span>
+                        </div>
+                        <div class="situation-row">
+                            <span class="situation-label">底池:</span>
+                            <span class="situation-value">${example.pot}</span>
+                        </div>
+                        ${example.opponent ? `
+                            <div class="situation-row">
+                                <span class="situation-label">对手类型:</span>
+                                <span class="situation-value">${example.opponent}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="sizing-rationale">
+                        <div class="rationale-title">🎯 Sizing理由</div>
+                        <div class="rationale-content">${example.rationale}</div>
+                    </div>
+
+                    ${example.wrong_sizing ? `
+                        <div class="wrong-way">
+                            <div class="wrong-title">❌ 错误做法: ${example.wrong_sizing.size}</div>
+                            <div style="color: #d0d0d0; line-height: 1.7; margin-top: 10px;">
+                                ${example.wrong_sizing.why_wrong}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    ${example.key_points ? `
+                        <div style="margin-top: 15px; padding: 15px; background: rgba(56, 239, 125, 0.1); border-radius: 8px;">
+                            <strong style="color: #38ef7d;">🔑 关键要点:</strong>
+                            <ul style="margin: 10px 0; padding-left: 20px; color: #d0d0d0; line-height: 1.8;">
+                                ${example.key_points.map(point => `<li style="margin: 5px 0;">${point}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function renderCalculator() {
+            const html = `
+                <div class="calculator-tool">
+                    <div class="calculator-title">🧮 Sizing优化计算器</div>
+                    
+                    <div class="calculator-input-group">
+                        <label class="input-label">当前底池 (BB):</label>
+                        <input type="number" class="input-field" id="current-pot" placeholder="例如: 50">
+                    </div>
+                    
+                    <div class="calculator-input-group">
+                        <label class="input-label">你的牌力 (1-10):</label>
+                        <input type="number" class="input-field" id="hand-strength" min="1" max="10" placeholder="1=Air, 10=Nuts">
+                    </div>
+                    
+                    <div class="calculator-input-group">
+                        <label class="input-label">剩余有效筹码 (BB):</label>
+                        <input type="number" class="input-field" id="effective-stack" placeholder="例如: 200">
+                    </div>
+                    
+                    <div class="calculator-input-group">
+                        <label class="input-label">当前街道:</label>
+                        <select class="input-field" id="current-street">
+                            <option value="flop">翻牌圈</option>
+                            <option value="turn">转牌圈</option>
+                            <option value="river">河牌圈</option>
+                        </select>
+                    </div>
+                    
+                    <div class="calculator-input-group">
+                        <label class="input-label">对手类型:</label>
+                        <select class="input-field" id="opponent-type">
+                            <option value="fish">鱼 (松被动)</option>
+                            <option value="calling_station">跟注站</option>
+                            <option value="nit">Nit (紧弱)</option>
+                            <option value="tag">TAG (紧凶)</option>
+                            <option value="lag">LAG (松凶)</option>
+                        </select>
+                    </div>
+                    
+                    <button class="calculate-btn" onclick="calculateOptimalSizing()">
+                        计算最优Sizing
+                    </button>
+                    
+                    <div class="result-display" id="sizing-result">
+                        <!-- 结果将显示在这里 -->
+                    </div>
+                </div>
+
+                <div class="pro-insight">
+                    <div class="insight-title">💡 使用说明</div>
+                    <div class="insight-content">
+                        <p style="margin-bottom: 10px;">这个计算器基于GTO solver数据和世界级玩家的经验，综合考虑:</p>
+                        <ul style="padding-left: 20px; line-height: 1.8;">
+                            <li>你的牌力和range构成</li>
+                            <li>剩余筹码深度 (SPR)</li>
+                            <li>对手的倾向性</li>
+                            <li>当前街道的策略目标</li>
+                        </ul>
+                        <p style="margin-top: 10px; color: #FFD700; font-weight: 700;">记住: 这是建议，实战中要根据具体情况调整！</p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('content-area').innerHTML = html;
+        }
+
+        function calculateOptimalSizing() {
+            const pot = parseFloat(document.getElementById('current-pot').value);
+            const strength = parseInt(document.getElementById('hand-strength').value);
+            const stack = parseFloat(document.getElementById('effective-stack').value);
+            const street = document.getElementById('current-street').value;
+            const opponent = document.getElementById('opponent-type').value;
+
+            if (!pot || !strength || !stack) {
+                alert('请填写所有必填字段！');
+                return;
+            }
+
+            const result = window.calculateSizing(pot, strength, stack, street, opponent);
+            
+            const resultDiv = document.getElementById('sizing-result');
+            resultDiv.innerHTML = `
+                <h3 style="color: #38ef7d; font-size: 1.4em; margin-bottom: 15px;">📊 推荐Sizing结果</h3>
+                
+                <div style="background: rgba(0, 0, 0, 0.3); padding: 20px; border-radius: 10px; margin: 15px 0;">
+                    <div style="font-size: 2em; font-weight: 700; color: #FFD700; margin-bottom: 10px;">
+                        ${result.sizing_bb}BB (${result.sizing_percent}% pot)
+                    </div>
+                    <div style="color: #b0b0b0;">
+                        推荐下注金额: ${result.sizing_bb}BB，相当于底池的${result.sizing_percent}%
+                    </div>
+                </div>
+
+                <div style="margin: 20px 0;">
+                    <h4 style="color: #38ef7d; margin-bottom: 10px;">🎯 策略类型</h4>
+                    <div style="background: rgba(56, 239, 125, 0.1); padding: 15px; border-radius: 8px; color: #d0d0d0;">
+                        ${result.strategy_type}
+                    </div>
+                </div>
+
+                <div style="margin: 20px 0;">
+                    <h4 style="color: #FFD700; margin-bottom: 10px;">📝 详细说明</h4>
+                    <div style="background: rgba(0, 0, 0, 0.2); padding: 15px; border-radius: 8px; color: #d0d0d0; line-height: 1.8;">
+                        ${result.explanation}
+                    </div>
+                </div>
+
+                ${result.alternative ? `
+                    <div style="margin: 20px 0;">
+                        <h4 style="color: #9370db; margin-bottom: 10px;">🔄 备选方案</h4>
+                        <div style="background: rgba(138, 43, 226, 0.1); padding: 15px; border-radius: 8px; color: #d0d0d0; line-height: 1.8;">
+                            ${result.alternative}
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+            
+            resultDiv.classList.add('show');
+        }
+
+        function backToCategories() {
+            document.getElementById('category-selector').style.display = 'grid';
+            document.getElementById('training-area').style.display = 'none';
+            currentCategory = null;
+        }
+    </script>
+</body>
+</html>
+

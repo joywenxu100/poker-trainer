@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025-2026赛季 球队统计排行榜</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f3460 50%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(236, 179, 101, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(52, 152, 219, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(155, 89, 182, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(236, 179, 101, 0.2) 0%, rgba(236, 179, 101, 0.05) 100%);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(236, 179, 101, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(236, 179, 101, 0.1) 50%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .header h1 {
+            font-size: 52px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #ecb365 0%, #ffd89b 50%, #ecb365 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(236, 179, 101, 0.5);
+            position: relative;
+            z-index: 1;
+            letter-spacing: 3px;
+        }
+
+        .header .season {
+            font-size: 24px;
+            opacity: 0.95;
+            letter-spacing: 3px;
+            color: #ecb365;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.98) 100%);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(236, 179, 101, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ecb365, #3498db, #9b59b6);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stats-card:hover::before {
+            opacity: 1;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 
+                0 25px 70px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(236, 179, 101, 0.5);
+        }
+
+        .card-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 28px;
+            padding-bottom: 18px;
+            border-bottom: 3px solid;
+            text-align: center;
+            position: relative;
+            letter-spacing: 1px;
+        }
+
+        .card-title::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: currentColor;
+            border-radius: 3px;
+        }
+
+        .card-title.appearances {
+            color: #ecb365;
+            border-color: #ecb365;
+        }
+
+        .card-title.goals {
+            color: #e74c3c;
+            border-color: #e74c3c;
+        }
+
+        .card-title.assists {
+            color: #3498db;
+            border-color: #3498db;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .ranking-item:hover {
+            transform: translateX(8px) scale(1.02);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+        }
+
+        .ranking-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 5px;
+            background: linear-gradient(180deg, #ecb365, #e74c3c);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .ranking-item:hover::before {
+            opacity: 1;
+        }
+
+        .rank-number {
+            font-size: 26px;
+            font-weight: bold;
+            min-width: 55px;
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        .rank-number.top1 {
+            color: #FFD700;
+            font-size: 34px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+
+        .rank-number.top2 {
+            color: #C0C0C0;
+            font-size: 30px;
+            text-shadow: 0 0 15px rgba(192, 192, 192, 0.6);
+        }
+
+        .rank-number.top3 {
+            color: #CD7F32;
+            font-size: 28px;
+            text-shadow: 0 0 12px rgba(205, 127, 50, 0.6);
+        }
+
+        .player-info {
+            flex: 1;
+            margin-left: 15px;
+        }
+
+        .player-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .player-number {
+            font-size: 14px;
+            color: #718096;
+        }
+
+        .stat-value {
+            font-size: 30px;
+            font-weight: bold;
+            color: #2c3e50;
+            min-width: 70px;
+            text-align: right;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, rgba(236, 179, 101, 0.15) 0%, rgba(236, 179, 101, 0.05) 100%);
+            border-radius: 12px;
+            border: 2px solid rgba(236, 179, 101, 0.3);
+            box-shadow: 0 4px 12px rgba(236, 179, 101, 0.2);
+        }
+
+        .trophy-icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+
+        .podium {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 25px;
+            margin: 40px 0;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.98) 100%);
+            border-radius: 24px;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 1);
+            border: 1px solid rgba(236, 179, 101, 0.2);
+        }
+
+        .podium-item {
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .podium-item:hover {
+            transform: scale(1.05);
+        }
+
+        .podium-rank {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .podium-player {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 15px 0;
+            color: #2d3748;
+        }
+
+        .podium-value {
+            font-size: 40px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .podium-base {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px 45px;
+            border-radius: 12px;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .podium-base::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        }
+
+        .podium-item.first .podium-base {
+            height: 200px;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            box-shadow: 0 10px 40px rgba(255, 215, 0, 0.4);
+        }
+
+        .podium-item.second .podium-base {
+            height: 160px;
+            background: linear-gradient(135deg, #C0C0C0 0%, #A8A8A8 100%);
+            box-shadow: 0 10px 40px rgba(192, 192, 192, 0.4);
+        }
+
+        .podium-item.third .podium-base {
+            height: 130px;
+            background: linear-gradient(135deg, #CD7F32 0%, #B8722E 100%);
+            box-shadow: 0 10px 40px rgba(205, 127, 50, 0.4);
+        }
+
+        .export-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 18px 36px;
+            background: linear-gradient(135deg, #ecb365 0%, #e67e22 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(236, 179, 101, 0.5);
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .export-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 36px rgba(236, 179, 101, 0.7);
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);
+        }
+
+        .highlight-section {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.98) 100%);
+            border-radius: 24px;
+            padding: 45px;
+            margin-bottom: 35px;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 1);
+            border: 1px solid rgba(236, 179, 101, 0.2);
+        }
+
+        .highlight-title {
+            font-size: 36px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 35px;
+            background: linear-gradient(135deg, #ecb365 0%, #e67e22 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stats-card, .highlight-section {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .stats-card:nth-child(1) { animation-delay: 0.1s; }
+        .stats-card:nth-child(2) { animation-delay: 0.2s; }
+        .stats-card:nth-child(3) { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏆 球队统计排行榜 🏆</h1>
+            <div class="season">2025-2026赛季 (2025.02.15-)</div>
+        </div>
+
+        <!-- 颁奖台展示 - 出场次数 -->
+        <div class="highlight-section">
+            <div class="highlight-title">🎖️ 出场次数冠军榜 🎖️</div>
+            <div class="podium">
+                <div class="podium-item second">
+                    <div class="podium-rank">🥈</div>
+                    <div class="podium-player">赵哥<br><span style="font-size:16px; color:#718096;">(9号)</span></div>
+                    <div class="podium-value">21</div>
+                    <div class="podium-base">
+                        <div style="font-size:18px; margin-top:40px;">场次</div>
+                    </div>
+                </div>
+                <div class="podium-item first">
+                    <div class="podium-rank">🥇</div>
+                    <div class="podium-player">贾总<br><span style="font-size:16px; color:#718096;">(3号)</span></div>
+                    <div class="podium-value">22</div>
+                    <div class="podium-base">
+                        <div style="font-size:18px; margin-top:60px;">场次</div>
+                    </div>
+                </div>
+                <div class="podium-item third">
+                    <div class="podium-rank">🥉</div>
+                    <div class="podium-player">小鸡<br><span style="font-size:16px; color:#718096;">(11号)</span></div>
+                    <div class="podium-value">20</div>
+                    <div class="podium-base">
+                        <div style="font-size:18px; margin-top:10px;">场次</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 统计榜单 -->
+        <div class="stats-grid">
+            <!-- 出场次数榜 -->
+            <div class="stats-card">
+                <div class="card-title appearances">📊 出场次数榜 (共24场)</div>
+                <div class="ranking-list" id="appearancesList"></div>
+            </div>
+
+            <!-- 进球榜 -->
+            <div class="stats-card">
+                <div class="card-title goals">⚽ 进球榜</div>
+                <div class="ranking-list" id="goalsList"></div>
+            </div>
+
+            <!-- 助攻榜 -->
+            <div class="stats-card">
+                <div class="card-title assists">🎯 助攻榜</div>
+                <div class="ranking-list" id="assistsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <button class="export-btn" onclick="window.print()">📄 导出报告</button>
+
+    <script>
+        // 数据
+        const appearancesData = [
+            { rank: 1, name: "贾总", number: "3号", value: 22 },
+            { rank: 2, name: "赵哥", number: "9号", value: 21 },
+            { rank: 3, name: "小鸡", number: "11号", value: 20 },
+            { rank: 4, name: "Zanetti", number: "4号", value: 20 },
+            { rank: 5, name: "亮子", number: "5号", value: 19 },
+            { rank: 6, name: "老陆", number: "21号", value: 18 },
+            { rank: 7, name: "付总", number: "23号", value: 17 },
+            { rank: 8, name: "小龙", number: "8号", value: 16 },
+            { rank: 9, name: "小文", number: "27号", value: 15 },
+            { rank: 10, name: "难队", number: "6号", value: 14 },
+            { rank: 11, name: "赛哥", number: "47号", value: 13 },
+            { rank: 12, name: "严总", number: "20号", value: 12 }
+        ];
+
+        const goalsData = [
+            { rank: 1, name: "亮子", number: "5号", value: 17 },
+            { rank: 2, name: "赵哥", number: "9号", value: 16 },
+            { rank: 3, name: "小文", number: "27号", value: 14 },
+            { rank: 4, name: "小龙", number: "8号", value: 14 },
+            { rank: 5, name: "付总", number: "23号", value: 12 },
+            { rank: 6, name: "老陆", number: "21号", value: 10 },
+            { rank: 7, name: "琦玉", number: "13号", value: 8 },
+            { rank: 8, name: "jojo", number: "14号", value: 5 },
+            { rank: 9, name: "小鸡", number: "11号", value: 4 },
+            { rank: 10, name: "鸭子", number: "9号", value: 3 },
+            { rank: 11, name: "辉哥", number: "2号", value: 3 },
+            { rank: 12, name: "小尹", number: "7号", value: 2 }
+        ];
+
+        const assistsData = [
+            { rank: 1, name: "赵哥", number: "9号", value: 20 },
+            { rank: 2, name: "小龙", number: "8号", value: 11 },
+            { rank: 3, name: "亮子", number: "5号", value: 10 },
+            { rank: 4, name: "小鸡", number: "11号", value: 9 },
+            { rank: 5, name: "贾总", number: "3号", value: 8 },
+            { rank: 6, name: "付总", number: "23号", value: 8 },
+            { rank: 7, name: "Zanetti", number: "4号", value: 7 },
+            { rank: 8, name: "赛哥", number: "47号", value: 6 },
+            { rank: 9, name: "小文", number: "27号", value: 5 },
+            { rank: 10, name: "严总", number: "20号", value: 4 },
+            { rank: 11, name: "难队", number: "6号", value: 3 },
+            { rank: 12, name: "刘晗", number: "16号", value: 3 }
+        ];
+
+        function createRankingItem(data) {
+            const topClass = data.rank === 1 ? 'top1' : data.rank === 2 ? 'top2' : data.rank === 3 ? 'top3' : '';
+            const trophy = data.rank === 1 ? '🏆' : data.rank === 2 ? '🥈' : data.rank === 3 ? '🥉' : '';
+            
+            return `
+                <div class="ranking-item">
+                    <div class="rank-number ${topClass}">
+                        ${trophy} ${data.rank}
+                    </div>
+                    <div class="player-info">
+                        <div class="player-name">${data.name}</div>
+                        <div class="player-number">${data.number}</div>
+                    </div>
+                    <div class="stat-value">${data.value}</div>
+                </div>
+            `;
+        }
+
+        function renderRankings() {
+            document.getElementById('appearancesList').innerHTML = appearancesData.map(createRankingItem).join('');
+            document.getElementById('goalsList').innerHTML = goalsData.map(createRankingItem).join('');
+            document.getElementById('assistsList').innerHTML = assistsData.map(createRankingItem).join('');
+        }
+
+        // 页面加载时渲染
+        window.addEventListener('DOMContentLoaded', renderRankings);
+    </script>
+</body>
+</html>
+

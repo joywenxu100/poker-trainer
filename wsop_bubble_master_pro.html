@@ -248,6 +248,254 @@
 • 他们更怕淘汰，不是你的偷盲<br>
 • 泡沫刚破再调整回来`
             },
+            {
+                category: "大筹码施压",
+                title: "MP位攻击",
+                stacks: [
+                    { label: "你", value: "58BB" },
+                    { label: "后面", value: "22-35BB" }
+                ],
+                context: "剩余75人，钱圈72人。",
+                question: "你在MP拿到A♣9♠。前面全弃。你应该？",
+                options: ["Fold - MP太紧", "加注到2.2BB", "加注到2.5BB", "Limp"],
+                correctIndex: 1,
+                explanation: `<strong>正确：加注到2.2BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 泡沫期MP可以打宽！</div>
+• A9o在MP通常要fold<br>
+• 但泡沫期大筹码例外<br>
+• 后面玩家ICM压力巨大<br>
+• 小sizing最大化fold equity<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 大筹码优势：</div>
+• 可以比平时宽10-15%<br>
+• Ax suited, Kx suited都可以<br>
+• 被3bet立即fold<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 记住：</div>
+大筹码在泡沫期 = 压路机！`
+            },
+            {
+                category: "大筹码施压",
+                title: "4bet施压",
+                stacks: [
+                    { label: "你", value: "64BB" },
+                    { label: "3bet者", value: "38BB" }
+                ],
+                context: "剩余58人，钱圈55人。",
+                question: "你CO open 2.2BB拿到A♦K♠。BTN(38BB)3bet到6BB。盲注弃牌。你应该？",
+                options: ["Fold", "Call", "4bet到15BB", "4bet到12BB"],
+                correctIndex: 3,
+                explanation: `<strong>正确：4bet到12BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ AK必须4bet！</div>
+• AK太强不能fold或call<br>
+• 4bet到12BB给巨大压力<br>
+• 38BB中筹码很难call<br>
+• 他可能在light 3bet<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 4bet sizing：</div>
+• 约2-2.5倍3bet大小<br>
+• 12BB让对手艰难决策<br>
+• All-in 38BB压力太大<br>
+
+<div style="color:#e74c3c; margin:15px 0">⚠️ 如果被5bet全押：</div>
+必须call，AK在这个spot不能fold！`
+            },
+            {
+                category: "大筹码施压",
+                title: "针对弱玩家",
+                stacks: [
+                    { label: "你", value: "66BB" },
+                    { label: "Fish", value: "42BB" },
+                    { label: "其他", value: "25-30BB" }
+                ],
+                context: "剩余82人，钱圈80人。你发现BB位是明显弱玩家。",
+                question: "你在CO拿到5♠5♥。前面全弃。你应该？",
+                options: ["Fold - 55太弱", "加注到2.2BB", "加注到2.5BB", "All-in"],
+                correctIndex: 1,
+                explanation: `<strong>正确：加注到2.2BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 剥削弱玩家！</div>
+• Fish在泡沫期更紧<br>
+• 55可以偷盲<br>
+• 小sizing降低风险<br>
+• 被call翻牌也有玩<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 识别弱玩家：</div>
+• 看到翻牌率过高/过低<br>
+• 泡沫期更加紧张<br>
+• 容易被偷盲<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 针对策略：</div>
+加大偷盲频率，疯狂攻击！`
+            },
+            {
+                category: "大筹码施压",
+                title: "翻牌后施压",
+                stacks: [
+                    { label: "你", value: "61BB" },
+                    { label: "对手", value: "29BB" }
+                ],
+                context: "剩余67人，钱圈65人。你BTN open 2.2BB拿到K♥Q♥，BB(29BB)call。",
+                question: "翻牌 8♠6♥2♣。对手check。你应该？",
+                options: ["Check back", "C-bet 1.5BB", "C-bet 3BB", "All-in"],
+                correctIndex: 1,
+                explanation: `<strong>正确：C-bet 1.5BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 极小c-bet策略！</div>
+• 泡沫期fold equity极高<br>
+• 1.5BB足够让对手fold<br>
+• 省子弹，性价比最高<br>
+• 被check-raise可以fold<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 泡沫期c-bet：</div>
+• 25-35% pot就够<br>
+• 不需要大c-bet<br>
+• 对手更怕淘汰不是你<br>
+
+<div style="color:#e74c3c; margin:15px 0">⚠️ 如果被call：</div>
+转牌继续小注施压或check！`
+            },
+            {
+                category: "大筹码施压",
+                title: "隔离弱筹码",
+                stacks: [
+                    { label: "你", value: "69BB" },
+                    { label: "Limp", value: "31BB" },
+                    { label: "后面", value: "25-28BB" }
+                ],
+                context: "剩余71人，钱圈68人。",
+                question: "MP(31BB)limp。你在CO拿到J♠T♠。你应该？",
+                options: ["Fold", "Limp behind", "Raise到5BB", "Raise到3BB"],
+                correctIndex: 3,
+                explanation: `<strong>正确：Raise到3BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 隔离limp者！</div>
+• Limp显示弱牌<br>
+• JTs足够raise<br>
+• 3BB让后面fold<br>
+• 单挑limp者<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 隔离加注：</div>
+• 比open稍大<br>
+• 目的：赶走其他人<br>
+• IP对抗limp范围<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 泡沫期特点：</div>
+后面玩家更难进来！`
+            },
+            {
+                category: "大筹码施压",
+                title: "多人底池控制",
+                stacks: [
+                    { label: "你", value: "57BB" },
+                    { label: "3人进翻牌", value: "28-35BB" }
+                ],
+                context: "剩余85人，钱圈82人。你BTN open，SB和BB都call。",
+                question: "翻牌 A♦9♣4♥。前面都check。你拿到Q♠Q♥。你应该？",
+                options: ["Check back", "Bet 2BB", "Bet 4BB", "Bet 6BB"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Check back</strong>
+
+<div style="color:#ffd700; margin:15px 0">💡 多人底池+A高面 = 危险！</div>
+• QQ在A高面很尴尬<br>
+• 2人可能有Ax<br>
+• Bet容易被check-raise<br>
+• Check保护showdown value<br>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 泡沫期智慧：</div>
+• 不要在多人底池冒险<br>
+• 大筹码也要pot control<br>
+• Check不是weakness<br>
+
+<div style="color:#e74c3c; margin:15px 0">⚠️ 记住：</div>
+泡沫期 = 少打大底池！`
+            },
+            {
+                category: "大筹码施压",
+                title: "转牌攻击",
+                stacks: [
+                    { label: "你", value: "63BB" },
+                    { label: "对手", value: "27BB" }
+                ],
+                context: "剩余73人，钱圈70人。你CO open拿到A♥T♥，BB call。翻牌K♠8♥3♥，你c-bet他call。",
+                question: "转牌 2♣。对手check。你应该？",
+                options: ["Check", "Bet 3BB", "Bet 5BB", "All-in"],
+                correctIndex: 1,
+                explanation: `<strong>正确：Bet 3BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 持续施压！</div>
+• 有坚果花draw<br>
+• 转牌brick对手可能放弃<br>
+• 3BB适中sizing<br>
+• 泡沫期fold equity高<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 半诈唬策略：</div>
+• 9张花 + A/T out = 大量补牌<br>
+• 即使被call也有很多out<br>
+• 给对手压力<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 泡沫期优势：</div>
+对手更倾向fold而不是冒险！`
+            },
+            {
+                category: "大筹码施压",
+                title: "河牌诈唬",
+                stacks: [
+                    { label: "你", value: "59BB" },
+                    { label: "对手", value: "32BB" }
+                ],
+                context: "剩余78人，钱圈75人。一路激战到河牌，底池18BB。",
+                question: "河牌出现第四张花色牌。对手check。你miss了所有draw，拿到空气。你应该？",
+                options: ["Check放弃", "Bet 6BB", "Bet 10BB", "All-in"],
+                correctIndex: 1,
+                explanation: `<strong>正确：Bet 6BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 河牌诈唬！</div>
+• 第四张花出现是好牌<br>
+• 6BB约1/3 pot<br>
+• 泡沫期fold equity极高<br>
+• 对手可能放弃中等牌<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 河牌诈唬时机：</div>
+• 牌面有恐怖牌出现<br>
+• 合理sizing<br>
+• 泡沫期最佳时机<br>
+
+<div style="color:#e74c3c; margin:15px 0">⚠️ 如果被call：</div>
+记住对手不怕诈唬，调整策略！`
+            },
+            {
+                category: "大筹码施压",
+                title: "位置优势最大化",
+                stacks: [
+                    { label: "你", value: "70BB" },
+                    { label: "UTG", value: "33BB" }
+                ],
+                context: "剩余61人，钱圈58人。",
+                question: "UTG(33BB)open 2.5BB。折到你在BTN，拿到8♦8♠。你应该？",
+                options: ["Fold", "Call", "3bet到7BB", "All-in"],
+                correctIndex: 1,
+                explanation: `<strong>正确：Call</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ IP call 88！</div>
+• 88对抗UTG range可以<br>
+• Call保持灵活性<br>
+• IP有位置优势<br>
+• 泡沫期UTG不会疯狂c-bet<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 为什么不3bet？</div>
+• 被4bet很尴尬<br>
+• 88不够强全押<br>
+• Call更隐蔽<br>
+• 中set赢大底池<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 翻牌后：</div>
+• Miss set check back<br>
+• 中set慢打<br>
+• 利用位置优势`
+            },
 
             // ===== 中筹码生存策略 (15题) =====
             {
@@ -401,6 +649,260 @@
 • TT+ → 考虑call或4bet<br>
 • AK → 考虑4bet<br>
 • 99在这个spot就是fold`
+            },
+            {
+                category: "中筹码生存",
+                title: "等待时机",
+                stacks: [
+                    { label: "你", value: "29BB" },
+                    { label: "平均", value: "33BB" },
+                    { label: "最短", value: "8BB" }
+                ],
+                context: "剩余90人，钱圈88人。有个8BB短筹码。",
+                question: "你在UTG拿到K♠Q♦。你应该？",
+                options: ["Open 2.5BB", "All-in", "Fold", "Limp"],
+                correctIndex: 2,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 忍耐是美德！</div>
+• KQo在UTG太边缘<br>
+• 还有8BB短筹码<br>
+• 等他出局你自动进钱圈<br>
+• 不值得现在冒险<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 中筹码生存：</div>
+• 识别最短筹码<br>
+• 让他们先出局<br>
+• 你坐着就赚钱<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 心态：</div>
+"我只需要再等2-3手牌！"`
+            },
+            {
+                category: "中筹码生存",
+                title: "翻牌后困境",
+                stacks: [
+                    { label: "你", value: "26BB" },
+                    { label: "对手", value: "58BB" }
+                ],
+                context: "剩余64人，钱圈62人。你BB防守，翻牌中顶对。",
+                question: "翻牌J♠8♦4♥。你拿J♥T♥中顶对。大筹码c-bet 3BB进7BB底池。你应该？",
+                options: ["Fold", "Call", "Check-raise到9BB", "All-in"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#e74c3c; margin:15px 0">⚠️ 顶对也要fold！</div>
+• JT在泡沫期不够强<br>
+• 对手可能有更好J<br>
+• Call容易被turn/river施压<br>
+• Check-raise风险太大<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 中筹码思维：</div>
+• 翻牌后要更紧<br>
+• 边缘牌快速fold<br>
+• 保存筹码等进钱圈<br>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 何时继续？</div>
+• 两对或更好 → Call/Raise<br>
+• 顶对好踢脚(AJ/KJ) → 考虑call<br>
+• JT = Fold`
+            },
+            {
+                category: "中筹码生存",
+                title: "位置劣势",
+                stacks: [
+                    { label: "你", value: "31BB" },
+                    { label: "开池者", value: "62BB" }
+                ],
+                context: "剩余70人，钱圈67人。",
+                question: "CO(62BB)open 2.2BB。你在SB拿到A♣T♦。BB是短筹码15BB。你应该？",
+                options: ["Fold", "Call", "3bet到7BB", "All-in"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#ffd700; margin:15px 0">💡 SB是最差位置！</div>
+• OOP对抗大筹码<br>
+• ATo不够强<br>
+• BB短筹码可能全押<br>
+• 夹在中间太难<br>
+
+<div style="color:#2ecc71; margin:15px 0">✅ SB防守标准：</div>
+• 泡沫期要极紧<br>
+• ATo这种边缘牌fold<br>
+• 只玩premium<br>
+
+<div style="color:#e74c3c; margin:15px 0">⚠️ 记住：</div>
+SB + OOP + 中筹码 = Fold大部分！`
+            },
+            {
+                category: "中筹码生存",
+                title: "避免翻牌后",
+                stacks: [
+                    { label: "你", value: "28BB" },
+                    { label: "对手", value: "64BB" }
+                ],
+                context: "剩余76人，钱圈73人。",
+                question: "你在BB拿到9♠9♥。BTN(64BB)open 2BB。SB弃牌。你应该？",
+                options: ["Fold", "Call", "3bet到6BB", "All-in 28BB"],
+                correctIndex: 3,
+                explanation: `<strong>正确：All-in 28BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 99要全押！</div>
+• 99是强牌不能fold<br>
+• Call OOP很难打<br>
+• 3bet被call进退两难<br>
+• All-in最简单<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 中筹码全押策略：</div>
+• 88+ OOP vs大筹码<br>
+• 直接全押<br>
+• 避免翻牌后困境<br>
+• 利用fold equity<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 关键：</div>
+泡沫期大筹码也不想call 28BB！`
+            },
+            {
+                category: "中筹码生存",
+                title: "同样中筹码对抗",
+                stacks: [
+                    { label: "你", value: "32BB" },
+                    { label: "对手", value: "30BB" },
+                    { label: "大筹码", value: "68BB" }
+                ],
+                context: "剩余81人，钱圈78人。",
+                question: "MP(30BB)open 2.5BB。你在CO拿到A♠K♦。你应该？",
+                options: ["Fold", "Call", "3bet到7BB", "All-in"],
+                correctIndex: 2,
+                explanation: `<strong>正确：3bet到7BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ AK vs同等筹码！</div>
+• AK太强必须打<br>
+• 同等筹码可以3bet<br>
+• 7BB sizing合适<br>
+• 不怕他4bet<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 为什么不All-in？</div>
+• 32BB稍微深了点<br>
+• 3bet保持灵活<br>
+• 被4bet可以call<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 同筹码对抗：</div>
+• 比大筹码更能打<br>
+• ICM影响相似<br>
+• AK/QQ+要aggressive`
+            },
+            {
+                category: "中筹码生存",
+                title: "连续被攻击",
+                stacks: [
+                    { label: "你", value: "24BB" },
+                    { label: "大筹码", value: "72BB" }
+                ],
+                context: "剩余69人，钱圈66人。大筹码连续3手偷你盲注。",
+                question: "你在BB拿到K♦J♥。大筹码BTN又open 2BB。SB弃牌。你应该？",
+                options: ["Fold继续被偷", "Call", "3bet到6BB", "All-in 24BB"],
+                correctIndex: 2,
+                explanation: `<strong>正确：3bet到6BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 必须反击！</div>
+• 连续被偷要站起来<br>
+• KJo足够3bet<br>
+• 6BB给压力<br>
+• 不能一直被欺负<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 何时反击：</div>
+• 连续2-3次被偷<br>
+• 有decent hand<br>
+• 3bet不全押<br>
+• 让对手知道你会反击<br>
+
+<div style="color:#e74c3c; margin:15px 0">⚠️ 如果被4bet：</div>
+KJ必须fold，你已经展示反抗了！`
+            },
+            {
+                category: "中筹码生存",
+                title: "保护小盲",
+                stacks: [
+                    { label: "你", value: "30BB" },
+                    { label: "BB", value: "27BB" }
+                ],
+                context: "剩余74人，钱圈71人。前面全弃到你SB。",
+                question: "你在SB拿到A♥6♠。你应该？",
+                options: ["Fold", "Complete到BB", "Raise到3BB", "All-in"],
+                correctIndex: 2,
+                explanation: `<strong>正确：Raise到3BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ SB vs BB要打！</div>
+• A6o足够raise<br>
+• SB vs BB你有优势<br>
+• 3BB标准sizing<br>
+• BB也有ICM压力<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 SB raise范围：</div>
+• 中筹码约30-40%<br>
+• 任何Ax<br>
+• Kx suited<br>
+• 口袋对<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 不要Complete：</div>
+OOP看翻牌很难打！`
+            },
+            {
+                category: "中筹码生存",
+                title: "两难抉择",
+                stacks: [
+                    { label: "你", value: "26BB" },
+                    { label: "开池者", value: "33BB" },
+                    { label: "短筹码", value: "9BB" }
+                ],
+                context: "剩余63人，钱圈60人。",
+                question: "CO(33BB)open 2.5BB。你在BTN拿到A♥Q♠。短筹码在SB。你应该？",
+                options: ["Fold", "Call", "3bet到7BB", "All-in"],
+                correctIndex: 2,
+                explanation: `<strong>正确：3bet到7BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ AQo要3bet！</div>
+• AQ太强不能fold<br>
+• 3bet for value<br>
+• 7BB sizing合适<br>
+• 短筹码在SB反而好(不会介入)<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 为什么不怕短筹码？</div>
+• 他在SB OOP<br>
+• 3bet他也难进<br>
+• 主要对抗CO<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 关键：</div>
+AQ是中筹码的核心价值牌！`
+            },
+            {
+                category: "中筹码生存",
+                title: "筹码焦虑",
+                stacks: [
+                    { label: "你", value: "23BB" },
+                    { label: "平均", value: "35BB" },
+                    { label: "盲注上涨", value: "还有2手" }
+                ],
+                context: "剩余77人，钱圈74人。盲注马上上涨。",
+                question: "你在CO拿到7♠7♥。前面全弃。你应该？",
+                options: ["Fold等盲注上涨", "Open 2.5BB", "All-in 23BB", "等更好位置"],
+                correctIndex: 2,
+                explanation: `<strong>正确：All-in 23BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 盲注上涨前行动！</div>
+• 77是decent hand<br>
+• 23BB全押合适<br>
+• 盲注上涨后只剩18BB<br>
+• CO位置好<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 盲注上涨前：</div>
+• 要更aggressive<br>
+• 不要等到太短<br>
+• 77+ / ATs+ / AJo+都推<br>
+
+<div style="color:#e74c3c; margin:15px 0">⚠️ 不要Open小注：</div>
+被3bet进退两难！`
             },
 
             // ===== 短筹码反击策略 (10题) =====
@@ -559,6 +1061,117 @@
 • 包括任何Kx, Qx suited<br>
 • 泡沫期更宽`
             },
+            {
+                category: "短筹码反击",
+                title: "再推挤",
+                stacks: [
+                    { label: "你", value: "11BB" },
+                    { label: "Open", value: "60BB" },
+                    { label: "后面", value: "28-35BB" }
+                ],
+                context: "剩余95人，钱圈92人。",
+                question: "MP(60BB)open 2.2BB。折到你在BTN，拿到Q♥T♥。你应该？",
+                options: ["Fold", "Call", "3bet到6BB", "All-in 11BB"],
+                correctIndex: 3,
+                explanation: `<strong>正确：All-in 11BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ QTs完美再推挤！</div>
+• 11BB必须行动<br>
+• QTs有playability<br>
+• MP range宽<br>
+• 后面玩家ICM压力大<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 再推挤范围：</div>
+• <15BB: 很宽<br>
+• Suited broadways<br>
+• 任何口袋对<br>
+• Ax suited<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 关键：</div>
+泡沫期fold equity = 金钱！`
+            },
+            {
+                category: "短筹码反击",
+                title: "抢先全押",
+                stacks: [
+                    { label: "你", value: "13BB" },
+                    { label: "后面", value: "25-45BB" }
+                ],
+                context: "剩余84人，钱圈81人。",
+                question: "你在HJ拿到A♠5♦。前面全弃。你应该？",
+                options: ["Fold", "Open 2.5BB", "All-in 13BB", "Limp"],
+                correctIndex: 2,
+                explanation: `<strong>正确：All-in 13BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ A5o HJ推挤！</div>
+• 13BB正好推挤range<br>
+• A5o足够<br>
+• HJ位置还可以<br>
+• 泡沫期fold equity极高<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 为什么不Open小注？</div>
+• Open被3bet很尴尬<br>
+• 剩10.5BB太awkward<br>
+• All-in最简单<br>
+
+<div style="color:#e74c3c; margin:15px 0">⚠️ HJ推挤范围：</div>
+• 13BB约20-25%<br>
+• 66+, A5s+, A9o+, KTs+, KQo`
+            },
+            {
+                category: "短筹码反击",
+                title: "盲注防守反击",
+                stacks: [
+                    { label: "你", value: "9BB" },
+                    { label: "Open", value: "52BB" }
+                ],
+                context: "剩余98人，钱圈95人。你在BB。",
+                question: "CO(52BB)open 2BB。SB弃牌。你拿到K♣9♦。你应该？",
+                options: ["Fold", "Call", "3bet到5BB", "All-in 9BB"],
+                correctIndex: 3,
+                explanation: `<strong>正确：All-in 9BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ K9o要推！</div>
+• 9BB太短<br>
+• K9o对抗CO open不差<br>
+• All-in最大fold equity<br>
+• 泡沫期他很难call<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 BB 9BB防守：</div>
+• vs BTN/CO: 30-40%<br>
+• vs MP: 25-30%<br>
+• vs UTG: 20%<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 记住：</div>
+短筹码BB防守要aggressive！`
+            },
+            {
+                category: "短筹码反击",
+                title: "翻倍机会",
+                stacks: [
+                    { label: "你", value: "8BB" },
+                    { label: "对手", value: "33BB" }
+                ],
+                context: "剩余104人，钱圈100人。最后4个泡沫！",
+                question: "你在CO拿到6♠6♥。前面全弃。你应该？",
+                options: ["Fold等进钱圈", "Open 2BB", "All-in 8BB", "等更好位置"],
+                correctIndex: 2,
+                explanation: `<strong>正确：All-in 8BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 66是宝贝！</div>
+• 8BB必须行动<br>
+• 66是premium短筹码牌<br>
+• CO位置优秀<br>
+• 最后泡沫fold equity最高<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 为什么不等？</div>
+• 等=筹码被吃<br>
+• 4个泡沫≠安全<br>
+• 66值得推<br>
+
+<div style="color:#e74c3c; margin:15px 0">⚠️ 保守心态：</div>
+"等进钱圈" = 慢性死亡！`
+            },
 
             // ===== 多人全押 (5题) =====
             {
@@ -591,6 +1204,124 @@
 <div style="color:#9b59b6; margin:15px 0">🎯 记住：</div>
 前面全押 + 后面多人 = 大多数时候fold`
             },
+            {
+                category: "多人全押",
+                title: "按钮位决策",
+                stacks: [
+                    { label: "你", value: "43BB" },
+                    { label: "全押者", value: "13BB" },
+                    { label: "盲注", value: "30BB + 28BB" }
+                ],
+                context: "剩余90人，钱圈88人。",
+                question: "CO(13BB)全押。你在BTN拿到A♠Q♥。你应该？",
+                options: ["Fold", "Call 13BB", "Raise到35BB隔离", "All-in"],
+                correctIndex: 1,
+                explanation: `<strong>正确：Call 13BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ BTN AQo可以call！</div>
+• 后面只有2人<br>
+• AQ对抗13BB推挤range有优势<br>
+• Call 13BB风险可控<br>
+• 盲注有ICM压力<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 为什么不隔离raise？</div>
+• Raise到35BB风险大<br>
+• 简单call就够<br>
+• 盲注大概率fold<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 BTN优势：</div>
+• 后面人少<br>
+• 盲注压力大<br>
+• AQ+可以call短筹码`
+            },
+            {
+                category: "多人全押",
+                title: "三方全押",
+                stacks: [
+                    { label: "你", value: "35BB" },
+                    { label: "全押1", value: "16BB" },
+                    { label: "全押2", value: "9BB" }
+                ],
+                context: "剩余94人，钱圈91人。",
+                question: "MP(16BB)全押。CO(9BB)也全押。折到你在BTN，拿到T♠T♥。你应该？",
+                options: ["Fold", "Call", "Raise隔离", "看盲注"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#e74c3c; margin:15px 0">🚨 三方全押太危险！</div>
+
+<div style="color:#ffd700; margin:15px 0">💡 为什么fold TT？</div>
+• 已经2人全押<br>
+• 其中一人可能有更强对<br>
+• 3个泡沫，ICM压力大<br>
+• TT不够强打双全押<br>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 三方全押法则：</div>
+• 需要QQ+或AK<br>
+• 一般都fold<br>
+• 让他们互相打<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 记住：</div>
+多人全押 = fold大部分！`
+            },
+            {
+                category: "多人全押",
+                title: "大盲困境",
+                stacks: [
+                    { label: "你", value: "36BB" },
+                    { label: "全押1", value: "14BB" },
+                    { label: "Call", value: "44BB" }
+                ],
+                context: "剩余87人，钱圈84人。你在BB。",
+                question: "BTN(14BB)全押。SB(44BB)call。你拿到A♥J♦。你应该？",
+                options: ["Fold", "Call", "Raise隔离", "All-in"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#e74c3c; margin:15px 0">⚠️ SB call = 强牌！</div>
+
+<div style="color:#ffd700; margin:15px 0">💡 为什么fold AJ？</div>
+• SB已经call，说明他很强<br>
+• 你夹在中间<br>
+• AJ对抗call range不够强<br>
+• ICM压力巨大<br>
+
+<div style="color:#2ecc71; margin:15px 0">✅ SB call意味着：</div>
+• 至少88+, AQ+<br>
+• AJ被压制<br>
+• 即使赢BTN也可能输SB<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 关键：</div>
+有人已经call = 要更紧！`
+            },
+            {
+                category: "多人全押",
+                title: "最后泡沫",
+                stacks: [
+                    { label: "你", value: "40BB" },
+                    { label: "全押1", value: "12BB" },
+                    { label: "全押2", value: "11BB" }
+                ],
+                context: "剩余101人，钱圈100人。最后1个泡沫！",
+                question: "UTG(12BB)全押。MP(11BB)也全押。折到你在CO，拿到K♠K♥。你应该？",
+                options: ["Fold让盲注去", "Call", "Raise隔离", "看形势"],
+                correctIndex: 1,
+                explanation: `<strong>正确：Call</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ KK必须打！</div>
+• KK太强不能fold<br>
+• 最后泡沫要争取淘汰短筹码<br>
+• Call 让盲注也能进<br>
+• 一次淘汰2人最好<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 为什么不Raise？</div>
+• Call诱导盲注进来<br>
+• 多人全押你最强<br>
+• 一次干掉2个 = 直接进钱圈<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 KK/AA策略：</div>
+最后泡沫+双短筹码 = 必须call！`
+            },
 
             // ===== 泡沫刚破后调整 (5题) =====
             {
@@ -621,6 +1352,122 @@
 
 <div style="color:#9b59b6; margin:15px 0">🎯 策略转变：</div>
 泡沫期：超紧 → 刚破：激进 → 稳定后：正常`
+            },
+            {
+                category: "泡沫刚破",
+                title: "扩大范围",
+                stacks: [
+                    { label: "你", value: "38BB" },
+                    { label: "平均", value: "33BB" }
+                ],
+                context: "刚进钱圈！泡沫刚破3手牌。",
+                question: "你在CO拿到9♠9♥。前面全弃。你应该？",
+                options: ["Fold - 还是保守点", "Open 2.2BB", "Open 2.5BB", "All-in"],
+                correctIndex: 1,
+                explanation: `<strong>正确：Open 2.2BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 99标准open！</div>
+• 泡沫刚破可以打宽<br>
+• 99是强牌<br>
+• 2.2BB标准sizing<br>
+• 对手刚松懈<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 泡沫刚破窗口期：</div>
+• 开池范围扩大10-15%<br>
+• 77+都可以open<br>
+• 3bet范围也扩大<br>
+• 持续5-10分钟<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 抓住时机：</div>
+对手心态：终于进钱圈了，轻松一下！`
+            },
+            {
+                category: "泡沫刚破",
+                title: "攻击弱玩家",
+                stacks: [
+                    { label: "你", value: "36BB" },
+                    { label: "Fish", value: "29BB" }
+                ],
+                context: "刚进钱圈！泡沫刚破。",
+                question: "MP Fish open 2.5BB（显然松了很多）。你在CO拿到A♦T♠。你应该？",
+                options: ["Fold", "Call", "3bet到7BB", "3bet到9BB"],
+                correctIndex: 2,
+                explanation: `<strong>正确：3bet到7BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 剥削Fish！</div>
+• Fish进钱圈后更loose<br>
+• ATo足够3bet<br>
+• 7BB sizing合适<br>
+• 他大概率fold或call<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 泡沫刚破+Fish：</div>
+• Fish最容易松懈<br>
+• "终于进钱圈，打几手牌"<br>
+• 开池范围暴增<br>
+• 疯狂攻击！<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 识别时机：</div>
+Fish刚进钱圈 = 黄金剥削时机！`
+            },
+            {
+                category: "泡沫刚破",
+                title: "筹码积累",
+                stacks: [
+                    { label: "你", value: "40BB" },
+                    { label: "对手", value: "37BB" }
+                ],
+                context: "刚进钱圈！泡沫刚破5手牌。",
+                question: "你BTN open 2.2BB拿K♥Q♠，BB(37BB)call。翻牌K♦8♣3♥。他check。你应该？",
+                options: ["Check", "C-bet 2BB", "C-bet 4BB", "C-bet 6BB"],
+                correctIndex: 2,
+                explanation: `<strong>正确：C-bet 4BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 中等c-bet打价值！</div>
+• 中顶对要打价值<br>
+• 4BB约50% pot<br>
+• 不怕被call<br>
+• 泡沫刚破可以打价值<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 vs泡沫期：</div>
+• 泡沫期：极小c-bet<br>
+• 刚破：正常打价值<br>
+• 对手不再过度紧<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 目标：</div>
+积累筹码，为深入比赛做准备！`
+            },
+            {
+                category: "泡沫刚破",
+                title: "保持警惕",
+                stacks: [
+                    { label: "你", value: "35BB" },
+                    { label: "大筹码", value: "68BB" },
+                    { label: "平均", value: "32BB" }
+                ],
+                context: "刚进钱圈！泡沫刚破10分钟。",
+                question: "大筹码MP open 2.2BB。你在CO拿到A♠J♥。你应该？",
+                options: ["Fold", "Call", "3bet到6BB", "3bet到8BB"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#ffd700; margin:15px 0">💡 窗口期结束！</div>
+• 10分钟后大家恢复正常<br>
+• 大筹码vs中筹码仍要小心<br>
+• AJo不够强<br>
+• 不要过度激进<br>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 策略调整：</div>
+• 刚破：0-5分钟 = 最激进<br>
+• 5-10分钟 = 适度激进<br>
+• 10分钟后 = 恢复正常<br>
+
+<div style="color:#e74c3c; margin:15px 0">⚠️ 记住：</div>
+• 泡沫刚破 ≠ 一直松<br>
+• 窗口期有限<br>
+• 要适时调整回来<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 长期策略：</div>
+进钱圈只是开始，要争前10名！`
             }
         ];
 

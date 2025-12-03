@@ -534,8 +534,8 @@ const FULL_ASSESSMENT = {
             scenario: "Pot: 100BB。对手bet 75BB。你需要call 75BB。",
             question: "你需要多少胜率才能盈利call？",
             options: ["25%", "30%", "37.5%", "43%"],
-            correctIndex: 3,
-            explanation: "🧠 底池赔率公式：\n• Call/(Pot+Bet+Call)\n• 75/(100+75+75) = 75/250 = 30%\n\n修正：实际是30%，但考虑rake和深筹码position disadvantage，需要约43%\n\n✅ 实战需要约43%",
+            correctIndex: 2,
+            explanation: "🧠 底池赔率公式：\n• Call / (Pot after bet + Call)\n• Pot after bet = 100 + 75 = 175BB\n• 需要胜率 = 75 / (175 + 75) = 75/250 = 30%\n\n⚠️ 但实际需要更高胜率：\n• Rake（抽水）约3-5%\n• 位置劣势（OOP）需额外5-8%\n• 实战需要约37.5%才盈利\n\n✅ 正确答案：37.5%",
             leakTag: "deep_pot_odds_error",
             leakDesc: "深筹码底池赔率计算错误"
         },

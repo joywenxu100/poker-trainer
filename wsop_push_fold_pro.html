@@ -159,6 +159,172 @@
 
 <div style="color:#ffd700; margin:15px 0">💡 筹码越少，范围越宽！</div>`
             },
+            {
+                position: "UTG",
+                stack: "8BB",
+                players: 9,
+                question: "UTG位8BB，你拿到5♠5♥。你应该？",
+                options: ["Fold", "All-in", "等位置", "Open小注"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div class="range-display">
+<div style="color:#2ecc71; font-weight:700">📊 UTG 8BB推挤范围：</div>
+<strong>22+, A5s+, A7o+, K9s+, KJo+, QJs</strong><br>
+约18%
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 所有对子都推！</div>
+• 8BB非常critical<br>
+• 55对抗call range优势<br>
+• 不能再等了<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 22+永远推！</div>`
+            },
+            {
+                position: "UTG",
+                stack: "12BB",
+                players: 9,
+                question: "UTG位12BB，你拿到A♦Q♣。你应该？",
+                options: ["Fold", "All-in", "Open 2.5BB", "Limp"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div class="range-display">
+<div style="color:#2ecc71; font-weight:700">📊 UTG 12BB推挤范围：</div>
+<strong>55+, A8s+, ATo+, KTs+, KQo</strong><br>
+约14%
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ AQo是顶级推挤牌！</div>
+• AQ在UTG很强<br>
+• 12BB正好推挤<br>
+• 对抗任何call range优势<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 AQ+永远推！</div>`
+            },
+            {
+                position: "UTG",
+                stack: "10BB",
+                players: 6,
+                question: "6人桌，UTG位10BB，你拿到K♥T♥。你应该？",
+                options: ["Fold", "All-in", "Open 2BB", "看后面"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 6人桌范围宽很多！</div>
+• 6人桌UTG≈9人桌MP<br>
+• KTs是强推挤牌<br>
+• Suited很重要<br>
+• 10BB必须行动<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 6人桌vs9人桌：</div>
+所有位置宽30-40%！`
+            },
+            {
+                position: "UTG",
+                stack: "15BB",
+                players: 9,
+                question: "UTG位15BB，你拿到9♠9♥。你应该？",
+                options: ["Fold", "All-in", "Open 2.5BB", "看翻牌"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 99强推挤牌！</div>
+• 99对抗任何range优势<br>
+• 15BB避免翻牌后<br>
+• UTG 99必推<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 77+ UTG永推！</div>`
+            },
+            {
+                position: "UTG",
+                stack: "8BB",
+                players: 9,
+                question: "UTG位8BB，你拿到K♦9♦。你应该？",
+                options: ["Fold", "All-in", "等位置", "看后面"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ K9s刚好够！</div>
+• 8BB critical stack<br>
+• K9s vs random不差<br>
+• Suited加分<br>
+• 必须行动<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 8BB范围：</div>
+K9s+, KJo+ 都可以推！`
+            },
+            {
+                position: "UTG",
+                stack: "12BB",
+                players: 9,
+                question: "UTG位12BB，你拿到K♣Q♠。你应该？",
+                options: ["Fold", "All-in", "Open 2.5BB", "看后面"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#e74c3c; margin:15px 0">❌ KQo不够！</div>
+• 12BB不是特别紧急<br>
+• KQo vs UTG call range偏弱<br>
+• 被AK/AQ dominate<br>
+• 等更好位置<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 UTG 12BB：</div>
+需要KQs，不是KQo！`
+            },
+            {
+                position: "UTG",
+                stack: "10BB",
+                players: 9,
+                question: "UTG位10BB，你拿到A♠5♦。你应该？",
+                options: ["Fold", "All-in", "等位置", "看后面"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#e74c3c; margin:15px 0">❌ A5o太弱！</div>
+• 虽然有A<br>
+• 但5 kicker太差<br>
+• UTG需要A7o+<br>
+• 容易被dominate<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 UTG Ace：</div>
+需要A7o+或A5s+！`
+            },
+            {
+                position: "UTG",
+                stack: "15BB",
+                players: 9,
+                question: "UTG位15BB，你拿到A♣J♥。你应该？",
+                options: ["Fold", "All-in", "Open 2.5BB", "看后面"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ AJo标准推挤！</div>
+• AJ在UTG足够强<br>
+• 15BB正好<br>
+• 对抗call range优势<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 UTG范围：</div>
+AJ+,88+,ATs+,KQs 都推！`
+            },
+            {
+                position: "UTG",
+                stack: "8BB",
+                players: 6,
+                question: "6人桌，UTG位8BB，你拿到Q♥J♦。你应该？",
+                options: ["Fold", "All-in", "Open 2BB", "看后面"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 6人桌QJo可推！</div>
+• 6人桌UTG更宽<br>
+• 8BB必须行动<br>
+• QJo vs random不差<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 6人桌特点：</div>
+可以推更多broadway！`
+            },
 
             // ===== MP推挤范围 (8题) =====
             {
@@ -182,6 +348,132 @@
 • 12BB正好推挤<br>
 
 <div style="color:#ffd700; margin:15px 0">💎 Suited连牌 = 推挤好牌！</div>`
+            },
+            {
+                position: "MP",
+                stack: "10BB",
+                players: 9,
+                question: "MP位10BB，前面全弃。你拿到A♦7♠。你应该？",
+                options: ["Fold", "All-in", "Open 2BB", "看后面"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div class="range-display">
+<div style="color:#2ecc71; font-weight:700">📊 MP 10BB推挤范围：</div>
+<strong>44+, A4s+, A7o+, K8s+, KTo+, QTs+, JTs</strong><br>
+约22%
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ A7o刚好够！</div>
+• MP位比UTG宽<br>
+• A7o足够<br>
+• 10BB必须行动<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 MP vs UTG：</div>
+宽约5-8%！`
+            },
+            {
+                position: "MP",
+                stack: "15BB",
+                players: 9,
+                question: "MP位15BB，前面全弃。你拿到7♣7♦。你应该？",
+                options: ["Fold", "All-in", "Open 2.5BB", "看翻牌"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 77标准推挤！</div>
+• 口袋对都推<br>
+• 77对random优势<br>
+• 15BB正好<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 MP范围：</div>
+22+都可以推！`
+            },
+            {
+                position: "MP",
+                stack: "12BB",
+                players: 9,
+                question: "MP位12BB，前面全弃。你拿到K♠J♥。你应该？",
+                options: ["Fold", "All-in", "Open 2BB", "看后面"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ KJo可以推！</div>
+• MP位足够宽<br>
+• KJo vs后面range优势<br>
+• 12BB标准<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 MP broadway：</div>
+KJo+, QJs 都可以！`
+            },
+            {
+                position: "MP",
+                stack: "8BB",
+                players: 9,
+                question: "MP位8BB，前面全弃。你拿到J♥9♥。你应该？",
+                options: ["Fold", "All-in", "Open 2BB", "看后面"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ J9s可推！</div>
+• 8BB critical<br>
+• J9s suited connector<br>
+• MP位可以<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 Suited connector：</div>
+J9s+, T9s 都可以推！`
+            },
+            {
+                position: "MP",
+                stack: "12BB",
+                players: 6,
+                question: "6人桌，MP位12BB，前面全弃。你拿到9♠9♥。你应该？",
+                options: ["Fold", "All-in", "Open 2.5BB", "看翻牌"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 99强推挤牌！</div>
+• 6人桌MP很宽<br>
+• 99对random巨大优势<br>
+• 12BB避免翻牌后<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 6人桌MP：</div>
+约25-28%范围！`
+            },
+            {
+                position: "MP",
+                stack: "10BB",
+                players: 9,
+                question: "MP位10BB，前面全弃。你拿到A♠3♦。你应该？",
+                options: ["Fold", "All-in", "等位置", "看后面"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#e74c3c; margin:15px 0">❌ A3o太弱！</div>
+• 虽然有A<br>
+• 但3 kicker太差<br>
+• MP需要A7o+<br>
+• 等更好位置<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 MP Ace范围：</div>
+A7o+或A4s+！`
+            },
+            {
+                position: "MP",
+                stack: "15BB",
+                players: 9,
+                question: "MP位15BB，前面全弃。你拿到A♦K♥。你应该？",
+                options: ["Fold", "All-in", "Open 2.5BB", "看翻牌"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ AK必推！</div>
+• AK是顶级牌<br>
+• 15BB正好全押<br>
+• 对抗任何range优势<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 Premium：</div>
+AK/QQ+ 永远推！`
             },
 
             // ===== CO推挤范围 (8题) =====
@@ -207,6 +499,125 @@
 
 <div style="color:#ffd700; margin:15px 0">💎 口袋对 = 推挤神器！</div>`
             },
+            {
+                position: "CO",
+                stack: "12BB",
+                players: 9,
+                question: "CO位12BB，前面全弃。你拿到A♥6♠。你应该？",
+                options: ["Fold", "All-in", "Open 2BB", "看后面"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ A6o可推！</div>
+• CO位很宽<br>
+• A6o足够<br>
+• 12BB标准<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 CO范围：</div>
+A2+, 22+都可以！`
+            },
+            {
+                position: "CO",
+                stack: "10BB",
+                players: 9,
+                question: "CO位10BB，前面全弃。你拿到Q♦9♦。你应该？",
+                options: ["Fold", "All-in", "Open 2BB", "看后面"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ Q9s很强！</div>
+• Suited connector<br>
+• CO位足够<br>
+• 10BB必推<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 CO suited：</div>
+Q8s+, J9s+, T8s+都可以！`
+            },
+            {
+                position: "CO",
+                stack: "15BB",
+                players: 9,
+                question: "CO位15BB，前面全弃。你拿到K♣7♠。你应该？",
+                options: ["Fold", "All-in", "Open 2BB", "看后面"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ K7o可推！</div>
+• CO约30%范围<br>
+• K7o足够<br>
+• 15BB标准<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 CO King：</div>
+K5o+, K2s+都可以！`
+            },
+            {
+                position: "CO",
+                stack: "12BB",
+                players: 6,
+                question: "6人桌，CO位12BB，前面全弃。你拿到T♥8♥。你应该？",
+                options: ["Fold", "All-in", "Open 2BB", "看后面"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ T8s可推！</div>
+• 6人桌CO非常宽<br>
+• T8s suited connector<br>
+• 12BB标准<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 6人桌CO：</div>
+约35-40%范围！`
+            },
+            {
+                position: "CO",
+                stack: "14BB",
+                players: 9,
+                question: "CO位14BB，前面全弃。你拿到3♣3♦。你应该？",
+                options: ["Fold", "All-in", "Open 2.5BB", "看翻牌"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 所有对子都推！</div>
+• CO位22+都可以<br>
+• 33对random优势<br>
+• 14BB标准<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 CO对子：</div>
+22+永远推！`
+            },
+            {
+                position: "CO",
+                stack: "10BB",
+                players: 9,
+                question: "CO位10BB，前面全弃。你拿到A♦K♣。你应该？",
+                options: ["Fold", "All-in", "Open 2.5BB", "看翻牌"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ AK顶级推挤牌！</div>
+• AK对random巨大优势<br>
+• 10BB避免翻牌后<br>
+• 必推<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 Premium：</div>
+AK/JJ+ 任何位置任何筹码都推！`
+            },
+            {
+                position: "CO",
+                stack: "12BB",
+                players: 9,
+                question: "CO位12BB，前面全弃。你拿到9♥7♥。你应该？",
+                options: ["Fold", "All-in", "Open 2BB", "看后面"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 97s可推！</div>
+• CO约30%范围<br>
+• 97s suited<br>
+• 12BB标准<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 CO suited connector：</div>
+76s+都可以推！`
+            },
 
             // ===== BTN推挤范围 (6题) =====
             {
@@ -230,6 +641,91 @@
 • K4o对random range不差<br>
 
 <div style="color:#ffd700; margin:15px 0">💎 按钮位 = 推挤天堂！</div>`
+            },
+            {
+                position: "BTN",
+                stack: "10BB",
+                players: 9,
+                question: "按钮位10BB，前面全弃。你拿到Q♥7♠。你应该？",
+                options: ["Fold", "All-in", "Open 2BB", "看盲注"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ Q7o可推！</div>
+• BTN约50%范围<br>
+• Q7o vs blind不差<br>
+• 10BB必推<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 BTN Queen：</div>
+Q2s+, Q5o+都可以！`
+            },
+            {
+                position: "BTN",
+                stack: "15BB",
+                players: 9,
+                question: "按钮位15BB，前面全弃。你拿到J♦7♦。你应该？",
+                options: ["Fold", "All-in", "Open 2BB", "看盲注"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ J7s很强！</div>
+• Suited加分<br>
+• BTN位可以很宽<br>
+• 15BB标准<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 BTN suited：</div>
+J5s+, T6s+, 95s+都可以！`
+            },
+            {
+                position: "BTN",
+                stack: "12BB",
+                players: 9,
+                question: "按钮位12BB，前面全弃。你拿到8♣6♣。你应该？",
+                options: ["Fold", "All-in", "Open 2BB", "看盲注"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 86s可推！</div>
+• BTN极宽<br>
+• 86s suited connector<br>
+• 12BB标准<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 BTN特点：</div>
+几乎所有suited都可以推！`
+            },
+            {
+                position: "BTN",
+                stack: "10BB",
+                players: 6,
+                question: "6人桌，按钮位10BB，前面全弃。你拿到K♠3♥。你应该？",
+                options: ["Fold", "All-in", "Open 2BB", "看盲注"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ K3o可推！</div>
+• 6人桌BTN超宽<br>
+• K3o足够<br>
+• 10BB必推<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 6人桌BTN：</div>
+约55-60%范围！`
+            },
+            {
+                position: "BTN",
+                stack: "13BB",
+                players: 9,
+                question: "按钮位13BB，前面全弃。你拿到2♠2♥。你应该？",
+                options: ["Fold", "All-in", "Open 2BB", "看盲注"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 所有对子都推！</div>
+• BTN位22+都可以<br>
+• 22 vs random有优势<br>
+• 13BB标准<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 BTN对子：</div>
+22+ 100%推！`
             },
 
             // ===== SB推挤范围 (4题) =====
@@ -255,6 +751,57 @@
 
 <div style="color:#ffd700; margin:15px 0">💎 SB vs BB = 推挤最宽！</div>`
             },
+            {
+                position: "SB",
+                stack: "10BB",
+                players: 9,
+                question: "小盲10BB，前面全弃。你拿到K♦5♠。你应该？",
+                options: ["Fold", "Complete", "All-in", "看大盲"],
+                correctIndex: 2,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ K5o可推！</div>
+• SB约55%范围<br>
+• K5o vs BB够强<br>
+• 10BB必推<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 SB King：</div>
+K2+都可以推！`
+            },
+            {
+                position: "SB",
+                stack: "15BB",
+                players: 9,
+                question: "小盲15BB，前面全弃。你拿到8♥6♥。你应该？",
+                options: ["Fold", "Complete", "All-in", "Open 3BB"],
+                correctIndex: 2,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 86s很强！</div>
+• Suited connector<br>
+• SB vs BB可以很宽<br>
+• 15BB标准<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 SB suited：</div>
+65s+, 75s+, 86s+都可以！`
+            },
+            {
+                position: "SB",
+                stack: "12BB",
+                players: 6,
+                question: "6人桌，小盲12BB，前面全弃。你拿到Q♦3♠。你应该？",
+                options: ["Fold", "Complete", "All-in", "看大盲"],
+                correctIndex: 2,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ Q3o可推！</div>
+• 6人桌SB超宽<br>
+• Q3o足够<br>
+• 12BB必推<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 6人桌SB：</div>
+约60-65%范围！`
+            },
 
             // ===== Call推挤范围 (4题) =====
             {
@@ -278,6 +825,75 @@
 • 11BB vs 30BB赔率合适<br>
 
 <div style="color:#ffd700; margin:15px 0">💎 筹码量影响call范围！</div>`
+            },
+            {
+                position: "BB Defense",
+                stack: "25BB",
+                players: 9,
+                question: "你在大盲25BB。BTN(12BB)全押。前面全弃，SB弃牌。你拿到K♠T♥。你应该？",
+                options: ["Fold", "Call", "看他范围", "考虑ICM"],
+                correctIndex: 1,
+                explanation: `<strong>正确：Call</strong>
+
+<div class="range-display">
+<div style="color:#2ecc71; font-weight:700">📊 BB call BTN推挤范围：</div>
+<strong>55+, A5o+, A2s+, K9o+, K5s+, QTo+, Q9s+, JTs</strong><br>
+约25%的牌
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ KTo刚好call！</div>
+• BTN推挤范围~45%<br>
+• KTo有优势<br>
+• 底池赔率好<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 vs BTN推挤：</div>
+Call范围比vs CO宽很多！`
+            },
+            {
+                position: "BB Defense",
+                stack: "35BB",
+                players: 9,
+                question: "你在大盲35BB。SB(10BB)全押。你拿到6♥6♣。你应该？",
+                options: ["Fold", "Call", "看他范围", "考虑ICM"],
+                correctIndex: 1,
+                explanation: `<strong>正确：Call</strong>
+
+<div class="range-display">
+<div style="color:#2ecc71; font-weight:700">📊 BB call SB推挤范围：</div>
+<strong>33+, A2o+, K5o+, K2s+, Q7o+, Q2s+, J8o+, J5s+, T8o+, T6s+, 97s+</strong><br>
+约35%的牌
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 66必call！</div>
+• SB推挤范围~55%<br>
+• 66对抗宽range巨大优势<br>
+• 底池赔率超好<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 vs SB推挤：</div>
+Call范围最宽！`
+            },
+            {
+                position: "BB Defense",
+                stack: "28BB",
+                players: 9,
+                question: "你在大盲28BB。MP(13BB)全押。前面全弃。你拿到Q♦J♠。你应该？",
+                options: ["Fold", "Call", "看他范围", "考虑ICM"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold</strong>
+
+<div class="range-display">
+<div style="color:#2ecc71; font-weight:700">📊 BB call MP推挤范围：</div>
+<strong>88+, ATo+, A8s+, KQo, KJs+</strong><br>
+约10%的牌
+</div>
+
+<div style="color:#e74c3c; margin:15px 0">❌ QJo不够！</div>
+• MP推挤范围~20%较紧<br>
+• QJo被很多牌dominate<br>
+• 不够call<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 vs MP推挤：</div>
+Call范围很紧！`
             }
         ];
 

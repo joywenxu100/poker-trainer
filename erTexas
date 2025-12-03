@@ -1,0 +1,37 @@
+warning: in the working copy of 'advanced_trainer.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'assessment.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'assessment_full.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'exploit_trainer.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'poker-helper/index.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'poker_checklist.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'poker_trainer.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'preflop_heatmap.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'preflop_heatmap_pro.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'preflop_ranges.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'preflop_ranges_straddle.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'straddle_exploit_master.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'straddle_exploit_trainer.html', LF will be replaced by CRLF the next time Git touches it
+ advanced_trainer.html         |  2 [32m+[m[31m-[m
+ assessment.html               |  2 [32m+[m[31m-[m
+ assessment_full.html          |  2 [32m+[m[31m-[m
+ exploit_trainer.html          |  2 [32m+[m[31m-[m
+ poker-helper/index.html       |  2 [32m+[m[31m-[m
+ poker_checklist.html          |  2 [32m+[m[31m-[m
+ poker_trainer.html            |  2 [32m+[m[31m-[m
+ preflop_heatmap.html          |  2 [32m+[m[31m-[m
+ preflop_heatmap_pro.html      |  2 [32m+[m[31m-[m
+ preflop_ranges.html           |  4 [32m++[m[31m--[m
+ preflop_ranges_straddle.html  |  2 [32m+[m[31m-[m
+ straddle_exploit_master.html  |  2 [32m+[m[31m-[m
+ straddle_exploit_trainer.html |  2 [32m+[m[31m-[m
+ wsop_assessment.html          |  2 [32m+[m[31m-[m
+ wsop_bubble_master.html       |  2 [32m+[m[31m-[m
+ wsop_final_table.html         |  2 [32m+[m[31m-[m
+ wsop_icm_calculator.html      |  2 [32m+[m[31m-[m
+ wsop_icm_trainer.html         |  2 [32m+[m[31m-[m
+ wsop_mental_game.html         |  2 [32m+[m[31m-[m
+ wsop_payout_analyzer.html     |  2 [32m+[m[31m-[m
+ wsop_push_fold.html           |  2 [32m+[m[31m-[m
+ wsop_stack_management.html    |  2 [32m+[m[31m-[m
+ wsop_tournament_hub.html      | 20 [32m++++++++++[m[31m----------[m
+ 23 files changed, 33 insertions(+), 33 deletions(-)

@@ -163,6 +163,219 @@
 <div style="color:#ffd700; margin:15px 0">💎 策略含义：</div>
 不要无谓地冒险去淘汰别人！`
             },
+            {
+                category: "ICM基础",
+                question: "为什么大筹码vs大筹码对抗，中筹码最获利？",
+                options: ["中筹码运气好", "筹码边际价值递减", "大筹码会犯错", "巧合"],
+                correctIndex: 1,
+                explanation: `<strong>正确：筹码边际价值递减</strong>
+
+<div class="icm-calc">
+<div style="color:#00d9ff; font-weight:700; margin-bottom:10px">📊 举例：</div>
+5人桌，奖金池$1M。你30BB，两个大筹码各50BB对抗<br>
+• 大筹码A赢了 → 100BB，ICM增加$80K<br>
+• 大筹码A输了 → 0BB，ICM损失$200K<br>
+• 你不参与 → 自动增加$50K！<br>
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 为什么你获利？</div>
+• 一个大筹码必定出局<br>
+• 你的名次自动提升<br>
+• 你什么都没做！<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 黄金法则：</div>
+让大筹码互相打，你坐着数钱！`
+            },
+            {
+                category: "ICM基础",
+                question: "什么是ICM税(ICM Tax)？",
+                options: ["政府收税", "网站抽水", "全押时需要更大优势才划算", "没这个概念"],
+                correctIndex: 2,
+                explanation: `<strong>正确：全押时需要更大优势才划算</strong>
+
+<div class="icm-calc">
+<div style="color:#00d9ff; font-weight:700; margin-bottom:10px">📊 ICM税计算：</div>
+现金局：55% vs 45% → +EV<br>
+锦标赛ICM：可能需要60% vs 40%才+EV<br>
+<strong>额外5%优势 = ICM税</strong>
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 为什么存在？</div>
+• 输了筹码的ICM损失大<br>
+• 赢得筹码的ICM收益小<br>
+• 风险/回报不对称<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 实战应用：</div>
+需要更强的牌才能全押！`
+            },
+            {
+                category: "ICM基础",
+                question: "决赛桌你40BB，其他人20-50BB。为什么不应该用AA去call短筹码(5BB)全押？",
+                options: ["AA会输", "ICM风险/回报不对称", "要trap", "应该call"],
+                correctIndex: 1,
+                explanation: `<strong>正确：ICM风险/回报不对称</strong>
+
+<div class="icm-calc">
+<div style="color:#00d9ff; font-weight:700; margin-bottom:10px">📊 ICM分析：</div>
+AA vs 随机牌 = 85% vs 15%<br>
+• 赢了：获得5BB，ICM增加约$10K<br>
+• 输了：损失5BB，ICM损失约$40K<br>
+<strong>风险$40K去赢$10K = 4:1不对称！</strong>
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 即使AA也要考虑：</div>
+• 其他人淘汰他对你更有利<br>
+• 你的ICM自动增加<br>
+• 15%输的可能性太贵<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 反直觉：</div>
+决赛桌AA vs短筹码 = Fold可能正确！`
+            },
+            {
+                category: "ICM基础",
+                question: "什么情况下ICM影响最小，可以接近chip EV打法？",
+                options: ["决赛桌", "泡沫期", "早期深筹码", "永远不能"],
+                correctIndex: 2,
+                explanation: `<strong>正确：早期深筹码</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ ICM影响小的情况：</div>
+• 距离钱圈很远<br>
+• 筹码很深(100BB+)<br>
+• 奖金跳跃小<br>
+• 人数多<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 为什么？</div>
+• 筹码边际价值递减不明显<br>
+• 一次全押不会改变太多<br>
+• 可以更接近chip EV<br>
+
+<div style="color:#e74c3c; margin:15px 0">⚠️ ICM影响大：</div>
+• 泡沫期<br>
+• 决赛桌<br>
+• Pay jump前<br>
+• 中短筹码<br>
+
+<div style="color:#00d9ff; margin:15px 0">📊 记住：</div>
+只有早期深筹码可以"打筹码"！`
+            },
+            {
+                category: "ICM基础",
+                question: "为什么同样筹码量，决赛桌的ICM价值远大于早期？",
+                options: ["人少", "接近奖金", "两者都是", "没区别"],
+                correctIndex: 2,
+                explanation: `<strong>正确：两者都是</strong>
+
+<div class="icm-calc">
+<div style="color:#00d9ff; font-weight:700; margin-bottom:10px">📊 对比：</div>
+早期200人，你40BB = 约$800<br>
+决赛桌5人，你40BB = 约$450K<br>
+<strong>同样40BB，价值相差560倍！</strong>
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 两个原因：</div>
+• 人少：你进前3概率大增<br>
+• 接近奖金：马上就能拿到钱<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 策略含义：</div>
+决赛桌每1BB都极其宝贵！`
+            },
+            {
+                category: "ICM基础",
+                question: "什么是FGS(Future Game Simulations)？",
+                options: ["未来游戏模拟", "ICM的精确计算方法", "考虑技术差异的ICM", "都对"],
+                correctIndex: 2,
+                explanation: `<strong>正确：考虑技术差异的ICM</strong>
+
+<div class="icm-calc">
+<div style="color:#00d9ff; font-weight:700; margin-bottom:10px">📊 ICM vs FGS：</div>
+• ICM：假设所有人技术相同<br>
+• FGS：考虑你比对手强<br>
+<br>
+<strong>如果你是高手，FGS > ICM</strong>
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 实战意义：</div>
+• 你是鱼 → 严格follow ICM<br>
+• 你是高手 → 可以稍微aggressive<br>
+• 未来能赢回来<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 关键：</div>
+技术优势 = 可以承担更多ICM风险！`
+            },
+            {
+                category: "ICM基础",
+                question: "为什么短筹码在决赛桌有"ICM保护"？",
+                options: ["大家同情他", "大筹码怕和他打", "他会全押", "ICM损失大于收益"],
+                correctIndex: 3,
+                explanation: `<strong>正确：ICM损失大于收益</strong>
+
+<div class="icm-calc">
+<div style="color:#00d9ff; font-weight:700; margin-bottom:10px">📊 举例：</div>
+5人桌，你50BB，短筹码8BB全押<br>
+• 你call赢了：+8BB，ICM增加$15K<br>
+• 你call输了：-8BB，ICM损失$45K<br>
+<strong>即使65% vs 35%也可能-EV！</strong>
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 为什么不call？</div>
+• 让别人去淘汰他<br>
+• 他出局你自动获利<br>
+• 风险/回报极度不对称<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 ICM保护：</div>
+短筹码反而最安全，因为没人敢call！`
+            },
+            {
+                category: "ICM基础",
+                question: "什么是"ICM自杀"(ICM Suicide)？",
+                options: ["故意输掉", "两个大筹码互相全押", "短筹码全押", "没这概念"],
+                correctIndex: 1,
+                explanation: `<strong>正确：两个大筹码互相全押</strong>
+
+<div class="icm-calc">
+<div style="color:#00d9ff; font-weight:700; margin-bottom:10px">📊 为什么是自杀？</div>
+5人桌，两个大筹码(各50BB)全押对抗<br>
+• 赢家：100BB，ICM增加$100K<br>
+• 输家：0BB，ICM损失$300K<br>
+• 其他3人：自动各增加$60-80K<br>
+<strong>最大的赢家 = 旁观者！</strong>
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 为什么是自杀？</div>
+• 即使赢了也没赚多少<br>
+• 输了直接出局<br>
+• 两个大筹码都亏ICM<br>
+• 只有旁观者赚<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 黄金法则：</div>
+决赛桌大筹码 = 绝不全押对抗！`
+            },
+            {
+                category: "ICM基础",
+                question: "为什么"ChipEV"在现金局正确，在锦标赛错误？",
+                options: ["现金局简单", "锦标赛有奖金结构", "心态不同", "运气成分"],
+                correctIndex: 1,
+                explanation: `<strong>正确：锦标赛有奖金结构</strong>
+
+<div class="icm-calc">
+<div style="color:#00d9ff; font-weight:700; margin-bottom:10px">📊 对比：</div>
+<strong>现金局：</strong><br>
+1BB = $1，永远不变<br>
+<br>
+<strong>锦标赛：</strong><br>
+1BB在早期 = $0.50<br>
+1BB在决赛桌 = $20,000<br>
+<strong>同样1BB，价值相差40,000倍！</strong>
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 关键区别：</div>
+• 现金局筹码=钱<br>
+• 锦标赛筹码≠钱<br>
+• 锦标赛筹码价值动态变化<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 记住：</div>
+锦标赛永远用ICM思考，不是ChipEV！`
+            },
 
             // ===== Pay Jump分析 (15题) =====
             {
@@ -212,6 +425,285 @@
 <div style="color:#ffd700; margin:15px 0">💎 黄金法则：</div>
 巨大pay jump = 即使AK也fold！`
             },
+            {
+                category: "Pay Jump",
+                question: "6人桌奖金：1st($800K) 2nd($500K) 3rd($350K) 4th($250K) 5th($180K) 6th($150K)。哪个jump最关键？",
+                options: ["6th→5th", "5th→4th", "4th→3rd", "3rd→2nd"],
+                correctIndex: 2,
+                explanation: `<strong>正确：4th→3rd</strong>
+
+<div class="icm-calc">
+<div style="color:#00d9ff; font-weight:700; margin-bottom:10px">📊 Jump计算：</div>
+• 6th→5th: +$30K (+20%)<br>
+• 5th→4th: +$70K (+39%)<br>
+• 4th→3rd: +$100K (+40%) ⭐<br>
+• 3rd→2nd: +$150K (+43%)<br>
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 为什么4→3最关键？</div>
+• 金额大且百分比高<br>
+• 进入前3意味深远<br>
+• 4人时ICM压力巨大<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 策略：</div>
+4人时最保守，进3后可激进！`
+            },
+            {
+                category: "Pay Jump",
+                question: "9人决赛桌，你38BB筹码第4。短筹码(8BB)全押，两个玩家call。你在CO拿到Q♠Q♥。你应该？",
+                options: ["Fold", "Call", "Raise隔离", "All-in"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#e74c3c; margin:15px 0">🚨 已经3人对抗！</div>
+
+<div class="icm-calc">
+<div style="color:#00d9ff; font-weight:700; margin-bottom:10px">📊 ICM分析：</div>
+• 短筹码大概率被淘汰<br>
+• 你进第3，ICM增加$80K<br>
+• 你参与风险损失$150K+<br>
+<strong>坐着等 > QQ参与</strong>
+</div>
+
+<div style="color:#ffd700; margin:15px 0">💎 黄金法则：</div>
+3人已经对抗 = 旁观最佳！`
+            },
+            {
+                category: "Pay Jump",
+                question: "决赛桌5人→4人jump $120K，4人→3人jump $180K。你32BB筹码第3。应该更紧还是更松？",
+                options: ["更紧-保护第3", "更松-争第1", "normal", "看对手"],
+                correctIndex: 0,
+                explanation: `<strong>正确：更紧-保护第3</strong>
+
+<div class="icm-calc">
+<div style="color:#00d9ff; font-weight:700; margin-bottom:10px">📊 分析：</div>
+• 当前第3名<br>
+• 下一个jump更大($180K)<br>
+• 保护第3 > 争第1<br>
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 策略：</div>
+• 等短筹码出局<br>
+• 保守保第3<br>
+• 进3人后再激进<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 记住：</div>
+下一个jump更大 = 保守！`
+            },
+            {
+                category: "Pay Jump",
+                question: "奖金从$100K到$1.5M。你40BB筹码第2。筹码第1(55BB)非常aggressive。你应该？",
+                options: ["跟他对抗", "避免对抗", "全押对决", "看牌"],
+                correctIndex: 1,
+                explanation: `<strong>正确：避免对抗</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 为什么避免？</div>
+• 你已经第2名<br>
+• 让他和其他人打<br>
+• 保护你的ICM<br>
+• 他aggressive = 会犯错<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 策略：</div>
+筹码领先aggressive = 让他自己毁<br>
+
+<div style="color:#00d9ff; margin:15px 0">📊 ICM原则：</div>
+领先时保守 > 冒险！`
+            },
+            {
+                category: "Pay Jump",
+                question: "3人桌奖金：1st($1.2M) 2nd($750K) 3rd($500K)。你45BB领先。短筹码(18BB)全押。你SB拿到J♠J♥。BB是40BB。你应该？",
+                options: ["Fold", "Call", "Raise隔离", "看BB"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#ffd700; margin:15px 0">💡 3人桌ICM关键！</div>
+
+<div class="icm-calc">
+<div style="color:#00d9ff; font-weight:700; margin-bottom:10px">📊 分析：</div>
+• 你领先45BB<br>
+• JJ vs 18BB全押 = 风险大<br>
+• BB可能call，你夹在中间<br>
+• 让BB去淘汰短筹码最优<br>
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 最佳结局：</div>
+BB淘汰短筹码 → 你直接进单挑！`
+            },
+            {
+                category: "Pay Jump",
+                question: "奖金池$5M，10人决赛桌。10th($150K) vs 9th($200K) vs 1st($1.5M)。哪个jump对你策略影响最大？",
+                options: ["10→9 ($50K)", "9→8 ($50K)", "前3名jump", "冠军"],
+                correctIndex: 0,
+                explanation: `<strong>正确：10→9 ($50K)</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 为什么10→9？</div>
+• 当前面临的jump<br>
+• 立即影响决策<br>
+• $50K对你现在最重要<br>
+• 后面的jump还远<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 ICM原则：</div>
+永远关注下一个jump，不是最终！`
+            },
+            {
+                category: "Pay Jump",
+                question: "为什么泡沫刚破后，大家会突然松懈？",
+                options: ["累了", "ICM压力瞬间释放", "开心", "饿了"],
+                correctIndex: 1,
+                explanation: `<strong>正确：ICM压力瞬间释放</strong>
+
+<div class="icm-calc">
+<div style="color:#00d9ff; font-weight:700; margin-bottom:10px">📊 心理变化：</div>
+泡沫前：$0 vs $5,000 = 巨大压力<br>
+刚破：保底$5,000 = 压力释放<br>
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 利用窗口期：</div>
+• 刚破后5-10分钟最松<br>
+• 疯狂积累筹码<br>
+• 对手会犯错<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 策略：</div>
+泡沫刚破 = 黄金时刻！`
+            },
+            {
+                category: "Pay Jump",
+                question: "你28BB，5人桌。奖金jump：5th($200K)→4th($300K)→3rd($450K)。短筹码10BB全押。你BTN拿到A♣Q♠。你应该？",
+                options: ["Fold-保第4", "Call-AQ很强", "看盲注", "Raise"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold-保第4</strong>
+
+<div class="icm-calc">
+<div style="color:#00d9ff; font-weight:700; margin-bottom:10px">📊 Jump分析：</div>
+• 5→4: +$100K (50%)<br>
+• 4→3: +$150K (50%)<br>
+<strong>两个jump都很大！</strong>
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 为什么fold？</div>
+• 等短筹码出局保底$300K<br>
+• AQ vs 10BB不值得冒险<br>
+• 风险$100K去赢$20K<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 决赛桌智慧：</div>
+巨大jump前 = 极度保守！`
+            },
+            {
+                category: "Pay Jump",
+                question: "9人桌→6人桌jump $80K，6人桌→5人桌jump $120K。你36BB筹码第6。策略？",
+                options: ["超紧保第6", "Normal", "Aggressive", "看对手"],
+                correctIndex: 0,
+                explanation: `<strong>正确：超紧保第6</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 为什么超紧？</div>
+• 当前第6名<br>
+• 下一个jump $120K更大<br>
+• 等9th/8th/7th出局<br>
+• 进6人再打<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 Pay jump策略：</div>
+• 下一jump更大 = 保守<br>
+• 已过大jump = 激进<br>
+• 动态调整！`
+            },
+            {
+                category: "Pay Jump",
+                question: "决赛桌你筹码第1(65BB)。2nd(50BB)和3rd(48BB)在对抗大底池。你应该？",
+                options: ["参与", "旁观", "攻击短筹码", "随意"],
+                correctIndex: 1,
+                explanation: `<strong>正确：旁观</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 最佳选择！</div>
+• 他们对抗你获利<br>
+• 一个必定受伤<br>
+• 你领先扩大<br>
+• 不要介入<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 领先者策略：</div>
+让对手互相打，你数钱！`
+            },
+            {
+                category: "Pay Jump",
+                question: "为什么最后1个泡沫时，所有人都极度紧张？",
+                options: ["累了", "ICM压力顶峰", "$0 vs 保底", "B和C都对"],
+                correctIndex: 3,
+                explanation: `<strong>正确：B和C都对</strong>
+
+<div class="icm-calc">
+<div style="color:#00d9ff; font-weight:700; margin-bottom:10px">📊 心理压力：</div>
+最后泡沫前：$0<br>
+进钱圈后：保底$5K-10K<br>
+<strong>0→$5K = 无限大的jump！</strong>
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ ICM压力顶峰：</div>
+• 最后1个人出局<br>
+• 所有人都不想是自己<br>
+• 压力达到最大值<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 利用：</div>
+大筹码疯狂偷盲最佳时机！`
+            },
+            {
+                category: "Pay Jump",
+                question: "3人桌，奖金：1st($1M) 2nd($600K) 3rd($400K)。你35BB筹码第2。2nd→1st jump大，你应该更aggressive？",
+                options: ["对-争冠军", "错-保第2", "看情况", "随意"],
+                correctIndex: 1,
+                explanation: `<strong>正确：错-保第2</strong>
+
+<div class="icm-calc">
+<div style="color:#00d9ff; font-weight:700; margin-bottom:10px">📊 分析：</div>
+• 你第2名，保底$600K<br>
+• 争第1风险淘汰变$400K<br>
+• 风险$200K去赢$400K<br>
+• 风险/回报：1:2不够好<br>
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 正确策略：</div>
+• 保护第2名<br>
+• 等短筹码出局<br>
+• 单挑再争<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 3人桌ICM：</div>
+保第2 > 争第1！`
+            },
+            {
+                category: "Pay Jump",
+                question: "决赛桌4人，你筹码第4(25BB)。前3名都45-50BB。他们互相对抗，你应该？",
+                options: ["参与", "旁观", "偷盲", "All-in"],
+                correctIndex: 1,
+                explanation: `<strong>正确：旁观</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 第4名的生存之道！</div>
+• 让前3互相打<br>
+• 他们对抗你获利<br>
+• 保护你的第4<br>
+• 不要冒险<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 短筹码ICM：</div>
+旁观 = 最佳策略！`
+            },
+            {
+                category: "Pay Jump",
+                question: "为什么奖金从1st($1M)→2nd($600K)→3rd($200K)时，3人打法比1st($500K)→2nd($450K)→3rd($400K)更激进？",
+                options: ["第一个奖金大", "第一个jump大，更紧", "第二个jump小，更松", "C对"],
+                correctIndex: 3,
+                explanation: `<strong>正确：第二个jump小，更松</strong>
+
+<div class="icm-calc">
+<div style="color:#00d9ff; font-weight:700; margin-bottom:10px">📊 对比：</div>
+<strong>第一个：</strong>2nd→3rd = -$400K (67%)<br>
+<strong>第二个：</strong>2nd→3rd = -$50K (11%)<br>
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 为什么第二个更松？</div>
+• Jump小，压力小<br>
+• 掉名次损失小<br>
+• 可以更aggressive争第1<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 原则：</div>
+Jump越大 = 越保守！`
+            },
 
             // ===== 边缘ICM决策 (20题) =====
             {
@@ -236,6 +728,312 @@
 
 <div style="color:#e74c3c; margin:15px 0">⚠️ 如果被4bet：</div>
 5人桌QQ vs 4bet要认真考虑fold！`
+            },
+            {
+                category: "边缘ICM",
+                question: "4人桌，你32BB筹码第3。短筹码15BB全押。你BTN拿到99。盲注是40BB和35BB。你应该？",
+                options: ["Fold", "Call", "Raise隔离", "看盲注"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 边缘决策！</div>
+• 99 vs 15BB全押理论+EV<br>
+• 但4人桌ICM压力大<br>
+• 后面还有2个盲注<br>
+• 让他们去淘汰<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 关键：</div>
+4人桌99也要fold短筹码！`
+            },
+            {
+                category: "边缘ICM",
+                question: "6人桌，你42BB。CO(45BB)open 2.2BB。你BTN拿到A♠K♦。你应该？",
+                options: ["Fold", "Call", "3bet到6BB", "3bet到8BB"],
+                correctIndex: 3,
+                explanation: `<strong>正确：3bet到8BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ AK必须aggressive！</div>
+• 6人桌AK很强<br>
+• 3bet for value<br>
+• 8BB sizing好<br>
+• ICM影响减弱<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 6人桌特点：</div>
+ICM压力比9人桌小很多！`
+            },
+            {
+                category: "边缘ICM",
+                question: "决赛桌5人，你28BB筹码第4。UTG(50BB)open 2.5BB。你MP拿到J♠J♥。你应该？",
+                options: ["Fold", "Call", "3bet到7BB", "All-in"],
+                correctIndex: 3,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 28BB JJ全押！</div>
+• JJ很强<br>
+• 28BB正好全押<br>
+• 避免翻牌后OOP<br>
+• UTG很难call<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 中筹码策略：</div>
+JJ+ <30BB = 全押！`
+            },
+            {
+                category: "边缘ICM",
+                question: "3人桌，你35BB筹码第2。BTN(42BB)raise 2BB。你SB拿到A♥Q♦。BB是28BB。你应该？",
+                options: ["Fold", "Call", "3bet到7BB", "All-in"],
+                correctIndex: 2,
+                explanation: `<strong>正确：3bet到7BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ AQ vs BTN强！</div>
+• BTN range很宽<br>
+• AQ有优势<br>
+• 3bet打价值<br>
+• 7BB sizing好<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 3人桌：</div>
+范围大幅扩宽！`
+            },
+            {
+                category: "边缘ICM",
+                question: "5人桌，你45BB筹码第2。两个短筹码(12BB和14BB)互相全押。你在CO拿到K♠K♥。后面还有2人。你应该？",
+                options: ["Fold让他们打", "Call", "Raise", "看后面"],
+                correctIndex: 1,
+                explanation: `<strong>正确：Call</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ KK太强了！</div>
+• 两个短筹码全押<br>
+• KK不能fold<br>
+• Call隔离<br>
+• 一次淘汰2人最好<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 KK/AA例外：</div>
+即使多人全押也可以call！`
+            },
+            {
+                category: "边缘ICM",
+                question: "4人桌，你38BB。MP(40BB)open 2.5BB。你CO拿到T♠T♥。你应该？",
+                options: ["Fold", "Call", "3bet到8BB", "All-in"],
+                correctIndex: 1,
+                explanation: `<strong>正确：Call</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ TT call看set！</div>
+• 4人桌TT decent<br>
+• Call保持灵活<br>
+• 3bet被4bet尴尬<br>
+• 中set价值大<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 边缘对子：</div>
+4人桌可以call mining！`
+            },
+            {
+                category: "边缘ICM",
+                question: "6人桌，你35BB筹码第3。CO(48BB)open 2.2BB。你BTN拿到8♠8♥。你应该？",
+                options: ["Fold", "Call", "3bet到6BB", "All-in"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#ffd700; margin:15px 0">💡 88边缘牌！</div>
+• 88对抗open偏弱<br>
+• ICM压力<br>
+• Call OOP难打<br>
+• 3bet被4bet糟糕<br>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 何时玩88？</div>
+• 更好位置<br>
+• 更短筹码全押<br>
+• 这个spot = Fold`
+            },
+            {
+                category: "边缘ICM",
+                question: "决赛桌7人，你40BB。UTG(55BB)open 2.5BB。你MP拿到A♣J♦。你应该？",
+                options: ["Fold", "Call", "3bet到7BB", "All-in"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ AJo要fold！</div>
+• 7人桌ICM压力大<br>
+• UTG range紧<br>
+• AJ被dominate<br>
+• MP位置不好<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 决赛桌：</div>
+7人以上要极紧！`
+            },
+            {
+                category: "边缘ICM",
+                question: "5人桌，你32BB。短筹码(16BB)CO全押。你BTN拿到A♥T♠。盲注是45BB和38BB。你应该？",
+                options: ["Fold", "Call", "Raise隔离", "看盲注"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#ffd700; margin:15px 0">💡 ATo边缘！</div>
+• 对抗16BB推挤略优<br>
+• 但5人桌ICM压力大<br>
+• 后面还有2个盲注<br>
+• 不值得冒险<br>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 记住：</div>
+边缘优势 + 高ICM = Fold！`
+            },
+            {
+                category: "边缘ICM",
+                question: "3人桌，你40BB筹码第2。SB(45BB)raise 3BB。你BB拿到9♠9♥。你应该？",
+                options: ["Fold", "Call", "3bet到9BB", "All-in"],
+                correctIndex: 2,
+                explanation: `<strong>正确：3bet到9BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 99 3bet！</div>
+• 3人桌99很强<br>
+• SB range宽<br>
+• 3bet for value<br>
+• 9BB sizing好<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 3人桌：</div>
+88+ = Premium hands！`
+            },
+            {
+                category: "边缘ICM",
+                question: "6人桌，你38BB。HJ(42BB)open 2.2BB。你CO拿到K♠Q♥。你应该？",
+                options: ["Fold", "Call", "3bet到6BB", "All-in"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#ffd700; margin:15px 0">💡 KQo边缘！</div>
+• KQ offsuit不够强<br>
+• HJ range decent<br>
+• ICM压力存在<br>
+• 不值得冒险<br>
+
+<div style="color:#2ecc71; margin:15px 0">✅ KQs vs KQo：</div>
+Suited可以考虑，offsuit fold！`
+            },
+            {
+                category: "边缘ICM",
+                question: "4人桌，你35BB筹码第2。UTG(42BB)open 2.5BB。你BTN拿到A♦Q♠。你应该？",
+                options: ["Fold", "Call", "3bet到8BB", "All-in"],
+                correctIndex: 2,
+                explanation: `<strong>正确：3bet到8BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ AQo 3bet！</div>
+• 4人桌AQ强<br>
+• 3bet for value<br>
+• 8BB sizing好<br>
+• ICM影响小<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 4人桌：</div>
+AQ+ = 顶级牌！`
+            },
+            {
+                category: "边缘ICM",
+                question: "5人桌，你40BB筹码第2。CO(38BB)open 2.2BB。你BTN拿到7♦7♣。你应该？",
+                options: ["Fold", "Call", "3bet到6BB", "All-in"],
+                correctIndex: 1,
+                explanation: `<strong>正确：Call</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 77 call看set！</div>
+• IP优势<br>
+• Call mining<br>
+• Miss了容易fold<br>
+• 中set赢大底池<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 小对子：</div>
+IP可以call，OOP fold！`
+            },
+            {
+                category: "边缘ICM",
+                question: "决赛桌8人，你42BB。MP(48BB)open 2.5BB。你CO拿到Q♠Q♥。你应该？",
+                options: ["Fold", "Call", "3bet到8BB", "All-in"],
+                correctIndex: 2,
+                explanation: `<strong>正确：3bet到8BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ QQ 3bet！</div>
+• QQ太强<br>
+• 3bet for value<br>
+• 8BB sizing好<br>
+• 不能只call<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 Premium：</div>
+QQ+ 永远要打价值！`
+            },
+            {
+                category: "边缘ICM",
+                question: "6人桌，你36BB。BTN(45BB)open 2.2BB。你SB拿到A♠T♦。BB是32BB。你应该？",
+                options: ["Fold", "Call", "3bet到7BB", "All-in"],
+                correctIndex: 2,
+                explanation: `<strong>正确：3bet到7BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ ATo vs BTN可以！</div>
+• BTN range很宽<br>
+• ATo有优势<br>
+• 3bet合理<br>
+• 7BB sizing好<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 6人桌：</div>
+vs BTN范围可以宽！`
+            },
+            {
+                category: "边缘ICM",
+                question: "5人桌，你32BB筹码第4。CO(48BB)open 2.2BB。你BTN拿到A♥9♥。你应该？",
+                options: ["Fold", "Call", "3bet到6BB", "All-in"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#ffd700; margin:15px 0">💡 A9s边缘！</div>
+• 虽然suited<br>
+• 但第4名ICM压力大<br>
+• CO range decent<br>
+• 保守为主<br>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 筹码排名影响：</div>
+短筹码要更保守！`
+            },
+            {
+                category: "边缘ICM",
+                question: "4人桌，你38BB。SB(40BB)raise 3BB。你BB拿到A♣J♠。你应该？",
+                options: ["Fold", "Call", "3bet到9BB", "All-in"],
+                correctIndex: 2,
+                explanation: `<strong>正确：3bet到9BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ AJs 3bet！</div>
+• 4人桌AJ强<br>
+• SB range很宽<br>
+• 3bet for value<br>
+• 9BB sizing好<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 4人桌特点：</div>
+范围极宽，aggressive打法！`
+            },
+            {
+                category: "边缘ICM",
+                question: "3人桌，你35BB筹码第3。BTN(48BB)raise 2BB。你SB拿到K♥J♥。BB是32BB。你应该？",
+                options: ["Fold", "Call", "3bet到7BB", "All-in"],
+                correctIndex: 2,
+                explanation: `<strong>正确：3bet到7BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ KJs 3bet！</div>
+• 3人桌KJs强<br>
+• BTN range极宽<br>
+• Suited很好<br>
+• 7BB sizing好<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 3人桌：</div>
+Suited broadway = 积极3bet！`
+            },
+            {
+                category: "边缘ICM",
+                question: "决赛桌7人，你38BB筹码第5。前面全弃到你在CO，拿到A♦K♣。你应该？",
+                options: ["Fold", "Open 2.2BB", "Open 2.5BB", "All-in"],
+                correctIndex: 1,
+                explanation: `<strong>正确：Open 2.2BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ AK standard open！</div>
+• AK太强必须打<br>
+• 2.2BB标准sizing<br>
+• 不要all-in吓跑<br>
+• 打价值<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 Premium策略：</div>
+AK/QQ+不要全押，要打价值！`
             },
 
             // ===== ICM vs cEV冲突 (15题) =====
@@ -268,6 +1066,252 @@
 cEV正确 ≠ ICM正确<br>
 现金局策略 ≠ 锦标赛策略`
             },
+            {
+                category: "ICM vs cEV",
+                question: "5人桌，你40BB。短筹码14BB全押。你拿到AKo。cEV=+$22K，ICM=+$5K。你应该？",
+                options: ["Follow cEV - call", "Follow ICM - 考虑fold", "Call肯定对", "随意"],
+                correctIndex: 2,
+                explanation: `<strong>正确：Call肯定对</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 两者都正+EV！</div>
+• cEV: +$22K<br>
+• ICM: +$5K<br>
+<strong>ICM仍然+EV，必须call！</strong>
+
+<div style="color:#ffd700; margin:15px 0">💎 关键：</div>
+只要ICM+EV就call，不管cEV多少！`
+            },
+            {
+                category: "ICM vs cEV",
+                question: "4人桌，你35BB。中筹码28BB全押。你拿到QQ。cEV=+$35K，ICM=-$12K。你应该？",
+                options: ["Follow cEV - call", "Follow ICM - fold", "看对手", "随意"],
+                correctIndex: 1,
+                explanation: `<strong>正确：Follow ICM - fold</strong>
+
+<div style="color:#e74c3c; margin:15px 0">🚨 ICM -EV！</div>
+
+<div class="icm-calc">
+<div style="color:#00d9ff; font-weight:700; margin-bottom:10px">📊 分析：</div>
+• 虽然cEV大赚<br>
+• 但ICM亏损$12K<br>
+• 锦标赛玩的是ICM<br>
+<strong>必须fold！</strong>
+</div>
+
+<div style="color:#ffd700; margin:15px 0">💎 记住：</div>
+ICM -EV = 必须fold，不管牌多强！`
+            },
+            {
+                category: "ICM vs cEV",
+                question: "决赛桌6人，你42BB。大筹码(58BB)open 2.2BB。你拿到JJ。cEV说3bet，ICM说call。你应该？",
+                options: ["Follow cEV - 3bet", "Follow ICM - call", "Fold", "All-in"],
+                correctIndex: 1,
+                explanation: `<strong>正确：Follow ICM - call</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 都不是fold！</div>
+• JJ太强不能fold<br>
+• cEV说aggressive<br>
+• ICM说保守<br>
+• 选择call平衡<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 原则：</div>
+两者都能玩 → 选更保守的ICM！`
+            },
+            {
+                category: "ICM vs cEV",
+                question: "3人桌，你38BB。对手45BB和32BB。你拿到A9o。cEV说可以open，ICM说要紧。你应该？",
+                options: ["Follow cEV - open", "Follow ICM - fold", "看位置", "随意"],
+                correctIndex: 2,
+                explanation: `<strong>正确：看位置</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 位置决定！</div>
+• BTN：Follow cEV - open<br>
+• UTG：Follow ICM - fold<br>
+• 3人桌位置极重要<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 原则：</div>
+ICM vs cEV冲突 → 位置是关键因素！`
+            },
+            {
+                category: "ICM vs cEV",
+                question: "5人桌，你30BB筹码第4。短筹码12BB全押。你拿到A8s。cEV=+$8K，ICM=-$3K。你应该？",
+                options: ["Call", "Fold", "Raise", "看后面"],
+                correctIndex: 1,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#e74c3c; margin:15px 0">🚨 ICM -EV！</div>
+• 虽然cEV+$8K<br>
+• 但ICM-$3K<br>
+• 你是第4名<br>
+• 保守最重要<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 短筹码原则：</div>
+筹码排名低 → 更严格follow ICM！`
+            },
+            {
+                category: "ICM vs cEV",
+                question: "为什么现金局高手在锦标赛表现一般？",
+                options: ["运气差", "只会chip EV思维", "心态问题", "B对"],
+                correctIndex: 3,
+                explanation: `<strong>正确：只会chip EV思维</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 核心问题！</div>
+• 现金局 = chip EV永远正确<br>
+• 锦标赛 = ICM思维<br>
+• 两者有巨大冲突<br>
+• 不转变思维 = 失败<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 成为冠军：</div>
+必须学会ICM思维！`
+            },
+            {
+                category: "ICM vs cEV",
+                question: "4人桌，你45BB筹码领先。中筹码30BB全押。你拿到AQs。cEV=+$28K，ICM=+$15K。你应该？",
+                options: ["Fold-差距大", "Call-都+EV", "看对手", "随意"],
+                correctIndex: 1,
+                explanation: `<strong>正确：Call-都+EV</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ ICM +$15K！</div>
+• cEV和ICM都+EV<br>
+• ICM赚得少但仍赚<br>
+• AQs很强<br>
+• 必须call<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 记住：</div>
+ICM>0 = Call，不管cEV多少！`
+            },
+            {
+                category: "ICM vs cEV",
+                question: "单挑，你48BB vs对手52BB。你拿到KTo。cEV说open，ICM也说open。有区别吗？",
+                options: ["没区别", "有-sizing不同", "有-频率不同", "完全一样"],
+                correctIndex: 0,
+                explanation: `<strong>正确：没区别</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 单挑特殊！</div>
+• 单挑ICM影响几乎为0<br>
+• ChipEV ≈ ICM<br>
+• 可以现金局打法<br>
+• 筹码=奖金线性<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 原则：</div>
+只有单挑可以忽略ICM！`
+            },
+            {
+                category: "ICM vs cEV",
+                question: "决赛桌7人，你40BB。短筹码10BB全押。你拿到99。cEV=+$18K，ICM=+$2K。你应该？",
+                options: ["Fold", "Call", "Raise", "看后面"],
+                correctIndex: 1,
+                explanation: `<strong>正确：Call</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ ICM仍+EV！</div>
+• cEV赚很多<br>
+• ICM赚很少<br>
+• 但仍然+$2K<br>
+• 99够强call<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 边缘：</div>
+ICM+$2K = 刚好够call！`
+            },
+            {
+                category: "ICM vs cEV",
+                question: "5人桌，你35BB。两个玩家全押对抗。你拿到KK。cEV=+$80K，ICM=+$40K。你应该？",
+                options: ["Fold", "Call两人", "等结果", "看情况"],
+                correctIndex: 1,
+                explanation: `<strong>正确：Call两人</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ KK太强！</div>
+• ICM仍+$40K<br>
+• KK不能fold<br>
+• 一次淘汰2人<br>
+• 巨大优势<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 KK/AA：</div>
+几乎任何情况都call！`
+            },
+            {
+                category: "ICM vs cEV",
+                question: "3人桌，你32BB筹码第3。大筹码50BB open。你拿到A7o。cEV=+$5K，ICM=-$2K。你应该？",
+                options: ["Call", "3bet", "Fold", "All-in"],
+                correctIndex: 2,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#e74c3c; margin:15px 0">🚨 ICM -EV！</div>
+• cEV略+EV<br>
+• ICM -EV<br>
+• 你是短筹码<br>
+• 保守第一<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 记住：</div>
+短筹码ICM -EV = 坚决fold！`
+            },
+            {
+                category: "ICM vs cEV",
+                question: "6人桌，你50BB筹码领先。中筹码32BB全押。你拿到AJs。cEV=+$30K，ICM=+$8K。你应该？",
+                options: ["Fold-差太多", "Call-都+EV", "看牌面", "随意"],
+                correctIndex: 1,
+                explanation: `<strong>正确：Call-都+EV</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ ICM +$8K！</div>
+• 虽然差距大<br>
+• 但ICM仍+$8K<br>
+• AJs很强<br>
+• 必须call<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 原则：</div>
+ICM>0 = 正确决策！`
+            },
+            {
+                category: "ICM vs cEV",
+                question: "决赛桌4人，你38BB。对手35BB/32BB/28BB。你拿到TT。cEV说可以开局，ICM说要等。你应该？",
+                options: ["Follow cEV", "Follow ICM", "看位置", "随意"],
+                correctIndex: 1,
+                explanation: `<strong>正确：Follow ICM</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 4人桌ICM顶峰！</div>
+• 4人桌ICM压力最大<br>
+• TT不够强aggressive<br>
+• 等短筹码出局<br>
+• 保守第一<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 4人桌：</div>
+严格follow ICM！`
+            },
+            {
+                category: "ICM vs cEV",
+                question: "什么时候cEV和ICM最接近？",
+                options: ["决赛桌", "泡沫期", "早期深筹码", "单挑"],
+                correctIndex: 3,
+                explanation: `<strong>正确：单挑</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 单挑特殊！</div>
+• 只有2人<br>
+• 筹码≈奖金线性<br>
+• ICM影响极小<br>
+• cEV ≈ ICM<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 记住：</div>
+• 早期：ICM小影响<br>
+• 决赛桌：ICM巨大影响<br>
+• 单挑：ICM几乎无影响`
+            },
+            {
+                category: "ICM vs cEV",
+                question: "5人桌，你40BB筹码第2。短筹码8BB全押。你拿到ATo。cEV=+$12K，ICM=-$1K。这是边缘决策吗？",
+                options: ["是-ICM接近0", "否-ICM负就fold", "看对手", "随意"],
+                correctIndex: 1,
+                explanation: `<strong>正确：否-ICM负就fold</strong>
+
+<div style="color:#e74c3c; margin:15px 0">🚨 ICM -$1K！</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 不是边缘！</div>
+• ICM负数 = 错误<br>
+• 不管多少<br>
+• -$1K也是亏<br>
+• 坚决fold<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 原则：</div>
+ICM<0 = 永远fold！`
+            },
 
             // ===== 大筹码ICM策略 (10题) =====
             {
@@ -295,6 +1339,166 @@ cEV正确 ≠ ICM正确<br>
 
 <div style="color:#e74c3c; margin:15px 0">⚠️ 避免：</div>
 和其他大筹码正面对抗！`
+            },
+            {
+                category: "大筹码ICM",
+                question: "你65BB筹码领先，6人桌。中筹码(28BB)BTN open 2.2BB。你SB拿到K♥9♥。BB是短筹码14BB。你应该？",
+                options: ["Fold", "Call", "3bet到6BB", "All-in"],
+                correctIndex: 2,
+                explanation: `<strong>正确：3bet到6BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 大筹码施压！</div>
+• K9s足够3bet<br>
+• BTN range宽<br>
+• 中筹码ICM压力大<br>
+• 小sizing给压力<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 大筹码策略：</div>
+疯狂3bet中筹码！`
+            },
+            {
+                category: "大筹码ICM",
+                question: "决赛桌5人，你55BB筹码领先。前面全弃到你在CO，拿到Q♦8♦。你应该？",
+                options: ["Fold", "Open 2BB", "Open 2.5BB", "Open 3BB"],
+                correctIndex: 1,
+                explanation: `<strong>正确：Open 2BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ Q8s可以open！</div>
+• 大筹码可以宽<br>
+• 2BB小sizing<br>
+• 给对手压力<br>
+• Suited有playability<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 大筹码原则：</div>
+小sizing高频率！`
+            },
+            {
+                category: "大筹码ICM",
+                question: "你60BB领先，4人桌。中筹码(30BB)open 2.5BB。你BTN拿到7♠7♥。你应该？",
+                options: ["Fold", "Call", "3bet到6BB", "All-in"],
+                correctIndex: 2,
+                explanation: `<strong>正确：3bet到6BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 77可以3bet施压！</div>
+• 大筹码优势<br>
+• 77对抗中筹码够强<br>
+• 3bet施压<br>
+• 他很难call<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 大筹码特权：</div>
+可以更宽3bet！`
+            },
+            {
+                category: "大筹码ICM",
+                question: "5人桌，你70BB筹码领先。短筹码(12BB)全押。你BTN拿到A♣8♥。盲注是30BB和35BB。你应该？",
+                options: ["Fold让别人去", "Call", "Raise隔离", "看盲注"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold让别人去</strong>
+
+<div style="color:#ffd700; margin:15px 0">💡 大筹码也要避险！</div>
+• A8o不够强<br>
+• 让中筹码去冒险<br>
+• 你坐着获利<br>
+• 保护领先<br>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 记住：</div>
+大筹码≠无脑call短筹码！`
+            },
+            {
+                category: "大筹码ICM",
+                question: "你68BB领先，6人桌。另一个大筹码(62BB)在CO open 2.2BB。你BTN拿到K♠K♥。你应该？",
+                options: ["Fold避免对抗", "Call", "3bet到6BB", "3bet到8BB"],
+                correctIndex: 3,
+                explanation: `<strong>正确：3bet到8BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ KK必须打！</div>
+• KK太强<br>
+• 即使大筹码对抗<br>
+• 3bet for value<br>
+• 8BB sizing好<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 例外：</div>
+KK/AA可以和大筹码对抗！`
+            },
+            {
+                category: "大筹码ICM",
+                question: "决赛桌7人，你55BB领先。中筹码(32BB)MP open 2.5BB。你CO拿到J♠T♠。你应该？",
+                options: ["Fold", "Call", "3bet到6BB", "All-in"],
+                correctIndex: 2,
+                explanation: `<strong>正确：3bet到6BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ JTs可以3bet！</div>
+• 大筹码优势<br>
+• JTs有价值<br>
+• 中筹码压力大<br>
+• 6BB小sizing<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 大筹码3bet范围：</div>
+比中筹码宽30-40%！`
+            },
+            {
+                category: "大筹码ICM",
+                question: "你72BB领先，5人桌。中筹码(28BB)和(32BB)在对抗大底池。你应该做什么？",
+                options: ["参与", "旁观", "偷盲", "All-in"],
+                correctIndex: 1,
+                explanation: `<strong>正确：旁观</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 旁观最优！</div>
+• 他们对抗你获利<br>
+• 一个必定受伤<br>
+• 你领先扩大<br>
+• 不要介入<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 大筹码智慧：</div>
+让对手互相消耗！`
+            },
+            {
+                category: "大筹码ICM",
+                question: "你60BB领先，4人桌。短筹码(18BB)全押。中筹码(35BB)在考虑。你BTN拿到Q♠Q♥。你应该？",
+                options: ["Fold等结果", "Call", "Raise隔离", "All-in"],
+                correctIndex: 2,
+                explanation: `<strong>正确：Raise隔离</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ QQ要隔离！</div>
+• QQ很强<br>
+• Raise赶走中筹码<br>
+• 单挑短筹码<br>
+• 淘汰他最好<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 大筹码特权：</div>
+Premium hands可以aggressive淘汰短筹码！`
+            },
+            {
+                category: "大筹码ICM",
+                question: "你65BB领先，6人桌。所有人都25-35BB。你应该采用什么策略？",
+                options: ["保守保领先", "疯狂aggressive", "Normal", "看对手"],
+                correctIndex: 1,
+                explanation: `<strong>正确：疯狂aggressive</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 最佳时机！</div>
+• 你大筹码<br>
+• 所有人中筹码<br>
+• 他们ICM压力巨大<br>
+• 你可以疯狂施压<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 大筹码黄金时刻：</div>
+vs 多个中筹码 = 疯狂攻击！`
+            },
+            {
+                category: "大筹码ICM",
+                question: "你58BB领先，5人桌。另一个大筹码(54BB)非常aggressive。你应该？",
+                options: ["和他对抗", "完全避免他", "看牌决定", "随意"],
+                correctIndex: 2,
+                explanation: `<strong>正确：看牌决定</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 灵活应对！</div>
+• Premium(QQ+/AK) = 对抗<br>
+• 边缘牌 = 避免<br>
+• 不要无脑避免<br>
+• 也不要无脑对抗<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 原则：</div>
+大筹码vs大筹码 = 看牌力！`
             },
 
             // ===== 短筹码ICM策略 (10题) =====
@@ -325,6 +1529,170 @@ cEV正确 ≠ ICM正确<br>
 
 <div style="color:#e74c3c; margin:15px 0">⚠️ 记住：</div>
 短筹码要主动，不要被动等死！`
+            },
+            {
+                category: "短筹码ICM",
+                question: "你12BB短筹码，6人桌。大筹码(60BB)BTN open 2BB。你SB拿到K♥9♦。BB是45BB。你应该？",
+                options: ["Fold", "Call", "3bet到6BB", "All-in 12BB"],
+                correctIndex: 3,
+                explanation: `<strong>正确：All-in 12BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 短筹码反击！</div>
+• K9o足够推挤<br>
+• vs BTN宽range优势<br>
+• 12BB正好全押<br>
+• 他不想call<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 短筹码原则：</div>
+12BB以下 = fold or 全押！`
+            },
+            {
+                category: "短筹码ICM",
+                question: "你8BB短筹码，5人桌。前面全弃到你在CO，拿到A♦5♣。你应该？",
+                options: ["Fold", "Open 2BB", "All-in 8BB", "Limp"],
+                correctIndex: 2,
+                explanation: `<strong>正确：All-in 8BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ A5o全押！</div>
+• 8BB必须行动<br>
+• A5o足够<br>
+• CO位置好<br>
+• 不要等死<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 8BB推挤范围：</div>
+CO约35-40%！`
+            },
+            {
+                category: "短筹码ICM",
+                question: "你14BB短筹码，4人桌。大筹码(55BB)open 2.2BB。你BTN拿到Q♠T♥。你应该？",
+                options: ["Fold", "Call", "3bet到5BB", "All-in 14BB"],
+                correctIndex: 3,
+                explanation: `<strong>正确：All-in 14BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ QTo推挤！</div>
+• 4人桌QTo够强<br>
+• 14BB正好全押<br>
+• vs大筹码range优势<br>
+• 他ICM压力大<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 4人桌短筹码：</div>
+推挤范围极宽！`
+            },
+            {
+                category: "短筹码ICM",
+                question: "你6BB短筹码，5人桌。两个大筹码(60BB和55BB)在对抗。你应该？",
+                options: ["参与", "等机会", "偷盲", "All-in"],
+                correctIndex: 1,
+                explanation: `<strong>正确：等机会</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 等他们打完！</div>
+• 大筹码对抗对你有利<br>
+• 一个必定受伤<br>
+• 你的名次自动升<br>
+• 耐心等待<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 短筹码ICM：</div>
+旁观大筹码对抗最有利！`
+            },
+            {
+                category: "短筹码ICM",
+                question: "你10BB短筹码，6人桌。中筹码(28BB)open 2.5BB。你CO拿到6♠6♥。你应该？",
+                options: ["Fold", "Call", "3bet到6BB", "All-in 10BB"],
+                correctIndex: 3,
+                explanation: `<strong>正确：All-in 10BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 66全押！</div>
+• 66是口袋对<br>
+• 10BB正好推挤<br>
+• vs open range优势<br>
+• 不能call<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 短筹码：</div>
+所有对子都可以全押！`
+            },
+            {
+                category: "短筹码ICM",
+                question: "你15BB短筹码，决赛桌7人。前面全弃到你在BTN，拿到K♣7♠。你应该？",
+                options: ["Fold", "Open 2.5BB", "All-in 15BB", "Limp"],
+                correctIndex: 2,
+                explanation: `<strong>正确：All-in 15BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ K7o推挤！</div>
+• 15BB属于推挤区<br>
+• BTN位置最好<br>
+• K7o足够<br>
+• 盲注有压力<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 15BB BTN：</div>
+推挤范围50-60%！`
+            },
+            {
+                category: "短筹码ICM",
+                question: "你9BB短筹码，5人桌。大筹码(58BB)BTN全押。你SB拿到A♥J♥。BB是短筹码11BB。你应该？",
+                options: ["Fold", "Call 9BB", "看BB", "考虑fold equity"],
+                correctIndex: 1,
+                explanation: `<strong>正确：Call 9BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ AJs必须call！</div>
+• AJs vs BTN推挤优势<br>
+• 9BB all-in了<br>
+• BTN range极宽<br>
+• 你有equity<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 短筹码call范围：</div>
+• AJ+ → Call<br>
+• 99+ → Call<br>
+• 其他 → Fold`
+            },
+            {
+                category: "短筹码ICM",
+                question: "你13BB短筹码，4人桌。你在SB。CO(45BB)open 2.2BB。BTN弃牌。BB是30BB。你拿到9♦8♦。你应该？",
+                options: ["Fold", "Call", "3bet到6BB", "All-in 13BB"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#ffd700; margin:15px 0">💡 98s不够！</div>
+• 虽然suited<br>
+• 但不够强推挤<br>
+• BB还在后面<br>
+• 保留筹码<br>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 13BB推挤范围：</div>
+• A8+, KT+, QJ<br>
+• 所有对子<br>
+• 98s = Fold`
+            },
+            {
+                category: "短筹码ICM",
+                question: "你11BB短筹码，6人桌。中筹码(32BB)CO open 2.2BB。你BTN拿到A♦3♥。你应该？",
+                options: ["Fold", "Call", "3bet到6BB", "All-in 11BB"],
+                correctIndex: 3,
+                explanation: `<strong>正确：All-in 11BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ A3o推挤！</div>
+• 11BB推挤区<br>
+• A3o vs CO够强<br>
+• BTN位置好<br>
+• 中筹码有压力<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 短筹码BTN：</div>
+所有Ax都可以全押！`
+            },
+            {
+                category: "短筹码ICM",
+                question: "你7BB短筹码，5人桌。你在BB。三个玩家全弃到SB(50BB)，他all-in 7BB。你拿到K♦6♠。你应该？",
+                options: ["Fold", "Call 6BB", "看筹码", "考虑ICM"],
+                correctIndex: 1,
+                explanation: `<strong>正确：Call 6BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ K6o call！</div>
+• SB推挤range极宽(70%+)<br>
+• K6o有35-40%胜率<br>
+• 只需call 6BB<br>
+• 底池odd好<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 BB call范围：</div>
+vs SB推挤 → 30-35%！`
             }
         ];
 

@@ -212,7 +212,7 @@ const ASSESSMENT_QUESTIONS = [
             { text: "50%" }
         ],
         correctIndex: 0,
-        explanation: "🧠 底池赔率计算：\n\n• Call 50BB 来赢 200BB (100+50+50)\n• 所需胜率 = 50 / 200 = 25%\n\n💡 公式：Call / (Pot + Bet + Call)\n\n✅ 正确：25%",
+        explanation: "🧠 底池赔率计算：\n\n• Pot after bet = 100 + 50 = 150BB\n• Call 50BB 来赢 150BB\n• 所需胜率 = 50 / (150 + 50) = 50/200 = 25%\n\n💡 正确公式：Call / (Pot after bet + Call)\n\n✅ 正确：25%",
         leakIfWrong: {
             1: { tag: "pot_odds_error", desc: "底池赔率计算错误", weight: 4 },
             2: { tag: "pot_odds_error", desc: "底池赔率计算错误", weight: 4 },
