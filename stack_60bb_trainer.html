@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ 60BB训练模块 - TAG短筹码策略</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0612;
+            --bg-card: #150d1f;
+            --gold: #ffd700;
+            --green: #2ecc71;
+            --red: #e74c3c;
+            --orange: #ff8c00;
+            --purple: #9b59b6;
+            --text: #f0f0f0;
+            --text-dim: #8a8a9a;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark), #1a0f2e);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(155, 89, 182, 0.2);
+            border: 1px solid rgba(155, 89, 182, 0.5);
+            color: var(--purple);
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        header {
+            text-align: center;
+            margin: 60px 0 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--purple), var(--orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .depth-indicator {
+            display: inline-block;
+            background: rgba(155, 89, 182, 0.2);
+            color: var(--purple);
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: 2px solid var(--purple);
+            margin-bottom: 20px;
+        }
+
+        .strategy-card {
+            background: linear-gradient(135deg, var(--bg-card), #1e1430);
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 30px;
+            border: 2px solid rgba(155, 89, 182, 0.3);
+        }
+
+        .strategy-card h2 {
+            color: var(--purple);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .stat-box {
+            background: rgba(155, 89, 182, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(155, 89, 182, 0.2);
+            text-align: center;
+        }
+
+        .stat-value {
+            color: var(--purple);
+            font-size: 2rem;
+            font-weight: 900;
+            margin: 8px 0;
+        }
+
+        .stat-change {
+            color: var(--red);
+            font-size: 0.85rem;
+        }
+
+        .adjustment-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .adjustment-list li {
+            padding: 15px 20px;
+            background: rgba(155, 89, 182, 0.1);
+            border-left: 4px solid var(--purple);
+            margin-bottom: 12px;
+            border-radius: 8px;
+            line-height: 1.7;
+        }
+
+        .push-fold-zone {
+            background: rgba(231, 76, 60, 0.15);
+            border: 2px solid var(--red);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+        }
+
+        .push-fold-zone h3 {
+            color: var(--red);
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(155, 89, 182, 0.1);
+        }
+
+        .comparison-table th {
+            background: rgba(155, 89, 182, 0.1);
+            color: var(--purple);
+            font-weight: 700;
+        }
+
+        .example-card {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 1px solid rgba(155, 89, 182, 0.2);
+        }
+
+        .action-step {
+            background: rgba(52, 152, 219, 0.1);
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin: 8px 0;
+            border-left: 3px solid #3498db;
+        }
+
+        .warning-box {
+            background: rgba(231, 76, 60, 0.15);
+            border: 2px solid var(--red);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+        }
+
+        .advice-box {
+            background: rgba(50, 205, 50, 0.1);
+            border-left: 4px solid var(--green);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .icm-alert {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 140, 0, 0.1));
+            border: 2px solid var(--gold);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+        }
+
+        .icm-alert h3 {
+            color: var(--gold);
+            margin-bottom: 15px;
+        }
+
+        .quiz-btn {
+            background: linear-gradient(135deg, var(--purple), var(--orange));
+            color: #fff;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quiz-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(155, 89, 182, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <a href="unified_training_hub.html" class="back-btn">← 返回训练中心</a>
+
+    <div class="container">
+        <header>
+            <h1>⚡ 60BB训练模块</h1>
+            <div class="depth-indicator">STANDARD Stack (60-100BB) · TAG</div>
+            <p style="color: var(--text-dim); font-size: 1.1rem; margin-top: 15px;">
+                标准锦标赛筹码深度 · 固执打法 · 开始考虑ICM
+            </p>
+        </header>
+
+        <!-- 核心策略 -->
+        <div class="strategy-card">
+            <h2>🎯 核心策略：Tight TAG</h2>
+            <p style="color: var(--text-dim); line-height: 1.8; margin-bottom: 20px;">
+                60BB是锦标赛最常见的筹码深度。这是<strong style="color: var(--purple);">solid, straightforward TAG打法</strong>的最佳深度。<br>
+                <strong style="color: var(--gold);">关键：避免边缘spots，position critical，开始考虑ICM。</strong>
+            </p>
+
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label" style="color: var(--text-dim); font-size: 0.9rem;">VPIP范围</div>
+                    <div class="stat-value">20-26%</div>
+                    <div class="stat-change">↓ 从100BB的24-30%</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label" style="color: var(--text-dim); font-size: 0.9rem;">PFR范围</div>
+                    <div class="stat-value">17-23%</div>
+                    <div class="stat-change">↓ 从100BB的20-26%</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label" style="color: var(--text-dim); font-size: 0.9rem;">3-Bet频率</div>
+                    <div class="stat-value">8-12%</div>
+                    <div class="stat-change">↓ 从100BB的10-14%</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label" style="color: var(--text-dim); font-size: 0.9rem;">Cbet频率</div>
+                    <div class="stat-value">55-65%</div>
+                    <div class="stat-change">↓ 从100BB的60-68%</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label" style="color: var(--text-dim); font-size: 0.9rem;">SPR目标</div>
+                    <div class="stat-value">3-7</div>
+                    <div class="stat-change">⚠️ 经常committed</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label" style="color: var(--text-dim); font-size: 0.9rem;">风险容忍度</div>
+                    <div class="stat-value">中低</div>
+                    <div class="stat-change">避免高variance</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ICM警告 -->
+        <div class="icm-alert">
+            <h3>🎯 重要：60BB开始考虑ICM压力</h3>
+            <p style="line-height: 1.8; margin-bottom: 15px;">
+                如果你在锦标赛中，60BB是ICM开始影响决策的深度。<br>
+                特别是在以下情况：
+            </p>
+            <ul style="line-height: 2; margin-left: 20px;">
+                <li><strong style="color: var(--gold);">泡沫期接近</strong> → ICM压力高，更保守</li>
+                <li><strong style="color: var(--gold);">钱圈边缘</strong> → Survival > Chip accumulation</li>
+                <li><strong style="color: var(--gold);">Final table bubble</strong> → 极度保守</li>
+                <li><strong style="color: var(--gold);">vs短筹码all-in</strong> → Call range收紧（ICM tax）</li>
+            </ul>
+            <p style="margin-top: 15px; padding: 15px; background: rgba(255,69,0,0.1); border-radius: 8px;">
+                <strong style="color: var(--red);">关键调整：</strong>如果ICM压力高（>0.6），所有范围收紧额外10-15%！
+            </p>
+        </div>
+
+        <!-- 8大关键调整 -->
+        <div class="strategy-card">
+            <h2>🔧 从100BB的8大关键调整</h2>
+            <ul class="adjustment-list">
+                <li>
+                    <strong>1. Open范围收紧到TAG标准</strong><br>
+                    UTG: 10-11%, MP: 13-15%, CO: 25-28%, BTN: 35-40%。<br>
+                    移除所有投机牌（suited connectors under 87s, low suited Aces under A5s）。<br>
+                    <span style="color: var(--purple);">原因：60BB隐含赔率低，只玩solid hands。</span>
+                </li>
+                <li>
+                    <strong>2. 3-Bet几乎全部价值</strong><br>
+                    3-Bet主要JJ+, AQ+。诈唬极rare，只用premium blockers（AKo, A5s）。<br>
+                    <span style="color: var(--purple);">原因：60BB的3-Bet pot (15BB, SPR=3)，经常直接all-in。</span>
+                </li>
+                <li>
+                    <strong>3. 面对3-Bet：4-Bet or Fold</strong><br>
+                    不要call 3-Bet unless you have QQ+/AK。99-JJ 要么4-Bet要么fold。<br>
+                    <span style="color: var(--purple);">原因：60BB call 3-Bet很容易stack off on flop。</span>
+                </li>
+                <li>
+                    <strong>4. Cbet更selective</strong><br>
+                    只Cbet你有equity或clear story的flops。不要auto-Cbet every flop。<br>
+                    <span style="color: var(--purple);">原因：60BB时对手更容易defend或check-raise。</span>
+                </li>
+                <li>
+                    <strong>5. 停止所有Fancy Plays</strong><br>
+                    No float, no delayed Cbet, no fancy check-raises, no river overbets bluffs。<br>
+                    <span style="color: var(--purple);">原因：60BB时straightforward打法最profitable。</span>
+                </li>
+                <li>
+                    <strong>6. Position极度重要</strong><br>
+                    OOP时极度谨慎。避免OOP call raises。只用premium hands OOP打大底池。<br>
+                    <span style="color: var(--purple);">原因：60BB时position disadvantage致命。</span>
+                </li>
+                <li>
+                    <strong>7. Committed Point Awareness</strong><br>
+                    60BB时，一旦底池>20BB且你投入>10BB，你基本committed。不要在不想all-in的情况下build pot。<br>
+                    <span style="color: var(--purple);">原因：SPR低，容易被迫all-in。</span>
+                </li>
+                <li>
+                    <strong>8. ICM优先（如果适用）</strong><br>
+                    泡沫期或钱圈边缘，ICM > chip EV。避免与其他medium stacks battle，target短筹码。<br>
+                    <span style="color: var(--purple);">原因：60BB时survival价值高。</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Push/Fold Zone Warning -->
+        <div class="push-fold-zone">
+            <h3>⚠️ 接近Push/Fold Zone</h3>
+            <p style="line-height: 1.8; margin-bottom: 20px;">
+                60BB距离Push/Fold zone (40BB)只有一次double up失败的距离！<br>
+                <strong style="color: var(--red);">如果你输掉一个60BB的all-in，你就变成短筹码。</strong>
+            </p>
+            <div style="background: rgba(255,69,0,0.2); padding: 20px; border-radius: 10px;">
+                <strong style="color: var(--red); font-size: 1.1rem;">关键心态：</strong>
+                <ul style="line-height: 2; margin: 15px 0 0 20px;">
+                    <li>不要轻易all-in with marginal hands</li>
+                    <li>避免race without clear edge</li>
+                    <li>TT-以下不要轻易commit</li>
+                    <li>AQ/AJ facing pressure考虑fold</li>
+                    <li>保护你的60BB，等待premium spots</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 100BB vs 60BB对比 -->
+        <div class="strategy-card">
+            <h2>📊 100BB vs 60BB 对比</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>场景</th>
+                        <th>100BB做法</th>
+                        <th>60BB调整</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>UTG Open</strong></td>
+                        <td>12% (77+, ATs+, AJo+)</td>
+                        <td>10% (99+, AJs+, AQo+)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CO Open</strong></td>
+                        <td>30%</td>
+                        <td>25% (移除所有SC, 低suited Aces)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>BTN vs BB 3-Bet</strong></td>
+                        <td>3-Bet 12%</td>
+                        <td>3-Bet 9% (几乎全价值)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>面对3-Bet with TT</strong></td>
+                        <td>Mix (Call/4-Bet/Fold)</td>
+                        <td>4-Bet 70% or Fold 30%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>面对3-Bet with 99</strong></td>
+                        <td>Mix</td>
+                        <td>Fold 80%, 4-Bet 20% IP only</td>
+                    </tr>
+                    <tr>
+                        <td><strong>面对3-Bet with AJo</strong></td>
+                        <td>Fold 90%</td>
+                        <td>Fold 100%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Flop Cbet</strong></td>
+                        <td>60% overall</td>
+                        <td>50% overall (更selective)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Float Plays</strong></td>
+                        <td>Almost Never</td>
+                        <td>Never</td>
+                    </tr>
+                    <tr>
+                        <td><strong>vs Aggression</strong></td>
+                        <td>Fold边缘spots</td>
+                        <td>Fold almost all marginal spots</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ICM考虑</strong></td>
+                        <td>开始考虑</td>
+                        <td>重要因素（if bubble/ITM）</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 实战例子 -->
+        <div class="example-card">
+            <h3>💡 例子1：你有JJ，面对UTG 3-Bet</h3>
+            <div class="action-step">
+                <strong>场景：</strong>你CO open JJ，UTG 3-Bet到9BB。你60BB深度。
+            </div>
+            <div class="action-step" style="background: rgba(231, 76, 60, 0.1); border-color: var(--red);">
+                <strong>❌ 100BB做法：</strong>Mix（Call 30%, 4-Bet 30%, Fold 40%）
+            </div>
+            <div class="action-step" style="background: rgba(50, 205, 50, 0.1); border-color: var(--green);">
+                <strong>✅ 60BB正确做法：</strong>4-Bet to 22-24BB（打算all-in if he shoves）。<br>
+                <strong>原因：</strong>
+                <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
+                    <li>60BB时call 3-Bet with JJ很难postflop play</li>
+                    <li>Flop任何overcard都很难处理</li>
+                    <li>4-Bet size刚好让你committed</li>
+                    <li>JJ vs UTG 3-Bet range有足够equity</li>
+                    <li>如果他fold，你win 14BB（huge）</li>
+                </ul>
+                <strong>结论：</strong>60BB时，JJ 4-Bet for value是最佳选择。
+            </div>
+        </div>
+
+        <div class="example-card">
+            <h3>💡 例子2：泡沫期，你有88，按钮位</h3>
+            <div class="action-step">
+                <strong>场景：</strong>锦标赛泡沫期，你BTN 60BB，88。Fold to you。SB有40BB，BB有55BB。
+            </div>
+            <div class="action-step" style="background: rgba(50, 205, 50, 0.1); border-color: var(--green);">
+                <strong>✅ 60BB ICM决策：</strong>
+                <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
+                    <li><strong>如果ICM低：</strong>Open 2.5BB（标准play）</li>
+                    <li><strong>如果ICM高（泡沫期）：</strong>考虑fold或min-raise。<br>
+                    原因：SB有40BB（可能shove），你call会risk 40BB。<br>
+                    输了你变成20BB short stack，ICM损失巨大。</li>
+                </ul>
+                <strong>结论：</strong>60BB + 高ICM = 即使88在BTN也要谨慎。Survival > chip。
+            </div>
+        </div>
+
+        <div class="example-card">
+            <h3>💡 例子3：你有AQo，MP open，你CO</h3>
+            <div class="action-step">
+                <strong>场景：</strong>MP open 2.5BB，你CO有AQo，60BB深度。
+            </div>
+            <div class="action-step" style="background: rgba(231, 76, 60, 0.1); border-color: var(--red);">
+                <strong>❌ 100BB做法：</strong>3-Bet 50%, Call 50%
+            </div>
+            <div class="action-step" style="background: rgba(50, 205, 50, 0.1); border-color: var(--green);">
+                <strong>✅ 60BB正确做法：</strong>3-Bet 80%, Call 0%, Fold 20%（if ICM高）。<br>
+                <strong>原因：</strong>
+                <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
+                    <li>60BB时不要call 3-Bet with AQo OOP</li>
+                    <li>3-Bet for value是best option</li>
+                    <li>如果他4-Bet，你可以fold（损失8BB）</li>
+                    <li>如果他fold，你win 4.5BB</li>
+                    <li>如果他call，你IP with strong hand</li>
+                </ul>
+                <strong>结论：</strong>60BB时，AQo 3-Bet for value，不要call。
+            </div>
+        </div>
+
+        <!-- 致命错误 -->
+        <div class="warning-box">
+            <h3 style="color: var(--red); font-size: 1.5rem;">🚨 60BB致命错误</h3>
+            <ol style="line-height: 2.2; margin-left: 20px;">
+                <li><strong>Call 3-Bet with marginal hands</strong> → 60BB时几乎never call 3-Bet with 99-, AJ-。</li>
+                <li><strong>Open投机牌</strong> → 停止open suited connectors, low suited Aces。</li>
+                <li><strong>Fancy plays</strong> → 60BB时fancy play = 送钱。Straightforward wins。</li>
+                <li><strong>轻易all-in without premium</strong> → TT-以下不要轻易all-in。</li>
+                <li><strong>OOP打大底池</strong> → 60BB时OOP极度disadvantage。</li>
+                <li><strong>忽略ICM</strong> → 泡沫期/钱圈边缘必须考虑ICM。</li>
+                <li><strong>vs短筹码all-in call太宽</strong> → ICM tax，call range收紧。</li>
+            </ol>
+        </div>
+
+        <!-- 成功关键 -->
+        <div class="advice-box">
+            <h3 style="color: var(--green); font-size: 1.4rem;">✅ 60BB成功关键</h3>
+            <ol style="line-height: 2; margin-left: 20px;">
+                <li>🎯 <strong>Tight TAG</strong>：只玩solid hands，避免边缘spots。</li>
+                <li>🛡️ <strong>Protect Your Stack</strong>：60BB很珍贵，不要轻易gamble。</li>
+                <li>💰 <strong>Premium Hands Aggressive</strong>：有strong hand时aggressive，maximize value。</li>
+                <li>📍 <strong>Position Critical</strong>：OOP时极度谨慎，只用premium打大底池。</li>
+                <li>🎭 <strong>Straightforward > Fancy</strong>：直接打法最profitable。</li>
+                <li>🎯 <strong>ICM Awareness</strong>：泡沫期/钱圈边缘优先survival。</li>
+                <li>⚡ <strong>3-Bet or Fold</strong>：面对3-Bet，4-Bet or fold，不要call。</li>
+                <li>🚫 <strong>No Tilt</strong>：60BB输一次big pot = short stack。保持discipline。</li>
+            </ol>
+        </div>
+
+        <!-- 训练测验 -->
+        <div style="text-align: center; background: linear-gradient(135deg, #1e1430, var(--bg-card)); border-radius: 20px; padding: 40px; margin: 40px 0; border: 2px solid rgba(155, 89, 182, 0.3);">
+            <h2 style="color: var(--purple); margin-bottom: 20px;">🎮 60BB TAG决策测验</h2>
+            <p style="color: var(--text-dim); margin-bottom: 25px; font-size: 1.05rem;">
+                测试你的60BB solid TAG打法和ICM awareness
+            </p>
+            <button class="quiz-btn" onclick="alert('60BB测验开发中！\n\n将包含：\n- 25个60BB场景\n- 3-Bet pot管理\n- ICM决策\n- vs短筹码all-in\n- Position awareness\n- Stack preservation\n\n完成后评分和建议。')">
+                开始测验
+            </button>
+        </div>
+
+        <!-- 链接 -->
+        <div style="text-align: center; margin: 50px 0; padding-top: 30px; border-top: 1px solid rgba(155,89,182,0.2);">
+            <p style="color: var(--text-dim); margin-bottom: 20px;">继续学习其他筹码深度</p>
+            <a href="stack_100bb_trainer.html" style="color: var(--purple); text-decoration: none; margin: 0 15px;">← 100BB训练</a>
+            <a href="wsop_short_stack.html" style="color: var(--purple); text-decoration: none; margin: 0 15px;">40BB训练 →</a>
+            <a href="unified_training_hub.html" style="color: var(--purple); text-decoration: none; margin: 0 15px;">返回中心</a>
+        </div>
+    </div>
+
+    <script src="stack_depth_adapter.js"></script>
+</body>
+</html>
+
