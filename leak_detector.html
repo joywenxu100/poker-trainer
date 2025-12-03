@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Leak检测器 - 深度诊断系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0612;
+            --bg-card: #150d1f;
+            --gold: #ffd700;
+            --green: #2ecc71;
+            --red: #e74c3c;
+            --blue: #3498db;
+            --orange: #ff8c00;
+            --purple: #9b59b6;
+            --text: #f0f0f0;
+            --text-dim: #8a8a9a;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark), #1a0f2e);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(155, 89, 182, 0.2);
+            border: 1px solid rgba(155, 89, 182, 0.5);
+            color: var(--purple);
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        header {
+            text-align: center;
+            margin: 60px 0 50px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--red), var(--orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            font-weight: 900;
+        }
+
+        .leak-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .category-card {
+            background: linear-gradient(135deg, var(--bg-card), #1e1430);
+            border-radius: 20px;
+            padding: 35px;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--gold);
+            box-shadow: 0 12px 35px rgba(255, 215, 0, 0.3);
+        }
+
+        .category-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+        }
+
+        .category-card h3 {
+            color: var(--gold);
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+        }
+
+        .severity-badge {
+            display: inline-block;
+            padding: 6px 15px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .severity-critical {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--red);
+            border: 2px solid var(--red);
+        }
+
+        .severity-high {
+            background: rgba(255, 140, 0, 0.2);
+            color: var(--orange);
+            border: 2px solid var(--orange);
+        }
+
+        .severity-medium {
+            background: rgba(255, 215, 0, 0.2);
+            color: var(--gold);
+            border: 2px solid var(--gold);
+        }
+
+        .leak-examples {
+            background: rgba(231, 76, 60, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--red);
+            margin: 15px 0;
+        }
+
+        .leak-examples h4 {
+            color: var(--red);
+            margin-bottom: 10px;
+        }
+
+        .leak-examples ul {
+            margin-left: 20px;
+            line-height: 2;
+        }
+
+        .fix-section {
+            background: rgba(50, 205, 50, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--green);
+            margin: 15px 0;
+        }
+
+        .fix-section h4 {
+            color: var(--green);
+            margin-bottom: 10px;
+        }
+
+        .diagnosis-section {
+            background: linear-gradient(135deg, var(--bg-card), #1e1430);
+            border-radius: 25px;
+            padding: 50px;
+            margin: 50px 0;
+            border: 2px solid rgba(52, 152, 219, 0.3);
+        }
+
+        .diagnosis-section h2 {
+            color: var(--blue);
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .quiz-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .quiz-card {
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid rgba(52, 152, 219, 0.2);
+        }
+
+        .quiz-card h4 {
+            color: var(--blue);
+            margin-bottom: 15px;
+        }
+
+        .quiz-option {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .quiz-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--blue);
+        }
+
+        .diagnosis-btn {
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            color: #fff;
+            padding: 18px 60px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: block;
+            margin: 40px auto;
+        }
+
+        .diagnosis-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 35px rgba(52, 152, 219, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            .leak-categories { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <a href="unified_training_hub.html" class="back-btn">← 返回训练中心</a>
+
+    <div class="container">
+        <header>
+            <h1>🔍 Leak检测器</h1>
+            <p style="font-size: 1.3rem; color: var(--text-dim); margin-top: 15px;">
+                深度诊断系统 · 识别15大常见Leaks · 针对性修复方案
+            </p>
+        </header>
+
+        <!-- 15大Leak分类 -->
+        <div class="leak-categories">
+            
+            <!-- Leak 1: 范围过宽 -->
+            <div class="category-card">
+                <div class="category-icon">📏</div>
+                <span class="severity-badge severity-critical">严重性: CRITICAL</span>
+                <h3>1. 范围过宽 (Too Wide)</h3>
+                <p style="color: var(--text-dim); line-height: 1.8; margin-bottom: 15px;">
+                    在不应该的位置/深度玩太多手牌，导致频繁进入losing situations。
+                </p>
+
+                <div class="leak-examples">
+                    <h4>🚨 表现</h4>
+                    <ul>
+                        <li>UTG open 30%+ 的手牌</li>
+                        <li>60BB深度还在玩suited connectors</li>
+                        <li>OOP call 3-Bet with marginal hands</li>
+                        <li>Short stack还想LAG</li>
+                    </ul>
+                </div>
+
+                <div class="fix-section">
+                    <h4>✅ 修复方案</h4>
+                    <ul>
+                        <li>学习各深度的正确Open范围</li>
+                        <li>使用range charts训练</li>
+                        <li>早位置极度收紧</li>
+                        <li>筹码<100BB时明显收紧</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Leak 2: 位置awareness不足 -->
+            <div class="category-card">
+                <div class="category-icon">📍</div>
+                <span class="severity-badge severity-critical">严重性: CRITICAL</span>
+                <h3>2. 位置Awareness不足</h3>
+                <p style="color: var(--text-dim); line-height: 1.8; margin-bottom: 15px;">
+                    不根据位置调整策略，早位置too loose，后位置too tight。
+                </p>
+
+                <div class="leak-examples">
+                    <h4>🚨 表现</h4>
+                    <ul>
+                        <li>UTG open speculative hands</li>
+                        <li>BTN不够aggressive</li>
+                        <li>OOP打大底池</li>
+                        <li>所有位置用同样范围</li>
+                    </ul>
+                </div>
+
+                <div class="fix-section">
+                    <h4>✅ 修复方案</h4>
+                    <ul>
+                        <li>深度学习位置战争模块</li>
+                        <li>早位置只玩premium</li>
+                        <li>后位置maximize aggression</li>
+                        <li>OOP极度保守</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Leak 3: 筹码深度awareness不足 -->
+            <div class="category-card">
+                <div class="category-icon">💰</div>
+                <span class="severity-badge severity-critical">严重性: CRITICAL</span>
+                <h3>3. 筹码深度Awareness不足</h3>
+                <p style="color: var(--text-dim); line-height: 1.8; margin-bottom: 15px;">
+                    在不同筹码深度使用相同策略，不会根据stack调整。
+                </p>
+
+                <div class="leak-examples">
+                    <h4>🚨 表现</h4>
+                    <ul>
+                        <li>60BB还想300BB的LAG</li>
+                        <li>不知道何时过渡</li>
+                        <li>忽略SPR</li>
+                        <li>Short stack fancy play</li>
+                    </ul>
+                </div>
+
+                <div class="fix-section">
+                    <h4>✅ 修复方案</h4>
+                    <ul>
+                        <li>完成stack_transition_master训练</li>
+                        <li>学习5个关键过渡点</li>
+                        <li>时刻关注SPR</li>
+                        <li>根据stack实时调整</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Leak 4: Call 3-Bet太多 -->
+            <div class="category-card">
+                <div class="category-icon">📞</div>
+                <span class="severity-badge severity-high">严重性: HIGH</span>
+                <h3>4. Call 3-Bet过多</h3>
+                <p style="color: var(--text-dim); line-height: 1.8; margin-bottom: 15px;">
+                    面对3-Bet用marginal hands call，OOP尤其致命。
+                </p>
+
+                <div class="leak-examples">
+                    <h4>🚨 表现</h4>
+                    <ul>
+                        <li>OOP call 3-Bet with 99, AJ</li>
+                        <li>Call 3-Bet频率>15%</li>
+                        <li>不会4-Bet or Fold</li>
+                        <li>中筹码call 3-Bet</li>
+                    </ul>
+                </div>
+
+                <div class="fix-section">
+                    <h4>✅ 修复方案</h4>
+                    <ul>
+                        <li>学习"4-Bet or Fold"策略</li>
+                        <li>OOP只用QQ+/AK call</li>
+                        <li>中筹码停止call 3-Bet</li>
+                        <li>训练polarized 4-Bet range</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Leak 5: Over-aggressive -->
+            <div class="category-card">
+                <div class="category-icon">⚔️</div>
+                <span class="severity-badge severity-high">严重性: HIGH</span>
+                <h3>5. 过度Aggressive</h3>
+                <p style="color: var(--text-dim); line-height: 1.8; margin-bottom: 15px;">
+                    Triple barrel pure bluff，3-Bet/4-Bet过多，不会fold。
+                </p>
+
+                <div class="leak-examples">
+                    <h4>🚨 表现</h4>
+                    <ul>
+                        <li>Triple barrel无equity</li>
+                        <li>3-Bet频率>20%</li>
+                        <li>Float every flop</li>
+                        <li>Never fold to raises</li>
+                    </ul>
+                </div>
+
+                <div class="fix-section">
+                    <h4>✅ 修复方案</h4>
+                    <ul>
+                        <li>学习balance训练模块</li>
+                        <li>Bluff需要equity/blockers</li>
+                        <li>学会fold边缘spots</li>
+                        <li>Pot control训练</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Leak 6: 过度Passive -->
+            <div class="category-card">
+                <div class="category-icon">🛑</div>
+                <span class="severity-badge severity-high">严重性: HIGH</span>
+                <h3>6. 过度Passive</h3>
+                <p style="color: var(--text-dim); line-height: 1.8; margin-bottom: 15px;">
+                    Check/Call过多，不够aggressive，错失value。
+                </p>
+
+                <div class="leak-examples">
+                    <h4>🚨 表现</h4>
+                    <ul>
+                        <li>Strong hands slowplay过度</li>
+                        <li>Cbet频率<45%</li>
+                        <li>Check-raise频率<8%</li>
+                        <li>River不敢thin value</li>
+                    </ul>
+                </div>
+
+                <div class="fix-section">
+                    <h4>✅ 修复方案</h4>
+                    <ul>
+                        <li>学习aggressive TAG策略</li>
+                        <li>Value bet三条街训练</li>
+                        <li>Check-raise训练</li>
+                        <li>River thin value训练</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Leak 7: ICM awareness不足 -->
+            <div class="category-card">
+                <div class="category-icon">🎯</div>
+                <span class="severity-badge severity-critical">严重性: CRITICAL (MTT)</span>
+                <h3>7. ICM Awareness不足</h3>
+                <p style="color: var(--text-dim); line-height: 1.8; margin-bottom: 15px;">
+                    泡沫期/钱圈边缘不考虑ICM，chip EV ≠ $ EV。
+                </p>
+
+                <div class="leak-examples">
+                    <h4>🚨 表现</h4>
+                    <ul>
+                        <li>泡沫期too loose</li>
+                        <li>vs短筹码all-in call太宽</li>
+                        <li>不避免vs中筹码battle</li>
+                        <li>钱圈边缘gamble</li>
+                    </ul>
+                </div>
+
+                <div class="fix-section">
+                    <h4>✅ 修复方案</h4>
+                    <ul>
+                        <li>学习wsop_icm_trainer</li>
+                        <li>泡沫期收紧20%+</li>
+                        <li>vs短筹码收紧call range</li>
+                        <li>中筹码避免对抗</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Leak 8: Tilt控制不足 -->
+            <div class="category-card">
+                <div class="category-icon">😡</div>
+                <span class="severity-badge severity-critical">严重性: CRITICAL</span>
+                <h3>8. Tilt控制不足</h3>
+                <p style="color: var(--text-dim); line-height: 1.8; margin-bottom: 15px;">
+                    Bad beat后策略崩溃，revenge play，范围失控。
+                </p>
+
+                <div class="leak-examples">
+                    <h4>🚨 表现</h4>
+                    <ul>
+                        <li>连续bad beat后too loose</li>
+                        <li>对特定玩家revenge</li>
+                        <li>输了大底池后all-in频繁</li>
+                        <li>不能接受正确的fold</li>
+                    </ul>
+                </div>
+
+                <div class="fix-section">
+                    <h4>✅ 修复方案</h4>
+                    <ul>
+                        <li>心理训练模块</li>
+                        <li>设置stop-loss</li>
+                        <li>Bad beat后休息</li>
+                        <li>GTO fallback训练</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Leak 9-15省略，继续类似结构... -->
+            <div class="category-card">
+                <div class="category-icon">🎭</div>
+                <span class="severity-badge severity-medium">严重性: MEDIUM</span>
+                <h3>9. 对手Profiling不足</h3>
+                <p style="color: var(--text-dim); line-height: 1.8; margin-bottom: 15px;">
+                    不观察对手tendencies，everyone plays the same。
+                </p>
+                <div class="fix-section">
+                    <h4>✅ 修复</h4>
+                    <ul><li>学习opponent_classifier模块</li></ul>
+                </div>
+            </div>
+
+            <div class="category-card">
+                <div class="category-icon">💸</div>
+                <span class="severity-badge severity-high">严重性: HIGH</span>
+                <h3>10. Pot Control不足</h3>
+                <p style="color: var(--text-dim); line-height: 1.8; margin-bottom: 15px;">
+                    Medium hands打大底池，不会控制pot size。
+                </p>
+                <div class="fix-section">
+                    <h4>✅ 修复</h4>
+                    <ul><li>学习100BB/60BB pot control训练</li></ul>
+                </div>
+            </div>
+
+            <div class="category-card">
+                <div class="category-icon">🎲</div>
+                <span class="severity-badge severity-medium">严重性: MEDIUM</span>
+                <h3>11. Bet Sizing错误</h3>
+                <p style="color: var(--text-dim); line-height: 1.8; margin-bottom: 15px;">
+                    Bet size不一致，暴露hand strength。
+                </p>
+                <div class="fix-section">
+                    <h4>✅ 修复</h4>
+                    <ul><li>学习balanced bet sizing</li></ul>
+                </div>
+            </div>
+
+            <div class="category-card">
+                <div class="category-icon">📺</div>
+                <span class="severity-badge severity-medium">严重性: MEDIUM</span>
+                <h3>12. 翻后Cbet太多/太少</h3>
+                <p style="color: var(--text-dim); line-height: 1.8; margin-bottom: 15px;">
+                    Auto-Cbet every flop或从不Cbet。
+                </p>
+                <div class="fix-section">
+                    <h4>✅ 修复</h4>
+                    <ul><li>学习selective Cbet策略</li></ul>
+                </div>
+            </div>
+
+            <div class="category-card">
+                <div class="category-icon">🎪</div>
+                <span class="severity-badge severity-medium">严重性: MEDIUM</span>
+                <h3>13. Fancy Play过度</h3>
+                <p style="color: var(--text-dim); line-height: 1.8; margin-bottom: 15px;">
+                    中短筹码还想fancy play，level war。
+                </p>
+                <div class="fix-section">
+                    <h4>✅ 修复</h4>
+                    <ul><li>中短筹码: straightforward > fancy</li></ul>
+                </div>
+            </div>
+
+            <div class="category-card">
+                <div class="category-icon">🔄</div>
+                <span class="severity-badge severity-high">严重性: HIGH</span>
+                <h3>14. 不会动态调整</h3>
+                <p style="color: var(--text-dim); line-height: 1.8; margin-bottom: 15px;">
+                    Strategy固化，不根据table dynamics调整。
+                </p>
+                <div class="fix-section">
+                    <h4>✅ 修复</h4>
+                    <ul><li>学习dynamic_adjuster模块</li></ul>
+                </div>
+            </div>
+
+            <div class="category-card">
+                <div class="category-icon">⏰</div>
+                <span class="severity-badge severity-high">严重性: HIGH</span>
+                <h3>15. 不会识别被针对</h3>
+                <p style="color: var(--text-dim); line-height: 1.8; margin-bottom: 15px;">
+                    被对手exploit还不知道，继续送钱。
+                </p>
+                <div class="fix-section">
+                    <h4>✅ 修复</h4>
+                    <ul><li>学习targeted_detection模块</li></ul>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 自我诊断区域 -->
+        <div class="diagnosis-section">
+            <h2>🩺 自我诊断测试</h2>
+            <p style="text-align: center; color: var(--text-dim); font-size: 1.1rem; margin-bottom: 40px;">
+                回答10个问题，识别你的主要Leaks
+            </p>
+
+            <button class="diagnosis-btn" onclick="alert('自我诊断测试功能开发中！\n\n将包含：\n- 10个关键问题\n- AI分析你的主要leaks\n- 严重性排序\n- 针对性训练计划\n- 预期修复时间\n\n完成后生成完整诊断报告。')">
+                开始诊断测试
+            </button>
+        </div>
+
+        <!-- 底部链接 -->
+        <div style="text-align: center; margin: 60px 0; padding-top: 40px; border-top: 2px solid rgba(255,69,0,0.3);">
+            <p style="font-size: 1.2rem; color: var(--text-dim); margin-bottom: 25px;">
+                识别并修复leaks，是成为世界级玩家的必经之路！
+            </p>
+            <a href="hand_history_analyzer.html" style="color: var(--red); text-decoration: none; font-size: 1.1rem; margin: 0 20px;">
+                ← 手牌分析器
+            </a>
+            <a href="unified_training_hub.html" style="color: var(--red); text-decoration: none; font-size: 1.1rem; margin: 0 20px;">
+                返回训练中心
+            </a>
+        </div>
+    </div>
+
+    <script src="leak_detector_engine.js"></script>
+</body>
+</html>
+
