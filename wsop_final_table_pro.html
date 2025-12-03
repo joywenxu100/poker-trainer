@@ -200,19 +200,34 @@ QQ+在9人桌要打价值！`
                 players: 9,
                 question: "9人桌，你28BB中等筹码。CO(55BB)open 2.2BB。你在BTN拿到9♠9♥。你应该？",
                 options: ["Fold", "Call", "3bet到7BB", "All-in"],
-                correctIndex: 0,
-                explanation: `<strong>正确：Fold</strong>
+                correctIndex: 1,
+                explanation: `<strong>正确：Call</strong>
 
-<div style="color:#e74c3c">⚠️ 9人桌99的困境！</div>
-• 28BB不深不浅<br>
-• CO range包含overpairs<br>
-• Call OOP很难打<br>
-• 3bet被4bet尴尬<br>
+<div style="color:#2ecc71">✅ 99 BTN vs CO可以call！</div>
+• 99 vs CO 15-20% range ≈ 53-55% equity<br>
+• **BTN有位置优势**（不是OOP！）<br>
+• 28BB SPR约12，可以set mining<br>
+• 中set可以stack overpairs<br>
 
-<div style="color:#ffd700">💡 何时可以玩99？</div>
-• 你是大筹码 → Call<br>
-• 位置更好 → 考虑<br>
-• 这个spot = Fold`
+<div style="color:#ffd700">💡 为什么call不是3bet？</div>
+• 3bet被4bet确实尴尬<br>
+• Call更隐蔽更安全<br>
+• Miss set容易fold<br>
+• 击中set赢大底池<br>
+
+<div style="color:#e74c3c">⚠️ ICM考虑：</div>
+9人桌ICM压力确实大，但99太强不能fold！<br>
+• Fold = 过度保守<br>
+• Call = 平衡ICM和价值<br>
+• 3bet = 过于激进<br>
+
+<div style="color:#9b59b6">🎯 冠军打法：</div>
+• 90%时间：Call<br>
+• 10%时间：3bet混合策略<br>
+• 0%时间：Fold（除非极端ICM）<br>
+
+<div style="color:#ffd700">💎 记住：</div>
+BTN是IP不是OOP，位置优势巨大！`
             },
             {
                 category: "9人桌",
