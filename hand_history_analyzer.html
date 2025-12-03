@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📝 手牌历史分析器 - 实战反馈系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0612;
+            --bg-card: #150d1f;
+            --gold: #ffd700;
+            --green: #2ecc71;
+            --red: #e74c3c;
+            --blue: #3498db;
+            --orange: #ff8c00;
+            --purple: #9b59b6;
+            --text: #f0f0f0;
+            --text-dim: #8a8a9a;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark), #1a0f2e);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(155, 89, 182, 0.2);
+            border: 1px solid rgba(155, 89, 182, 0.5);
+            color: var(--purple);
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        header {
+            text-align: center;
+            margin: 60px 0 40px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-dim);
+            margin-bottom: 25px;
+        }
+
+        .upload-section {
+            background: linear-gradient(135deg, var(--bg-card), #1e1430);
+            border-radius: 25px;
+            padding: 50px;
+            margin-bottom: 40px;
+            border: 2px solid rgba(52, 152, 219, 0.3);
+            text-align: center;
+        }
+
+        .upload-area {
+            border: 3px dashed var(--blue);
+            border-radius: 20px;
+            padding: 60px 40px;
+            background: rgba(52, 152, 219, 0.05);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            background: rgba(52, 152, 219, 0.15);
+            border-color: var(--gold);
+        }
+
+        .upload-area.dragover {
+            background: rgba(52, 152, 219, 0.2);
+            border-color: var(--green);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            color: #fff;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .upload-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+        }
+
+        .format-guide {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .format-card {
+            background: var(--bg-card);
+            border-radius: 18px;
+            padding: 30px;
+            border: 2px solid rgba(52, 152, 219, 0.2);
+        }
+
+        .format-card h3 {
+            color: var(--blue);
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+        }
+
+        .format-card pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            color: var(--green);
+            border-left: 3px solid var(--green);
+        }
+
+        .quick-input {
+            background: linear-gradient(135deg, var(--bg-card), #1e1430);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            border: 2px solid rgba(255, 140, 0, 0.3);
+        }
+
+        .quick-input h2 {
+            color: var(--orange);
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .input-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-field label {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .input-field input,
+        .input-field select,
+        .input-field textarea {
+            background: rgba(52, 152, 219, 0.1);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            color: var(--text);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .input-field textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .analyze-btn {
+            background: linear-gradient(135deg, var(--orange), var(--gold));
+            color: #000;
+            padding: 15px 50px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .analyze-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 140, 0, 0.4);
+        }
+
+        .results-section {
+            background: linear-gradient(135deg, var(--bg-card), #1e1430);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 40px;
+            border: 2px solid rgba(50, 205, 50, 0.3);
+            display: none;
+        }
+
+        .results-section.show {
+            display: block;
+        }
+
+        .result-card {
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--blue);
+        }
+
+        .leak-detected {
+            background: rgba(231, 76, 60, 0.15);
+            border-left-color: var(--red);
+        }
+
+        .good-play {
+            background: rgba(50, 205, 50, 0.15);
+            border-left-color: var(--green);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-box {
+            background: rgba(52, 152, 219, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(52, 152, 219, 0.3);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            color: var(--blue);
+            font-weight: 900;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        .recommendation-box {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 140, 0, 0.1));
+            border: 2px solid var(--gold);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .recommendation-box h3 {
+            color: var(--gold);
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .upload-section { padding: 30px 20px; }
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <a href="unified_training_hub.html" class="back-btn">← 返回训练中心</a>
+
+    <div class="container">
+        <header>
+            <h1>📝 手牌历史分析器</h1>
+            <p class="subtitle">导入实战手牌 · AI深度分析 · Leak检测 · 个性化训练建议</p>
+        </header>
+
+        <!-- 上传区域 -->
+        <div class="upload-section">
+            <h2 style="color: var(--blue); margin-bottom: 30px;">📤 方式1: 导入手牌历史文件</h2>
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📁</div>
+                <h3 style="color: var(--text); margin-bottom: 15px;">拖拽文件到这里或点击上传</h3>
+                <p style="color: var(--text-dim); margin-bottom: 20px;">
+                    支持格式: PokerStars (.txt), GGPoker (.txt), 手动输入 (.txt/.csv)
+                </p>
+                <input type="file" id="fileInput" accept=".txt,.csv" style="display: none;">
+                <button class="upload-btn" onclick="document.getElementById('fileInput').click()">
+                    选择文件
+                </button>
+            </div>
+        </div>
+
+        <!-- 支持的格式指南 -->
+        <div class="format-guide">
+            <div class="format-card">
+                <h3>📋 PokerStars格式</h3>
+                <p style="color: var(--text-dim); margin-bottom: 15px;">标准手牌历史格式</p>
+                <pre>PokerStars Hand #123456789
+Tournament #123, $100+$9
+Table '123' 9-max Seat #5
+Seat 1: Player1 (15000)
+Seat 2: Hero (15000)
+Hero: posts small blind 50
+...</pre>
+            </div>
+
+            <div class="format-card">
+                <h3>📋 GGPoker格式</h3>
+                <p style="color: var(--text-dim); margin-bottom: 15px;">GG扑克手牌历史</p>
+                <pre>Game Hand #123456789
+Tournament #T123
+Table 1, 9-max
+Player1 (15000)
+Hero (15000)
+Hero posts SB 50
+...</pre>
+            </div>
+
+            <div class="format-card">
+                <h3>📋 简化输入格式</h3>
+                <p style="color: var(--text-dim); margin-bottom: 15px;">快速手动输入</p>
+                <pre>Position: BTN
+Stack: 60BB
+Hand: AKo
+Action: Open 2.5BB
+Result: Won 15BB
+Notes: vs TAG player
+...</pre>
+            </div>
+        </div>
+
+        <!-- 快速手动输入 -->
+        <div class="quick-input">
+            <h2>⚡ 方式2: 快速手动输入</h2>
+            <p style="color: var(--text-dim); margin-bottom: 25px;">
+                没有手牌历史文件？手动输入关键信息即可获得分析！
+            </p>
+
+            <div class="input-grid">
+                <div class="input-field">
+                    <label>你的位置</label>
+                    <select id="position">
+                        <option value="UTG">UTG</option>
+                        <option value="UTG1">UTG+1</option>
+                        <option value="MP">MP</option>
+                        <option value="LJ">LJ</option>
+                        <option value="HJ">HJ</option>
+                        <option value="CO">CO</option>
+                        <option value="BTN" selected>BTN</option>
+                        <option value="SB">SB</option>
+                        <option value="BB">BB</option>
+                    </select>
+                </div>
+
+                <div class="input-field">
+                    <label>有效筹码</label>
+                    <select id="stack">
+                        <option value="300">300BB+</option>
+                        <option value="150">150-250BB</option>
+                        <option value="100">100-150BB</option>
+                        <option value="60" selected>60-100BB</option>
+                        <option value="40">40-60BB</option>
+                        <option value="20">20-40BB</option>
+                        <option value="10">10-20BB</option>
+                    </select>
+                </div>
+
+                <div class="input-field">
+                    <label>你的手牌</label>
+                    <input type="text" id="hand" placeholder="例: AKo, QQ, 76s" />
+                </div>
+
+                <div class="input-field">
+                    <label>翻前动作</label>
+                    <select id="preflopAction">
+                        <option value="fold">Fold</option>
+                        <option value="call">Call</option>
+                        <option value="open" selected>Open Raise</option>
+                        <option value="3bet">3-Bet</option>
+                        <option value="4bet">4-Bet</option>
+                        <option value="allin">All-in</option>
+                    </select>
+                </div>
+
+                <div class="input-field">
+                    <label>对手位置</label>
+                    <select id="opponentPos">
+                        <option value="none">无/Fold</option>
+                        <option value="SB" selected>SB</option>
+                        <option value="BB">BB</option>
+                        <option value="EP">EP</option>
+                        <option value="MP">MP</option>
+                        <option value="LP">LP</option>
+                    </select>
+                </div>
+
+                <div class="input-field">
+                    <label>对手类型</label>
+                    <select id="opponentType">
+                        <option value="unknown">不清楚</option>
+                        <option value="nit">Nit（极紧）</option>
+                        <option value="tight">Tight（紧）</option>
+                        <option value="tag" selected>TAG（紧凶）</option>
+                        <option value="lag">LAG（松凶）</option>
+                        <option value="loose">Loose（松）</option>
+                        <option value="maniac">Maniac（疯狂）</option>
+                    </select>
+                </div>
+
+                <div class="input-field">
+                    <label>结果</label>
+                    <select id="result">
+                        <option value="won">赢了</option>
+                        <option value="lost" selected>输了</option>
+                        <option value="fold">我Fold了</option>
+                    </select>
+                </div>
+
+                <div class="input-field">
+                    <label>底池大小（BB）</label>
+                    <input type="number" id="pot" placeholder="例: 25" />
+                </div>
+            </div>
+
+            <div class="input-field">
+                <label>详细描述（可选）</label>
+                <textarea id="details" placeholder="描述牌局过程，翻牌圈/转牌圈/河牌圈发生了什么..."></textarea>
+            </div>
+
+            <div style="text-align: center;">
+                <button class="analyze-btn" onclick="analyzeHand()">
+                    🔍 开始分析
+                </button>
+            </div>
+        </div>
+
+        <!-- 分析结果区域 -->
+        <div class="results-section" id="resultsSection">
+            <h2 style="color: var(--green); font-size: 2rem; margin-bottom: 30px; text-align: center;">
+                📊 分析结果
+            </h2>
+
+            <!-- 统计数据 -->
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label">策略匹配度</div>
+                    <div class="stat-value" id="matchScore">-</div>
+                    <div class="stat-label">vs理想策略</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">决策质量</div>
+                    <div class="stat-value" id="decisionQuality">-</div>
+                    <div class="stat-label">EV评分</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">位置利用</div>
+                    <div class="stat-value" id="positionScore">-</div>
+                    <div class="stat-label">Position Awareness</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">对手调整</div>
+                    <div class="stat-value" id="adjustmentScore">-</div>
+                    <div class="stat-label">Exploitation Level</div>
+                </div>
+            </div>
+
+            <!-- 具体分析 -->
+            <div id="analysisDetails"></div>
+
+            <!-- 训练建议 -->
+            <div class="recommendation-box">
+                <h3>🎯 个性化训练建议</h3>
+                <div id="trainingRecommendations"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="stack_depth_adapter.js"></script>
+    <script src="hand_analyzer_engine.js"></script>
+    <script>
+        // 文件上传处理
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const content = e.target.result;
+                parseHandHistory(content);
+            };
+            reader.readAsText(file);
+        }
+
+        function parseHandHistory(content) {
+            // 解析手牌历史文件
+            alert('文件上传成功！\n\n正在解析手牌历史...\n（功能开发中，将支持PokerStars/GGPoker格式）');
+            // TODO: 实现完整解析逻辑
+        }
+
+        // 手动输入分析
+        function analyzeHand() {
+            const position = document.getElementById('position').value;
+            const stack = parseInt(document.getElementById('stack').value);
+            const hand = document.getElementById('hand').value;
+            const action = document.getElementById('preflopAction').value;
+            const opponentPos = document.getElementById('opponentPos').value;
+            const opponentType = document.getElementById('opponentType').value;
+            const result = document.getElementById('result').value;
+            const pot = document.getElementById('pot').value;
+            const details = document.getElementById('details').value;
+
+            if (!hand) {
+                alert('请输入你的手牌！');
+                return;
+            }
+
+            // 调用分析引擎
+            const analysis = performAnalysis({
+                position, stack, hand, action,
+                opponentPos, opponentType, result, pot, details
+            });
+
+            displayResults(analysis);
+        }
+
+        function performAnalysis(handData) {
+            // 这里应该调用实际的分析引擎
+            // 现在返回模拟数据
+            return {
+                matchScore: 78,
+                decisionQuality: 'B+',
+                positionScore: 85,
+                adjustmentScore: 72,
+                leaks: [
+                    {
+                        type: 'leak',
+                        title: '范围过宽',
+                        description: `在${handData.position}位置用${handData.hand} ${handData.action}，这个手牌在${handData.stack}BB深度时应该fold。`,
+                        severity: 'medium'
+                    }
+                ],
+                goodPlays: [
+                    {
+                        type: 'good',
+                        title: '位置利用良好',
+                        description: '你在有利位置做出了正确的aggressive play。'
+                    }
+                ],
+                recommendations: [
+                    `建议学习：${handData.stack}BB深度的${handData.position}位置Open范围`,
+                    `推荐训练模块：stack_${Math.floor(handData.stack/10)*10}bb_trainer.html`,
+                    `针对${handData.opponentType}对手的剥削策略训练`
+                ]
+            };
+        }
+
+        function displayResults(analysis) {
+            // 显示结果区域
+            document.getElementById('resultsSection').classList.add('show');
+
+            // 填充统计数据
+            document.getElementById('matchScore').textContent = analysis.matchScore + '%';
+            document.getElementById('decisionQuality').textContent = analysis.decisionQuality;
+            document.getElementById('positionScore').textContent = analysis.positionScore + '%';
+            document.getElementById('adjustmentScore').textContent = analysis.adjustmentScore + '%';
+
+            // 填充详细分析
+            let detailsHTML = '';
+            
+            if (analysis.leaks && analysis.leaks.length > 0) {
+                analysis.leaks.forEach(leak => {
+                    detailsHTML += `
+                        <div class="result-card leak-detected">
+                            <h3 style="color: var(--red); margin-bottom: 10px;">🚨 ${leak.title}</h3>
+                            <p style="line-height: 1.8;">${leak.description}</p>
+                        </div>
+                    `;
+                });
+            }
+
+            if (analysis.goodPlays && analysis.goodPlays.length > 0) {
+                analysis.goodPlays.forEach(good => {
+                    detailsHTML += `
+                        <div class="result-card good-play">
+                            <h3 style="color: var(--green); margin-bottom: 10px;">✅ ${good.title}</h3>
+                            <p style="line-height: 1.8;">${good.description}</p>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('analysisDetails').innerHTML = detailsHTML;
+
+            // 填充训练建议
+            let recsHTML = '<ul style="line-height: 2; margin-left: 20px;">';
+            analysis.recommendations.forEach(rec => {
+                recsHTML += `<li>${rec}</li>`;
+            });
+            recsHTML += '</ul>';
+            document.getElementById('trainingRecommendations').innerHTML = recsHTML;
+
+            // 滚动到结果
+            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
+
