@@ -585,22 +585,28 @@ const lagRanges = {
         }
     },
 
-    // Call 4-Bet 范围 (平跟4-Bet)
+    // Call 4-Bet 范围 (平跟4-Bet) - ⚠️ 关键：必须区分IP和OOP！
     call4Bet: {
+        IP: {
+            range: ['QQ', 'JJ', 'TT', '99',
+                   'AKs', 'AQs', 'AJs',
+                   'AKo',
+                   '87s', '76s'],
+            percentage: '~5%',
+            notes: '有位置时可以用更宽范围平跟4-Bet：QQ/JJ/TT（set value），99（深筹码），AK/AQ（摊牌价值），87s/76s（隐含赔率+欺骗性）'
+        },
+        OOP: {
+            range: ['QQ', 'JJ',
+                   'AKs', 'AKo'],
+            percentage: '~2%',
+            notes: 'OOP大幅收紧！只用QQ/JJ/AK平跟。TT及以下应该fold，因为翻后难打且SPR低。深筹码OOP更应该5-Bet or Fold'
+        },
         general: {
             range: ['QQ', 'JJ', 'TT',
                    'AKs', 'AQs', 'AJs',
                    'AKo'],
             percentage: '~3%',
-            notes: '面对4-Bet通常是QQ+/AK 4-Bet或fold，只有少数情况平跟（主要是QQ/JJ不确定是否领先）'
-        },
-        deep: {
-            range: ['QQ', 'JJ', 'TT', '99',
-                   'AKs', 'AQs', 'AJs',
-                   'AKo',
-                   '87s', '76s'],
-            percentage: '~4%',
-            notes: '400BB+超深筹码时，可以考虑用更多牌平跟4-Bet'
+            notes: '通用范围（当不确定位置时）：QQ/JJ/TT + AK/AQ'
         }
     },
 
@@ -1196,12 +1202,19 @@ function highlightRange(position, action, vsPosition = null) {
             <div style="margin-top: 15px;"><span class="highlight">包含手牌：</span>${range.join(', ')}</div>
         `;
     } else if (action === 'call4bet') {
-        const data = lagRanges.call4Bet.general;
+        // ⚠️ 修复：区分IP和OOP
+        const rangeKey = vsPosition === 'IP' || !vsPosition ? 'IP' : (vsPosition === 'OOP' ? 'OOP' : 'general');
+        const data = lagRanges.call4Bet[rangeKey];
         range = data.range || [];
         details = `
-            <div><span class="highlight">Call 4-Bet范围</span></div>
+            <div><span class="highlight">Call 4-Bet范围：</span>${rangeKey === 'IP' ? '有位置 (IP)' : rangeKey === 'OOP' ? '无位置 (OOP)' : '通用'}</div>
             <div><span class="highlight">范围：</span>${data.percentage}</div>
             <div><span class="highlight">说明：</span>${data.notes}</div>
+            <div style="margin-top: 10px; padding: 10px; background: rgba(255,69,0,0.1); border-radius: 5px;">
+                <strong>🎯 关键差异：</strong><br>
+                • <strong>IP (5%)</strong>: 可以用99, TT, 甚至87s/76s平跟，利用位置优势翻后操作<br>
+                • <strong>OOP (2%)</strong>: 只用QQ/JJ/AK平跟，其他牌5-Bet or Fold！
+            </div>
             <div style="margin-top: 15px;"><span class="highlight">包含手牌：</span>${range.join(', ')}</div>
         `;
     } else if (action === 'squeeze') {
@@ -1251,7 +1264,7 @@ function highlightRange(position, action, vsPosition = null) {
         // vs 4-Bet - 面对4-Bet的完整决策
         // ✅ 修复：添加安全保护
         const fiveBetData = lagRanges.fiveBet?.general || {};
-        const call4BetData = lagRanges.call4Bet?.general || {};
+        const call4BetData = lagRanges.call4Bet?.IP || {}; // ⚠️ 使用IP作为展示默认值
         const fiveBetRange = fiveBetData.range || [];
         const call4BetRange = call4BetData.range || [];
         
@@ -1262,13 +1275,17 @@ function highlightRange(position, action, vsPosition = null) {
                 <strong>📊 面对4-Bet的三种选择：</strong><br><br>
                 <div style="margin: 10px 0;"><span class="highlight">1. 5-Bet/All-in (${fiveBetData.percentage || 'N/A'})：</span>
                 ${fiveBetRange.join(', ')}</div>
-                <div style="margin: 10px 0;"><span class="highlight">2. Call 4-Bet (${call4BetData.percentage || 'N/A'})：</span>
-                ${call4BetRange.join(', ')}</div>
+                <div style="margin: 10px 0;"><span class="highlight">2. Call 4-Bet - IP (${call4BetData.percentage || 'N/A'})：</span>
+                ${call4BetRange.join(', ')}<br>
+                <span style="color: #FF4500;">⚠️ OOP只call QQ/JJ/AK，其他5-Bet or Fold！</span></div>
                 <div style="margin: 10px 0;"><span class="highlight">3. Fold：</span>所有其他牌（包括大部分3-Bet诈唬牌）</div>
             </div>
             <div style="margin-top: 15px; padding: 15px; background: rgba(220,20,60,0.1); border-radius: 5px;">
                 <strong>⚡ 深筹码提示：</strong>300BB+时，QQ/JJ可以call 4-Bet<br>
-                但100BB时，通常是5-Bet or Fold（QQ可以5-Bet all-in）
+                但100BB时，通常是5-Bet or Fold（QQ可以5-Bet all-in）<br><br>
+                <strong>🎯 位置区别：</strong><br>
+                • IP: 可以call 99, TT, 甚至87s/76s（利用位置优势）<br>
+                • OOP: 只call QQ/JJ/AK（其他太难翻后操作）
             </div>
         `;
         range = [...fiveBetRange, ...call4BetRange];
@@ -1472,7 +1489,7 @@ function generateQuestion() {
         position = positions[Math.floor(Math.random() * positions.length)];
         
         const fiveBetRange = lagRanges.fiveBet.general.range;
-        const callRange = lagRanges.call4Bet.general.range;
+        const callRange = lagRanges.call4Bet.IP.range; // ⚠️ 修复：默认使用IP范围
         
         if (isInRange(hand, fiveBetRange)) {
             correctAnswer = '5bet';
