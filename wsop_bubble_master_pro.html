@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 泡沫期大师训练 - 50题深度版</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-dark: #0a0612; --bg-card: #150d1f; --gold: #ffd700;
+            --red: #e74c3c; --green: #2ecc71; --purple: #9b59b6;
+            --text: #f0f0f0; --text-dim: #8a8a9a;
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg-dark); color: var(--text);
+            min-height: 100vh; padding: 15px;
+        }
+        .header {
+            text-align: center; padding: 30px 20px;
+            background: linear-gradient(135deg, var(--bg-card), #1e1430);
+            border-radius: 20px; margin-bottom: 25px;
+        }
+        .header h1 { color: var(--gold); font-size: 2rem; margin-bottom: 10px; }
+        .progress-bar {
+            height: 8px; background: rgba(255,215,0,0.2);
+            border-radius: 10px; margin: 20px 0; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, var(--gold), var(--red));
+            transition: width 0.3s; width: 0%;
+        }
+        .scenario-card {
+            background: var(--bg-card); border-radius: 20px;
+            padding: 30px; margin-bottom: 20px; display: none;
+        }
+        .scenario-card.active { display: block; }
+        .scenario-header { color: var(--red); font-size: 1.3rem; margin-bottom: 20px; }
+        .stack-info {
+            display: flex; gap: 15px; flex-wrap: wrap; margin: 20px 0;
+            padding: 20px; background: rgba(155,89,182,0.1);
+            border-radius: 15px;
+        }
+        .stack-item { text-align: center; flex: 1; min-width: 80px; }
+        .stack-label { color: var(--text-dim); font-size: 0.9rem; }
+        .stack-value { color: var(--gold); font-size: 1.3rem; font-weight: 700; }
+        .question { font-size: 1.1rem; color: var(--text); margin: 25px 0; line-height: 1.6; }
+        .options { display: flex; flex-direction: column; gap: 12px; margin: 20px 0; }
+        .option-btn {
+            padding: 18px; background: rgba(155,89,182,0.2);
+            border: 2px solid rgba(155,89,182,0.3); border-radius: 12px;
+            color: var(--text); cursor: pointer; transition: all 0.3s;
+            text-align: left; font-size: 1rem;
+        }
+        .option-btn:hover { background: rgba(155,89,182,0.3); transform: translateX(5px); }
+        .option-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .option-btn.correct { background: rgba(46,204,113,0.3); border-color: var(--green); }
+        .option-btn.wrong { background: rgba(231,76,60,0.3); border-color: var(--red); }
+        .explanation {
+            display: none; margin-top: 25px; padding: 25px;
+            background: rgba(0,0,0,0.3); border-radius: 15px;
+            border-left: 4px solid var(--gold);
+        }
+        .explanation.show { display: block; }
+        .next-btn {
+            width: 100%; padding: 18px; margin-top: 20px;
+            background: linear-gradient(135deg, var(--gold), #b8860b);
+            border: none; border-radius: 15px; color: #000;
+            font-size: 1.1rem; font-weight: 700; cursor: pointer;
+            display: none;
+        }
+        .next-btn.show { display: block; }
+        .stats { display: flex; justify-content: center; gap: 30px; margin: 20px 0; }
+        .stat { text-align: center; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; }
+        .stat-value.correct { color: var(--green); }
+        .stat-value.wrong { color: var(--red); }
+        .stat-label { color: var(--text-dim); font-size: 0.9rem; }
+        .back-btn {
+            position: fixed; top: 15px; left: 15px;
+            background: rgba(155,89,182,0.2); border: 1px solid rgba(155,89,182,0.5);
+            color: var(--purple); padding: 10px 18px; border-radius: 25px;
+            text-decoration: none; font-size: 0.85rem; z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <a href="wsop_tournament_hub.html?v=7" class="back-btn">← 返回</a>
+    
+    <div class="header">
+        <h1>🎯 泡沫期大师训练</h1>
+        <p>50个实战场景 · 精准掌握泡沫期策略</p>
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value correct" id="correctCount">0</div>
+                <div class="stat-label">正确</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value wrong" id="wrongCount">0</div>
+                <div class="stat-label">错误</div>
+            </div>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <p id="progressText">第 1 / 50 题</p>
+    </div>
+
+    <div id="scenarioContainer"></div>
+
+    <script>
+        const BUBBLE_SCENARIOS = [
+            // ===== 大筹码施压策略 (15题) =====
+            {
+                category: "大筹码施压",
+                title: "按钮位偷盲",
+                stacks: [
+                    { label: "你", value: "70BB" },
+                    { label: "SB", value: "25BB" },
+                    { label: "BB", value: "30BB" }
+                ],
+                context: "剩余52人，钱圈50人。你是桌上筹码最多的玩家。",
+                question: "你在按钮位拿到K♠9♥。前面全弃到你。你应该？",
+                options: ["弃牌", "加注到2.2BB", "加注到3BB", "Limp"],
+                correctIndex: 1,
+                explanation: `<strong>正确：加注到2.2BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 为什么小额加注？</div>
+• 泡沫期盲注有巨大ICM压力<br>
+• 小额加注给对手最大压力（fold或3bet全押）<br>
+• 被3bet可以轻松fold K9o<br>
+• 大筹码应该疯狂利用ICM<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 大筹码泡沫期原则：</div>
+• 按钮位偷盲范围 >50%<br>
+• 小sizing高频率<br>
+• 被3bet立即fold垃圾牌<br>
+• 不要和中筹码建大底池`
+            },
+            {
+                category: "大筹码施压",
+                title: "CO位施压",
+                stacks: [
+                    { label: "你", value: "65BB" },
+                    { label: "BTN", value: "28BB" },
+                    { label: "盲注", value: "20-25BB" }
+                ],
+                context: "剩余101人，钱圈100人。最后1个泡沫！",
+                question: "你在CO拿到Q♣T♠。前面全弃。你应该？",
+                options: ["弃牌", "加注到2.2BB", "加注到2.5BB", "All-in"],
+                correctIndex: 1,
+                explanation: `<strong>正确：加注到2.2BB</strong>
+
+<div style="color:#e74c3c; margin:15px 0">🔥 最后泡沫ICM压力极大！</div>
+• QTo在CO位足够偷盲<br>
+• 后面3个玩家都不想淘汰<br>
+• 小sizing让对手更难防守<br>
+• 即使被call，你IP有位置优势<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 关键时刻：</div>
+• 最后1个泡沫ICM压力达到顶峰<br>
+• 大筹码应该极度激进<br>
+• 每次成功偷盲都是纯利润<br>
+• 目标：让对手艰难决策`
+            },
+            {
+                category: "大筹码施压",
+                title: "vs短筹码全押",
+                stacks: [
+                    { label: "你", value: "60BB" },
+                    { label: "短筹码", value: "8BB" },
+                    { label: "其他", value: "25-30BB" }
+                ],
+                context: "剩余65人，钱圈63人。你在大盲。",
+                question: "CO短筹码(8BB)全押。按钮和小盲弃牌。你拿到K♠J♣。你应该？",
+                options: ["Fold", "Call 8BB", "不要和短筹码对抗"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#ffd700; margin:15px 0">🎯 泡沫期黄金法则：</div>
+<strong>让别人去淘汰短筹码！</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 为什么fold KJo？</div>
+• 即使KJ vs 随机牌只有60%胜率<br>
+• 输了损失8BB = 巨额ICM损失<br>
+• 赢了只获得8BB = 微小ICM收益<br>
+• 风险/回报严重不对称<br>
+
+<div style="color:#e74c3c; margin:15px 0">⚠️ 记住：</div>
+• 大筹码vs短筹码 = ICM陷阱<br>
+• 等别人淘汰他，你的ICM股权自动增加<br>
+• 只用AA/KK考虑call短筹码`
+            },
+            {
+                category: "大筹码施压",
+                title: "3bet light施压",
+                stacks: [
+                    { label: "你", value: "68BB" },
+                    { label: "MP开池", value: "35BB" },
+                    { label: "盲注", value: "22-28BB" }
+                ],
+                context: "剩余78人，钱圈75人。",
+                question: "MP(35BB)open 2.5BB，折到你在CO，拿到A♥5♥。你应该？",
+                options: ["Fold", "Call", "3bet到7BB", "3bet到9BB"],
+                correctIndex: 2,
+                explanation: `<strong>正确：3bet到7BB</strong>
+
+<div style="color:#ffd700; margin:15px 0">💡 大筹码3bet light策略：</div>
+• A5s有blocker和补牌潜力<br>
+• MP在泡沫期会fold太多<br>
+• 7BB sizing给对手巨大压力<br>
+• 被4bet可以fold<br>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 为什么现在3bet？</div>
+• 泡沫期fold equity极高<br>
+• 中筹码不想冒险<br>
+• 大筹码应该利用ICM优势<br>
+• 目标：积累更多筹码进入钱圈<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 大筹码心态：</div>
+进钱圈没意义，要争取前3名！`
+            },
+            {
+                category: "大筹码施压",
+                title: "连续偷盲",
+                stacks: [
+                    { label: "你", value: "72BB" },
+                    { label: "盲注们", value: "18-30BB" }
+                ],
+                context: "剩余88人，钱圈85人。你已经连续3手偷盲成功。",
+                question: "你在按钮位拿到7♣6♣。前面全弃。你应该？",
+                options: ["现在收手，形象太激进了", "继续加注到2.2BB", "Limp看翻牌", "加注稍大3BB"],
+                correctIndex: 1,
+                explanation: `<strong>正确：继续加注2.2BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 为什么继续偷？</div>
+• 泡沫期ICM压力持续存在<br>
+• 对手即使注意到也不敢3bet<br>
+• 76s有可玩性，被call也能打<br>
+• 大筹码应该持续施压<br>
+
+<div style="color:#e74c3c; margin:15px 0">❌ 常见错误思维：</div>
+"我偷太多了，该收手了"<br>
+→ 错！只要泡沫还在，就继续偷！<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 大师级认知：</div>
+• 对手知道你在偷也无可奈何<br>
+• 他们更怕淘汰，不是你的偷盲<br>
+• 泡沫刚破再调整回来`
+            },
+
+            // ===== 中筹码生存策略 (15题) =====
+            {
+                category: "中筹码生存",
+                title: "避免边缘对抗",
+                stacks: [
+                    { label: "你", value: "28BB" },
+                    { label: "大筹码", value: "70BB" },
+                    { label: "平均", value: "32BB" }
+                ],
+                context: "剩余65人，钱圈63人。",
+                question: "大筹码在CO open 2.2BB。你在按钮位拿到A♠J♣。你应该？",
+                options: ["3bet到7BB", "Call", "Fold", "All-in"],
+                correctIndex: 2,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#e74c3c; margin:15px 0">⚠️ 中筹码泡沫期铁律：</div>
+<strong>不要和大筹码建大底池！</strong>
+
+<div style="color:#ffd700; margin:15px 0">💡 为什么fold AJo？</div>
+• 大筹码在偷盲，range很宽<br>
+• 但你3bet他会继续战斗<br>
+• 28BB不够深可以折腾<br>
+• 输了可能直接淘汰<br>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 中筹码策略：</div>
+• 等更好的spot<br>
+• 等短筹码出局<br>
+• 避免vs大筹码<br>
+• 目标：进钱圈再说`
+            },
+            {
+                category: "中筹码生存",
+                title: "盲注防守难题",
+                stacks: [
+                    { label: "你", value: "25BB" },
+                    { label: "开池者", value: "55BB" },
+                    { label: "短筹码", value: "12BB" }
+                ],
+                context: "剩余52人，钱圈50人。你在大盲。",
+                question: "大筹码BTN open 2BB。你拿到K♠9♥。你应该？",
+                options: ["Call - 赔率不错", "3bet到6BB", "Fold", "Check手气"],
+                correctIndex: 2,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#ffd700; margin:15px 0">🎯 泡沫期盲注防守：</div>
+<strong>要比平时紧很多！</strong>
+
+<div style="color:#e74c3c; margin:15px 0">❌ 为什么不能call K9o？</div>
+• OOP打K9o很难<br>
+• 大筹码会持续施压<br>
+• miss了被c-bet很尴尬<br>
+• 中了K可能被dominate<br>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 中筹码盲注防守：</div>
+• 只防守premium hands<br>
+• 宁可fold太多<br>
+• 等位置好的spot<br>
+• 保存弹药进钱圈`
+            },
+            {
+                category: "中筹码生存",
+                title: "夹在中间",
+                stacks: [
+                    { label: "你", value: "30BB" },
+                    { label: "开池者", value: "38BB" },
+                    { label: "大筹码", value: "72BB" }
+                ],
+                context: "剩余101人，钱圈100人。最后1个泡沫！",
+                question: "MP(38BB) open 2.5BB。你在CO拿到T♠T♣。按钮位是大筹码(72BB)。你应该？",
+                options: ["Call", "3bet到7BB", "Fold", "All-in"],
+                correctIndex: 2,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#e74c3c; margin:15px 0">🚨 这是最难的spot之一！</div>
+
+<div style="color:#ffd700; margin:15px 0">💡 为什么fold TT？</div>
+• 后面还有大筹码(squeeze威胁)<br>
+• Call会被大筹码squeeze<br>
+• 3bet会被MP 4bet或call<br>
+• All-in太激进(30BB不是短筹码)<br>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 关键认知：</div>
+• 最后1个泡沫！TT虽强但不值得冒险<br>
+• 等1人出局，再激进也不迟<br>
+• 保守1手牌 = 保证进钱圈<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 高级玩家选择：</div>
+如果按钮位是短筹码，可以3bet<br>
+但大筹码在后面 = 必须fold`
+            },
+            {
+                category: "中筹码生存",
+                title: "短筹码全押决策",
+                stacks: [
+                    { label: "你", value: "32BB" },
+                    { label: "短筹码", value: "9BB" },
+                    { label: "大盲", value: "45BB" }
+                ],
+                context: "剩余78人，钱圈75人。",
+                question: "短筹码(9BB)在CO全押。你在按钮位拿到Q♠Q♥。大盲位是中等筹码(45BB)。你应该？",
+                options: ["Fold - 让别人去", "Call 9BB", "Re-raise到30BB隔离", "All-in"],
+                correctIndex: 2,
+                explanation: `<strong>正确：Re-raise到30BB隔离</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 为什么QQ要隔离？</div>
+• QQ是premium hand，不能fold<br>
+• Call只获得9BB，被大盲squeeze很尴尬<br>
+• Re-raise到30BB让大盲fold<br>
+• 单挑对抗短筹码9BB全押<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 隔离加注大小：</div>
+• 全押的3-3.5倍<br>
+• 目的：赶走其他人<br>
+• 单挑短筹码<br>
+
+<div style="color:#e74c3c; margin:15px 0">⚠️ 何时不隔离？</div>
+• 边缘牌like AJo → Fold<br>
+• 后面有大筹码可能4bet → Fold<br>
+• 但QQ这种premium必须隔离`
+            },
+            {
+                category: "中筹码生存",
+                title: "被squeeze的抉择",
+                stacks: [
+                    { label: "你", value: "27BB" },
+                    { label: "3bet者", value: "65BB" },
+                    { label: "开池者", value: "35BB" }
+                ],
+                context: "剩余68人，钱圈65人。",
+                question: "你在CO open 2.5BB拿到9♠9♥。大筹码BTN 3bet到8BB。盲注弃牌。你应该？",
+                options: ["Fold", "Call", "4bet到22BB", "All-in"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#ffd700; margin:15px 0">💔 这就是中筹码的悲哀</div>
+
+<div style="color:#e74c3c; margin:15px 0">❌ 为什么不能继续？</div>
+• 大筹码在squeeze，range包含99<br>
+• Call会OOP进入SPR=3的局面<br>
+• 4bet会被AA/KK/AK压制<br>
+• All-in 27BB太激进<br>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 正确思维：</div>
+• 99是好牌，但不够强对抗3bet<br>
+• 泡沫期要extra cautious<br>
+• Fold 2.5BB的损失可以接受<br>
+• 保存27BB等更好机会<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 何时可以call/4bet？</div>
+• TT+ → 考虑call或4bet<br>
+• AK → 考虑4bet<br>
+• 99在这个spot就是fold`
+            },
+
+            // ===== 短筹码反击策略 (10题) =====
+            {
+                category: "短筹码反击",
+                title: "利用ICM压力",
+                stacks: [
+                    { label: "你", value: "12BB" },
+                    { label: "大筹码", value: "75BB" },
+                    { label: "中筹码", value: "28-35BB" }
+                ],
+                context: "剩余55人，钱圈52人。",
+                question: "你在按钮位拿到K♣J♠。前面全弃到你。你应该？",
+                options: ["Fold等更好的牌", "Limp", "Open到2.5BB", "All-in 12BB"],
+                correctIndex: 3,
+                explanation: `<strong>正确：All-in 12BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 短筹码泡沫期策略：</div>
+<strong>利用ICM压力反击！</strong>
+
+<div style="color:#ffd700; margin:15px 0">💡 为什么全押？</div>
+• 盲注有ICM压力不敢call<br>
+• KJs是很强的推挤牌<br>
+• 12BB必须行动了<br>
+• 全押有巨大fold equity<br>
+
+<div style="color:#e74c3c; margin:15px 0">❌ 为什么不小注？</div>
+• Open 2.5BB被3bet很尴尬<br>
+• 剩9.5BB进退两难<br>
+• Limp更是送死<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 短筹码黄金时刻：</div>
+泡沫期是短筹码最容易偷盲的时候！`
+            },
+            {
+                category: "短筹码反击",
+                title: "极短筹码策略",
+                stacks: [
+                    { label: "你", value: "7BB" },
+                    { label: "盲注", value: "45BB + 32BB" }
+                ],
+                context: "剩余88人，钱圈85人。",
+                question: "你在CO拿到A♥3♦。前面全弃。你应该？",
+                options: ["Fold", "All-in", "等按钮位", "等更好的牌"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#e74c3c; margin:15px 0">🚨 7BB是危险区域！</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 为什么A3o要推？</div>
+• 7BB只够推2-3手<br>
+• A3o在CO推挤是标准<br>
+• 泡沫期fold equity极高<br>
+• 再等盲注会吃掉你<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 极短筹码生存法则：</div>
+• <8BB: 推挤范围极宽<br>
+• 任何Ax，Kx suited都推<br>
+• 不要等"完美"牌<br>
+• 位置好就行动<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 记住：</div>
+7BB等不起，A3o已经很好了！`
+            },
+            {
+                category: "短筹码反击",
+                title: "泡沫刚破",
+                stacks: [
+                    { label: "你", value: "15BB" },
+                    { label: "平均", value: "38BB" }
+                ],
+                context: "刚刚进入钱圈！现在250人，保底$1,500。冠军$500,000。",
+                question: "你在UTG拿到9♠9♥。你应该？",
+                options: ["Fold保住名次", "Open到2.5BB", "All-in 15BB", "Limp看set"],
+                correctIndex: 2,
+                explanation: `<strong>正确：All-in 15BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 泡沫刚破 = 黄金时刻！</div>
+
+<div style="color:#ffd700; margin:15px 0">💡 为什么现在激进？</div>
+• ICM压力暂时释放<br>
+• 大家松了口气<br>
+• 99在UTG推挤是标准<br>
+• 15BB正好是推挤stack<br>
+
+<div style="color:#e74c3c; margin:15px 0">❌ 保守心态 = 慢性死亡：</div>
+"我进钱圈了，保住吧"<br>
+→ 错！$1,500没意义，要争前10！<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 冠军思维：</div>
+• 进钱圈只是开始<br>
+• 必须积累筹码<br>
+• 泡沫刚破是最佳时机<br>
+• 99 UTG推 = 正确决策`
+            },
+            {
+                category: "短筹码反击",
+                title: "vs大筹码偷盲",
+                stacks: [
+                    { label: "你", value: "10BB" },
+                    { label: "BTN大筹码", value: "68BB" }
+                ],
+                context: "剩余92人，钱圈90人。你在大盲。",
+                question: "大筹码BTN open 2BB（明显在偷）。小盲弃牌。你拿到A♦8♣。你应该？",
+                options: ["Fold", "Call看翻牌", "3bet到6BB", "All-in 10BB"],
+                correctIndex: 3,
+                explanation: `<strong>正确：All-in 10BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 这是反击时机！</div>
+
+<div style="color:#ffd700; margin:15px 0">💡 为什么全押？</div>
+• 他在偷盲，range很宽<br>
+• A8o对抗宽range有优势<br>
+• 10BB正好全押<br>
+• 他在泡沫期很难call<br>
+
+<div style="color:#e74c3c; margin:15px 0">❌ 为什么不call？</div>
+• Call剩8BB OOP<br>
+• Miss了必须fold c-bet<br>
+• 被动等死<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 短筹码生存法则：</div>
+• 不要被动call<br>
+• 要么fold，要么全押<br>
+• 主动出击<br>
+• 利用泡沫期fold equity`
+            },
+            {
+                category: "短筹码反击",
+                title: "小盲vs大盲",
+                stacks: [
+                    { label: "你(SB)", value: "14BB" },
+                    { label: "BB", value: "55BB" }
+                ],
+                context: "剩余105人，钱圈100人。前面全弃到你。",
+                question: "你在小盲拿到K♦7♠。你应该？",
+                options: ["Fold", "Complete到BB", "Raise到3BB", "All-in 14BB"],
+                correctIndex: 3,
+                explanation: `<strong>正确：All-in 14BB</strong>
+
+<div style="color:#ffd700; margin:15px 0">💡 SB vs BB是特殊战场</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 为什么K7o要推？</div>
+• SB vs BB你有range优势<br>
+• K7o对抗BB防守range不错<br>
+• 14BB推挤是标准<br>
+• 泡沫期BB fold pressure巨大<br>
+
+<div style="color:#e74c3c; margin:15px 0">❌ Complete = 送钱：</div>
+• OOP打K7o很难<br>
+• Miss了损失1BB<br>
+• 被动等死<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 SB推挤范围：</div>
+• <15BB: 推50%+的牌<br>
+• 包括任何Kx, Qx suited<br>
+• 泡沫期更宽`
+            },
+
+            // ===== 多人全押 (5题) =====
+            {
+                category: "多人全押",
+                title: "前面已有全押",
+                stacks: [
+                    { label: "你", value: "38BB" },
+                    { label: "全押者", value: "11BB" },
+                    { label: "后面", value: "多人还未行动" }
+                ],
+                context: "剩余102人，钱圈100人。你在MP。",
+                question: "UTG(11BB)全押。你拿到J♠J♥。后面还有6人未行动。你应该？",
+                options: ["Fold", "Call 11BB", "Raise到30BB隔离", "All-in"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#e74c3c; margin:15px 0">🚨 这是ICM陷阱！</div>
+
+<div style="color:#ffd700; margin:15px 0">💡 为什么fold JJ？</div>
+• 后面还有6人未行动<br>
+• 可能有人拿更强牌<br>
+• 最后2个泡沫，ICM压力巨大<br>
+• JJ虽强但不值得冒险<br>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 何时可以call/raise？</div>
+• QQ+ → 考虑<br>
+• 位置更好（按钮） → 考虑<br>
+• 后面人少 → 考虑<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 记住：</div>
+前面全押 + 后面多人 = 大多数时候fold`
+            },
+
+            // ===== 泡沫刚破后调整 (5题) =====
+            {
+                category: "泡沫刚破",
+                title: "立即调整",
+                stacks: [
+                    { label: "你", value: "42BB" },
+                    { label: "平均", value: "35BB" }
+                ],
+                context: "刚进钱圈！泡沫刚破。现在还剩180人。",
+                question: "CO open 2.2BB。你在按钮位拿到A♣Q♦。你应该？",
+                options: ["Fold", "Call", "3bet到6BB", "3bet到8BB"],
+                correctIndex: 2,
+                explanation: `<strong>正确：3bet到6BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 泡沫刚破 = 战术转变！</div>
+
+<div style="color:#ffd700; margin:15px 0">💡 为什么现在激进？</div>
+• ICM压力瞬间释放<br>
+• 对手会松懈<br>
+• AQo是强牌，3bet for value<br>
+• 需要积累筹码争前列<br>
+
+<div style="color:#e74c3c; margin:15px 0">⚠️ 不要错过窗口期：</div>
+• 泡沫刚破后5-10分钟最松<br>
+• 之后又会紧回来<br>
+• 抓住机会积累筹码<br>
+
+<div style="color:#9b59b6; margin:15px 0">🎯 策略转变：</div>
+泡沫期：超紧 → 刚破：激进 → 稳定后：正常`
+            }
+        ];
+
+        let currentQuestion = 0;
+        let correctCount = 0;
+        let wrongCount = 0;
+        let answered = false;
+
+        function renderScenario() {
+            if (currentQuestion >= BUBBLE_SCENARIOS.length) {
+                showCompletion();
+                return;
+            }
+
+            const scenario = BUBBLE_SCENARIOS[currentQuestion];
+            const container = document.getElementById('scenarioContainer');
+            
+            container.innerHTML = `
+                <div class="scenario-card active">
+                    <div class="scenario-header">
+                        ${scenario.category} · ${scenario.title}
+                    </div>
+                    <div class="stack-info">
+                        ${scenario.stacks.map(s => `
+                            <div class="stack-item">
+                                <div class="stack-label">${s.label}</div>
+                                <div class="stack-value">${s.value}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <p style="color:#8a8a9a; margin:15px 0; line-height:1.6">${scenario.context}</p>
+                    <div class="question">${scenario.question}</div>
+                    <div class="options">
+                        ${scenario.options.map((opt, idx) => `
+                            <button class="option-btn" onclick="selectOption(${idx})">${opt}</button>
+                        `).join('')}
+                    </div>
+                    <div class="explanation" id="explanation"></div>
+                    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">下一题 →</button>
+                </div>
+            `;
+
+            updateProgress();
+            answered = false;
+        }
+
+        function selectOption(idx) {
+            if (answered) return;
+            answered = true;
+
+            const scenario = BUBBLE_SCENARIOS[currentQuestion];
+            const buttons = document.querySelectorAll('.option-btn');
+            
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === scenario.correctIndex) {
+                    btn.classList.add('correct');
+                } else if (i === idx) {
+                    btn.classList.add('wrong');
+                }
+            });
+
+            if (idx === scenario.correctIndex) {
+                correctCount++;
+            } else {
+                wrongCount++;
+            }
+
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('wrongCount').textContent = wrongCount;
+
+            const explanation = document.getElementById('explanation');
+            explanation.innerHTML = scenario.explanation;
+            explanation.classList.add('show');
+            document.getElementById('nextBtn').classList.add('show');
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            renderScenario();
+            window.scrollTo(0, 0);
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / BUBBLE_SCENARIOS.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = 
+                `第 ${currentQuestion + 1} / ${BUBBLE_SCENARIOS.length} 题`;
+        }
+
+        function showCompletion() {
+            const accuracy = Math.round((correctCount / BUBBLE_SCENARIOS.length) * 100);
+            document.getElementById('scenarioContainer').innerHTML = `
+                <div class="scenario-card active" style="text-align:center">
+                    <h2 style="color:#ffd700; font-size:2rem; margin-bottom:20px">🏆 训练完成！</h2>
+                    <p style="font-size:3rem; margin:20px 0">${accuracy}%</p>
+                    <p style="color:#8a8a9a; margin-bottom:30px">正确率</p>
+                    <p style="color:#2ecc71; font-size:1.2rem">正确: ${correctCount}</p>
+                    <p style="color:#e74c3c; font-size:1.2rem; margin-bottom:30px">错误: ${wrongCount}</p>
+                    ${accuracy >= 80 ? 
+                        '<p style="color:#ffd700">🎯 优秀！你已经掌握泡沫期策略！</p>' :
+                        '<p style="color:#f39c12">📚 建议重新训练巩固知识</p>'
+                    }
+                    <button onclick="location.reload()" style="margin-top:20px; padding:15px 30px; background:var(--gold); border:none; border-radius:10px; color:#000; font-weight:700; cursor:pointer">重新训练</button>
+                </div>
+            `;
+        }
+
+        renderScenario();
+    </script>
+</body>
+</html>

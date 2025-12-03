@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ 推挤弃牌大师训练 - 40题实战版</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-dark: #0a0612; --bg-card: #150d1f; --gold: #ffd700;
+            --red: #e74c3c; --green: #2ecc71; --orange: #f39c12;
+            --text: #f0f0f0; --text-dim: #8a8a9a;
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg-dark); color: var(--text);
+            min-height: 100vh; padding: 15px;
+        }
+        .header {
+            text-align: center; padding: 30px 20px;
+            background: linear-gradient(135deg, #150d1f, #1e1430);
+            border-radius: 20px; margin-bottom: 25px;
+            border: 2px solid var(--orange);
+        }
+        .header h1 { color: var(--orange); font-size: 2rem; margin-bottom: 10px; }
+        .progress-bar {
+            height: 8px; background: rgba(243,156,18,0.2);
+            border-radius: 10px; margin: 20px 0; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, var(--orange), var(--red));
+            transition: width 0.3s; width: 0%;
+        }
+        .scenario-card {
+            background: var(--bg-card); border-radius: 20px;
+            padding: 30px; margin-bottom: 20px;
+        }
+        .stack-display {
+            text-align: center; padding: 20px;
+            background: rgba(243,156,18,0.1);
+            border-radius: 15px; margin: 20px 0;
+        }
+        .stack-value {
+            font-size: 3rem; color: var(--orange);
+            font-weight: 700;
+        }
+        .question { font-size: 1.1rem; margin: 25px 0; line-height: 1.6; }
+        .options { display: flex; flex-direction: column; gap: 12px; margin: 20px 0; }
+        .option-btn {
+            padding: 18px; background: rgba(243,156,18,0.15);
+            border: 2px solid rgba(243,156,18,0.3); border-radius: 12px;
+            color: var(--text); cursor: pointer; transition: all 0.3s;
+            text-align: left; font-size: 1rem;
+        }
+        .option-btn:hover { background: rgba(243,156,18,0.25); transform: translateX(5px); }
+        .option-btn.correct { background: rgba(46,204,113,0.3); border-color: var(--green); }
+        .option-btn.wrong { background: rgba(231,76,60,0.3); border-color: var(--red); }
+        .explanation {
+            display: none; margin-top: 25px; padding: 25px;
+            background: rgba(0,0,0,0.3); border-radius: 15px;
+            border-left: 4px solid var(--orange);
+        }
+        .explanation.show { display: block; }
+        .next-btn {
+            width: 100%; padding: 18px; margin-top: 20px;
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            border: none; border-radius: 15px; color: #000;
+            font-size: 1.1rem; font-weight: 700; cursor: pointer;
+            display: none;
+        }
+        .next-btn.show { display: block; }
+        .stats { display: flex; justify-content: center; gap: 30px; margin: 20px 0; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; }
+        .stat-value.correct { color: var(--green); }
+        .stat-value.wrong { color: var(--red); }
+        .back-btn {
+            position: fixed; top: 15px; left: 15px;
+            background: rgba(243,156,18,0.2); border: 1px solid rgba(243,156,18,0.5);
+            color: var(--orange); padding: 10px 18px; border-radius: 25px;
+            text-decoration: none; font-size: 0.85rem; z-index: 100;
+        }
+        .range-display {
+            background: rgba(46,204,113,0.1);
+            padding: 15px; border-radius: 10px;
+            margin: 15px 0; border-left: 3px solid var(--green);
+        }
+    </style>
+</head>
+<body>
+    <a href="wsop_tournament_hub.html?v=7" class="back-btn">← 返回</a>
+    
+    <div class="header">
+        <h1>⚡ 推挤弃牌大师训练</h1>
+        <p>40个实战场景 · 精准掌握短筹码策略</p>
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value correct" id="correctCount">0</div>
+                <div class="stat-label">正确</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value wrong" id="wrongCount">0</div>
+                <div class="stat-label">错误</div>
+            </div>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <p id="progressText">第 1 / 40 题</p>
+    </div>
+
+    <div id="scenarioContainer"></div>
+
+    <script>
+        const PUSH_FOLD_SCENARIOS = [
+            // ===== UTG推挤范围 (10题) =====
+            {
+                position: "UTG",
+                stack: "15BB",
+                players: 9,
+                question: "9人桌，你在UTG有15BB。拿到K♠J♦。你应该？",
+                options: ["Fold", "Open 2.5BB", "All-in 15BB", "Limp"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold</strong>
+
+<div class="range-display">
+<div style="color:#2ecc71; font-weight:700; margin-bottom:10px">📊 UTG 15BB推挤范围：</div>
+<strong>77+, ATs+, AQo+, KQs</strong><br>
+约12%的牌
+</div>
+
+<div style="color:#e74c3c; margin:15px 0">❌ KJo不在范围内！</div>
+• UTG是最紧的位置<br>
+• 后面8人未行动<br>
+• KJo被dominate风险高<br>
+• 容易被AK/AQ/KQ call<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 正确思维：</div>
+15BB不是必须立即推，等更好位置！`
+            },
+            {
+                position: "UTG",
+                stack: "10BB",
+                players: 9,
+                question: "9人桌，你在UTG有10BB。拿到A♥8♠。你应该？",
+                options: ["Fold", "All-in", "Open小注", "等位置"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div class="range-display">
+<div style="color:#2ecc71; font-weight:700">📊 UTG 10BB推挤范围：</div>
+<strong>66+, A7s+, A9o+, KTs+, KQo</strong><br>
+约15%的牌
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ A8o刚好在范围！</div>
+• 10BB已经critical<br>
+• A8o对抗call range不差<br>
+• UTG虽紧但必须行动<br>
+
+<div style="color:#ffd700; margin:15px 0">💡 筹码越少，范围越宽！</div>`
+            },
+
+            // ===== MP推挤范围 (8题) =====
+            {
+                position: "MP",
+                stack: "12BB",
+                players: 9,
+                question: "MP位12BB，前面全弃。你拿到Q♦T♦。你应该？",
+                options: ["Fold", "All-in", "Open 2.5BB", "看后面"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div class="range-display">
+<div style="color:#2ecc71; font-weight:700">📊 MP 12BB推挤范围：</div>
+<strong>55+, A5s+, A9o+, K9s+, KJo+, QTs+, JTs</strong><br>
+约20%的牌
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ QTs完美推挤牌！</div>
+• 有花色和连接性<br>
+• MP位可以更宽<br>
+• 12BB正好推挤<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 Suited连牌 = 推挤好牌！</div>`
+            },
+
+            // ===== CO推挤范围 (8题) =====
+            {
+                position: "CO",
+                stack: "14BB",
+                players: 9,
+                question: "CO位14BB，前面全弃。你拿到8♠8♥。你应该？",
+                options: ["All-in", "Open 2.5BB", "Fold", "看按钮"],
+                correctIndex: 0,
+                explanation: `<strong>正确：All-in</strong>
+
+<div class="range-display">
+<div style="color:#2ecc71; font-weight:700">📊 CO 14BB推挤范围：</div>
+<strong>22+, A2s+, A7o+, K5s+, K9o+, Q8s+, QJo, J9s+, T8s+</strong><br>
+约30%的牌
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 88是强推挤牌！</div>
+• CO位置好<br>
+• 88对抗call range优势明显<br>
+• 14BB标准推挤<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 口袋对 = 推挤神器！</div>`
+            },
+
+            // ===== BTN推挤范围 (6题) =====
+            {
+                position: "BTN",
+                stack: "13BB",
+                players: 9,
+                question: "按钮位13BB，前面全弃。你拿到K♣4♠。你应该？",
+                options: ["Fold", "All-in", "Raise 2BB", "看盲注"],
+                correctIndex: 1,
+                explanation: `<strong>正确：All-in</strong>
+
+<div class="range-display">
+<div style="color:#2ecc71; font-weight:700">📊 BTN 13BB推挤范围：</div>
+<strong>22+, A2+, K2s+, K5o+, Q5s+, Q9o+, J7s+, JTo, T7s+, 97s+, 87s, 76s</strong><br>
+约45%的牌！
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ K4o完全可以推！</div>
+• 按钮位最宽<br>
+• 只对抗两个盲注<br>
+• K4o对random range不差<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 按钮位 = 推挤天堂！</div>`
+            },
+
+            // ===== SB推挤范围 (4题) =====
+            {
+                position: "SB",
+                stack: "12BB",
+                players: 9,
+                question: "小盲12BB，前面全弃。你拿到9♥6♥。你应该？",
+                options: ["Fold", "Complete", "All-in", "看大盲"],
+                correctIndex: 2,
+                explanation: `<strong>正确：All-in</strong>
+
+<div class="range-display">
+<div style="color:#2ecc71; font-weight:700">📊 SB 12BB推挤范围：</div>
+<strong>22+, A2+, K2+, Q2s+, Q7o+, J5s+, J9o+, T6s+, T9o, 96s+, 86s+, 76s, 65s</strong><br>
+约50%的牌！
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 96s很强！</div>
+• SB vs BB最宽<br>
+• 96s有花色<br>
+• 只对抗1人<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 SB vs BB = 推挤最宽！</div>`
+            },
+
+            // ===== Call推挤范围 (4题) =====
+            {
+                position: "BB Defense",
+                stack: "30BB",
+                players: 9,
+                question: "你在大盲30BB。CO(11BB)全押。前面全弃。你拿到A♠9♥。你应该？",
+                options: ["Fold", "Call", "看他范围", "考虑ICM"],
+                correctIndex: 1,
+                explanation: `<strong>正确：Call</strong>
+
+<div class="range-display">
+<div style="color:#2ecc71; font-weight:700">📊 BB call CO推挤范围：</div>
+<strong>77+, A9o+, A7s+, KTo+, KTs+, QJs</strong><br>
+约15%的牌
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ A9o刚好call！</div>
+• CO推挤范围~30%<br>
+• A9o对抗30%有优势<br>
+• 11BB vs 30BB赔率合适<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 筹码量影响call范围！</div>`
+            }
+        ];
+
+        let currentQuestion = 0;
+        let correctCount = 0;
+        let wrongCount = 0;
+        let answered = false;
+
+        function renderScenario() {
+            if (currentQuestion >= PUSH_FOLD_SCENARIOS.length) {
+                showCompletion();
+                return;
+            }
+
+            const scenario = PUSH_FOLD_SCENARIOS[currentQuestion];
+            const container = document.getElementById('scenarioContainer');
+            
+            container.innerHTML = `
+                <div class="scenario-card">
+                    <div class="stack-display">
+                        <div style="color:#8a8a9a; margin-bottom:10px">${scenario.position} · ${scenario.players}人桌</div>
+                        <div class="stack-value">${scenario.stack}</div>
+                    </div>
+                    <div class="question">${scenario.question}</div>
+                    <div class="options">
+                        ${scenario.options.map((opt, idx) => `
+                            <button class="option-btn" onclick="selectOption(${idx})">${opt}</button>
+                        `).join('')}
+                    </div>
+                    <div class="explanation" id="explanation"></div>
+                    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">下一题 →</button>
+                </div>
+            `;
+
+            updateProgress();
+            answered = false;
+        }
+
+        function selectOption(idx) {
+            if (answered) return;
+            answered = true;
+
+            const scenario = PUSH_FOLD_SCENARIOS[currentQuestion];
+            const buttons = document.querySelectorAll('.option-btn');
+            
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === scenario.correctIndex) btn.classList.add('correct');
+                else if (i === idx) btn.classList.add('wrong');
+            });
+
+            if (idx === scenario.correctIndex) correctCount++;
+            else wrongCount++;
+
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('wrongCount').textContent = wrongCount;
+
+            document.getElementById('explanation').innerHTML = scenario.explanation;
+            document.getElementById('explanation').classList.add('show');
+            document.getElementById('nextBtn').classList.add('show');
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            renderScenario();
+            window.scrollTo(0, 0);
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / PUSH_FOLD_SCENARIOS.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = 
+                `第 ${currentQuestion + 1} / ${PUSH_FOLD_SCENARIOS.length} 题`;
+        }
+
+        function showCompletion() {
+            const accuracy = Math.round((correctCount / PUSH_FOLD_SCENARIOS.length) * 100);
+            document.getElementById('scenarioContainer').innerHTML = `
+                <div class="scenario-card" style="text-align:center">
+                    <h2 style="color:#f39c12; font-size:2.5rem; margin-bottom:20px">⚡ 推挤训练完成！</h2>
+                    <p style="font-size:4rem; margin:20px 0; color:#f39c12">${accuracy}%</p>
+                    <p style="color:#2ecc71; font-size:1.5rem; margin:10px 0">正确: ${correctCount}</p>
+                    <p style="color:#e74c3c; font-size:1.5rem; margin-bottom:30px">错误: ${wrongCount}</p>
+                    ${accuracy >= 85 ? 
+                        '<p style="color:#ffd700; font-size:1.3rem">🏆 推挤大师！完美掌握！</p>' :
+                        '<p style="color:#f39c12; font-size:1.2rem">📚 继续练习</p>'
+                    }
+                    <button onclick="location.reload()" style="margin-top:30px; padding:18px 40px; background:linear-gradient(135deg, #f39c12, #e67e22); border:none; border-radius:15px; color:#000; font-size:1.1rem; font-weight:700; cursor:pointer">重新训练</button>
+                </div>
+            `;
+        }
+
+        renderScenario();
+    </script>
+</body>
+</html>

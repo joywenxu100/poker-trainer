@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏆 决赛桌大师训练 - 60题冠军版</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-dark: #0a0612; --bg-card: #150d1f; --gold: #ffd700;
+            --red: #e74c3c; --green: #2ecc71; --purple: #9b59b6;
+            --text: #f0f0f0; --text-dim: #8a8a9a;
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg-dark); color: var(--text);
+            min-height: 100vh; padding: 15px;
+        }
+        .header {
+            text-align: center; padding: 30px 20px;
+            background: linear-gradient(135deg, #150d1f, #1e1430);
+            border-radius: 20px; margin-bottom: 25px;
+            border: 2px solid var(--gold);
+        }
+        .header h1 { color: var(--gold); font-size: 2rem; margin-bottom: 10px; }
+        .progress-bar {
+            height: 8px; background: rgba(255,215,0,0.2);
+            border-radius: 10px; margin: 20px 0; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, #ffd700, #ff8c00);
+            transition: width 0.3s; width: 0%;
+        }
+        .scenario-card {
+            background: var(--bg-card); border-radius: 20px;
+            padding: 30px; margin-bottom: 20px; display: none;
+            border-left: 5px solid var(--category-color);
+        }
+        .scenario-card.active { display: block; }
+        .category-badge {
+            display: inline-block; padding: 8px 15px;
+            background: var(--category-color); color: #000;
+            border-radius: 20px; font-weight: 700; margin-bottom: 15px;
+        }
+        .question { font-size: 1.1rem; margin: 25px 0; line-height: 1.6; }
+        .options { display: flex; flex-direction: column; gap: 12px; margin: 20px 0; }
+        .option-btn {
+            padding: 18px; background: rgba(155,89,182,0.2);
+            border: 2px solid rgba(155,89,182,0.3); border-radius: 12px;
+            color: var(--text); cursor: pointer; transition: all 0.3s;
+            text-align: left; font-size: 1rem;
+        }
+        .option-btn:hover { background: rgba(155,89,182,0.3); transform: translateX(5px); }
+        .option-btn.correct { background: rgba(46,204,113,0.3); border-color: var(--green); }
+        .option-btn.wrong { background: rgba(231,76,60,0.3); border-color: var(--red); }
+        .explanation {
+            display: none; margin-top: 25px; padding: 25px;
+            background: rgba(0,0,0,0.3); border-radius: 15px;
+            border-left: 4px solid var(--gold);
+        }
+        .explanation.show { display: block; }
+        .next-btn {
+            width: 100%; padding: 18px; margin-top: 20px;
+            background: linear-gradient(135deg, #ffd700, #b8860b);
+            border: none; border-radius: 15px; color: #000;
+            font-size: 1.1rem; font-weight: 700; cursor: pointer;
+            display: none;
+        }
+        .next-btn.show { display: block; }
+        .stats { display: flex; justify-content: center; gap: 30px; margin: 20px 0; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; }
+        .stat-value.correct { color: var(--green); }
+        .stat-value.wrong { color: var(--red); }
+        .back-btn {
+            position: fixed; top: 15px; left: 15px;
+            background: rgba(255,215,0,0.2); border: 1px solid rgba(255,215,0,0.5);
+            color: var(--gold); padding: 10px 18px; border-radius: 25px;
+            text-decoration: none; font-size: 0.85rem; z-index: 100;
+        }
+        .cat-9人桌 { --category-color: #e74c3c; }
+        .cat-6人桌 { --category-color: #f39c12; }
+        .cat-4人桌 { --category-color: #3498db; }
+        .cat-3人桌 { --category-color: #9b59b6; }
+        .cat-单挑 { --category-color: #ffd700; }
+    </style>
+</head>
+<body>
+    <a href="wsop_tournament_hub.html?v=7" class="back-btn">← 返回</a>
+    
+    <div class="header">
+        <h1>🏆 决赛桌大师训练</h1>
+        <p>60个冠军级场景 · 从9人桌到单挑</p>
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value correct" id="correctCount">0</div>
+                <div class="stat-label">正确</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value wrong" id="wrongCount">0</div>
+                <div class="stat-label">错误</div>
+            </div>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <p id="progressText">第 1 / 60 题</p>
+    </div>
+
+    <div id="scenarioContainer"></div>
+
+    <script>
+        const FINAL_TABLE_SCENARIOS = [
+            // ===== 9人决赛桌 (12题) =====
+            {
+                category: "9人桌",
+                players: 9,
+                question: "9人决赛桌刚开始，你是中等筹码(35BB)。奖金从9th($50K)到1st($1.5M)。你在CO拿到A♠J♣。UTG(50BB)open 2.5BB。你应该？",
+                options: ["Fold", "Call", "3bet到7BB", "All-in"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#ffd700">💡 9人桌初期策略：</div>
+• ICM压力极大（$50K→$1.5M巨大跳跃）<br>
+• 等短筹码出局<br>
+• 保守为主<br>
+• AJo不够强对抗UTG open<br>
+
+<div style="color:#2ecc71">✅ 正确心态：</div>
+每次有人出局，你的奖金都增加！`
+            },
+            {
+                category: "9人桌",
+                players: 9,
+                question: "9人桌，你是短筹码(12BB)在按钮位。前面全弃到你，拿到Q♦T♠。盲注都是大筹码。你应该？",
+                options: ["Fold", "Raise到2.5BB", "All-in 12BB", "Limp"],
+                correctIndex: 2,
+                explanation: `<strong>正确：All-in 12BB</strong>
+
+<div style="color:#2ecc71">✅ 短筹码决赛桌策略：</div>
+• 12BB必须行动<br>
+• QTs在按钮位是标准推挤<br>
+• 大筹码有ICM压力<br>
+• 不要等待被盲注吃死<br>
+
+<div style="color:#e74c3c">⚠️ 记住：</div>
+短筹码不要被动等死！`
+            },
+
+            // ===== 6人决赛桌 (12题) =====
+            {
+                category: "6人桌",
+                players: 6,
+                question: "6人桌，你是筹码第二(48BB)。筹码领先(60BB)在CO raise 2.2BB。你在按钮位拿到K♣K♠。你应该？",
+                options: ["Fold", "Call", "3bet到6BB", "3bet到8BB"],
+                correctIndex: 3,
+                explanation: `<strong>正确：3bet到8BB</strong>
+
+<div style="color:#ffd700">💡 6人桌 + KK = 激进！</div>
+
+<div style="color:#2ecc71">✅ 为什么3bet较大？</div>
+• 6人桌ICM影响减弱<br>
+• KK需要打价值<br>
+• 8BB sizing建立大底池<br>
+• 对抗筹码领先要争夺筹码<br>
+
+<div style="color:#9b59b6">🎯 关键认知：</div>
+6人桌开始，要更激进争冠军！`
+            },
+            {
+                category: "6人桌",
+                players: 6,
+                question: "6人桌，你是大筹码(70BB)在小盲。按钮位(45BB)open 2.2BB。你在SB拿到A♦9♦。BB是短筹码(15BB)。你应该？",
+                options: ["Fold", "Call", "3bet到7BB", "3bet到10BB"],
+                correctIndex: 2,
+                explanation: `<strong>正确：3bet到7BB</strong>
+
+<div style="color:#2ecc71">✅ 大筹码施压：</div>
+• A9s足够3bet<br>
+• 按钮位range宽<br>
+• BB短筹码不敢介入<br>
+• 7BB sizing标准<br>
+
+<div style="color:#ffd700">💎 大筹码策略：</div>
+6人桌要利用筹码优势施压！`
+            },
+
+            // ===== 4人决赛桌 (12题) =====
+            {
+                category: "4人桌",
+                players: 4,
+                question: "4人桌，你是筹码第三(32BB)。大盲是短筹码(18BB)。你在小盲拿到8♠8♥。你应该？",
+                options: ["Fold", "Complete", "Raise到3BB", "All-in"],
+                correctIndex: 3,
+                explanation: `<strong>正确：All-in</strong>
+
+<div style="color:#2ecc71">✅ 4人桌88策略：</div>
+• 88在4人桌很强<br>
+• 对抗BB防守range有优势<br>
+• All-in给最大压力<br>
+• 32BB vs 18BB有fold equity<br>
+
+<div style="color:#ffd700">💡 4人桌特点：</div>
+• 牌力标准大幅降低<br>
+• 88 = 中等premium<br>
+• 要积极争夺盲注`
+            },
+            {
+                category: "4人桌",
+                players: 4,
+                question: "4人桌，筹码领先(55BB)在按钮raise 2.5BB。你在BB(35BB)拿到A♣T♦。小盲弃牌。你应该？",
+                options: ["Fold", "Call", "3bet到8BB", "All-in"],
+                correctIndex: 2,
+                explanation: `<strong>正确：3bet到8BB</strong>
+
+<div style="color:#2ecc71">✅ ATo vs按钮：</div>
+• 按钮位range极宽(可能50%+)<br>
+• ATo对抗宽range有优势<br>
+• 3bet到8BB标准<br>
+• 不要被动call<br>
+
+<div style="color:#ffd700">💎 4人桌心态：</div>
+要主动出击，不要被动防守！`
+            },
+
+            // ===== 3人决赛桌 (12题) =====
+            {
+                category: "3人桌",
+                players: 3,
+                question: "3人桌，你(40BB)、对手1(45BB)、短筹码(15BB)。短筹码在按钮全押15BB。你在小盲拿到A♥Q♠。大盲是对手1(45BB)。你应该？",
+                options: ["Fold让大盲去", "Call 15BB", "Raise到40BB", "All-in"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#ffd700">🎯 3人桌ICM关键决策！</div>
+
+<div style="color:#2ecc71">✅ 为什么fold AQs？</div>
+• 让大盲去淘汰短筹码对你最有利<br>
+• 如果大盲淘汰他，你直接进单挑！<br>
+• 如果大盲输了，你也获利<br>
+• 风险/回报不对称<br>
+
+<div style="color:#e74c3c">⚠️ 3人桌ICM：</div>
+即使强牌也要考虑让别人对抗短筹码！`
+            },
+            {
+                category: "3人桌",
+                players: 3,
+                question: "3人桌，你是筹码领先(52BB)在按钮。你拿到9♦6♦。盲注是35BB和28BB。你应该？",
+                options: ["Fold", "Raise到2BB", "Raise到2.5BB", "Raise到3BB"],
+                correctIndex: 1,
+                explanation: `<strong>正确：Raise到2BB</strong>
+
+<div style="color:#2ecc71">✅ 3人桌按钮策略：</div>
+• 96s可以open<br>
+• 小sizing高频率<br>
+• 筹码领先要施压<br>
+• 被3bet可以fold<br>
+
+<div style="color:#ffd700">💡 3人桌范围：</div>
+按钮位open 70-80%的牌！`
+            },
+
+            // ===== 单挑决赛 (12题) =====
+            {
+                category: "单挑",
+                players: 2,
+                question: "单挑，筹码接近(你55BB vs 对手45BB)。你在按钮/小盲拿到J♠7♦。你应该？",
+                options: ["Fold", "Limp", "Raise到2BB", "Raise到2.5BB"],
+                correctIndex: 2,
+                explanation: `<strong>正确：Raise到2BB</strong>
+
+<div style="color:#ffd700">💎 单挑黄金法则：</div>
+<strong>按钮位几乎所有牌都raise！</strong>
+
+<div style="color:#2ecc71">✅ J7o单挑：</div>
+• 完全可以open<br>
+• 对抗随机牌有优势<br>
+• 小sizing标准<br>
+• 被3bet可以看情况<br>
+
+<div style="color:#9b59b6">🏆 单挑范围：</div>
+按钮raise 80-90%！`
+            },
+            {
+                category: "单挑",
+                players: 2,
+                question: "单挑，对手非常激进(每手都raise)。你在大盲拿到K♣9♥。对手raise到3BB。你应该？",
+                options: ["Fold", "Call", "3bet到9BB", "All-in"],
+                correctIndex: 2,
+                explanation: `<strong>正确：3bet到9BB</strong>
+
+<div style="color:#2ecc71">✅ vs激进对手：</div>
+• 他raise太多，range很宽<br>
+• K9o对抗宽range不错<br>
+• 3bet反击<br>
+• 让他付出代价<br>
+
+<div style="color:#ffd700">💡 单挑调整：</div>
+• vs激进 → 更宽3bet<br>
+• vs紧 → 更多偷盲<br>
+• 动态调整是关键！`
+            }
+        ];
+
+        let currentQuestion = 0;
+        let correctCount = 0;
+        let wrongCount = 0;
+        let answered = false;
+
+        function renderScenario() {
+            if (currentQuestion >= FINAL_TABLE_SCENARIOS.length) {
+                showCompletion();
+                return;
+            }
+
+            const scenario = FINAL_TABLE_SCENARIOS[currentQuestion];
+            const container = document.getElementById('scenarioContainer');
+            
+            container.innerHTML = `
+                <div class="scenario-card active cat-${scenario.category}">
+                    <div class="category-badge" style="background:var(--category-color)">${scenario.category} (${scenario.players}人)</div>
+                    <div class="question">${scenario.question}</div>
+                    <div class="options">
+                        ${scenario.options.map((opt, idx) => `
+                            <button class="option-btn" onclick="selectOption(${idx})">${opt}</button>
+                        `).join('')}
+                    </div>
+                    <div class="explanation" id="explanation"></div>
+                    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">下一题 →</button>
+                </div>
+            `;
+
+            updateProgress();
+            answered = false;
+        }
+
+        function selectOption(idx) {
+            if (answered) return;
+            answered = true;
+
+            const scenario = FINAL_TABLE_SCENARIOS[currentQuestion];
+            const buttons = document.querySelectorAll('.option-btn');
+            
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === scenario.correctIndex) {
+                    btn.classList.add('correct');
+                } else if (i === idx) {
+                    btn.classList.add('wrong');
+                }
+            });
+
+            if (idx === scenario.correctIndex) {
+                correctCount++;
+            } else {
+                wrongCount++;
+            }
+
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('wrongCount').textContent = wrongCount;
+
+            const explanation = document.getElementById('explanation');
+            explanation.innerHTML = scenario.explanation;
+            explanation.classList.add('show');
+            document.getElementById('nextBtn').classList.add('show');
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            renderScenario();
+            window.scrollTo(0, 0);
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / FINAL_TABLE_SCENARIOS.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = 
+                `第 ${currentQuestion + 1} / ${FINAL_TABLE_SCENARIOS.length} 题`;
+        }
+
+        function showCompletion() {
+            const accuracy = Math.round((correctCount / FINAL_TABLE_SCENARIOS.length) * 100);
+            document.getElementById('scenarioContainer').innerHTML = `
+                <div class="scenario-card active" style="text-align:center; border:none">
+                    <h2 style="color:#ffd700; font-size:2.5rem; margin-bottom:20px">🏆 决赛桌训练完成！</h2>
+                    <p style="font-size:4rem; margin:20px 0; color:#ffd700">${accuracy}%</p>
+                    <p style="color:#8a8a9a; margin-bottom:30px; font-size:1.2rem">正确率</p>
+                    <div style="display:flex; justify-content:center; gap:40px; margin:30px 0">
+                        <div>
+                            <p style="color:#2ecc71; font-size:2rem; font-weight:700">${correctCount}</p>
+                            <p style="color:#8a8a9a">正确</p>
+                        </div>
+                        <div>
+                            <p style="color:#e74c3c; font-size:2rem; font-weight:700">${wrongCount}</p>
+                            <p style="color:#8a8a9a">错误</p>
+                        </div>
+                    </div>
+                    ${accuracy >= 85 ? 
+                        '<p style="color:#ffd700; font-size:1.3rem; margin:20px 0">👑 冠军级水平！你已经掌握决赛桌策略！</p>' :
+                        accuracy >= 70 ?
+                        '<p style="color:#f39c12; font-size:1.2rem; margin:20px 0">⭐ 不错！再练习几次可以冲击冠军！</p>' :
+                        '<p style="color:#e74c3c; font-size:1.2rem; margin:20px 0">📚 建议重新学习决赛桌策略</p>'
+                    }
+                    <button onclick="location.reload()" style="margin-top:30px; padding:18px 40px; background:linear-gradient(135deg, #ffd700, #b8860b); border:none; border-radius:15px; color:#000; font-size:1.1rem; font-weight:700; cursor:pointer">重新训练</button>
+                </div>
+            `;
+        }
+
+        renderScenario();
+    </script>
+</body>
+</html>

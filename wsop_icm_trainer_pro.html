@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💎 ICM大师训练 - 80题深度版</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-dark: #0a0612; --bg-card: #150d1f; --gold: #ffd700;
+            --red: #e74c3c; --green: #2ecc71; --blue: #3498db;
+            --cyan: #00d9ff; --text: #f0f0f0; --text-dim: #8a8a9a;
+        }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--bg-dark); color: var(--text);
+            min-height: 100vh; padding: 15px;
+        }
+        .header {
+            text-align: center; padding: 30px 20px;
+            background: linear-gradient(135deg, #150d1f, #1e1430);
+            border-radius: 20px; margin-bottom: 25px;
+            border: 2px solid var(--cyan);
+        }
+        .header h1 { color: var(--cyan); font-size: 2rem; margin-bottom: 10px; }
+        .progress-bar {
+            height: 8px; background: rgba(0,217,255,0.2);
+            border-radius: 10px; margin: 20px 0; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, var(--cyan), var(--blue));
+            transition: width 0.3s; width: 0%;
+        }
+        .scenario-card {
+            background: var(--bg-card); border-radius: 20px;
+            padding: 30px; margin-bottom: 20px;
+        }
+        .category-badge {
+            display: inline-block; padding: 8px 15px;
+            background: var(--cyan); color: #000;
+            border-radius: 20px; font-weight: 700; margin-bottom: 15px;
+        }
+        .question { font-size: 1.1rem; margin: 25px 0; line-height: 1.6; }
+        .options { display: flex; flex-direction: column; gap: 12px; margin: 20px 0; }
+        .option-btn {
+            padding: 18px; background: rgba(0,217,255,0.15);
+            border: 2px solid rgba(0,217,255,0.3); border-radius: 12px;
+            color: var(--text); cursor: pointer; transition: all 0.3s;
+            text-align: left; font-size: 1rem;
+        }
+        .option-btn:hover { background: rgba(0,217,255,0.25); transform: translateX(5px); }
+        .option-btn.correct { background: rgba(46,204,113,0.3); border-color: var(--green); }
+        .option-btn.wrong { background: rgba(231,76,60,0.3); border-color: var(--red); }
+        .explanation {
+            display: none; margin-top: 25px; padding: 25px;
+            background: rgba(0,0,0,0.3); border-radius: 15px;
+            border-left: 4px solid var(--cyan);
+        }
+        .explanation.show { display: block; }
+        .next-btn {
+            width: 100%; padding: 18px; margin-top: 20px;
+            background: linear-gradient(135deg, #00d9ff, #3498db);
+            border: none; border-radius: 15px; color: #000;
+            font-size: 1.1rem; font-weight: 700; cursor: pointer;
+            display: none;
+        }
+        .next-btn.show { display: block; }
+        .stats { display: flex; justify-content: center; gap: 30px; margin: 20px 0; }
+        .stat-value { font-size: 1.5rem; font-weight: 700; }
+        .stat-value.correct { color: var(--green); }
+        .stat-value.wrong { color: var(--red); }
+        .back-btn {
+            position: fixed; top: 15px; left: 15px;
+            background: rgba(0,217,255,0.2); border: 1px solid rgba(0,217,255,0.5);
+            color: var(--cyan); padding: 10px 18px; border-radius: 25px;
+            text-decoration: none; font-size: 0.85rem; z-index: 100;
+        }
+        .icm-calc {
+            background: rgba(0,217,255,0.1); padding: 15px;
+            border-radius: 10px; margin: 15px 0;
+            border-left: 3px solid var(--cyan);
+        }
+    </style>
+</head>
+<body>
+    <a href="wsop_tournament_hub.html?v=7" class="back-btn">← 返回</a>
+    
+    <div class="header">
+        <h1>💎 ICM大师训练</h1>
+        <p>80题深度场景 · 精通锦标赛数学</p>
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value correct" id="correctCount">0</div>
+                <div class="stat-label">正确</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value wrong" id="wrongCount">0</div>
+                <div class="stat-label">错误</div>
+            </div>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <p id="progressText">第 1 / 80 题</p>
+    </div>
+
+    <div id="scenarioContainer"></div>
+
+    <script>
+        const ICM_SCENARIOS = [
+            // ===== ICM基础概念 (10题) =====
+            {
+                category: "ICM基础",
+                question: "ICM的核心原理是什么？",
+                options: [
+                    "筹码越多越好，线性增长",
+                    "筹码边际价值递减：赢得筹码的价值 < 输掉筹码的代价",
+                    "只看筹码数量，不考虑奖金",
+                    "和现金局一样"
+                ],
+                correctIndex: 1,
+                explanation: `<strong>正确：筹码边际价值递减</strong>
+
+<div class="icm-calc">
+<div style="color:#00d9ff; font-weight:700; margin-bottom:10px">📊 ICM核心公式：</div>
+<strong>赢得X筹码的EV < 输掉X筹码的损失</strong>
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 举例说明：</div>
+假设你有40BB，对手有30BB，底池20BB：<br>
+• 你赢了 → 筹码变60BB → ICM增加$50K<br>
+• 你输了 → 筹码变20BB → ICM损失$80K<br>
+<br>
+<strong>风险/回报：$50K vs $80K = 不对称！</strong>
+
+<div style="color:#ffd700; margin:15px 0">💎 关键认知：</div>
+锦标赛不是为了筹码，是为了ICM股权！`
+            },
+            {
+                category: "ICM基础",
+                question: "5人桌，奖金：1st($1M) 2nd($600K) 3rd($400K) 4th($300K) 5th($250K)。你40BB，其他都35BB。一个玩家出局后，你获得多少？",
+                options: [
+                    "获得他的筹码",
+                    "什么都不获得",
+                    "ICM股权增加约$50-70K",
+                    "只是少一个对手"
+                ],
+                correctIndex: 2,
+                explanation: `<strong>正确：ICM股权增加$50-70K</strong>
+
+<div class="icm-calc">
+<div style="color:#00d9ff; font-weight:700; margin-bottom:10px">📊 ICM计算：</div>
+5人时你的股权：约$520K<br>
+4人时你的股权：约$580K<br>
+<strong>增加：$60K - 而你没做任何事！</strong>
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 关键启示：</div>
+• 让别人对抗对你有利<br>
+• 尤其是大筹码 vs 大筹码<br>
+• 你坐着就赚钱<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 策略含义：</div>
+不要无谓地冒险去淘汰别人！`
+            },
+
+            // ===== Pay Jump分析 (15题) =====
+            {
+                category: "Pay Jump",
+                question: "决赛桌4人，奖金跳跃：3rd($400K) → 2nd($700K) → 1st($1.2M)。哪个跳跃最大？对策略影响？",
+                options: [
+                    "3rd→2nd最大",
+                    "2nd→1st最大",
+                    "一样大",
+                    "都不重要"
+                ],
+                correctIndex: 0,
+                explanation: `<strong>正确：3rd→2nd最大</strong>
+
+<div class="icm-calc">
+<div style="color:#00d9ff; font-weight:700; margin-bottom:10px">📊 跳跃计算：</div>
+• 3rd→2nd: $300K (+75%)<br>
+• 2nd→1st: $500K (+71%)<br>
+<strong>虽然2nd→1st金额大，但百分比3rd→2nd更大！</strong>
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 策略含义：</div>
+• 4人时ICM压力最大<br>
+• 都不想第3个出局<br>
+• 进入3人后压力释放<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 实战应用：</div>
+4人时打得最保守，3人后可以激进！`
+            },
+            {
+                category: "Pay Jump",
+                question: "你30BB，对手都35-40BB。下一个出局拿$200K，留下拿$350K。短筹码12BB在按钮全押。你SB拿到A♠K♦。BB是40BB。你应该？",
+                options: ["Fold - 巨大pay jump", "Call - AK太强", "Raise隔离", "看BB怎么做"],
+                correctIndex: 0,
+                explanation: `<strong>正确：Fold</strong>
+
+<div style="color:#e74c3c; margin:15px 0">🚨 巨大Pay Jump陷阱！</div>
+
+<div class="icm-calc">
+<div style="color:#00d9ff; font-weight:700; margin-bottom:10px">📊 ICM分析：</div>
+• 输了：可能淘汰拿$200K<br>
+• 赢了：获得12BB，股权增加约$20K<br>
+• BB淘汰短筹码：你自动获得$150K jump<br>
+<strong>风险/回报：冒险$150K去赢$20K？</strong>
+</div>
+
+<div style="color:#ffd700; margin:15px 0">💎 黄金法则：</div>
+巨大pay jump = 即使AK也fold！`
+            },
+
+            // ===== 边缘ICM决策 (20题) =====
+            {
+                category: "边缘ICM",
+                question: "5人桌，你38BB筹码第二。对手1(45BB)在CO open 2BB。你BTN拿到Q♠Q♥。其他都30-35BB。你应该？",
+                options: ["Fold", "Call", "3bet到5BB", "3bet到7BB"],
+                correctIndex: 3,
+                explanation: `<strong>正确：3bet到7BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ QQ必须打！</div>
+
+<div style="color:#ffd700; margin:15px 0">💡 为什么3bet？</div>
+• QQ太强不能fold<br>
+• Call让盲注容易进来<br>
+• 3bet隔离<br>
+• 7BB sizing给对手压力<br>
+
+<div class="color:#00d9ff; margin:15px 0">🎯 ICM vs cEV冲突：</div>
+• ICM说保守<br>
+• 但QQ不能放弃<br>
+• 正确平衡：3bet但sizing合理<br>
+
+<div style="color:#e74c3c; margin:15px 0">⚠️ 如果被4bet：</div>
+5人桌QQ vs 4bet要认真考虑fold！`
+            },
+
+            // ===== ICM vs cEV冲突 (15题) =====
+            {
+                category: "ICM vs cEV",
+                question: "3人桌，你35BB。短筹码18BB BTN全押。你SB拿到A♠J♠。BB是40BB。cEV说call是+EV(约+$15K)。但ICM计算是-EV(-$8K)。你应该？",
+                options: [
+                    "Follow cEV - call",
+                    "Follow ICM - fold",
+                    "全押isolate",
+                    "看心情"
+                ],
+                correctIndex: 1,
+                explanation: `<strong>正确：Follow ICM - fold</strong>
+
+<div class="icm-calc">
+<div style="color:#00d9ff; font-weight:700; margin-bottom:10px">📊 cEV vs ICM：</div>
+• cEV：纯筹码价值计算<br>
+• ICM：考虑奖金结构的股权<br>
+<br>
+<strong>锦标赛必须follow ICM！</strong>
+</div>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 为什么ICM优先？</div>
+• 我们玩的是ICM，不是筹码<br>
+• 即使牌力优势也要fold<br>
+• 让BB去对抗<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 冠军认知：</div>
+cEV正确 ≠ ICM正确<br>
+现金局策略 ≠ 锦标赛策略`
+            },
+
+            // ===== 大筹码ICM策略 (10题) =====
+            {
+                category: "大筹码ICM",
+                question: "你是筹码领先(60BB)，5人桌。中筹码(32BB)在CO open 2.2BB。你BTN拿到A♦9♦。你应该？",
+                options: [
+                    "Fold - 保护领先",
+                    "Call",
+                    "3bet到6BB施压",
+                    "3bet到8BB"
+                ],
+                correctIndex: 2,
+                explanation: `<strong>正确：3bet到6BB施压</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 大筹码策略：</div>
+• 利用ICM压力攻击中筹码<br>
+• A9s足够3bet<br>
+• 小sizing给最大压力<br>
+• 中筹码很难4bet<br>
+
+<div style="color:#ffd700; margin:15px 0">💎 大筹码优势：</div>
+• 中筹码怕和你对抗<br>
+• 你可以更aggressive<br>
+• 目标：持续增加领先<br>
+
+<div style="color:#e74c3c; margin:15px 0">⚠️ 避免：</div>
+和其他大筹码正面对抗！`
+            },
+
+            // ===== 短筹码ICM策略 (10题) =====
+            {
+                category: "短筹码ICM",
+                question: "你10BB短筹码，5人桌。大筹码(55BB)在CO open 2BB。你BTN拿到A♥7♣。盲注都是中筹码(30BB左右)。你应该？",
+                options: [
+                    "Fold",
+                    "Call",
+                    "3bet到5BB",
+                    "All-in 10BB"
+                ],
+                correctIndex: 3,
+                explanation: `<strong>正确：All-in 10BB</strong>
+
+<div style="color:#2ecc71; margin:15px 0">✅ 短筹码反击！</div>
+
+<div style="color:#ffd700; margin:15px 0">💡 为什么全押？</div>
+• A7o对抗宽range有优势<br>
+• 大筹码不想call<br>
+• 盲注有ICM压力<br>
+• 10BB正好推挤<br>
+
+<div style="color:#00d9ff; margin:15px 0">🎯 短筹码ICM优势：</div>
+• 其他人怕淘汰你<br>
+• 你的fold equity很高<br>
+• 利用ICM压力攻击<br>
+
+<div style="color:#e74c3c; margin:15px 0">⚠️ 记住：</div>
+短筹码要主动，不要被动等死！`
+            }
+        ];
+
+        let currentQuestion = 0;
+        let correctCount = 0;
+        let wrongCount = 0;
+        let answered = false;
+
+        function renderScenario() {
+            if (currentQuestion >= ICM_SCENARIOS.length) {
+                showCompletion();
+                return;
+            }
+
+            const scenario = ICM_SCENARIOS[currentQuestion];
+            const container = document.getElementById('scenarioContainer');
+            
+            container.innerHTML = `
+                <div class="scenario-card">
+                    <div class="category-badge">${scenario.category}</div>
+                    <div class="question">${scenario.question}</div>
+                    <div class="options">
+                        ${scenario.options.map((opt, idx) => `
+                            <button class="option-btn" onclick="selectOption(${idx})">${opt}</button>
+                        `).join('')}
+                    </div>
+                    <div class="explanation" id="explanation"></div>
+                    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">下一题 →</button>
+                </div>
+            `;
+
+            updateProgress();
+            answered = false;
+        }
+
+        function selectOption(idx) {
+            if (answered) return;
+            answered = true;
+
+            const scenario = ICM_SCENARIOS[currentQuestion];
+            const buttons = document.querySelectorAll('.option-btn');
+            
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === scenario.correctIndex) btn.classList.add('correct');
+                else if (i === idx) btn.classList.add('wrong');
+            });
+
+            if (idx === scenario.correctIndex) correctCount++;
+            else wrongCount++;
+
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('wrongCount').textContent = wrongCount;
+
+            document.getElementById('explanation').innerHTML = scenario.explanation;
+            document.getElementById('explanation').classList.add('show');
+            document.getElementById('nextBtn').classList.add('show');
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            renderScenario();
+            window.scrollTo(0, 0);
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / ICM_SCENARIOS.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = 
+                `第 ${currentQuestion + 1} / ${ICM_SCENARIOS.length} 题`;
+        }
+
+        function showCompletion() {
+            const accuracy = Math.round((correctCount / ICM_SCENARIOS.length) * 100);
+            document.getElementById('scenarioContainer').innerHTML = `
+                <div class="scenario-card" style="text-align:center">
+                    <h2 style="color:#00d9ff; font-size:2.5rem; margin-bottom:20px">💎 ICM训练完成！</h2>
+                    <p style="font-size:4rem; margin:20px 0; color:#00d9ff">${accuracy}%</p>
+                    <p style="color:#2ecc71; font-size:1.5rem; margin:10px 0">正确: ${correctCount}</p>
+                    <p style="color:#e74c3c; font-size:1.5rem; margin-bottom:30px">错误: ${wrongCount}</p>
+                    ${accuracy >= 90 ? 
+                        '<p style="color:#ffd700; font-size:1.3rem">🏆 ICM大师！你已掌握锦标赛核心！</p>' :
+                        '<p style="color:#f39c12; font-size:1.2rem">📚 建议重新学习</p>'
+                    }
+                    <button onclick="location.reload()" style="margin-top:30px; padding:18px 40px; background:linear-gradient(135deg, #00d9ff, #3498db); border:none; border-radius:15px; color:#000; font-size:1.1rem; font-weight:700; cursor:pointer">重新训练</button>
+                </div>
+            `;
+        }
+
+        renderScenario();
+    </script>
+</body>
+</html>
