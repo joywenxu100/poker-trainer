@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 100BB训练模块 - LAG到TAG关键过渡</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0612;
+            --bg-card: #150d1f;
+            --gold: #ffd700;
+            --green: #2ecc71;
+            --red: #e74c3c;
+            --orange: #ff8c00;
+            --blue: #3498db;
+            --text: #f0f0f0;
+            --text-dim: #8a8a9a;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark), #1a0f2e);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(155, 89, 182, 0.2);
+            border: 1px solid rgba(155, 89, 182, 0.5);
+            color: #9b59b6;
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        header {
+            text-align: center;
+            margin: 60px 0 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--orange), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+        }
+
+        .depth-indicator {
+            display: inline-block;
+            background: rgba(255, 140, 0, 0.2);
+            color: var(--orange);
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: 2px solid var(--orange);
+            margin-bottom: 20px;
+        }
+
+        .critical-banner {
+            background: linear-gradient(135deg, rgba(255, 69, 0, 0.2), rgba(255, 140, 0, 0.15));
+            border: 3px solid var(--orange);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .critical-banner h2 {
+            color: var(--orange);
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+
+        .strategy-card {
+            background: linear-gradient(135deg, var(--bg-card), #1e1430);
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 30px;
+            border: 2px solid rgba(255, 140, 0, 0.3);
+        }
+
+        .strategy-card h2 {
+            color: var(--orange);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .stat-box {
+            background: rgba(255, 140, 0, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 140, 0, 0.2);
+            text-align: center;
+        }
+
+        .stat-label {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            color: var(--orange);
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 5px;
+        }
+
+        .stat-change {
+            color: var(--red);
+            font-size: 0.85rem;
+        }
+
+        .transition-box {
+            background: rgba(255, 69, 0, 0.15);
+            border: 2px solid var(--red);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+        }
+
+        .transition-box h3 {
+            color: var(--red);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .mindset-grid {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 20px;
+            align-items: center;
+            margin: 25px 0;
+        }
+
+        .mindset-box {
+            background: rgba(255, 140, 0, 0.1);
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 140, 0, 0.3);
+        }
+
+        .mindset-box h4 {
+            color: var(--orange);
+            margin-bottom: 12px;
+        }
+
+        .arrow {
+            font-size: 3rem;
+            color: var(--orange);
+            text-align: center;
+        }
+
+        .adjustment-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .adjustment-list li {
+            padding: 15px 20px;
+            background: rgba(255, 140, 0, 0.1);
+            border-left: 4px solid var(--orange);
+            margin-bottom: 12px;
+            border-radius: 8px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 140, 0, 0.1);
+        }
+
+        .comparison-table th {
+            background: rgba(255, 140, 0, 0.1);
+            color: var(--orange);
+            font-weight: 700;
+        }
+
+        .example-card {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 140, 0, 0.2);
+        }
+
+        .example-card h3 {
+            color: var(--blue);
+            margin-bottom: 15px;
+        }
+
+        .action-step {
+            background: rgba(52, 152, 219, 0.1);
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin: 8px 0;
+            border-left: 3px solid var(--blue);
+        }
+
+        .warning-box {
+            background: rgba(231, 76, 60, 0.15);
+            border: 2px solid var(--red);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+        }
+
+        .warning-box h3 {
+            color: var(--red);
+            margin-bottom: 12px;
+            font-size: 1.5rem;
+        }
+
+        .advice-box {
+            background: rgba(50, 205, 50, 0.1);
+            border-left: 4px solid var(--green);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .advice-box h3 {
+            color: var(--green);
+            margin-bottom: 12px;
+        }
+
+        .quiz-section {
+            background: linear-gradient(135deg, #1e1430, var(--bg-card));
+            border-radius: 20px;
+            padding: 35px;
+            margin: 30px 0;
+            border: 2px solid rgba(255, 140, 0, 0.3);
+        }
+
+        .quiz-btn {
+            background: linear-gradient(135deg, var(--orange), var(--gold));
+            color: #000;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quiz-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 140, 0, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .mindset-grid { grid-template-columns: 1fr; }
+            .arrow { transform: rotate(90deg); }
+        }
+    </style>
+</head>
+<body>
+    <a href="unified_training_hub.html" class="back-btn">← 返回训练中心</a>
+
+    <div class="container">
+        <header>
+            <h1>🎯 100BB训练模块</h1>
+            <div class="depth-indicator">COMFORTABLE Stack (100-150BB) · TAG+ / Semi-LAG</div>
+            <p style="color: var(--text-dim); font-size: 1.1rem; margin-top: 15px;">
+                从LAG到TAG的关键过渡点 · 心态调整最重要
+            </p>
+        </header>
+
+        <!-- 关键过渡横幅 -->
+        <div class="critical-banner">
+            <h2>🚨 最关键过渡点！</h2>
+            <p style="font-size: 1.2rem; line-height: 1.8; color: var(--text);">
+                这是从<strong style="color: var(--gold);">松凶(LAG)</strong>切换到<strong style="color: var(--orange);">紧凶(TAG)</strong>的分水岭！<br>
+                <strong style="color: var(--red);">难度：⭐⭐⭐⭐⭐ HARD</strong><br>
+                90%的LAG玩家在这里失败，因为无法改变aggressive心态！
+            </p>
+        </div>
+
+        <!-- 心态转变 -->
+        <div class="transition-box">
+            <h3>🧠 心态转变：这是最难的部分</h3>
+            <p style="color: var(--text); line-height: 1.8; margin-bottom: 20px;">
+                从300BB→150BB只是"收紧一点"，心态还是LAG。<br>
+                但从150BB→100BB需要<strong style="color: var(--red);">彻底改变思维方式</strong>！
+            </p>
+
+            <div class="mindset-grid">
+                <div class="mindset-box">
+                    <h4>❌ LAG心态（300/150BB）</h4>
+                    <ul style="line-height: 2; margin-left: 20px;">
+                        <li>进攻第一</li>
+                        <li>最大化chip accumulation</li>
+                        <li>高风险高回报</li>
+                        <li>Fancy plays</li>
+                        <li>压迫对手</li>
+                        <li>Bluff频繁</li>
+                    </ul>
+                </div>
+
+                <div class="arrow">→</div>
+
+                <div class="mindset-box">
+                    <h4>✅ TAG心态（100BB）</h4>
+                    <ul style="line-height: 2; margin-left: 20px;">
+                        <li>平衡accumulation和survival</li>
+                        <li>Solid play为主</li>
+                        <li>中等风险</li>
+                        <li>直接打法</li>
+                        <li>Selective aggression</li>
+                        <li>Bluff selective</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="background: rgba(255, 69, 0, 0.2); padding: 20px; border-radius: 10px; margin-top: 20px;">
+                <strong style="color: var(--red); font-size: 1.2rem;">⚠️ 常见心态错误：</strong>
+                <ul style="line-height: 2; margin: 15px 0 0 20px;">
+                    <li>"我还有100BB，够深了，继续LAG吧" → <strong style="color: var(--red);">错！</strong></li>
+                    <li>"收紧就是弱，我要保持aggressive" → <strong style="color: var(--red);">错！</strong></li>
+                    <li>"Triple barrel还是可以的吧" → <strong style="color: var(--red);">错！</strong></li>
+                    <li>"3-Bet pot all-in没问题" → <strong style="color: var(--red);">错！</strong></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 核心策略 -->
+        <div class="strategy-card">
+            <h2>🎯 核心策略：TAG+ / Semi-LAG</h2>
+            <p style="color: var(--text-dim); line-height: 1.8; margin-bottom: 20px;">
+                在100BB深度，你需要明显收紧范围和减少诈唬。<br>
+                <strong style="color: var(--orange);">不再是"LAG稍微收紧"，而是"TAG稍微loose"！</strong>
+            </p>
+
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label">VPIP范围</div>
+                    <div class="stat-value">24-30%</div>
+                    <div class="stat-change">↓ 从150BB的28-34%</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">PFR范围</div>
+                    <div class="stat-value">20-26%</div>
+                    <div class="stat-change">↓ 从150BB的24-30%</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">3-Bet频率</div>
+                    <div class="stat-value">10-14%</div>
+                    <div class="stat-change">↓ 从150BB的12-16%</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Cbet频率</div>
+                    <div class="stat-value">60-68%</div>
+                    <div class="stat-change">↓ 从150BB的65-72%</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">SPR目标</div>
+                    <div class="stat-value">5-10</div>
+                    <div class="stat-change">⚠️ SPR更低，更易committed</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">风险容忍度</div>
+                    <div class="stat-value">中等</div>
+                    <div class="stat-change">明显降低</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 10大关键调整 -->
+        <div class="strategy-card">
+            <h2>🔧 从150BB的10大关键调整</h2>
+            <ul class="adjustment-list">
+                <li>
+                    <strong>1. Open范围再收紧5% → TAG范围</strong><br>
+                    只玩solid hands。移除所有边缘suited hands（K8s-K6s, Q9s-Q6s, J9s-J6s等）。<br>
+                    <span style="color: var(--orange);">原因：100BB隐含赔率不足以支持投机牌。</span>
+                </li>
+                <li>
+                    <strong>2. 3-Bet诈唬减少40% → 主要价值</strong><br>
+                    3-Bet主要用于value（JJ+, AQ+）。诈唬只用premium bluffs（A5s-A2s, suited connectors with blockers）。<br>
+                    <span style="color: var(--orange);">原因：100BB的3-Bet pot（25BB，SPR=3）极易committed。</span>
+                </li>
+                <li>
+                    <strong>3. 停止Triple Barrel Pure Bluff</strong><br>
+                    不要用完全空气三条街下注。至少需要some equity或strong blockers。<br>
+                    <span style="color: var(--orange);">原因：100BB时对手更容易call down。</span>
+                </li>
+                <li>
+                    <strong>4. 更多Pot Control With Medium Hands</strong><br>
+                    顶对弱踢脚、中对、弱两对 → check back turn/river，或small bet。不要aggressive 3条街。<br>
+                    <span style="color: var(--orange);">原因：降低variance，避免huge pots without nuts。</span>
+                </li>
+                <li>
+                    <strong>5. Fold更多边缘Spots</strong><br>
+                    弱顶对vs aggression → fold。中对vs double barrel → fold。听牌without odds → fold。<br>
+                    <span style="color: var(--orange);">原因：100BB时每个错误call都很贵。</span>
+                </li>
+                <li>
+                    <strong>6. Position更加重要</strong><br>
+                    OOP时极度谨慎。避免OOP打大底池。IP时才考虑fancy plays。<br>
+                    <span style="color: var(--orange);">原因：100BB的position优势更critical。</span>
+                </li>
+                <li>
+                    <strong>7. 停止Float Plays</strong><br>
+                    不要用空气Float flop打算turn偷。Float只用有equity的牌（听牌、对、overs）。<br>
+                    <span style="color: var(--orange);">原因：100BB时Float后被raise代价太高。</span>
+                </li>
+                <li>
+                    <strong>8. Check-Raise频率降低</strong><br>
+                    从150BB的18-23% → 100BB的15-20%。更多check-call或check-fold。<br>
+                    <span style="color: var(--orange);">原因：100BB的check-raise pot极大，风险高。</span>
+                </li>
+                <li>
+                    <strong>9. vs LAG玩家避免Ego Battle</strong><br>
+                    不要试图out-aggressive LAG玩家。用solid hands，让他们bluff into you。<br>
+                    <span style="color: var(--orange);">原因：100BB时ego battle代价是你的tournament life。</span>
+                </li>
+                <li>
+                    <strong>10. 开始考虑ICM（如果接近钱圈）</strong><br>
+                    如果是锦标赛且接近泡沫期，ICM开始影响决策。<br>
+                    <span style="color: var(--orange);">原因：100BB时chip的价值开始受ICM影响。</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 详细对比表 -->
+        <div class="strategy-card">
+            <h2>📊 150BB vs 100BB 完整对比</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>场景</th>
+                        <th>150BB做法</th>
+                        <th>100BB调整（关键！）</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>UTG Open</strong></td>
+                        <td>14% (包括22-55, A9s+)</td>
+                        <td>12% (移除22-44, A9s)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CO Open</strong></td>
+                        <td>38%</td>
+                        <td>30% (收紧8%！)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>BTN vs SB 3-Bet</strong></td>
+                        <td>3-Bet 15%</td>
+                        <td>3-Bet 12% (主要价值)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>面对3-Bet with TT</strong></td>
+                        <td>Call 70%</td>
+                        <td>Call 40%, 4-Bet 30%, Fold 30%</td>
+                    </tr>
+                    <tr>
+                        <td><strong>面对3-Bet with AJo</strong></td>
+                        <td>Call 40%, Fold 60%</td>
+                        <td>Fold 90% OOP, Call 10% IP only</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Flop Cbet湿牌面</strong></td>
+                        <td>55-65%</td>
+                        <td>45-55% (更多check)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Triple Barrel Bluff</strong></td>
+                        <td>Selective (25%)</td>
+                        <td>Rare (10%, need strong reason)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>顶对弱踢脚 vs Raise</strong></td>
+                        <td>Call考虑, Fold部分</td>
+                        <td>Fold 85%+</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Float with A高</strong></td>
+                        <td>Occasional</td>
+                        <td>Almost Never</td>
+                    </tr>
+                    <tr>
+                        <td><strong>vs Aggressive LAG</strong></td>
+                        <td>Selective battle</td>
+                        <td>Avoid battle, trap only</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 实战例子 -->
+        <div class="example-card">
+            <h3>💡 关键例子1：你有99，面对CO 3-Bet (OOP)</h3>
+            <div class="action-step">
+                <strong>场景：</strong>你UTG open 99，CO 3-Bet。你和他都是100BB深度。
+            </div>
+            <div class="action-step" style="background: rgba(231, 76, 60, 0.1); border-color: var(--red);">
+                <strong>❌ 150BB做法：</strong>Call 70%，打算flop check-raise或check-call。
+            </div>
+            <div class="action-step" style="background: rgba(50, 205, 50, 0.1); border-color: var(--green);">
+                <strong>✅ 100BB正确做法：</strong>
+                <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
+                    <li>Fold 60% （最安全）</li>
+                    <li>4-Bet 30% （如果他3-Bet很宽）</li>
+                    <li>Call 10% （只有极特殊情况）</li>
+                </ul>
+                <strong>原因：</strong>100BB，3-Bet pot是25BB，SPR=3。你OOP with 99，面对Cbet很难处理。<br>
+                输了这手你变成短筹码。不值得冒险！
+            </div>
+        </div>
+
+        <div class="example-card">
+            <h3>💡 关键例子2：Flop顶对，Turn被Raise</h3>
+            <div class="action-step">
+                <strong>场景：</strong>你BTN open AJo，BB call。Flop A♠8♥3♦，你Cbet，他call。<br>
+                Turn 5♣，你bet 50%，他Raise到150%。你100BB深度。
+            </div>
+            <div class="action-step" style="background: rgba(231, 76, 60, 0.1); border-color: var(--red);">
+                <strong>❌ LAG做法：</strong>Call或3-Bet all-in（"他可能bluff"）。
+            </div>
+            <div class="action-step" style="background: rgba(50, 205, 50, 0.1); border-color: var(--green);">
+                <strong>✅ 100BB TAG做法：</strong>Fold 90%。<br>
+                <strong>原因：</strong>
+                <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
+                    <li>你只有顶对弱踢脚</li>
+                    <li>他的range是2对+, sets, 听牌, bluffs</li>
+                    <li>即使他50% bluff，你equity不够</li>
+                    <li>Call或3-Bet会put整个stack at risk</li>
+                    <li>100BB时不要在边缘spot gamble</li>
+                </ul>
+                <strong>结论：</strong>保护你的100BB，fold掉。等更好的spot。
+            </div>
+        </div>
+
+        <div class="example-card">
+            <h3>💡 关键例子3：Triple Barrel Decision</h3>
+            <div class="action-step">
+                <strong>场景：</strong>你CO open K♣Q♣，BTN call。Flop A♠7♦2♥，你Cbet，他call。<br>
+                Turn 9♠，你bet again，他call。River 4♦。你完全miss。
+            </div>
+            <div class="action-step" style="background: rgba(231, 76, 60, 0.1); border-color: var(--red);">
+                <strong>❌ LAG做法：</strong>River bet 75% pot（"代表Ax"）。
+            </div>
+            <div class="action-step" style="background: rgba(50, 205, 50, 0.1); border-color: var(--green);">
+                <strong>✅ 100BB TAG做法：</strong>Check back 95%。<br>
+                <strong>原因：</strong>
+                <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
+                    <li>他call了两次，range是Ax, 7x, pocket pairs, draws</li>
+                    <li>River brick，他的weak Ax会call</li>
+                    <li>你的story不够strong（两次small bet）</li>
+                    <li>100BB时triple barrel pure bluff fold equity太低</li>
+                    <li>失败了损失巨大（可能30-40BB）</li>
+                </ul>
+                <strong>结论：</strong>Check back，接受你miss了。保存筹码for next hand。
+            </div>
+        </div>
+
+        <!-- 最大警告 -->
+        <div class="warning-box">
+            <h3>🚨 100BB致命错误（必须避免！）</h3>
+            <ol style="line-height: 2.2; margin-left: 20px; font-size: 1.05rem;">
+                <li>
+                    <strong style="color: var(--red);">心态错误：还想LAG</strong><br>
+                    → 这是100BB最大杀手。必须接受你不再是LAG玩家！
+                </li>
+                <li>
+                    <strong style="color: var(--red);">3-Bet pot轻易all-in without premium</strong><br>
+                    → 100BB的3-Bet pot极易all-in。99以下不要轻易commit。
+                </li>
+                <li>
+                    <strong style="color: var(--red);">Triple barrel pure bluff</strong><br>
+                    → 100BB时几乎never triple barrel without equity/blockers。
+                </li>
+                <li>
+                    <strong style="color: var(--red);">Float plays</strong><br>
+                    → 停止用空气float。只float with equity。
+                </li>
+                <li>
+                    <strong style="color: var(--red);">vs LAG玩家ego battle</strong><br>
+                    → 100BB时避免battle。用strong hands trap他们。
+                </li>
+                <li>
+                    <strong style="color: var(--red);">不fold边缘spots</strong><br>
+                    → 学会fold顶对弱踢脚、中对、弱两对when facing aggression。
+                </li>
+                <li>
+                    <strong style="color: var(--red);">OOP打大底池</strong><br>
+                    → 100BB时OOP极度disadvantage。避免OOP big pots。
+                </li>
+            </ol>
+        </div>
+
+        <!-- 成功建议 -->
+        <div class="advice-box">
+            <h3>✅ 100BB成功的7个关键</h3>
+            <ol style="line-height: 2; margin-left: 20px;">
+                <li>🧠 <strong>心态第一</strong>：接受你现在是TAG，不是LAG。这是最难也是最重要的。</li>
+                <li>📊 <strong>收紧范围</strong>：只玩solid hands。移除所有边缘投机牌。</li>
+                <li>🛡️ <strong>Fold是朋友</strong>：学会fold边缘spots。保护你的100BB。</li>
+                <li>🎯 <strong>Selective Aggression</strong>：有strong hand才aggressive。不要bluff for the sake of it。</li>
+                <li>💰 <strong>Pot Control</strong>：Medium hands更多check back。避免huge pots without nuts。</li>
+                <li>📍 <strong>Position Critical</strong>：OOP极度谨慎。IP才考虑marginal plays。</li>
+                <li>🎭 <strong>Solid > Fancy</strong>：直接打法 > fancy plays。100BB时straightforward wins。</li>
+            </ol>
+        </div>
+
+        <!-- 训练测验 -->
+        <div class="quiz-section">
+            <h2 style="color: var(--orange); margin-bottom: 20px; text-align: center;">🎮 100BB过渡测验</h2>
+            <p style="text-align: center; color: var(--text-dim); margin-bottom: 25px; font-size: 1.1rem;">
+                测试你是否真正理解从LAG到TAG的转变<br>
+                <strong style="color: var(--red);">这是最难的测验！</strong>
+            </p>
+            <div style="text-align: center;">
+                <button class="quiz-btn" onclick="alert('100BB过渡测验功能开发中！\n\n将包含：\n- 30个关键决策场景\n- LAG vs TAG思维对比\n- 边缘spot fold训练\n- 3-Bet pot管理\n- Pot control练习\n- 心态调整测试\n\n完成后给出个性化分析和建议。')">
+                    开始测验（高难度）
+                </button>
+            </div>
+        </div>
+
+        <!-- 相关模块链接 -->
+        <div style="text-align: center; margin: 50px 0; padding-top: 30px; border-top: 1px solid rgba(255,140,0,0.2);">
+            <p style="color: var(--text-dim); margin-bottom: 20px;">继续学习其他筹码深度</p>
+            <a href="stack_150bb_trainer.html" style="color: var(--orange); text-decoration: none; margin: 0 15px;">← 150BB训练</a>
+            <a href="stack_60bb_trainer.html" style="color: var(--orange); text-decoration: none; margin: 0 15px;">60BB训练 →</a>
+            <a href="unified_training_hub.html" style="color: var(--orange); text-decoration: none; margin: 0 15px;">返回中心</a>
+        </div>
+    </div>
+
+    <script src="stack_depth_adapter.js"></script>
+    <script>
+        // 页面加载动画
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.strategy-card, .example-card, .warning-box, .advice-box, .transition-box');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
+
