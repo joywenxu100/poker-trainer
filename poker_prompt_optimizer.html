@@ -1005,10 +1005,29 @@
                 showToast('🎉 分析完成！', 'success');
 
             } catch (error) {
+                console.error('分析错误:', error);
                 addLog(`❌ 错误：${error.message}`, 'error');
+                
+                // 根据错误类型提供解决建议
+                if (error.message.includes('密钥') || error.message.includes('API') || error.message.includes('401')) {
+                    addLog('💡 建议：请检查API密钥是否正确配置', 'warning');
+                } else if (error.message.includes('超时') || error.message.includes('timeout')) {
+                    addLog('💡 建议：网络较慢，请稍后重试', 'warning');
+                } else if (error.message.includes('quota') || error.message.includes('credit')) {
+                    addLog('💡 建议：API配额不足，请检查账户余额', 'warning');
+                }
+                
                 showToast(`❌ ${error.message}`, 'error');
                 updateProgress(1, 'error', '处理失败');
                 updateProgress(2, 'error', '处理失败');
+                
+                // 自动展开日志显示错误详情
+                const logContent = document.getElementById('logContent');
+                const logToggle = document.getElementById('logToggle');
+                if (logContent.classList.contains('collapsed')) {
+                    logContent.classList.remove('collapsed');
+                    logToggle.textContent = '收起';
+                }
             } finally {
                 btn.disabled = false;
                 btn.classList.remove('loading');

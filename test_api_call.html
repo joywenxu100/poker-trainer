@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>测试API调用</title>
+</head>
+<body>
+    <h1>测试Gemini API调用</h1>
+    <button onclick="testAPI()">测试API</button>
+    <div id="result"></div>
+    
+    <script>
+        async function testAPI() {
+            const apiKey = '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';
+            const apiUrl = 'https://openrouter.ai/api/v1/chat/completions';
+            
+            document.getElementById('result').innerHTML = '测试中...';
+            
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`,
+                        'HTTP-Referer': 'https://joywenxu100.github.io/poker-trainer/',
+                        'X-Title': 'Poker Prompt Optimizer Test'
+                    },
+                    body: JSON.stringify({
+                        model: 'google/gemini-3-pro-preview',
+                        max_tokens: 100,
+                        messages: [{
+                            role: 'user',
+                            content: '你好，请简短回复测试'
+                        }]
+                    })
+                });
+                
+                const data = await response.json();
+                console.log('API响应:', data);
+                
+                if (!response.ok) {
+                    document.getElementById('result').innerHTML = `❌ 错误: ${JSON.stringify(data, null, 2)}`;
+                } else {
+                    document.getElementById('result').innerHTML = `✅ 成功！<br><pre>${JSON.stringify(data, null, 2)}</pre>`;
+                }
+            } catch (error) {
+                document.getElementById('result').innerHTML = `❌ 异常: ${error.message}<br>${error.stack}`;
+                console.error('错误详情:', error);
+            }
+        }
+    </script>
+</body>
+</html>
+
