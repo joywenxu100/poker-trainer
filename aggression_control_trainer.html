@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>进攻性控制大师 - 3Bet/4Bet防御训练</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+
+        .problem-statement {
+            background: rgba(255, 87, 87, 0.2);
+            border-left: 4px solid #ff5757;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+
+        .solution-statement {
+            background: rgba(87, 255, 151, 0.2);
+            border-left: 4px solid #57ff97;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+
+        .training-modules {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .module-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+            border-color: #4CAF50;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .module-card.active {
+            border-color: #4CAF50;
+            background: rgba(76, 175, 80, 0.2);
+        }
+
+        .module-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .module-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .training-area {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin-top: 30px;
+            backdrop-filter: blur(10px);
+            display: none;
+        }
+
+        .training-area.show {
+            display: block;
+        }
+
+        .scenario {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .scenario-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .scenario-info {
+            flex: 1;
+        }
+
+        .position-info {
+            display: inline-block;
+            background: rgba(255, 193, 7, 0.3);
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .hand-display {
+            font-size: 3em;
+            text-align: center;
+            margin: 30px 0;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px;
+        }
+
+        .card {
+            display: inline-block;
+            width: 70px;
+            height: 100px;
+            background: white;
+            color: black;
+            border-radius: 10px;
+            margin: 0 10px;
+            line-height: 100px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .card.red {
+            color: #e74c3c;
+        }
+
+        .action-situation {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .action-btn {
+            padding: 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .action-btn.fold {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .action-btn.call {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+
+        .action-btn.raise {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+
+        .action-btn.reraise {
+            background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        }
+
+        .feedback {
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            display: none;
+            animation: slideIn 0.5s;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: rgba(46, 204, 113, 0.3);
+            border: 2px solid #2ecc71;
+        }
+
+        .feedback.wrong {
+            background: rgba(231, 76, 60, 0.3);
+            border: 2px solid #e74c3c;
+        }
+
+        .feedback.warning {
+            background: rgba(241, 196, 15, 0.3);
+            border: 2px solid #f1c40f;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .explanation {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .stats-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            opacity: 0.8;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .next-btn {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 20px auto;
+            display: block;
+            transition: all 0.3s;
+        }
+
+        .next-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .opponent-profile {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .range-display {
+            display: grid;
+            grid-template-columns: repeat(13, 1fr);
+            gap: 3px;
+            margin: 20px 0;
+            font-size: 0.8em;
+        }
+
+        .range-cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+
+        .range-cell.value {
+            background: rgba(231, 76, 60, 0.6);
+        }
+
+        .range-cell.bluff {
+            background: rgba(52, 152, 219, 0.6);
+        }
+
+        .key-lessons {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .lesson-item {
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(0, 0, 0, 0.2);
+            border-left: 4px solid #4CAF50;
+            border-radius: 5px;
+        }
+
+        .aggression-meter {
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .meter-bar {
+            width: 100%;
+            height: 40px;
+            background: linear-gradient(90deg, #2ecc71, #f1c40f, #e74c3c);
+            border-radius: 20px;
+            position: relative;
+            margin: 20px 0;
+        }
+
+        .meter-indicator {
+            position: absolute;
+            width: 4px;
+            height: 50px;
+            background: white;
+            top: -5px;
+            transition: left 0.5s;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+
+        .zone-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 进攻性控制大师</h1>
+            <div class="subtitle">3-Bet & 4-Bet 防御专项训练系统</div>
+            <div class="subtitle">专治过度激进 | 100%封堵压制漏洞</div>
+        </header>
+
+        <div class="problem-statement">
+            <h3>⚠️ 你的问题诊断</h3>
+            <p><strong>症状：</strong>3-Bet和4-Bet底池中过度激进，频繁被对手压制</p>
+            <p><strong>根本原因：</strong></p>
+            <ul style="margin-top: 10px; margin-left: 20px;">
+                <li>✗ 3-Bet/4-Bet范围过宽，包含太多边缘牌</li>
+                <li>✗ 未能识别对手的3-Bet/4-Bet类型（价值 vs 诈唬）</li>
+                <li>✗ 位置劣势时仍然过度激进</li>
+                <li>✗ 对再加注（5-Bet）缺乏应对策略</li>
+                <li>✗ 底池控制能力不足，容易陷入高风险决策</li>
+            </ul>
+        </div>
+
+        <div class="solution-statement">
+            <h3>✅ 训练目标</h3>
+            <p><strong>通过本系统，你将学会：</strong></p>
+            <ul style="margin-top: 10px; margin-left: 20px;">
+                <li>✓ 精准识别何时该激进、何时该保守</li>
+                <li>✓ 根据位置和对手类型调整策略</li>
+                <li>✓ 掌握正确的3-Bet/4-Bet防守范围</li>
+                <li>✓ 学会及时fold，避免堆筹码陷阱</li>
+                <li>✓ 建立平衡的进攻/防守体系</li>
+            </ul>
+        </div>
+
+        <div class="training-modules">
+            <div class="module-card" onclick="startModule(1)">
+                <div class="module-icon">🛡️</div>
+                <div class="module-title">面对3-Bet的防守</div>
+                <div>学会识别何时该call、fold还是4-Bet</div>
+            </div>
+
+            <div class="module-card" onclick="startModule(2)">
+                <div class="module-icon">⚔️</div>
+                <div class="module-title">4-Bet决策训练</div>
+                <div>掌握4-Bet的时机和范围控制</div>
+            </div>
+
+            <div class="module-card" onclick="startModule(3)">
+                <div class="module-icon">🎭</div>
+                <div class="module-title">对手类型识别</div>
+                <div>根据对手风格调整激进程度</div>
+            </div>
+
+            <div class="module-card" onclick="startModule(4)">
+                <div class="module-icon">📍</div>
+                <div class="module-title">位置意识强化</div>
+                <div>不同位置的激进度控制</div>
+            </div>
+
+            <div class="module-card" onclick="startModule(5)">
+                <div class="module-icon">💰</div>
+                <div class="module-title">底池大小控制</div>
+                <div>避免陷入过大底池的陷阱</div>
+            </div>
+
+            <div class="module-card" onclick="startModule(6)">
+                <div class="module-icon">🧠</div>
+                <div class="module-title">综合实战测试</div>
+                <div>50道高难度场景测试</div>
+            </div>
+        </div>
+
+        <!-- 统计面板 -->
+        <div class="stats-panel">
+            <div class="stat-card">
+                <div class="stat-label">正确率</div>
+                <div class="stat-value" id="accuracy">0%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">已完成</div>
+                <div class="stat-value" id="completed">0/50</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">过度激进率</div>
+                <div class="stat-value" id="aggression">0%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Fold准确率</div>
+                <div class="stat-value" id="foldAccuracy">0%</div>
+            </div>
+        </div>
+
+        <!-- 进攻性指示器 -->
+        <div class="aggression-meter">
+            <h3>你的进攻性水平</h3>
+            <div class="meter-bar">
+                <div class="meter-indicator" id="aggressionIndicator" style="left: 80%;"></div>
+            </div>
+            <div class="zone-labels">
+                <span>🟢 太保守</span>
+                <span>🟡 平衡</span>
+                <span>🔴 过度激进（你当前位置）</span>
+            </div>
+        </div>
+
+        <!-- 训练区域 -->
+        <div class="training-area" id="trainingArea">
+            <div class="scenario" id="scenarioContainer">
+                <!-- 场景动态生成 -->
+            </div>
+
+            <div class="feedback" id="feedback">
+                <!-- 反馈动态生成 -->
+            </div>
+
+            <button class="next-btn" onclick="nextScenario()" id="nextBtn" style="display: none;">
+                下一题 →
+            </button>
+        </div>
+
+        <!-- 关键要点总结 -->
+        <div class="key-lessons">
+            <h3>🎓 核心要点（必须记住）</h3>
+            <div class="lesson-item">
+                <strong>1. 位置是王道</strong><br>
+                IP（有位置）可以激进，OOP（无位置）必须保守。面对3-Bet时，EP和MP的牌要比BTN严格得多。
+            </div>
+            <div class="lesson-item">
+                <strong>2. 识别对手3-Bet类型</strong><br>
+                紧手的3-Bet = 强牌（fold中等牌）| 松手的3-Bet = 可能诈唬（可以4-Bet反击）
+            </div>
+            <div class="lesson-item">
+                <strong>3. 4-Bet要有理由</strong><br>
+                4-Bet只用：① 超强牌（AA/KK/AK） ② 对抗松手的诈唬4-Bet。其他情况考虑call或fold。
+            </div>
+            <div class="lesson-item">
+                <strong>4. 学会及时fold</strong><br>
+                面对3-Bet，大部分牌应该fold（包括AJ、KQ、77-99等中等牌）。Fold不是懦弱，是纪律。
+            </div>
+            <div class="lesson-item">
+                <strong>5. 控制底池大小</strong><br>
+                边缘牌在大底池里是灾难。宁可小底池亏小钱，不要大底池亏光。
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 训练数据
+        const trainingData = {
+            module1: [
+                {
+                    position: 'BTN',
+                    yourHand: ['A♠', 'J♥'],
+                    action: '你在BTN开局加注到3BB',
+                    situation: 'SB 3-Bet到10BB（SB是紧手，VPIP 18%）',
+                    stack: '100BB',
+                    opponent: '紧手（很少3-Bet，只用强牌）',
+                    options: [
+                        { action: 'Fold', correct: true, reason: 'AJ面对紧手的3-Bet应该fold。紧手的3-Bet范围是TT+/AQ+，你只有30%左右胜率，而且位置劣势（OOP）。' },
+                        { action: 'Call', correct: false, reason: '❌ Call会让你在不利位置打大底池，翻牌后很难处理。AJ在OOP很难盈利。' },
+                        { action: '4-Bet到25BB', correct: false, reason: '❌ 过度激进！对抗紧手4-Bet只会被AA/KK/QQ/AK call或re-raise，你的equity很差。' }
+                    ]
+                },
+                {
+                    position: 'CO',
+                    yourHand: ['K♦', 'Q♣'],
+                    action: '你在CO加注到2.5BB',
+                    situation: 'BTN 3-Bet到9BB（BTN是LAG玩家，3-Bet频率25%）',
+                    stack: '100BB',
+                    opponent: 'LAG松手（3-Bet范围很宽，包括诈唬）',
+                    options: [
+                        { action: 'Fold', correct: true, reason: 'KQ是边缘牌，面对3-Bet最安全的选择是fold，即使对手可能诈唬。' },
+                        { action: 'Call', correct: false, reason: '⚠️ 勉强可以，但你会在不利位置打大底池，翻牌后很难控制。只有你对对手很了解时才考虑。' },
+                        { action: '4-Bet到22BB', correct: false, reason: '❌ KQ不适合4-Bet。如果对手是LAG，可以考虑4-Bet bluff，但用更合适的牌（如A5s）。' }
+                    ]
+                },
+                {
+                    position: 'MP',
+                    yourHand: ['9♠', '9♥'],
+                    action: '你在MP加注到3BB',
+                    situation: 'BTN 3-Bet到10BB（BTN玩得标准，3-Bet频率12%）',
+                    stack: '100BB',
+                    opponent: '标准TAG（3-Bet频率适中）',
+                    options: [
+                        { action: 'Fold', correct: false, reason: '99太强了不能fold。这是常见错误。' },
+                        { action: 'Call', correct: true, reason: '✅ 99在这个场景最好的选择是call。你有set mining价值，而且如果中暗三条可以赢大底池。Fold太弱，4-Bet太激进。' },
+                        { action: '4-Bet到25BB', correct: false, reason: '❌ 过度激进！99面对标准3-Bet不应该4-Bet。4-Bet只会被更强的牌call（TT+/AK），而且失去set mining价值。' }
+                    ]
+                }
+            ],
+            module2: [
+                {
+                    position: 'BTN',
+                    yourHand: ['A♥', 'A♠'],
+                    action: '你在BTN开局加注到3BB',
+                    situation: 'SB 3-Bet到10BB',
+                    stack: '100BB',
+                    opponent: '任何类型对手',
+                    options: [
+                        { action: 'Fold', correct: false, reason: '❌ AA永远不fold！' },
+                        { action: 'Call', correct: false, reason: '❌ AA太强了，必须4-Bet建立大底池。Slow play会损失价值。' },
+                        { action: '4-Bet到25BB', correct: true, reason: '✅ AA是必须4-Bet的牌。你想建立大底池，而且面对5-Bet可以全下。这是价值4-Bet，不是诈唬。' }
+                    ]
+                },
+                {
+                    position: 'CO',
+                    yourHand: ['A♠', '5♠'],
+                    action: '你在CO加注到2.5BB',
+                    situation: 'BTN 3-Bet到9BB（BTN是LAG，3-Bet频率28%）',
+                    stack: '100BB',
+                    opponent: 'LAG松手（3-Bet范围很宽）',
+                    options: [
+                        { action: 'Fold', correct: false, reason: '对抗LAG的宽3-Bet范围，A5s fold掉了EV。' },
+                        { action: 'Call', correct: false, reason: 'A5s不适合call 3-Bet，翻牌后很难打。' },
+                        { action: '4-Bet到22BB（诈唬4-Bet）', correct: true, reason: '✅ 对抗LAG的宽3-Bet，A5s是完美的诈唬4-Bet牌。它有坚果潜力（同花/顺子），但现在价值不足以call。4-Bet可以让对手fold掉很多牌。' }
+                    ]
+                },
+                {
+                    position: 'MP',
+                    yourHand: ['J♥', 'J♠'],
+                    action: '你在MP加注到3BB',
+                    situation: 'BTN 3-Bet到10BB（标准TAG玩家）',
+                    stack: '100BB',
+                    opponent: '标准TAG',
+                    options: [
+                        { action: 'Fold', correct: false, reason: 'JJ太强了，不能fold。' },
+                        { action: 'Call', correct: true, reason: '✅ JJ面对3-Bet最平衡的打法是call。4-Bet太激进（会被QQ+/AK压制），fold太弱。Call可以看翻牌，有set mining价值。' },
+                        { action: '4-Bet到25BB', correct: false, reason: '❌ 过度激进的典型案例！JJ 4-Bet只会被QQ+/AK call或re-raise，你处于flip或被压制的状态。' }
+                    ]
+                }
+            ],
+            module3: [
+                {
+                    position: 'BTN',
+                    yourHand: ['Q♦', 'Q♠'],
+                    action: '你在BTN加注到3BB',
+                    situation: 'SB 3-Bet到10BB（这个SB是nit，过去20手只3-Bet过1次，拿的是AA）',
+                    stack: '100BB',
+                    opponent: '超级紧手（只用AA/KK 3-Bet）',
+                    options: [
+                        { action: 'Fold', correct: true, reason: '✅ 读懂对手很重要！虽然QQ是强牌，但对抗一个只用AA/KK 3-Bet的nit，你应该fold。这不是理论打法，而是剥削性调整。' },
+                        { action: 'Call', correct: false, reason: '⚠️ 可以考虑，但面对AA/KK，你的equity很差（18% vs AA）。除非你翻牌中set，否则会输掉大底池。' },
+                        { action: '4-Bet', correct: false, reason: '❌ 送钱！对抗只用AA/KK 3-Bet的对手，4-Bet只会被5-Bet，然后你不得不fold。' }
+                    ]
+                },
+                {
+                    position: 'CO',
+                    yourHand: ['8♠', '8♥'],
+                    action: '你在CO加注到2.5BB',
+                    situation: 'BTN 3-Bet到9BB（这个BTN是疯子，3-Bet频率40%）',
+                    stack: '100BB',
+                    opponent: '超级LAG（3-Bet range极宽，包括垃圾牌）',
+                    options: [
+                        { action: 'Fold', correct: false, reason: '对抗40%的3-Bet频率，88 fold太弱了。' },
+                        { action: 'Call', correct: true, reason: '✅ 88面对疯子的3-Bet，call是最好的选择。你有set mining价值，而且对手range很弱，翻牌后你可以经常赢下底池。' },
+                        { action: '4-Bet到22BB', correct: false, reason: '⚠️ 可以考虑，但88是边缘的4-Bet牌。如果对手经常fold给4-Bet，可以；但如果对手喜欢call/5-Bet，88会很难打。' }
+                    ]
+                }
+            ],
+            module4: [
+                {
+                    position: 'EP',
+                    yourHand: ['A♣', 'K♥'],
+                    action: '你在EP加注到3BB',
+                    situation: 'MP 3-Bet到10BB（MP是标准玩家）',
+                    stack: '100BB',
+                    opponent: '标准TAG',
+                    options: [
+                        { action: 'Fold', correct: false, reason: 'AK太强了不能fold。' },
+                        { action: 'Call', correct: false, reason: '⚠️ AK在OOP call 3-Bet不是最优。翻牌后难打。' },
+                        { action: '4-Bet到25BB', correct: true, reason: '✅ EP的AK面对3-Bet应该4-Bet。AK是你EP范围的顶端，面对5-Bet可以call。但要注意对手是超级紧手时考虑fold。' }
+                    ]
+                },
+                {
+                    position: 'MP',
+                    yourHand: ['A♥', 'Q♠'],
+                    action: '你在MP加注到3BB',
+                    situation: 'CO 3-Bet到10BB（CO是标准玩家）',
+                    stack: '100BB',
+                    opponent: '标准TAG',
+                    options: [
+                        { action: 'Fold', correct: true, reason: '✅ AQ面对位置玩家的3-Bet应该fold。你在OOP，被3-Bet range压制（他有AK/QQ+），翻牌后很难打。' },
+                        { action: 'Call', correct: false, reason: '❌ AQ在OOP call 3-Bet是亏钱打法。即使击中top pair，也不知道自己是否领先。' },
+                        { action: '4-Bet', correct: false, reason: '❌ 典型的过度激进！AQ不应该4-Bet，你会被AK/QQ+压制，只能fold掉5-Bet。' }
+                    ]
+                }
+            ],
+            module5: [
+                {
+                    position: 'BTN',
+                    yourHand: ['7♦', '7♣'],
+                    action: '你在BTN加注到3BB，SB 3-Bet到10BB，你4-Bet到28BB',
+                    situation: 'SB 5-Bet ALL-IN 100BB（SB是紧手）',
+                    stack: '100BB',
+                    opponent: '紧手（5-Bet range = AA/KK）',
+                    options: [
+                        { action: 'Fold', correct: true, reason: '✅ 必须fold！77面对紧手的5-Bet只有15%胜率。你之前的4-Bet就是错误，现在必须及时止损。这就是过度激进的代价。' },
+                        { action: 'Call（All-In）', correct: false, reason: '❌ 送钱！面对紧手5-Bet，77只是在赌博。即使对手有KK，你也只有18%胜率。这是经典的失控升级陷阱。' }
+                    ]
+                },
+                {
+                    position: 'CO',
+                    yourHand: ['A♠', 'K♣'],
+                    action: '你在CO加注到2.5BB，BTN 3-Bet到9BB，你4-Bet到24BB',
+                    situation: 'BTN 5-Bet到55BB（BTN是标准TAG）',
+                    stack: '100BB',
+                    opponent: '标准TAG（5-Bet range = QQ+/AK）',
+                    options: [
+                        { action: 'Fold', correct: false, reason: 'AK面对TAG的5-Bet不能fold，太弱了。' },
+                        { action: 'Call/All-In', correct: true, reason: '✅ AK面对标准TAG的5-Bet应该call。你对抗QQ+/AK range有45%+的equity，而且底池赔率很好。这是正确的激进。' }
+                    ]
+                }
+            ],
+            module6: [
+                {
+                    position: 'BTN',
+                    yourHand: ['K♠', 'J♠'],
+                    action: '你在BTN加注到3BB',
+                    situation: 'BB 3-Bet到12BB（BB是松凶玩家，3-Bet频率22%）',
+                    stack: '100BB',
+                    opponent: 'LAG（3-Bet range较宽）',
+                    options: [
+                        { action: 'Fold', correct: true, reason: '✅ KJs面对3-Bet应该fold。虽然对手可能诈唬，但KJs不够强，call会OOP打大底池，4-Bet又太激进。Fold是最稳妥的选择。' },
+                        { action: 'Call', correct: false, reason: '❌ KJs在OOP call 3-Bet是亏钱打法。翻牌后你会面对很多困难决策，容易丢失大量筹码。' },
+                        { action: '4-Bet到25BB', correct: false, reason: '❌ 过度激进！KJs不是4-Bet牌。如果想4-Bet bluff，应该用blockers更好的牌（如A5s）。' }
+                    ]
+                },
+                {
+                    position: 'SB',
+                    yourHand: ['Q♠', 'Q♥'],
+                    action: 'BTN加注到3BB，你在SB 3-Bet到12BB',
+                    situation: 'BTN 4-Bet到30BB（BTN是标准玩家）',
+                    stack: '100BB',
+                    opponent: '标准TAG（4-Bet range = JJ+/AK）',
+                    options: [
+                        { action: 'Fold', correct: false, reason: 'QQ面对4-Bet不应该fold，太弱了。' },
+                        { action: 'Call', correct: true, reason: '✅ QQ面对标准4-Bet最好的打法是call。你有30%机会翻牌击中set，而且有位置优势。5-Bet太激进（只被KK/AA call）。' },
+                        { action: '5-Bet All-In', correct: false, reason: '❌ 过度激进！QQ对抗标准4-Bet range (JJ+/AK) 是flip或略微领先，但5-Bet all-in只会被KK/AA call，你会损失很多EV。' }
+                    ]
+                },
+                {
+                    position: 'CO',
+                    yourHand: ['T♥', 'T♠'],
+                    action: '你在CO加注到2.5BB',
+                    situation: 'BTN 3-Bet到9BB（BTN 3-Bet频率15%）',
+                    stack: '100BB',
+                    opponent: '标准玩家',
+                    options: [
+                        { action: 'Fold', correct: false, reason: 'TT太强了，不能fold。' },
+                        { action: 'Call', correct: true, reason: '✅ TT面对标准3-Bet应该call。Set mining价值很高，4-Bet会被JJ+压制。这是平衡的打法。' },
+                        { action: '4-Bet到22BB', correct: false, reason: '❌ 过度激进！TT 4-Bet会被JJ+/AK call或re-raise，你处于不利位置。Call更有利可图。' }
+                    ]
+                },
+                {
+                    position: 'BTN',
+                    yourHand: ['A♦', 'J♦'],
+                    action: '你在BTN加注到3BB',
+                    situation: 'BB 3-Bet到11BB（BB是超级紧手，3-Bet频率5%）',
+                    stack: '100BB',
+                    opponent: 'Nit（只用AA/KK/QQ/AK 3-Bet）',
+                    options: [
+                        { action: 'Fold', correct: true, reason: '✅ 读懂对手！AJs面对只用顶级牌3-Bet的nit必须fold。你被严重压制（对抗QQ+/AK只有30-35%胜率）。' },
+                        { action: 'Call', correct: false, reason: '❌ 即使有位置，AJs call也是亏钱的。对手range太强，你翻牌后很少能持续。' },
+                        { action: '4-Bet', correct: false, reason: '❌ 极度过度激进！对抗nit 4-Bet只会被5-Bet，然后你必须fold，白白损失筹码。' }
+                    ]
+                },
+                {
+                    position: 'MP',
+                    yourHand: ['K♥', 'K♠'],
+                    action: '你在MP加注到3BB',
+                    situation: 'BTN 3-Bet到10BB（BTN是标准玩家）',
+                    stack: '100BB',
+                    opponent: '标准TAG',
+                    options: [
+                        { action: 'Fold', correct: false, reason: 'KK绝对不能fold！' },
+                        { action: 'Call', correct: false, reason: '❌ KK太强了，call会损失价值。必须4-Bet建立大底池。' },
+                        { action: '4-Bet到26BB', correct: true, reason: '✅ KK必须4-Bet！你想建立大底池获取价值，而且面对5-Bet（通常只有AA）可以考虑call。这是价值4-Bet的标准牌。' }
+                    ]
+                }
+            ]
+        };
+
+        // 状态管理
+        let currentModule = null;
+        let currentQuestion = 0;
+        let stats = {
+            total: 0,
+            correct: 0,
+            aggressive: 0,  // 过度激进的次数
+            foldCorrect: 0,
+            foldTotal: 0
+        };
+
+        // 开始模块
+        function startModule(moduleNum) {
+            currentModule = moduleNum;
+            currentQuestion = 0;
+            
+            // 更新模块卡片状态
+            document.querySelectorAll('.module-card').forEach((card, index) => {
+                card.classList.remove('active');
+                if (index + 1 === moduleNum) {
+                    card.classList.add('active');
+                }
+            });
+
+            // 显示训练区域
+            document.getElementById('trainingArea').classList.add('show');
+            
+            // 加载第一题
+            loadQuestion();
+        }
+
+        // 加载问题
+        function loadQuestion() {
+            const moduleData = trainingData[`module${currentModule}`];
+            if (!moduleData || currentQuestion >= moduleData.length) {
+                showModuleComplete();
+                return;
+            }
+
+            const q = moduleData[currentQuestion];
+            const container = document.getElementById('scenarioContainer');
+            
+            container.innerHTML = `
+                <div class="scenario-header">
+                    <div class="scenario-info">
+                        <span class="position-info">位置: ${q.position}</span>
+                        <span class="position-info">筹码: ${q.stack}</span>
+                    </div>
+                </div>
+
+                <div class="hand-display">
+                    <span class="card ${isRed(q.yourHand[0]) ? 'red' : ''}">${q.yourHand[0]}</span>
+                    <span class="card ${isRed(q.yourHand[1]) ? 'red' : ''}">${q.yourHand[1]}</span>
+                </div>
+
+                <div class="action-situation">
+                    <h3>场景：</h3>
+                    <p>${q.action}</p>
+                    <p><strong>${q.situation}</strong></p>
+                </div>
+
+                <div class="opponent-profile">
+                    <strong>对手类型：</strong> ${q.opponent}
+                </div>
+
+                <div style="text-align: center; margin: 20px 0; font-size: 1.2em; color: #f1c40f;">
+                    <strong>你会怎么做？</strong>
+                </div>
+
+                <div class="action-buttons">
+                    ${q.options.map((opt, idx) => `
+                        <button class="action-btn ${getButtonClass(opt.action)}" onclick="checkAnswer(${idx})">
+                            ${opt.action}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+
+            // 隐藏反馈和下一题按钮
+            document.getElementById('feedback').classList.remove('show');
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        // 检查答案
+        function checkAnswer(optionIndex) {
+            const moduleData = trainingData[`module${currentModule}`];
+            const q = moduleData[currentQuestion];
+            const selected = q.options[optionIndex];
+            
+            stats.total++;
+
+            // 禁用所有按钮
+            document.querySelectorAll('.action-btn').forEach(btn => {
+                btn.disabled = true;
+                btn.style.opacity = '0.5';
+            });
+
+            // 显示反馈
+            const feedback = document.getElementById('feedback');
+            let feedbackClass = 'wrong';
+            let feedbackIcon = '❌';
+
+            if (selected.correct) {
+                stats.correct++;
+                feedbackClass = 'correct';
+                feedbackIcon = '✅';
+                
+                // 如果选择了正确的fold，记录
+                if (selected.action === 'Fold' || selected.action.includes('Fold')) {
+                    stats.foldCorrect++;
+                    stats.foldTotal++;
+                }
+            } else {
+                // 检查是否过度激进
+                if (selected.action.includes('4-Bet') || selected.action.includes('Raise') || selected.action.includes('Re-raise')) {
+                    stats.aggressive++;
+                    feedbackClass = 'warning';
+                    feedbackIcon = '⚠️';
+                }
+                
+                if (selected.action === 'Fold') {
+                    stats.foldTotal++;
+                }
+            }
+
+            feedback.className = `feedback ${feedbackClass} show`;
+            feedback.innerHTML = `
+                <h3>${feedbackIcon} ${selected.correct ? '正确！' : selected.action.includes('4-Bet') || selected.action.includes('Raise') ? '过度激进！' : '错误！'}</h3>
+                <div class="explanation">
+                    <strong>分析：</strong>${selected.reason}
+                </div>
+                ${!selected.correct ? `
+                    <div class="explanation" style="margin-top: 15px; border: 2px solid #2ecc71;">
+                        <strong>✅ 正确答案：</strong>
+                        ${q.options.find(o => o.correct).reason}
+                    </div>
+                ` : ''}
+            `;
+
+            // 更新统计
+            updateStats();
+
+            // 显示下一题按钮
+            document.getElementById('nextBtn').style.display = 'block';
+        }
+
+        // 下一题
+        function nextScenario() {
+            currentQuestion++;
+            loadQuestion();
+        }
+
+        // 模块完成
+        function showModuleComplete() {
+            const container = document.getElementById('scenarioContainer');
+            const accuracy = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
+            
+            container.innerHTML = `
+                <div style="text-align: center; padding: 40px;">
+                    <h2>🎉 模块 ${currentModule} 完成！</h2>
+                    <div class="stats-panel" style="margin: 30px auto; max-width: 600px;">
+                        <div class="stat-card">
+                            <div class="stat-label">正确率</div>
+                            <div class="stat-value">${accuracy}%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">完成题目</div>
+                            <div class="stat-value">${stats.total}</div>
+                        </div>
+                    </div>
+                    <button class="next-btn" onclick="location.reload()">返回选择模块</button>
+                </div>
+            `;
+            
+            document.getElementById('feedback').classList.remove('show');
+            document.getElementById('nextBtn').style.display = 'none';
+        }
+
+        // 更新统计
+        function updateStats() {
+            const accuracy = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
+            const aggressionRate = stats.total > 0 ? Math.round((stats.aggressive / stats.total) * 100) : 0;
+            const foldAcc = stats.foldTotal > 0 ? Math.round((stats.foldCorrect / stats.foldTotal) * 100) : 0;
+
+            document.getElementById('accuracy').textContent = accuracy + '%';
+            document.getElementById('completed').textContent = `${stats.correct}/${stats.total}`;
+            document.getElementById('aggression').textContent = aggressionRate + '%';
+            document.getElementById('foldAccuracy').textContent = foldAcc + '%';
+
+            // 更新进攻性指示器
+            const indicator = document.getElementById('aggressionIndicator');
+            const position = 100 - aggressionRate;  // 100% 激进 = 0% 位置（右边）
+            indicator.style.left = position + '%';
+        }
+
+        // 辅助函数
+        function isRed(card) {
+            return card.includes('♥') || card.includes('♦');
+        }
+
+        function getButtonClass(action) {
+            if (action.includes('Fold')) return 'fold';
+            if (action.includes('Call')) return 'call';
+            if (action.includes('4-Bet') || action.includes('Re-raise')) return 'reraise';
+            if (action.includes('Raise')) return 'raise';
+            return '';
+        }
+    </script>
+</body>
+</html>
+
