@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 智能训练推荐系统 - AI个性化学习路径</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0612;
+            --bg-card: #150d1f;
+            --gold: #ffd700;
+            --green: #2ecc71;
+            --red: #e74c3c;
+            --blue: #3498db;
+            --orange: #ff8c00;
+            --purple: #9b59b6;
+            --text: #f0f0f0;
+            --text-dim: #8a8a9a;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark), #1a0f2e);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(155, 89, 182, 0.2);
+            border: 1px solid rgba(155, 89, 182, 0.5);
+            color: var(--purple);
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        header {
+            text-align: center;
+            margin: 60px 0 50px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--blue), var(--purple), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            font-weight: 900;
+        }
+
+        .assessment-section {
+            background: linear-gradient(135deg, var(--bg-card), #1e1430);
+            border-radius: 25px;
+            padding: 50px;
+            margin-bottom: 40px;
+            border: 2px solid rgba(52, 152, 219, 0.3);
+        }
+
+        .assessment-section h2 {
+            color: var(--blue);
+            font-size: 2rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .skill-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .skill-card {
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid rgba(52, 152, 219, 0.2);
+        }
+
+        .skill-card h3 {
+            color: var(--blue);
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+
+        .skill-level {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .skill-bar {
+            flex: 1;
+            height: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .skill-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--red), var(--orange), var(--gold), var(--green));
+            transition: width 0.6s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .slider-container {
+            margin: 20px 0;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: rgba(52, 152, 219, 0.2);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--blue);
+            cursor: pointer;
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, var(--blue), var(--purple));
+            color: #fff;
+            padding: 18px 60px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: block;
+            margin: 40px auto;
+        }
+
+        .generate-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 35px rgba(52, 152, 219, 0.5);
+        }
+
+        .roadmap-section {
+            background: linear-gradient(135deg, var(--bg-card), #1e1430);
+            border-radius: 25px;
+            padding: 50px;
+            margin-bottom: 40px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            display: none;
+        }
+
+        .roadmap-section.show {
+            display: block;
+        }
+
+        .roadmap-section h2 {
+            color: var(--gold);
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .phase-timeline {
+            position: relative;
+            padding-left: 40px;
+            margin: 40px 0;
+        }
+
+        .phase-timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--gold), var(--orange), var(--green));
+        }
+
+        .phase-item {
+            position: relative;
+            margin-bottom: 40px;
+            padding-left: 30px;
+        }
+
+        .phase-item::before {
+            content: '';
+            position: absolute;
+            left: -32px;
+            top: 5px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--gold);
+            border: 4px solid var(--bg-dark);
+            z-index: 1;
+        }
+
+        .phase-card {
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            border-left: 4px solid var(--gold);
+        }
+
+        .phase-card h3 {
+            color: var(--gold);
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+        }
+
+        .module-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .module-list li {
+            padding: 12px 20px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .module-list li:hover {
+            background: rgba(52, 152, 219, 0.2);
+            border-color: var(--blue);
+            transform: translateX(5px);
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-left: 10px;
+        }
+
+        .priority-critical {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--red);
+            border: 1px solid var(--red);
+        }
+
+        .priority-high {
+            background: rgba(255, 140, 0, 0.2);
+            color: var(--orange);
+            border: 1px solid var(--orange);
+        }
+
+        .priority-medium {
+            background: rgba(52, 152, 219, 0.2);
+            color: var(--blue);
+            border: 1px solid var(--blue);
+        }
+
+        .eta-info {
+            background: rgba(50, 205, 50, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid var(--green);
+            margin-top: 30px;
+        }
+
+        .eta-info h4 {
+            color: var(--green);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-box {
+            background: rgba(52, 152, 219, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid rgba(52, 152, 219, 0.3);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            color: var(--gold);
+            font-weight: 900;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            .skill-grid { grid-template-columns: 1fr; }
+            .stats-summary { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <a href="unified_training_hub.html" class="back-btn">← 返回训练中心</a>
+
+    <div class="container">
+        <header>
+            <h1>🎯 智能训练推荐系统</h1>
+            <p style="font-size: 1.3rem; color: var(--text-dim); margin-top: 15px;">
+                AI分析你的水平 · 生成个性化学习路径 · 最快达到世界级
+            </p>
+        </header>
+
+        <!-- 技能评估 -->
+        <div class="assessment-section">
+            <h2>📊 第一步：评估你的当前水平</h2>
+            <p style="text-align: center; color: var(--text-dim); margin-bottom: 30px; font-size: 1.05rem;">
+                请诚实评估你的各项技能水平（1-10分）
+            </p>
+
+            <div class="skill-grid">
+                
+                <div class="skill-card">
+                    <h3>翻前范围掌握</h3>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="preflopRange">
+                        <div class="skill-level">
+                            <span style="color: var(--text-dim);">新手</span>
+                            <div class="skill-bar">
+                                <div class="skill-fill" id="preflopBar" style="width: 50%;">5</div>
+                            </div>
+                            <span style="color: var(--text-dim);">大师</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="skill-card">
+                    <h3>位置awareness</h3>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="positionAware">
+                        <div class="skill-level">
+                            <span style="color: var(--text-dim);">新手</span>
+                            <div class="skill-bar">
+                                <div class="skill-fill" id="positionBar" style="width: 50%;">5</div>
+                            </div>
+                            <span style="color: var(--text-dim);">大师</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="skill-card">
+                    <h3>筹码深度适应</h3>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="stackAdapt">
+                        <div class="skill-level">
+                            <span style="color: var(--text-dim);">新手</span>
+                            <div class="skill-bar">
+                                <div class="skill-fill" id="stackBar" style="width: 50%;">5</div>
+                            </div>
+                            <span style="color: var(--text-dim);">大师</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="skill-card">
+                    <h3>翻后策略</h3>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="postflop">
+                        <div class="skill-level">
+                            <span style="color: var(--text-dim);">新手</span>
+                            <div class="skill-bar">
+                                <div class="skill-fill" id="postflopBar" style="width: 50%;">5</div>
+                            </div>
+                            <span style="color: var(--text-dim);">大师</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="skill-card">
+                    <h3>对手识别与调整</h3>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="opponent">
+                        <div class="skill-level">
+                            <span style="color: var(--text-dim);">新手</span>
+                            <div class="skill-bar">
+                                <div class="skill-fill" id="opponentBar" style="width: 50%;">5</div>
+                            </div>
+                            <span style="color: var(--text-dim);">大师</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="skill-card">
+                    <h3>ICM理解</h3>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="icm">
+                        <div class="skill-level">
+                            <span style="color: var(--text-dim);">新手</span>
+                            <div class="skill-bar">
+                                <div class="skill-fill" id="icmBar" style="width: 50%;">5</div>
+                            </div>
+                            <span style="color: var(--text-dim);">大师</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="skill-card">
+                    <h3>心理控制</h3>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="mental">
+                        <div class="skill-level">
+                            <span style="color: var(--text-dim);">新手</span>
+                            <div class="skill-bar">
+                                <div class="skill-fill" id="mentalBar" style="width: 50%;">5</div>
+                            </div>
+                            <span style="color: var(--text-dim);">大师</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="skill-card">
+                    <h3>平衡与防守</h3>
+                    <div class="slider-container">
+                        <input type="range" min="1" max="10" value="5" class="slider" id="balance">
+                        <div class="skill-level">
+                            <span style="color: var(--text-dim);">新手</span>
+                            <div class="skill-bar">
+                                <div class="skill-fill" id="balanceBar" style="width: 50%;">5</div>
+                            </div>
+                            <span style="color: var(--text-dim);">大师</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <button class="generate-btn" onclick="generateRoadmap()">
+                🚀 生成个性化学习路径
+            </button>
+        </div>
+
+        <!-- 学习路径 -->
+        <div class="roadmap-section" id="roadmapSection">
+            <h2>🗺️ 你的个性化学习路径</h2>
+
+            <div class="stats-summary" id="statsSummary">
+                <!-- 动态生成 -->
+            </div>
+
+            <div class="phase-timeline" id="phaseTimeline">
+                <!-- 动态生成 -->
+            </div>
+
+            <div class="eta-info">
+                <h4>⏱️ 预计完成时间</h4>
+                <div id="etaDetails"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 技能滑块交互
+        const skills = ['preflop', 'position', 'stack', 'postflop', 'opponent', 'icm', 'mental', 'balance'];
+        
+        skills.forEach(skill => {
+            const slider = document.getElementById(skill + 'Range') || 
+                          document.getElementById(skill + 'Aware') || 
+                          document.getElementById(skill + 'Adapt') || 
+                          document.getElementById(skill);
+            const bar = document.getElementById(skill + 'Bar');
+            
+            if (slider && bar) {
+                slider.addEventListener('input', (e) => {
+                    const value = e.target.value;
+                    bar.style.width = (value * 10) + '%';
+                    bar.textContent = value;
+                });
+            }
+        });
+
+        // 生成学习路径
+        function generateRoadmap() {
+            // 获取所有技能评分
+            const scores = {
+                preflop: parseInt(document.getElementById('preflopRange').value),
+                position: parseInt(document.getElementById('positionAware').value),
+                stack: parseInt(document.getElementById('stackAdapt').value),
+                postflop: parseInt(document.getElementById('postflop').value),
+                opponent: parseInt(document.getElementById('opponent').value),
+                icm: parseInt(document.getElementById('icm').value),
+                mental: parseInt(document.getElementById('mental').value),
+                balance: parseInt(document.getElementById('balance').value)
+            };
+
+            // 计算总体水平
+            const avgScore = Object.values(scores).reduce((a, b) => a + b, 0) / 8;
+            const weaknesses = Object.entries(scores).filter(([k, v]) => v < 7).sort((a, b) => a[1] - b[1]);
+
+            // 生成统计摘要
+            const statsSummary = document.getElementById('statsSummary');
+            statsSummary.innerHTML = `
+                <div class="stat-box">
+                    <div class="stat-label">当前总体水平</div>
+                    <div class="stat-value">${avgScore.toFixed(1)}/10</div>
+                    <div class="stat-label">${getLevelName(avgScore)}</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">需要改进项</div>
+                    <div class="stat-value">${weaknesses.length}</div>
+                    <div class="stat-label">个技能点</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">预计训练时长</div>
+                    <div class="stat-value">${estimateHours(weaknesses)}</div>
+                    <div class="stat-label">小时</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">目标水平</div>
+                    <div class="stat-value">9.5+</div>
+                    <div class="stat-label">世界级</div>
+                </div>
+            `;
+
+            // 生成训练阶段
+            const phases = generatePhases(scores, weaknesses);
+            const phaseTimeline = document.getElementById('phaseTimeline');
+            phaseTimeline.innerHTML = phases.map((phase, idx) => `
+                <div class="phase-item">
+                    <div class="phase-card">
+                        <h3>Phase ${idx + 1}: ${phase.title}</h3>
+                        <p style="color: var(--text-dim); margin-bottom: 15px; line-height: 1.8;">
+                            ${phase.description}
+                        </p>
+                        <ul class="module-list">
+                            ${phase.modules.map(mod => `
+                                <li onclick="window.location.href='${mod.link}'">
+                                    ${mod.name}
+                                    <span class="priority-badge priority-${mod.priority}">${mod.priority.toUpperCase()}</span>
+                                    <div style="font-size: 0.85rem; color: var(--text-dim); margin-top: 5px;">
+                                        ⏱️ ${mod.duration} | 🎯 提升${mod.improve}
+                                    </div>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `).join('');
+
+            // ETA详情
+            document.getElementById('etaDetails').innerHTML = `
+                <p style="line-height: 2; font-size: 1.05rem;">
+                    • <strong>每天训练2小时</strong>：约 ${Math.ceil(estimateHours(weaknesses) / 2)} 天完成<br>
+                    • <strong>每天训练4小时</strong>：约 ${Math.ceil(estimateHours(weaknesses) / 4)} 天完成<br>
+                    • <strong>集中训练</strong>（每天8小时）：约 ${Math.ceil(estimateHours(weaknesses) / 8)} 天完成<br>
+                    <br>
+                    <strong style="color: var(--gold);">坚持完成后，你将达到世界级水平！</strong>
+                </p>
+            `;
+
+            // 显示路径
+            document.getElementById('roadmapSection').classList.add('show');
+            document.getElementById('roadmapSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function getLevelName(score) {
+            if (score >= 9) return '世界级';
+            if (score >= 8) return '专业级';
+            if (score >= 7) return '高级';
+            if (score >= 6) return '中高级';
+            if (score >= 5) return '中级';
+            if (score >= 4) return '初中级';
+            return '初级';
+        }
+
+        function estimateHours(weaknesses) {
+            let total = 0;
+            weaknesses.forEach(([skill, score]) => {
+                const gap = 9 - score;
+                total += gap * 8; // 每提升1分需要8小时
+            });
+            return total + 20; // 基础综合训练
+        }
+
+        function generatePhases(scores, weaknesses) {
+            const phases = [];
+
+            // Phase 1: 修复最严重的弱点
+            if (weaknesses.length > 0 && weaknesses[0][1] < 5) {
+                phases.push({
+                    title: '紧急修复 - 最严重弱点',
+                    description: `你的${getSkillName(weaknesses[0][0])}水平严重不足（${weaknesses[0][1]}/10），这会严重影响整体表现。必须优先修复！`,
+                    modules: getModulesForSkill(weaknesses[0][0], 'critical')
+                });
+            }
+
+            // Phase 2: 基础技能强化
+            const basicWeaknesses = weaknesses.filter(([k, v]) => v >= 4 && v < 7);
+            if (basicWeaknesses.length > 0) {
+                phases.push({
+                    title: '基础强化',
+                    description: `提升${basicWeaknesses.length}个中等水平技能到7分以上，建立坚实基础。`,
+                    modules: basicWeaknesses.slice(0, 3).flatMap(([skill]) => getModulesForSkill(skill, 'high'))
+                });
+            }
+
+            // Phase 3: 高级技能提升
+            const advancedSkills = Object.entries(scores).filter(([k, v]) => v >= 7 && v < 9);
+            if (advancedSkills.length > 0) {
+                phases.push({
+                    title: '高级提升',
+                    description: '将已有优势进一步强化到9分，达到专业级水平。',
+                    modules: advancedSkills.slice(0, 2).flatMap(([skill]) => getModulesForSkill(skill, 'medium'))
+                });
+            }
+
+            // Phase 4: 综合实战
+            phases.push({
+                title: '综合实战与精进',
+                description: '完整整合所有技能，实战演练，冲击世界级水平。',
+                modules: [
+                    { name: '完整锦标赛模拟', link: 'wsop_tournament_hub.html', priority: 'high', duration: '10h', improve: '实战经验' },
+                    { name: 'AI对战训练', link: '#', priority: 'high', duration: '15h', improve: '综合能力' },
+                    { name: '决赛桌专项', link: 'wsop_final_table.html', priority: 'medium', duration: '8h', improve: '决赛桌技巧' }
+                ]
+            });
+
+            return phases;
+        }
+
+        function getSkillName(skill) {
+            const names = {
+                preflop: '翻前范围',
+                position: '位置awareness',
+                stack: '筹码深度适应',
+                postflop: '翻后策略',
+                opponent: '对手识别',
+                icm: 'ICM理解',
+                mental: '心理控制',
+                balance: '平衡与防守'
+            };
+            return names[skill] || skill;
+        }
+
+        function getModulesForSkill(skill, priority) {
+            const modules = {
+                preflop: [
+                    { name: '深筹码LAG翻前范围', link: 'deep_stack_lag_trainer.html', priority, duration: '8h', improve: '翻前范围+3' },
+                    { name: 'GTO范围训练', link: 'preflop_ranges.html', priority, duration: '6h', improve: '范围准确度+2' }
+                ],
+                position: [
+                    { name: '位置战争专项', link: 'positional_warfare.js', priority, duration: '6h', improve: '位置利用+3' },
+                    { name: 'LAG训练器位置模块', link: 'deep_stack_lag_trainer.html', priority, duration: '5h', improve: 'Position awareness+2' }
+                ],
+                stack: [
+                    { name: '筹码深度过渡大师', link: 'stack_transition_master.html', priority, duration: '10h', improve: '适应能力+4' },
+                    { name: '150BB训练', link: 'stack_150bb_trainer.html', priority, duration: '6h', improve: '150BB策略+3' },
+                    { name: '100BB过渡训练', link: 'stack_100bb_trainer.html', priority, duration: '8h', improve: 'LAG→TAG转变+3' }
+                ],
+                postflop: [
+                    { name: '翻后策略模块', link: 'postflop_strategies.js', priority, duration: '12h', improve: '翻后技巧+4' },
+                    { name: 'Cbet大师训练', link: 'cbet_mastery_trainer.html', priority, duration: '6h', improve: 'Cbet精度+3' }
+                ],
+                opponent: [
+                    { name: '对手识别系统', link: 'opponent_classifier.js', priority, duration: '8h', improve: '对手profiling+3' },
+                    { name: '动态调整引擎', link: 'dynamic_adjuster.js', priority, duration: '7h', improve: '调整能力+3' }
+                ],
+                icm: [
+                    { name: 'ICM决策大师', link: 'wsop_icm_trainer.html', priority, duration: '10h', improve: 'ICM理解+4' },
+                    { name: 'ICM计算器', link: 'wsop_icm_calculator.html', priority, duration: '4h', improve: 'ICM计算+2' }
+                ],
+                mental: [
+                    { name: '心理游戏大师', link: 'wsop_mental_game.html', priority, duration: '8h', improve: '心理控制+3' },
+                    { name: 'GTO退守训练', link: 'gto_fallback.js', priority, duration: '6h', improve: 'Tilt控制+2' }
+                ],
+                balance: [
+                    { name: '平衡训练模块', link: 'balance_trainer.js', priority, duration: '8h', improve: '平衡能力+3' },
+                    { name: '8大防守模块', link: 'tournament_defense_hub.html', priority, duration: '15h', improve: '防守能力+4' }
+                ]
+            };
+            return modules[skill] || [];
+        }
+    </script>
+</body>
+</html>
+
