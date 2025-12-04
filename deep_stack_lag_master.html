@@ -974,8 +974,192 @@
                 }
             ],
             
-            // 模块8：世界级综合测试（待完成）
-            module8: []
+            // 模块8：世界级综合测试（20题高难度混合场景）
+            module8: [
+                // 综合测试1：翻前识别+翻后执行
+                {
+                    position: 'CO',
+                    yourHand: ['Q♦', 'J♦'],
+                    action: 'UTG（Nit，VPIP 13%）开局8BB，MP fold',
+                    situation: '轮到你在CO，筹码260BB。这个Nit只用AA-TT/AK开局',
+                    stack: '260BB',
+                    potSize: '底池: 23BB',
+                    opponent: 'UTG超级Nit（翻前range极窄）',
+                    lagType: 'aggressive',
+                    options: [
+                        { action: 'Fold', correct: false, lagScore: 2, reason: '❌ QJs在CO对抗Nit开局不能fold。虽然对手紧，但你有位置+suited牌。' },
+                        { action: 'Call 8BB', correct: false, lagScore: 5, reason: '⚠️ Call可以，但对抗Nit应该更激进。你有位置优势，应该利用他的紧形象施压。' },
+                        { action: '3-Bet到24BB', correct: true, lagScore: 10, reason: '🔥 完美LAG剥削！对抗Nit的UTG开局，CO的QJs应该3-Bet。原因：①他会fold JJ/TT（怕你有更强牌）②你有位置 ③Suited牌有坚果潜力。翻后计划：如果他call，c-bet 60-70% pot持续施压！' }
+                    ],
+                    lagTip: '综合策略：对抗Nit识别+剥削+翻后计划。翻前3-Bet后，计划flop c-bet 60-70% pot，turn根据牌面决定是否barrel。'
+                },
+                
+                // 综合测试2：复杂多街决策
+                {
+                    position: 'BTN',
+                    yourHand: ['A♣', 'K♥'],
+                    action: '你在BTN open 10BB，BB（LAG疯子）call。Flop: 8♠ 7♣ 3♦，你c-bet 14BB他call。Turn: 2♥，你bet 32BB他call',
+                    situation: 'River: J♠（底池108BB，你剩余194BB），对手check。你完全miss了',
+                    flop: ['8♠', '7♣', '3♦', '2♥', 'J♠'],
+                    stack: '194BB',
+                    potSize: '底池: 108BB',
+                    opponent: 'BB超级LAG（call了两街）',
+                    lagType: 'aggressive',
+                    options: [
+                        { action: 'Check back（放弃）', correct: false, lagScore: 4, reason: '❌ 你投入了56BB（10+14+32），AK high在river还有一定showdown价值，但对抗LAG玩家check back等于放弃偷锅机会。' },
+                        { action: 'Bet 45BB（小注）', correct: false, lagScore: 6, reason: '⚠️ Sizing太小。对抗LAG玩家call了两街，45BB（42% pot）容易被bluff catch或raise。' },
+                        { action: 'Bet 80BB（75% pot）', correct: true, lagScore: 10, reason: '✅ LAG 3-barrel完成！你的story完美：AA/KK在这个牌面。对手LAG call了两街说明他有弱对子或听牌，River J可能让他认为你在bluff。80BB大注代表AA/KK，他很难call弱对子。这就是LAG的艺术：对手类型识别+多街story构建！' }
+                    ],
+                    lagTip: '综合技巧：对抗LAG玩家的3-barrel需要勇气。关键是story一致性（AA/KK）+对手range识别（弱对子）+River牌面（J是brick）。'
+                },
+                
+                // 综合测试3：位置+对手+牌力综合判断
+                {
+                    position: 'SB',
+                    yourHand: ['K♠', 'K♣'],
+                    action: 'CO（松手TAG，VPIP 26%）开局9BB，BTN fold',
+                    situation: '轮到你在SB，筹码270BB。你是KK，但在OOP位置',
+                    stack: '270BB',
+                    potSize: '底池: 22BB（含Antes）',
+                    opponent: 'CO松手TAG（开局range较宽）',
+                    lagType: 'aggressive',
+                    options: [
+                        { action: 'Call 7BB（Trap）', correct: false, lagScore: 3, reason: '❌ KK在深筹码环境绝不slow play！即使在OOP，你也必须3-Bet建立大底池。Trap会让对手便宜实现equity。' },
+                        { action: '3-Bet到28BB', correct: false, lagScore: 7, reason: '⚠️ Sizing偏小。深筹码环境，从SB 3-Bet应该更大（30-35BB），因为你OOP需要补偿位置劣势。' },
+                        { action: '3-Bet到35BB', correct: true, lagScore: 10, reason: '🔥 深筹码OOP 3-Bet sizing！KK从SB 3-Bet到35BB（4x）是标准。原因：①你OOP需要建立更大底池补偿位置劣势 ②对手松手TAG range宽，会给你价值 ③深筹码环境sizing要更大。翻后计划：flop几乎任何牌都c-bet 65-75% pot！' }
+                    ],
+                    lagTip: '综合要点：位置劣势时sizing要更大。OOP 3-Bet sizing = IP sizing × 1.2-1.3。KK在OOP必须激进建立大底池，不能slow play。'
+                },
+                
+                // 综合测试4：深筹码SPR控制
+                {
+                    position: 'CO',
+                    yourHand: ['6♣', '6♦'],
+                    action: 'EP（标准TAG）开局9BB',
+                    situation: '轮到你在CO，筹码300BB。66面对开局',
+                    stack: '300BB',
+                    potSize: '底池: 24BB',
+                    opponent: 'EP标准TAG',
+                    lagType: 'balanced',
+                    options: [
+                        { action: 'Fold', correct: false, lagScore: 3, reason: '❌ 66在深筹码环境有巨大set mining价值。300BB深度，中set能赢走100BB+。' },
+                        { action: '3-Bet到27BB', correct: false, lagScore: 5, reason: '❌ 66在CO 3-Bet EP是过度激进。虽然LAG要激进，但66被4-Bet时很难继续，而且浪费了set mining价值。' },
+                        { action: 'Call 9BB', correct: true, lagScore: 10, reason: '✅ 深筹码小对子完美策略！66 call的价值：①12.5%中set ②300BB/24BB = SPR 12.5，隐含赔率爆炸 ③位置优势翻后好打。LAG不是无脑激进，小对子在深筹码应该call！翻后计划：中set慢打榨取，miss fold。' }
+                    ],
+                    lagTip: '深筹码SPR控制：小对子(22-66)在深筹码环境应该call而非3-Bet。SPR>10时，set mining投资回报率远超3-Bet bluff。'
+                },
+                
+                // 综合测试5：对手适应+翻后执行
+                {
+                    position: 'BTN',
+                    yourHand: ['T♠', '9♠'],
+                    action: '你在BTN open 10BB，BB（超级LAG）3-Bet到35BB',
+                    situation: 'BB是疯子（3-Bet频率32%，经常诈唬）。你的T9s面对3-Bet',
+                    stack: '260BB',
+                    potSize: '底池: 51BB（含SB）',
+                    opponent: 'BB超级LAG疯子（3-Bet range极宽）',
+                    lagType: 'aggressive',
+                    options: [
+                        { action: 'Fold', correct: false, lagScore: 4, reason: '⚠️ T9s对抗疯子32%的3-Bet range有一定equity，但在OOP很难打。Fold可以，但不够LAG。' },
+                        { action: 'Call 25BB', correct: false, lagScore: 6, reason: '⚠️ T9s在OOP call 3-bet很难打。虽然对手range宽，但你在3-bet pot OOP没有技术优势。' },
+                        { action: '4-Bet到85BB（Bluff）', correct: true, lagScore: 10, reason: '🔥 LAG vs LAG反击！对抗32%的3-Bet疯子，T9s是完美的4-Bet bluff牌。原因：①对手range极宽，会fold大部分牌 ②T9s有坚果潜力（同花/顺子）③blocker效应（T阻断JT/T9）④你在IP。如果他call/5-Bet，你可以fold。这就是LAG的反击！' }
+                    ],
+                    lagTip: 'LAG vs LAG战术：对抗疯子3-Bet（>25%频率），你应该用suited连牌4-Bet bluff反击。T9s/98s/87s都是完美的4-Bet bluff牌。'
+                },
+                
+                // 综合测试6：翻后复杂决策树
+                {
+                    position: 'CO',
+                    yourHand: ['A♠', '9♠'],
+                    action: '你在CO 3-Bet到27BB，BB call。Flop: K♣ 9♦ 4♠（底池59BB），BB check',
+                    situation: '你击中中对，但K高牌面。筹码剩余233BB',
+                    flop: ['K♣', '9♦', '4♠'],
+                    stack: '233BB',
+                    potSize: '底池: 59BB',
+                    opponent: 'BB标准TAG',
+                    lagType: 'aggressive',
+                    options: [
+                        { action: 'Check back（控制底池）', correct: false, lagScore: 4, reason: '❌ A9击中中对在K高牌面应该bet。虽然有K在上面，但作为3-Bet侵略者必须c-bet。' },
+                        { action: 'C-bet 25BB（小注）', correct: false, lagScore: 6, reason: '⚠️ Sizing太小。深筹码环境25BB（42% pot）让对手任何听牌都有良好赔率call。' },
+                        { action: 'C-bet 40BB（68% pot）', correct: true, lagScore: 10, reason: '✅ LAG价值+保护c-bet！你的A9在这个牌面有多重价值：①可能领先弱Kx ②需要保护对抗听牌 ③代表强K或overpair。40BB大注：让听牌付出代价+给弱K难度。翻后计划：如果被raise评估对手，如果call继续turn施压！' }
+                    ],
+                    lagTip: '翻后复杂决策：击中中对在高牌面需要c-bet保护+价值。Sizing要足够大（65-75% pot）让听牌犯错，同时给弱top pair压力。'
+                },
+                
+                // 综合测试7：River高难度决策
+                {
+                    position: 'BTN',
+                    yourHand: ['J♥', 'J♠'],
+                    action: '你在BTN open 10BB，BB call。完整过程：Flop Q♠ 7♣ 2♦ 你c-bet 14BB他call，Turn 5♥ 你bet 32BB他call',
+                    situation: 'River: A♣（底池108BB，你剩余194BB），对手check。River A改变了一切',
+                    flop: ['Q♠', '7♣', '2♦', '5♥', 'A♣'],
+                    stack: '194BB',
+                    potSize: '底池: 108BB',
+                    opponent: 'BB是紧手TAG（call了两街）',
+                    lagType: 'cautious',
+                    options: [
+                        { action: 'Value bet 50BB', correct: false, lagScore: 3, reason: '❌ River A后JJ不是价值牌！对手call了两街，range是Qx/弱对子/听牌。River A让任何Ax都打败你，Value bet JJ会被所有Ax call，输给所有Qx。' },
+                        { action: 'Check back', correct: true, lagScore: 10, reason: '✅ LAG的纪律！虽然你投入了56BB，但JJ在River A出现后已经不是价值牌。对手紧手TAG call了两街，check back原因：①Showdown价值（打败missed听牌）②River A改变牌力排序 ③对手会check-call所有Ax。这是LAG的智慧：知道何时停止！' },
+                        { action: 'Bluff 80BB', correct: false, lagScore: 2, reason: '❌ JJ不应该turn成bluff！你有showdown价值，river A对你的range也不利（你3-barrel代表AA会被质疑）。Bluff会被Ax/Qx call。' }
+                    ],
+                    lagTip: '复杂River决策：当river牌改变牌力结构时，要重新评估hand strength。JJ在River A后应该check back保护showdown价值，不是value bet或bluff。'
+                },
+                
+                // 综合测试8：深筹码Blocker综合运用
+                {
+                    position: 'CO',
+                    yourHand: ['A♦', '3♦'],
+                    action: '你在CO open 9BB，BTN call。完整过程：Flop K♥ 8♠ 4♣ 你c-bet 14BB他call，Turn 2♦ 你check他check',
+                    situation: 'River: Q♠（底池56BB，你剩余227BB），你先行动。A high，完全miss',
+                    flop: ['K♥', '8♠', '4♣', '2♦', 'Q♠'],
+                    stack: '227BB',
+                    potSize: '底池: 56BB',
+                    opponent: 'BTN标准TAG（flop call后turn check）',
+                    lagType: 'aggressive',
+                    options: [
+                        { action: 'Check-fold', correct: false, lagScore: 4, reason: '⚠️ 你有A high showdown价值，而且对手turn也check（range不强）。放弃了river主动权。' },
+                        { action: 'Bet 25BB（小注）', correct: false, lagScore: 6, reason: '⚠️ Sizing太小，没有体现A blocker价值。25BB容易被bluff catch。' },
+                        { action: 'Bet 40BB（71% pot）', correct: true, lagScore: 10, reason: '🔥 A blocker完美应用！Turn双方check说明range都不强，River Q是完美bluff牌（代表你有Qx）。你的A♦阻断：①AK（top two）②AQ（top pair）③A8/A4（两对）。40BB大注让对手的弱Kx/88/44很难call。这是LAG Blocker的高级运用！' }
+                    ],
+                    lagTip: 'Blocker综合运用：River持有A时，可以阻断对手range中的强牌组合。在K high或Q high牌面bluff，A blocker让成功率提升20%+。'
+                },
+                
+                // 综合测试9：极限压力测试
+                {
+                    position: 'BTN',
+                    yourHand: ['5♣', '4♣'],
+                    action: 'CO（紧手TAG）开局9BB',
+                    situation: '轮到你在BTN，筹码280BB。54s是投机牌',
+                    stack: '280BB',
+                    potSize: '底池: 24BB',
+                    opponent: 'CO紧手TAG',
+                    lagType: 'aggressive',
+                    options: [
+                        { action: 'Fold', correct: false, lagScore: 4, reason: '⚠️ 54s在BTN对抗CO开局有一定价值。虽然弱，但深筹码+位置优势让它有盈利空间。' },
+                        { action: 'Call 9BB', correct: true, lagScore: 8, reason: '✅ 标准LAG打法！54s在深筹码BTN call的价值：①隐含赔率（中顺子/两对能赢大底池）②位置优势 ③投机牌成本可接受。翻后计划：击中强牌慢打，miss小底池弃牌。' },
+                        { action: '3-Bet到27BB', correct: true, lagScore: 10, reason: '🔥 激进LAG！54s在BTN 3-Bet CO是世界级LAG技术。原因：①对手紧会fold很多牌 ②你有位置 ③Suited牌有坚果潜力 ④建立超级LAG形象。如果他call，flop不管什么牌都计划c-bet！这是"松"的终极体现！' }
+                    ],
+                    lagTip: 'LAG极限测试：54s这种弱suited牌在BTN可以mix call和3-Bet（70% call / 30% 3-Bet）。3-Bet需要极强的翻后技术支持。'
+                },
+                
+                // 综合测试10：终极LAG测试
+                {
+                    position: 'CO',
+                    yourHand: ['K♥', 'Q♥'],
+                    action: '你在CO 3-Bet到27BB，BTN（超级紧手Nit）4-Bet到70BB',
+                    situation: 'BTN是超级Nit（VPIP 12%），4-Bet频率只有2%（只用AA/KK）。他4-Bet到70BB',
+                    stack: '253BB（你已投入27BB）',
+                    potSize: '底池: 101BB（含SB+BB）',
+                    opponent: 'BTN超级Nit（4-Bet = AA/KK）',
+                    lagType: 'cautious',
+                    options: [
+                        { action: '5-Bet到150BB', correct: false, lagScore: 2, reason: '❌ 送钱！KQs面对Nit的4-Bet（只有AA/KK）应该立即fold。5-Bet只会被6-Bet all-in，你对抗AA/KK只有25%胜率。' },
+                        { action: 'Call 43BB', correct: false, lagScore: 3, reason: '❌ KQs对抗AA/KK在70BB pot只有25% equity，call是-EV。即使你有位置，深筹码对抗AA/KK很难盈利。' },
+                        { action: 'Fold（损失27BB）', correct: true, lagScore: 10, reason: '✅ LAG的终极纪律！虽然你已投入27BB（sunk cost），但KQs面对超级Nit的4-Bet必须fold。这不是弱，而是剥削性调整：识别对手只用AA/KK 4-Bet → 你只有25%胜率 → fold是唯一正确选择。LAG≠疯子，知道何时fold是世界级！' }
+                    ],
+                    lagTip: '终极LAG纪律：对抗超级Nit的4-Bet，即使强如KQs也要fold。LAG的核心是"有选择的激进"，不是无脑。Sunk cost不是继续犯错的理由。'
+                }
+            ]
         };
 
         // 状态管理
