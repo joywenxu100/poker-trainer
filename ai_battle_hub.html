@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🤖 AI对战系统 - 世界冠军级别训练</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0612;
+            --bg-card: #150d1f;
+            --gold: #ffd700;
+            --green: #2ecc71;
+            --red: #e74c3c;
+            --blue: #3498db;
+            --orange: #ff8c00;
+            --purple: #9b59b6;
+            --text: #f0f0f0;
+            --text-dim: #8a8a9a;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark), #1a0f2e);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(155, 89, 182, 0.2);
+            border: 1px solid rgba(155, 89, 182, 0.5);
+            color: var(--purple);
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        header {
+            text-align: center;
+            margin: 60px 0 50px;
+        }
+
+        h1 {
+            font-size: 3.2rem;
+            background: linear-gradient(135deg, var(--purple), var(--blue), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            font-weight: 900;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 140, 0, 0.1));
+            border: 3px solid var(--gold);
+            border-radius: 25px;
+            padding: 50px;
+            margin-bottom: 50px;
+            text-align: center;
+        }
+
+        .hero-section h2 {
+            color: var(--gold);
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+        }
+
+        .ai-modes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 50px 0;
+        }
+
+        .ai-mode-card {
+            background: linear-gradient(135deg, var(--bg-card), #1e1430);
+            border-radius: 25px;
+            padding: 40px;
+            border: 2px solid transparent;
+            transition: all 0.4s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-mode-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .ai-mode-card:hover::before {
+            opacity: 1;
+        }
+
+        .ai-mode-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--gold);
+            box-shadow: 0 15px 45px rgba(255, 215, 0, 0.4);
+        }
+
+        .mode-icon {
+            font-size: 4rem;
+            margin-bottom: 25px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .mode-title {
+            color: var(--gold);
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin-bottom: 15px;
+        }
+
+        .mode-subtitle {
+            color: var(--orange);
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .mode-desc {
+            color: var(--text-dim);
+            line-height: 1.8;
+            margin-bottom: 25px;
+        }
+
+        .mode-features {
+            list-style: none;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .mode-features li {
+            padding: 10px 0;
+            color: var(--text);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .mode-features li::before {
+            content: '⚡ ';
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        .difficulty-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin: 15px 0;
+        }
+
+        .difficulty-easy {
+            background: rgba(50, 205, 50, 0.2);
+            color: var(--green);
+            border: 2px solid var(--green);
+        }
+
+        .difficulty-medium {
+            background: rgba(255, 140, 0, 0.2);
+            color: var(--orange);
+            border: 2px solid var(--orange);
+        }
+
+        .difficulty-hard {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--red);
+            border: 2px solid var(--red);
+        }
+
+        .difficulty-extreme {
+            background: rgba(138, 43, 226, 0.2);
+            color: var(--purple);
+            border: 2px solid var(--purple);
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, var(--gold), var(--orange));
+            color: #000;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5);
+        }
+
+        .features-section {
+            background: linear-gradient(135deg, var(--bg-card), #1e1430);
+            border-radius: 25px;
+            padding: 50px;
+            margin: 50px 0;
+            border: 2px solid rgba(52, 152, 219, 0.3);
+        }
+
+        .features-section h2 {
+            color: var(--blue);
+            font-size: 2rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .feature-card {
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            border: 2px solid rgba(52, 152, 219, 0.2);
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h3 {
+            color: var(--blue);
+            margin-bottom: 12px;
+        }
+
+        .stats-banner {
+            background: rgba(50, 205, 50, 0.1);
+            border: 2px solid var(--green);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 50px 0;
+            text-align: center;
+        }
+
+        .stats-banner h3 {
+            color: var(--green);
+            font-size: 1.8rem;
+            margin-bottom: 25px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-box {
+            background: rgba(50, 205, 50, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            color: var(--green);
+            font-weight: 900;
+        }
+
+        .stat-label {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            .ai-modes-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <a href="unified_training_hub.html" class="back-btn">← 返回训练中心</a>
+
+    <div class="container">
+        <header>
+            <h1>🤖 AI对战系统</h1>
+            <p style="font-size: 1.3rem; color: var(--text-dim); margin-top: 15px;">
+                世界冠军级AI · 实战模拟训练 · 冲击最高水平
+            </p>
+        </header>
+
+        <!-- Hero横幅 -->
+        <div class="hero-section">
+            <h2>🏆 挑战世界顶级AI玩家</h2>
+            <p style="font-size: 1.2rem; line-height: 2; color: var(--text); margin: 25px 0;">
+                从初级AI到10条WSOP金手链冠军级别<br>
+                完整模拟真实对手 · 每场对战都是成长<br>
+                <strong style="color: var(--gold);">打败最强AI，你就是世界第一！</strong>
+            </p>
+        </div>
+
+        <!-- AI对战模式 -->
+        <div class="ai-modes-grid">
+            
+            <!-- 模式1: 练习模式 -->
+            <div class="ai-mode-card" onclick="window.location.href='ai_practice_mode.html'">
+                <div class="mode-icon">🎯</div>
+                <div class="mode-title">练习模式</div>
+                <div class="mode-subtitle">新手友好 · 基础训练</div>
+                <span class="difficulty-badge difficulty-easy">难度: EASY ⭐</span>
+                <p class="mode-desc">
+                    对抗基础AI，学习基本策略和决策流程。AI会给出提示和建议。
+                </p>
+                <ul class="mode-features">
+                    <li>AI强度: 5-6/10</li>
+                    <li>实时提示系统</li>
+                    <li>决策建议</li>
+                    <li>错误纠正</li>
+                    <li>无时间压力</li>
+                </ul>
+                <button class="start-btn">开始练习</button>
+            </div>
+
+            <!-- 模式2: 标准对战 -->
+            <div class="ai-mode-card" onclick="window.location.href='ai_standard_battle.html'">
+                <div class="mode-icon">⚔️</div>
+                <div class="mode-title">标准对战</div>
+                <div class="mode-subtitle">常规训练 · 真实体验</div>
+                <span class="difficulty-badge difficulty-medium">难度: MEDIUM ⭐⭐⭐</span>
+                <p class="mode-desc">
+                    对抗中级AI，模拟真实锦标赛环境。AI使用TAG/LAG策略。
+                </p>
+                <ul class="mode-features">
+                    <li>AI强度: 7-8/10</li>
+                    <li>9种对手类型</li>
+                    <li>完整锦标赛模拟</li>
+                    <li>ICM压力</li>
+                    <li>真实时间限制</li>
+                </ul>
+                <button class="start-btn">开始对战</button>
+            </div>
+
+            <!-- 模式3: 冠军挑战 -->
+            <div class="ai-mode-card" onclick="window.location.href='ai_champion_challenge.html'">
+                <div class="mode-icon">👑</div>
+                <div class="mode-title">冠军挑战</div>
+                <div class="mode-subtitle">世界级 · 终极考验</div>
+                <span class="difficulty-badge difficulty-hard">难度: HARD ⭐⭐⭐⭐⭐</span>
+                <p class="mode-desc">
+                    对抗世界冠军级AI。模拟Phil Ivey, Daniel Negreanu等传奇玩家。
+                </p>
+                <ul class="mode-features">
+                    <li>AI强度: 9-10/10</li>
+                    <li>10大传奇冠军</li>
+                    <li>高级读牌能力</li>
+                    <li>动态策略调整</li>
+                    <li>极限决策压力</li>
+                </ul>
+                <button class="start-btn">挑战冠军</button>
+            </div>
+
+            <!-- 模式4: WSOP决赛桌 -->
+            <div class="ai-mode-card" onclick="window.location.href='ai_wsop_final_table.html'">
+                <div class="mode-icon">🏅</div>
+                <div class="mode-title">WSOP决赛桌</div>
+                <div class="mode-subtitle">终极挑战 · 金手链之战</div>
+                <span class="difficulty-badge difficulty-extreme">难度: EXTREME ⭐⭐⭐⭐⭐⭐</span>
+                <p class="mode-desc">
+                    完整模拟WSOP决赛桌。9位世界顶级AI，高ICM压力，电视转播环境。
+                </p>
+                <ul class="mode-features">
+                    <li>9位冠军级AI</li>
+                    <li>极限ICM压力</li>
+                    <li>电视转播模拟</li>
+                    <li>百万美元底池</li>
+                    <li>真实心理压力</li>
+                </ul>
+                <button class="start-btn">冲击金手链</button>
+            </div>
+
+        </div>
+
+        <!-- 系统特性 -->
+        <div class="features-section">
+            <h2>🌟 AI系统核心特性</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🧠</div>
+                    <h3>深度学习AI</h3>
+                    <p style="color: var(--text-dim); line-height: 1.7;">
+                        基于百万手牌训练，GTO+剥削混合策略
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🎭</div>
+                    <h3>9种对手类型</h3>
+                    <p style="color: var(--text-dim); line-height: 1.7;">
+                        Nit, TAG, LAG, Maniac等完整personality
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>动态调整</h3>
+                    <p style="color: var(--text-dim); line-height: 1.7;">
+                        AI实时分析你的策略并针对性调整
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔍</div>
+                    <h3>完整复盘</h3>
+                    <p style="color: var(--text-dim); line-height: 1.7;">
+                        每手牌AI思考过程分析，学习顶级决策
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>实时反馈</h3>
+                    <p style="color: var(--text-dim); line-height: 1.7;">
+                        即时错误指出，关键决策点分析
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>针对性训练</h3>
+                    <p style="color: var(--text-dim); line-height: 1.7;">
+                        基于你的leaks生成专项训练对局
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 训练数据统计 -->
+        <div class="stats-banner">
+            <h3>💪 AI训练系统数据</h3>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-value">15</div>
+                    <div class="stat-label">AI对手类型</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">100万+</div>
+                    <div class="stat-label">训练手牌数</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">10</div>
+                    <div class="stat-label">世界冠军模拟</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">95%</div>
+                    <div class="stat-label">决策准确度</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">无限</div>
+                    <div class="stat-label">对战次数</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 使用建议 -->
+        <div style="background: rgba(52, 152, 219, 0.1); border: 2px solid var(--blue); border-radius: 20px; padding: 40px; margin: 50px 0;">
+            <h3 style="color: var(--blue); font-size: 1.8rem; margin-bottom: 25px; text-align: center;">
+                📚 推荐训练路径
+            </h3>
+            <ol style="line-height: 2.5; margin-left: 40px; font-size: 1.05rem;">
+                <li>
+                    <strong>第1周:</strong> 练习模式 (20局) → 熟悉系统，掌握基础
+                </li>
+                <li>
+                    <strong>第2-3周:</strong> 标准对战 (50局) → 对抗各类AI，建立经验
+                </li>
+                <li>
+                    <strong>第4-5周:</strong> 冠军挑战 (30局) → 挑战世界级AI，提升上限
+                </li>
+                <li>
+                    <strong>第6周+:</strong> WSOP决赛桌 (10局) → 完整模拟，冲击金手链
+                </li>
+            </ol>
+            <p style="text-align: center; margin-top: 30px; font-size: 1.1rem; color: var(--gold);">
+                <strong>完成全部训练，你将具备夺冠实力！🏆</strong>
+            </p>
+        </div>
+
+        <!-- 底部链接 -->
+        <div style="text-align: center; margin: 60px 0; padding-top: 40px; border-top: 2px solid rgba(138,43,226,0.3);">
+            <p style="font-size: 1.2rem; color: var(--text-dim); margin-bottom: 25px;">
+                挑战最强AI，成就世界第一！
+            </p>
+            <a href="unified_training_hub.html" style="color: var(--purple); text-decoration: none; font-size: 1.1rem; margin: 0 20px;">
+                返回训练中心
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // 页面加载动画
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.ai-mode-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 150);
+            });
+        });
+    </script>
+</body>
+</html>
+
