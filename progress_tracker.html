@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📈 进步追踪系统 - 你的成长可视化</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0612;
+            --bg-card: #150d1f;
+            --gold: #ffd700;
+            --green: #2ecc71;
+            --red: #e74c3c;
+            --blue: #3498db;
+            --orange: #ff8c00;
+            --purple: #9b59b6;
+            --text: #f0f0f0;
+            --text-dim: #8a8a9a;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark), #1a0f2e);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(155, 89, 182, 0.2);
+            border: 1px solid rgba(155, 89, 182, 0.5);
+            color: var(--purple);
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            z-index: 100;
+        }
+
+        header {
+            text-align: center;
+            margin: 60px 0 50px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--green), var(--blue), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            font-weight: 900;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--bg-card), #1e1430);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            border: 2px solid rgba(50, 205, 50, 0.3);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(50, 205, 50, 0.3);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .stat-value {
+            font-size: 2.8rem;
+            color: var(--green);
+            font-weight: 900;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-change {
+            color: var(--green);
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .stat-change.negative {
+            color: var(--red);
+        }
+
+        .chart-section {
+            background: linear-gradient(135deg, var(--bg-card), #1e1430);
+            border-radius: 25px;
+            padding: 40px;
+            margin: 40px 0;
+            border: 2px solid rgba(52, 152, 219, 0.3);
+        }
+
+        .chart-section h2 {
+            color: var(--blue);
+            font-size: 2rem;
+            margin-bottom: 30px;
+        }
+
+        .progress-bars {
+            margin: 30px 0;
+        }
+
+        .skill-progress {
+            margin-bottom: 30px;
+        }
+
+        .skill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .skill-name {
+            font-size: 1.1rem;
+            color: var(--text);
+            font-weight: 600;
+        }
+
+        .skill-scores {
+            display: flex;
+            gap: 20px;
+            font-size: 0.9rem;
+        }
+
+        .score-before {
+            color: var(--red);
+        }
+
+        .score-after {
+            color: var(--green);
+        }
+
+        .progress-bar-container {
+            position: relative;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--red), var(--orange), var(--gold), var(--green));
+            border-radius: 15px;
+            transition: width 1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 15px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .milestones-section {
+            background: linear-gradient(135deg, var(--bg-card), #1e1430);
+            border-radius: 25px;
+            padding: 40px;
+            margin: 40px 0;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .milestones-section h2 {
+            color: var(--gold);
+            font-size: 2rem;
+            margin-bottom: 30px;
+        }
+
+        .milestones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .milestone-card {
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .milestone-card.achieved {
+            border-color: var(--gold);
+            background: rgba(255, 215, 0, 0.2);
+        }
+
+        .milestone-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            filter: grayscale(100%);
+        }
+
+        .milestone-card.achieved .milestone-icon {
+            filter: grayscale(0%);
+            animation: bounce 0.6s;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .milestone-title {
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .milestone-desc {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+        }
+
+        .history-section {
+            background: linear-gradient(135deg, var(--bg-card), #1e1430);
+            border-radius: 25px;
+            padding: 40px;
+            margin: 40px 0;
+            border: 2px solid rgba(155, 89, 182, 0.3);
+        }
+
+        .history-section h2 {
+            color: var(--purple);
+            font-size: 2rem;
+            margin-bottom: 30px;
+        }
+
+        .history-timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .history-timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, var(--purple), var(--blue));
+        }
+
+        .history-item {
+            position: relative;
+            margin-bottom: 30px;
+            padding-left: 30px;
+        }
+
+        .history-item::before {
+            content: '';
+            position: absolute;
+            left: -31px;
+            top: 5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--purple);
+            border: 3px solid var(--bg-dark);
+        }
+
+        .history-card {
+            background: rgba(155, 89, 182, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 3px solid var(--purple);
+        }
+
+        .history-date {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        .history-content {
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .projection-section {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 140, 0, 0.1));
+            border: 2px solid var(--gold);
+            border-radius: 25px;
+            padding: 40px;
+            margin: 40px 0;
+        }
+
+        .projection-section h2 {
+            color: var(--gold);
+            font-size: 2rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .projection-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .projection-card {
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .projection-card h3 {
+            color: var(--gold);
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+
+        .projection-card ul {
+            list-style: none;
+            line-height: 2;
+        }
+
+        .projection-card ul li::before {
+            content: '→ ';
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        .export-btn {
+            background: linear-gradient(135deg, var(--green), var(--blue));
+            color: #fff;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: block;
+            margin: 40px auto;
+        }
+
+        .export-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(50, 205, 50, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.2rem; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .projection-content { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <a href="unified_training_hub.html" class="back-btn">← 返回训练中心</a>
+
+    <div class="container">
+        <header>
+            <h1>📈 进步追踪系统</h1>
+            <p style="font-size: 1.3rem; color: var(--text-dim); margin-top: 15px;">
+                可视化你的成长 · 记录每一步进步 · 见证世界级之路
+            </p>
+        </header>
+
+        <!-- 核心数据面板 -->
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-label">总体水平</div>
+                <div class="stat-value">7.8</div>
+                <div class="stat-change">+2.3 ↑</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">⏱️</div>
+                <div class="stat-label">累计训练时长</div>
+                <div class="stat-value">142h</div>
+                <div class="stat-change">本周 +18h</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-label">完成训练模块</div>
+                <div class="stat-value">23</div>
+                <div class="stat-change">+5 新完成</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">🏆</div>
+                <div class="stat-label">达成里程碑</div>
+                <div class="stat-value">12</div>
+                <div class="stat-change">+3 本月</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">📈</div>
+                <div class="stat-label">进步速度</div>
+                <div class="stat-value">+0.42</div>
+                <div class="stat-change">分/周 (优秀)</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">🎮</div>
+                <div class="stat-label">实战手数</div>
+                <div class="stat-value">3,547</div>
+                <div class="stat-change">+892 本周</div>
+            </div>
+        </div>
+
+        <!-- 技能进步图表 -->
+        <div class="chart-section">
+            <h2>🎯 技能进步对比</h2>
+            <p style="color: var(--text-dim); margin-bottom: 30px; font-size: 1.05rem;">
+                开始时 vs 当前水平 - 每项技能的提升
+            </p>
+
+            <div class="progress-bars">
+                <div class="skill-progress">
+                    <div class="skill-header">
+                        <span class="skill-name">翻前范围掌握</span>
+                        <div class="skill-scores">
+                            <span class="score-before">开始: 4.5</span>
+                            <span>→</span>
+                            <span class="score-after">现在: 8.2 (+3.7)</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" style="width: 82%;">8.2/10</div>
+                    </div>
+                </div>
+
+                <div class="skill-progress">
+                    <div class="skill-header">
+                        <span class="skill-name">位置Awareness</span>
+                        <div class="skill-scores">
+                            <span class="score-before">开始: 5.0</span>
+                            <span>→</span>
+                            <span class="score-after">现在: 7.8 (+2.8)</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" style="width: 78%;">7.8/10</div>
+                    </div>
+                </div>
+
+                <div class="skill-progress">
+                    <div class="skill-header">
+                        <span class="skill-name">筹码深度适应</span>
+                        <div class="skill-scores">
+                            <span class="score-before">开始: 3.5</span>
+                            <span>→</span>
+                            <span class="score-after">现在: 8.5 (+5.0)</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" style="width: 85%;">8.5/10</div>
+                    </div>
+                </div>
+
+                <div class="skill-progress">
+                    <div class="skill-header">
+                        <span class="skill-name">翻后策略</span>
+                        <div class="skill-scores">
+                            <span class="score-before">开始: 5.5</span>
+                            <span>→</span>
+                            <span class="score-after">现在: 7.5 (+2.0)</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" style="width: 75%;">7.5/10</div>
+                    </div>
+                </div>
+
+                <div class="skill-progress">
+                    <div class="skill-header">
+                        <span class="skill-name">对手识别与调整</span>
+                        <div class="skill-scores">
+                            <span class="score-before">开始: 4.0</span>
+                            <span>→</span>
+                            <span class="score-after">现在: 7.2 (+3.2)</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" style="width: 72%;">7.2/10</div>
+                    </div>
+                </div>
+
+                <div class="skill-progress">
+                    <div class="skill-header">
+                        <span class="skill-name">ICM理解</span>
+                        <div class="skill-scores">
+                            <span class="score-before">开始: 3.0</span>
+                            <span>→</span>
+                            <span class="score-after">现在: 8.0 (+5.0)</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" style="width: 80%;">8.0/10</div>
+                    </div>
+                </div>
+
+                <div class="skill-progress">
+                    <div class="skill-header">
+                        <span class="skill-name">心理控制</span>
+                        <div class="skill-scores">
+                            <span class="score-before">开始: 6.0</span>
+                            <span>→</span>
+                            <span class="score-after">现在: 7.8 (+1.8)</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" style="width: 78%;">7.8/10</div>
+                    </div>
+                </div>
+
+                <div class="skill-progress">
+                    <div class="skill-header">
+                        <span class="skill-name">平衡与防守</span>
+                        <div class="skill-scores">
+                            <span class="score-before">开始: 4.5</span>
+                            <span>→</span>
+                            <span class="score-after">现在: 8.3 (+3.8)</span>
+                        </div>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" style="width: 83%;">8.3/10</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 里程碑成就 -->
+        <div class="milestones-section">
+            <h2>🏆 里程碑成就</h2>
+            <div class="milestones-grid">
+                <div class="milestone-card achieved">
+                    <div class="milestone-icon">🎯</div>
+                    <div class="milestone-title">新手启程</div>
+                    <div class="milestone-desc">完成首次训练</div>
+                </div>
+
+                <div class="milestone-card achieved">
+                    <div class="milestone-icon">📚</div>
+                    <div class="milestone-title">学习者</div>
+                    <div class="milestone-desc">累计训练50小时</div>
+                </div>
+
+                <div class="milestone-card achieved">
+                    <div class="milestone-icon">🔥</div>
+                    <div class="milestone-title">坚持者</div>
+                    <div class="milestone-desc">连续训练30天</div>
+                </div>
+
+                <div class="milestone-card achieved">
+                    <div class="milestone-icon">📊</div>
+                    <div class="milestone-title">范围大师</div>
+                    <div class="milestone-desc">翻前范围达到8分</div>
+                </div>
+
+                <div class="milestone-card achieved">
+                    <div class="milestone-icon">🎓</div>
+                    <div class="milestone-title">理论专家</div>
+                    <div class="milestone-desc">完成10个训练模块</div>
+                </div>
+
+                <div class="milestone-card achieved">
+                    <div class="milestone-icon">💯</div>
+                    <div class="milestone-title">筹码大师</div>
+                    <div class="milestone-desc">掌握全部筹码深度</div>
+                </div>
+
+                <div class="milestone-card achieved">
+                    <div class="milestone-icon">🛡️</div>
+                    <div class="milestone-title">防守专家</div>
+                    <div class="milestone-desc">完成8大防守模块</div>
+                </div>
+
+                <div class="milestone-card achieved">
+                    <div class="milestone-icon">🧠</div>
+                    <div class="milestone-title">战术家</div>
+                    <div class="milestone-desc">ICM理解达到8分</div>
+                </div>
+
+                <div class="milestone-card">
+                    <div class="milestone-icon">⭐</div>
+                    <div class="milestone-title">高级玩家</div>
+                    <div class="milestone-desc">总体水平达到8.5</div>
+                </div>
+
+                <div class="milestone-card">
+                    <div class="milestone-icon">💎</div>
+                    <div class="milestone-title">专业级</div>
+                    <div class="milestone-desc">总体水平达到9.0</div>
+                </div>
+
+                <div class="milestone-card">
+                    <div class="milestone-icon">👑</div>
+                    <div class="milestone-title">世界级</div>
+                    <div class="milestone-desc">总体水平达到9.5</div>
+                </div>
+
+                <div class="milestone-card">
+                    <div class="milestone-icon">🏅</div>
+                    <div class="milestone-title">WSOP冠军</div>
+                    <div class="milestone-desc">赢得WSOP金手链</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 训练历史 -->
+        <div class="history-section">
+            <h2>📜 训练历史</h2>
+            <div class="history-timeline">
+                <div class="history-item">
+                    <div class="history-card">
+                        <div class="history-date">今天 14:30</div>
+                        <div class="history-content">
+                            完成 <strong>100BB训练模块</strong>，掌握LAG→TAG关键过渡。筹码深度适应 +0.5分 → 8.5分
+                        </div>
+                    </div>
+                </div>
+
+                <div class="history-item">
+                    <div class="history-card">
+                        <div class="history-date">昨天 20:15</div>
+                        <div class="history-content">
+                            完成 <strong>8大防守模块</strong>全部训练。平衡与防守 +1.2分 → 8.3分。🎉 达成"防守专家"里程碑！
+                        </div>
+                    </div>
+                </div>
+
+                <div class="history-item">
+                    <div class="history-card">
+                        <div class="history-date">3天前 18:45</div>
+                        <div class="history-content">
+                            完成 <strong>ICM决策大师</strong>训练。ICM理解 +2.0分 → 8.0分。修复了泡沫期决策leak。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="history-item">
+                    <div class="history-card">
+                        <div class="history-date">1周前 16:20</div>
+                        <div class="history-content">
+                            完成 <strong>筹码深度过渡大师</strong>。筹码深度适应 +3.0分 → 8.0分。🎉 重大突破！
+                        </div>
+                    </div>
+                </div>
+
+                <div class="history-item">
+                    <div class="history-card">
+                        <div class="history-date">2周前 19:30</div>
+                        <div class="history-content">
+                            完成 <strong>深筹码LAG训练器</strong>全部内容。翻前范围 +2.5分 → 8.2分。
+                        </div>
+                    </div>
+                </div>
+
+                <div class="history-item">
+                    <div class="history-card">
+                        <div class="history-date">1个月前 10:00</div>
+                        <div class="history-content">
+                            🎯 开始系统训练！初始评估：总体水平 5.5分。设定目标：世界级水平 9.5+分。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 未来预测 -->
+        <div class="projection-section">
+            <h2>🔮 进步预测与建议</h2>
+            <div class="projection-content">
+                <div class="projection-card">
+                    <h3>当前进度</h3>
+                    <ul>
+                        <li>总体水平：7.8/10 (专业级入门)</li>
+                        <li>距离世界级(9.5)：还需 +1.7分</li>
+                        <li>当前进步速度：+0.42分/周</li>
+                        <li>已完成：68% 训练计划</li>
+                    </ul>
+                </div>
+
+                <div class="projection-card">
+                    <h3>预计达成时间</h3>
+                    <ul>
+                        <li>达到8.5分（高级）：约 2周</li>
+                        <li>达到9.0分（专业级）：约 4周</li>
+                        <li>达到9.5分（世界级）：约 6周</li>
+                        <li>完成全部训练：约 8周</li>
+                    </ul>
+                </div>
+
+                <div class="projection-card">
+                    <h3>下一步建议</h3>
+                    <ul>
+                        <li>优先：翻后策略提升 (7.5→8.5)</li>
+                        <li>重点：对手识别训练 (7.2→8.5)</li>
+                        <li>保持：筹码深度练习</li>
+                        <li>补充：实战手数增加到5000+</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 导出按钮 -->
+        <button class="export-btn" onclick="alert('导出功能开发中！\n\n将支持：\n- PDF进步报告\n- Excel数据表\n- 图表分析\n- 分享到社交媒体')">
+            📥 导出进步报告
+        </button>
+
+        <!-- 底部链接 -->
+        <div style="text-align: center; margin: 60px 0; padding-top: 40px; border-top: 2px solid rgba(50,205,50,0.3);">
+            <p style="font-size: 1.2rem; color: var(--text-dim); margin-bottom: 25px;">
+                坚持训练，记录成长，见证从新手到世界级的完整旅程！🏆
+            </p>
+            <a href="training_recommender.html" style="color: var(--green); text-decoration: none; font-size: 1.1rem; margin: 0 20px;">
+                ← 训练推荐
+            </a>
+            <a href="unified_training_hub.html" style="color: var(--green); text-decoration: none; font-size: 1.1rem; margin: 0 20px;">
+                返回训练中心
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // 动画效果：页面加载时逐个显示进度条
+        document.addEventListener('DOMContentLoaded', function() {
+            const progressBars = document.querySelectorAll('.progress-bar-fill');
+            progressBars.forEach((bar, index) => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, index * 200);
+            });
+        });
+
+        // 模拟数据保存（实际应该保存到localStorage或服务器）
+        function saveProgress(skill, score) {
+            const progress = JSON.parse(localStorage.getItem('pokerProgress') || '{}');
+            progress[skill] = {
+                score: score,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('pokerProgress', JSON.stringify(progress));
+        }
+
+        // 模拟数据加载
+        function loadProgress() {
+            return JSON.parse(localStorage.getItem('pokerProgress') || '{}');
+        }
+    </script>
+</body>
+</html>
+
