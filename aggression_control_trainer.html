@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>进攻性控制大师 - 3Bet/4Bet防御训练</title>
+    <title>进攻性控制大师 - 深筹码3Bet/4Bet防御训练</title>
     <style>
         * {
             margin: 0;
@@ -43,6 +43,14 @@
             font-size: 1.2em;
             opacity: 0.9;
             margin-top: 10px;
+        }
+
+        .game-setup {
+            background: rgba(255, 215, 0, 0.2);
+            border: 2px solid #ffd700;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
         }
 
         .problem-statement {
@@ -124,6 +132,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .scenario-info {
@@ -136,7 +146,16 @@
             padding: 8px 15px;
             border-radius: 20px;
             margin-right: 10px;
+            margin-bottom: 5px;
             font-weight: bold;
+        }
+
+        .pot-info {
+            background: rgba(76, 175, 80, 0.3);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
         }
 
         .hand-display {
@@ -254,6 +273,7 @@
             padding: 20px;
             border-radius: 10px;
             margin-top: 15px;
+            line-height: 1.6;
         }
 
         .stats-panel {
@@ -280,25 +300,6 @@
             opacity: 0.8;
         }
 
-        .progress-bar {
-            width: 100%;
-            height: 30px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            overflow: hidden;
-            margin: 20px 0;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4CAF50, #8BC34A);
-            transition: width 0.5s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-
         .next-btn {
             background: linear-gradient(135deg, #4CAF50, #45a049);
             color: white;
@@ -322,33 +323,6 @@
             padding: 15px;
             border-radius: 10px;
             margin: 15px 0;
-        }
-
-        .range-display {
-            display: grid;
-            grid-template-columns: repeat(13, 1fr);
-            gap: 3px;
-            margin: 20px 0;
-            font-size: 0.8em;
-        }
-
-        .range-cell {
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-            font-size: 0.9em;
-            cursor: pointer;
-        }
-
-        .range-cell.value {
-            background: rgba(231, 76, 60, 0.6);
-        }
-
-        .range-cell.bluff {
-            background: rgba(52, 152, 219, 0.6);
         }
 
         .key-lessons {
@@ -395,76 +369,96 @@
             justify-content: space-between;
             margin-top: 10px;
         }
+
+        .deep-stack-info {
+            background: rgba(0, 217, 255, 0.2);
+            border: 2px solid #00d9ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-size: 0.95em;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
             <h1>🎯 进攻性控制大师</h1>
-            <div class="subtitle">3-Bet & 4-Bet 防御专项训练系统</div>
-            <div class="subtitle">专治过度激进 | 100%封堵压制漏洞</div>
+            <div class="subtitle">深筹码 3-Bet & 4-Bet 防御专项训练</div>
+            <div class="subtitle">200-300BB · Straddle+Ante · 世界级策略</div>
         </header>
+
+        <div class="game-setup">
+            <h3>🎰 游戏设置（专为你的场景设计）</h3>
+            <ul style="margin-top: 10px; margin-left: 20px; line-height: 1.8;">
+                <li><strong>盲注结构：</strong>SB 1BB / BB 2BB / Straddle 4BB</li>
+                <li><strong>Ante：</strong>每人1BB（8人桌 = 8BB Ante）</li>
+                <li><strong>起始底池：</strong>7BB（盲注）+ 8BB（Ante）= 15BB</li>
+                <li><strong>筹码深度：</strong>200-300BB（深筹码专用策略）</li>
+                <li><strong>开局尺寸：</strong>Straddle后Open通常8-12BB</li>
+            </ul>
+        </div>
 
         <div class="problem-statement">
             <h3>⚠️ 你的问题诊断</h3>
             <p><strong>症状：</strong>3-Bet和4-Bet底池中过度激进，频繁被对手压制</p>
-            <p><strong>根本原因：</strong></p>
+            <p><strong>深筹码环境下的根本原因：</strong></p>
             <ul style="margin-top: 10px; margin-left: 20px;">
-                <li>✗ 3-Bet/4-Bet范围过宽，包含太多边缘牌</li>
-                <li>✗ 未能识别对手的3-Bet/4-Bet类型（价值 vs 诈唬）</li>
-                <li>✗ 位置劣势时仍然过度激进</li>
-                <li>✗ 对再加注（5-Bet）缺乏应对策略</li>
-                <li>✗ 底池控制能力不足，容易陷入高风险决策</li>
+                <li>✗ 低估了深筹码的隐含赔率（Set mining价值被忽视）</li>
+                <li>✗ 3-Bet/4-Bet范围未根据筹码深度调整</li>
+                <li>✗ Straddle位置压力下过度反击</li>
+                <li>✗ 大底池时不懂及时弃牌（200+BB底池很常见）</li>
+                <li>✗ 忽视Ante对底池赔率的影响（15BB起始底池）</li>
             </ul>
         </div>
 
         <div class="solution-statement">
-            <h3>✅ 训练目标</h3>
-            <p><strong>通过本系统，你将学会：</strong></p>
+            <h3>✅ 深筹码环境训练目标</h3>
+            <p><strong>通过本系统，你将掌握：</strong></p>
             <ul style="margin-top: 10px; margin-left: 20px;">
-                <li>✓ 精准识别何时该激进、何时该保守</li>
-                <li>✓ 根据位置和对手类型调整策略</li>
-                <li>✓ 掌握正确的3-Bet/4-Bet防守范围</li>
-                <li>✓ 学会及时fold，避免堆筹码陷阱</li>
-                <li>✓ 建立平衡的进攻/防守体系</li>
+                <li>✓ 深筹码特有的3-Bet/4-Bet防守范围</li>
+                <li>✓ Straddle环境下的位置意识（UTG/Straddle的压力）</li>
+                <li>✓ 何时利用隐含赔率call，何时果断fold</li>
+                <li>✓ 大底池决策的纪律性（100+BB的底池）</li>
+                <li>✓ 根据对手类型调整深筹码策略</li>
             </ul>
         </div>
 
         <div class="training-modules">
             <div class="module-card" onclick="startModule(1)">
                 <div class="module-icon">🛡️</div>
-                <div class="module-title">面对3-Bet的防守</div>
-                <div>学会识别何时该call、fold还是4-Bet</div>
+                <div class="module-title">面对3-Bet：深筹码防守</div>
+                <div>200BB+环境，学会利用隐含赔率</div>
             </div>
 
             <div class="module-card" onclick="startModule(2)">
                 <div class="module-icon">⚔️</div>
-                <div class="module-title">4-Bet决策训练</div>
-                <div>掌握4-Bet的时机和范围控制</div>
+                <div class="module-title">4-Bet决策：大底池控制</div>
+                <div>深筹码4-Bet sizing与范围管理</div>
             </div>
 
             <div class="module-card" onclick="startModule(3)">
                 <div class="module-icon">🎭</div>
-                <div class="module-title">对手类型识别</div>
-                <div>根据对手风格调整激进程度</div>
+                <div class="module-title">对手识别：深筹码专业玩家</div>
+                <div>识别深筹码高手的3-Bet模式</div>
             </div>
 
             <div class="module-card" onclick="startModule(4)">
                 <div class="module-icon">📍</div>
-                <div class="module-title">位置意识强化</div>
-                <div>不同位置的激进度控制</div>
+                <div class="module-title">Straddle位置压力管理</div>
+                <div>UTG/Straddle后的激进度控制</div>
             </div>
 
             <div class="module-card" onclick="startModule(5)">
                 <div class="module-icon">💰</div>
-                <div class="module-title">底池大小控制</div>
-                <div>避免陷入过大底池的陷阱</div>
+                <div class="module-title">超大底池止损训练</div>
+                <div>100BB+底池的及时fold训练</div>
             </div>
 
             <div class="module-card" onclick="startModule(6)">
                 <div class="module-icon">🧠</div>
-                <div class="module-title">综合实战测试</div>
-                <div>50道高难度场景测试</div>
+                <div class="module-title">综合实战：世界级场景</div>
+                <div>50道高难度深筹码测试</div>
             </div>
         </div>
 
@@ -486,6 +480,10 @@
                 <div class="stat-label">Fold准确率</div>
                 <div class="stat-value" id="foldAccuracy">0%</div>
             </div>
+            <div class="stat-card">
+                <div class="stat-label">深筹码意识</div>
+                <div class="stat-value" id="deepStackScore">0%</div>
+            </div>
         </div>
 
         <!-- 进攻性指示器 -->
@@ -497,7 +495,7 @@
             <div class="zone-labels">
                 <span>🟢 太保守</span>
                 <span>🟡 平衡</span>
-                <span>🔴 过度激进（你当前位置）</span>
+                <span>🔴 过度激进（当前）</span>
             </div>
         </div>
 
@@ -518,262 +516,270 @@
 
         <!-- 关键要点总结 -->
         <div class="key-lessons">
-            <h3>🎓 核心要点（必须记住）</h3>
+            <h3>🎓 深筹码核心要点（必须记住）</h3>
             <div class="lesson-item">
-                <strong>1. 位置是王道</strong><br>
-                IP（有位置）可以激进，OOP（无位置）必须保守。面对3-Bet时，EP和MP的牌要比BTN严格得多。
+                <strong>1. 深筹码 = 隐含赔率爆炸</strong><br>
+                200BB+环境下，小对子(77-JJ)、同花连牌(89s-JTs)的call价值大幅提升。中set可以赢走100BB+，远超3-Bet pot的15-30BB损失。
             </div>
             <div class="lesson-item">
-                <strong>2. 识别对手3-Bet类型</strong><br>
-                紧手的3-Bet = 强牌（fold中等牌）| 松手的3-Bet = 可能诈唬（可以4-Bet反击）
+                <strong>2. Straddle环境的尺寸调整</strong><br>
+                Open: 8-12BB（非3BB）| 3-Bet: 25-35BB（非10BB）| 4-Bet: 65-85BB（非25BB）。忽视这点会让你的sizing暴露牌力。
             </div>
             <div class="lesson-item">
-                <strong>3. 4-Bet要有理由</strong><br>
-                4-Bet只用：① 超强牌（AA/KK/AK） ② 对抗松手的诈唬4-Bet。其他情况考虑call或fold。
+                <strong>3. 位置在深筹码更致命</strong><br>
+                OOP打200BB底池是灾难。EP/MP面对位置玩家3-Bet，fold范围要比100BB时扩大30%。AQ、KQ、JJ在OOP几乎都是fold。
             </div>
             <div class="lesson-item">
-                <strong>4. 学会及时fold</strong><br>
-                面对3-Bet，大部分牌应该fold（包括AJ、KQ、77-99等中等牌）。Fold不是懦弱，是纪律。
+                <strong>4. 深筹码的4-Bet更两极化</strong><br>
+                4-Bet只用：① 超强牌（AA/KK/AK）价值 ② 坚果blocker（A5s/A4s）诈唬。中等牌（QQ/JJ/AQ）在深筹码4-Bet是灾难。
             </div>
             <div class="lesson-item">
-                <strong>5. 控制底池大小</strong><br>
-                边缘牌在大底池里是灾难。宁可小底池亏小钱，不要大底池亏光。
+                <strong>5. 学会在大底池止损</strong><br>
+                面对3-Bet已经投入10BB？Sunk cost！如果你手上是AJ/KQ这种边缘牌，fold掉10BB比在100BB+底池亏掉50BB强100倍。
+            </div>
+            <div class="lesson-item">
+                <strong>6. Ante改变底池赔率</strong><br>
+                15BB起始底池意味着：① Steal价值更高 ② 防守范围可以略宽 ③ 但3-Bet后的pot已经很大(40BB+)，不要轻易升级战争。
             </div>
         </div>
     </div>
 
     <script>
-        // 训练数据
+        // 深筹码训练数据（200-300BB专用）
         const trainingData = {
             module1: [
                 {
                     position: 'BTN',
                     yourHand: ['A♠', 'J♥'],
-                    action: '你在BTN开局加注到3BB',
-                    situation: 'SB 3-Bet到10BB（SB是紧手，VPIP 18%）',
-                    stack: '100BB',
-                    opponent: '紧手（很少3-Bet，只用强牌）',
+                    action: '起始底池15BB（Ante）。你在BTN开局加注到10BB',
+                    situation: 'SB 3-Bet到32BB（SB是紧手TAG，VPIP 18%，深筹码高手）',
+                    stack: '250BB',
+                    potSize: '底池: 52BB（10+32+10弃牌）',
+                    opponent: '紧手深筹码高手（3-Bet range: TT+/AQ+）',
                     options: [
-                        { action: 'Fold', correct: true, reason: 'AJ面对紧手的3-Bet应该fold。紧手的3-Bet范围是TT+/AQ+，你只有30%左右胜率，而且位置劣势（OOP）。' },
-                        { action: 'Call', correct: false, reason: '❌ Call会让你在不利位置打大底池，翻牌后很难处理。AJ在OOP很难盈利。' },
-                        { action: '4-Bet到25BB', correct: false, reason: '❌ 过度激进！对抗紧手4-Bet只会被AA/KK/QQ/AK call或re-raise，你的equity很差。' }
-                    ]
+                        { action: 'Fold（损失10BB）', correct: true, reason: '✅ 深筹码正确决策！AJ面对紧手TAG的3-Bet必须fold。你只有30%胜率且OOP，即使call进去，在150BB+的SPR下翻牌后极难打。Fold掉10BB是纪律。' },
+                        { action: 'Call 22BB', correct: false, reason: '❌ 深筹码灾难！AJ在OOP、54BB底池、200BB+有效筹码的环境下，翻牌后SPR=200/54≈3.7，这是最难打的区域。击中top pair不知道是否领先，miss了要持续投入。' },
+                        { action: '4-Bet到75BB', correct: false, reason: '❌ 过度激进！深筹码环境4-Bet sizing通常65-85BB，但AJ不够强。对抗紧手只会被QQ+/AK 5-Bet，你要么fold掉75BB，要么call off 250BB只有35%胜率。' }
+                    ],
+                    deepStackNote: '深筹码关键：AJ的价值在于浅筹码all-in能实现equity。深筹码环境下，你需要翻后技巧+位置优势才能盈利，OOP打不出EV。'
                 },
                 {
                     position: 'CO',
-                    yourHand: ['K♦', 'Q♣'],
-                    action: '你在CO加注到2.5BB',
-                    situation: 'BTN 3-Bet到9BB（BTN是LAG玩家，3-Bet频率25%）',
-                    stack: '100BB',
-                    opponent: 'LAG松手（3-Bet范围很宽，包括诈唬）',
+                    yourHand: ['8♦', '8♣'],
+                    action: '起始底池15BB。你在CO加注到10BB',
+                    situation: 'BTN 3-Bet到30BB（BTN是标准TAG，3-Bet频率12%）',
+                    stack: '280BB',
+                    potSize: '底池: 52BB',
+                    opponent: '标准TAG（3-Bet range: 99+/AQs+/AKo）',
                     options: [
-                        { action: 'Fold', correct: true, reason: 'KQ是边缘牌，面对3-Bet最安全的选择是fold，即使对手可能诈唬。' },
-                        { action: 'Call', correct: false, reason: '⚠️ 勉强可以，但你会在不利位置打大底池，翻牌后很难控制。只有你对对手很了解时才考虑。' },
-                        { action: '4-Bet到22BB', correct: false, reason: '❌ KQ不适合4-Bet。如果对手是LAG，可以考虑4-Bet bluff，但用更合适的牌（如A5s）。' }
-                    ]
+                        { action: 'Fold', correct: false, reason: '88在深筹码环境fold掉浪费了巨大的set mining价值。' },
+                        { action: 'Call 20BB', correct: true, reason: '✅ 深筹码完美决策！88 call的隐含赔率：投入30BB，12.5%中set，可以赢走80-150BB。深筹码环境下set mining的投资回报率爆炸。即使没中set，小底池好控制。' },
+                        { action: '4-Bet到75BB', correct: false, reason: '❌ 过度激进！88在深筹码4-Bet是灾难。被99+/AK call或5-Bet时，你只能fold（亏75BB）或call off 280BB处于flip/劣势。浪费了set mining价值。' }
+                    ],
+                    deepStackNote: '深筹码黄金法则：小对子(77-JJ)面对3-Bet，只要SPR>10就应该call。280BB/30BB≈9.3，已经足够。Set mining在深筹码是印钞机。'
                 },
                 {
                     position: 'MP',
-                    yourHand: ['9♠', '9♥'],
-                    action: '你在MP加注到3BB',
-                    situation: 'BTN 3-Bet到10BB（BTN玩得标准，3-Bet频率12%）',
-                    stack: '100BB',
-                    opponent: '标准TAG（3-Bet频率适中）',
+                    yourHand: ['J♥', 'T♥'],
+                    action: '起始底池15BB。你在MP加注到9BB',
+                    situation: 'CO 3-Bet到28BB（CO是松凶LAG，3-Bet频率22%）',
+                    stack: '260BB',
+                    potSize: '底池: 46BB',
+                    opponent: 'LAG松凶玩家（3-Bet range很宽，包括诈唬）',
                     options: [
-                        { action: 'Fold', correct: false, reason: '99太强了不能fold。这是常见错误。' },
-                        { action: 'Call', correct: true, reason: '✅ 99在这个场景最好的选择是call。你有set mining价值，而且如果中暗三条可以赢大底池。Fold太弱，4-Bet太激进。' },
-                        { action: '4-Bet到25BB', correct: false, reason: '❌ 过度激进！99面对标准3-Bet不应该4-Bet。4-Bet只会被更强的牌call（TT+/AK），而且失去set mining价值。' }
-                    ]
+                        { action: 'Fold', correct: true, reason: '✅ 正确！虽然JTs是好的投机牌，但在OOP面对3-Bet应该fold。深筹码环境下同花连牌的价值在于IP能看便宜翻牌，OOP打3-Bet pot太困难。' },
+                        { action: 'Call 19BB', correct: false, reason: '⚠️ 勉强可以考虑（如果你有很强的翻后技巧），但OOP在46BB底池、220BB有效筹码下，JTs翻后决策极度困难。击中一对不够强，听牌要持续投入。' },
+                        { action: '4-Bet到70BB', correct: false, reason: '❌ 虽然对抗LAG可以考虑4-Bet bluff，但JTs不是最佳选择。深筹码4-Bet bluff应该用A5s/A4s（blocker+坚果潜力），JTs被call后不好打。' }
+                    ],
+                    deepStackNote: '深筹码投机牌策略：同花连牌的价值在于"便宜看翻牌+深筹码hit坚果"。被3-Bet后底池已经大了（46BB），失去了"便宜"的前提。'
                 }
             ],
             module2: [
                 {
                     position: 'BTN',
                     yourHand: ['A♥', 'A♠'],
-                    action: '你在BTN开局加注到3BB',
-                    situation: 'SB 3-Bet到10BB',
-                    stack: '100BB',
+                    action: '起始底池15BB。你在BTN开局加注到10BB',
+                    situation: 'SB 3-Bet到32BB',
+                    stack: '270BB',
+                    potSize: '底池: 54BB',
                     opponent: '任何类型对手',
                     options: [
                         { action: 'Fold', correct: false, reason: '❌ AA永远不fold！' },
-                        { action: 'Call', correct: false, reason: '❌ AA太强了，必须4-Bet建立大底池。Slow play会损失价值。' },
-                        { action: '4-Bet到25BB', correct: true, reason: '✅ AA是必须4-Bet的牌。你想建立大底池，而且面对5-Bet可以全下。这是价值4-Bet，不是诈唬。' }
-                    ]
+                        { action: 'Call 22BB', correct: false, reason: '❌ AA太强了，深筹码环境必须4-Bet建立大底池。Slow play会损失巨大价值，而且让对手便宜看翻牌实现equity。' },
+                        { action: '4-Bet到80BB', correct: true, reason: '✅ 深筹码AA标准打法！4-Bet sizing = 2.5x 3-bet (32×2.5=80)。你想：①建立150BB+的底池 ②面对5-Bet可以全下250BB。这是价值4-Bet的核心。' }
+                    ],
+                    deepStackNote: '深筹码AA/KK策略：必须4-Bet到80-90BB建立大底池。不要怕"吓跑"对手，深筹码环境对手拿QQ/AK往往会继续。'
                 },
                 {
                     position: 'CO',
                     yourHand: ['A♠', '5♠'],
-                    action: '你在CO加注到2.5BB',
-                    situation: 'BTN 3-Bet到9BB（BTN是LAG，3-Bet频率28%）',
-                    stack: '100BB',
-                    opponent: 'LAG松手（3-Bet范围很宽）',
+                    action: '起始底池15BB。你在CO加注到9BB',
+                    situation: 'BTN 3-Bet到28BB（BTN是LAG，3-Bet频率26%，深筹码高手）',
+                    stack: '250BB',
+                    potSize: '底池: 46BB',
+                    opponent: 'LAG松手（3-Bet range很宽，包括大量诈唬）',
                     options: [
-                        { action: 'Fold', correct: false, reason: '对抗LAG的宽3-Bet范围，A5s fold掉了EV。' },
-                        { action: 'Call', correct: false, reason: 'A5s不适合call 3-Bet，翻牌后很难打。' },
-                        { action: '4-Bet到22BB（诈唬4-Bet）', correct: true, reason: '✅ 对抗LAG的宽3-Bet，A5s是完美的诈唬4-Bet牌。它有坚果潜力（同花/顺子），但现在价值不足以call。4-Bet可以让对手fold掉很多牌。' }
-                    ]
+                        { action: 'Fold', correct: false, reason: '对抗LAG的宽3-Bet range，A5s fold掉浪费了反击价值。' },
+                        { action: 'Call 19BB', correct: false, reason: 'A5s不适合call 3-Bet。它的价值在于坚果潜力（同花/顺子），但不够强到call大底池。' },
+                        { action: '4-Bet到70BB（诈唬）', correct: true, reason: '✅ 深筹码完美4-Bet bluff！A5s有：①A blocker（减少对手AA/AK） ②坚果潜力（nut flush）③不想call打46BB底池。4-Bet sizing=70BB可以让对手fold大量牌（KK-99/AQ/AJs）。' }
+                    ],
+                    deepStackNote: '深筹码4-Bet bluff策略：用A4s-A5s/K5s。Sizing要够大（65-75BB）才能产生fold equity，但不能太大导致commit。'
                 },
                 {
-                    position: 'MP',
-                    yourHand: ['J♥', 'J♠'],
-                    action: '你在MP加注到3BB',
-                    situation: 'BTN 3-Bet到10BB（标准TAG玩家）',
-                    stack: '100BB',
-                    opponent: '标准TAG',
+                    position: 'EP',
+                    yourHand: ['Q♥', 'Q♠'],
+                    action: '起始底池15BB。你在EP加注到9BB',
+                    situation: 'BTN 3-Bet到30BB（BTN是深筹码职业玩家）',
+                    stack: '280BB',
+                    potSize: '底池: 51BB',
+                    opponent: '深筹码职业玩家（3-Bet range: TT+/AQs+/AKo，极平衡）',
                     options: [
-                        { action: 'Fold', correct: false, reason: 'JJ太强了，不能fold。' },
-                        { action: 'Call', correct: true, reason: '✅ JJ面对3-Bet最平衡的打法是call。4-Bet太激进（会被QQ+/AK压制），fold太弱。Call可以看翻牌，有set mining价值。' },
-                        { action: '4-Bet到25BB', correct: false, reason: '❌ 过度激进的典型案例！JJ 4-Bet只会被QQ+/AK call或re-raise，你处于flip或被压制的状态。' }
-                    ]
+                        { action: 'Fold', correct: false, reason: 'QQ太强了不能fold。' },
+                        { action: 'Call 21BB', correct: true, reason: '✅ 深筹码QQ最优打法！Call的好处：①保留250BB筹码灵活性 ②12.5%中set能破解对手 ③避免被AA/KK 5-Bet。4-Bet QQ在深筹码环境风险太大。' },
+                        { action: '4-Bet到75BB', correct: false, reason: '❌ 过度激进！深筹码QQ 4-Bet的困境：对手5-Bet时你怎么办？Fold掉75BB？Call off 280BB对抗KK/AA只有18%胜率？QQ在深筹码应该set mining。' }
+                    ],
+                    deepStackNote: '深筹码JJ/QQ哲学：这些牌在100BB可以4-Bet/call all-in，但在200BB+环境，面对5-Bet进退两难。Call 3-bet set mining才是最优策略。'
                 }
             ],
             module3: [
                 {
                     position: 'BTN',
-                    yourHand: ['Q♦', 'Q♠'],
-                    action: '你在BTN加注到3BB',
-                    situation: 'SB 3-Bet到10BB（这个SB是nit，过去20手只3-Bet过1次，拿的是AA）',
-                    stack: '100BB',
-                    opponent: '超级紧手（只用AA/KK 3-Bet）',
+                    yourHand: ['A♣', 'K♥'],
+                    action: '起始底池15BB。你在BTN开局加注到10BB',
+                    situation: 'BB 3-Bet到32BB（BB是深筹码Nit，过去50手只3-Bet过2次）',
+                    stack: '260BB',
+                    potSize: '底池: 54BB',
+                    opponent: '超级紧手（可能只用AA/KK 3-Bet）',
                     options: [
-                        { action: 'Fold', correct: true, reason: '✅ 读懂对手很重要！虽然QQ是强牌，但对抗一个只用AA/KK 3-Bet的nit，你应该fold。这不是理论打法，而是剥削性调整。' },
-                        { action: 'Call', correct: false, reason: '⚠️ 可以考虑，但面对AA/KK，你的equity很差（18% vs AA）。除非你翻牌中set，否则会输掉大底池。' },
-                        { action: '4-Bet', correct: false, reason: '❌ 送钱！对抗只用AA/KK 3-Bet的对手，4-Bet只会被5-Bet，然后你不得不fold。' }
-                    ]
+                        { action: 'Fold', correct: true, reason: '✅ 读懂对手！虽然AK是强牌，但对抗一个极度紧的深筹码nit，fold是剥削性调整。如果他只用AA/KK 3-Bet（5% range），你AK只有29%胜率，4-Bet会被5-Bet。' },
+                        { action: 'Call 22BB', correct: false, reason: '⚠️ 可以考虑，但深筹码环境AK在OOP miss flop后（67%概率）很难继续。除非你有很强的翻后能力，否则fold更安全。' },
+                        { action: '4-Bet到80BB', correct: false, reason: '❌ 如果对手是标准TAG，AK应该4-Bet。但对抗极度紧的nit，4-Bet只会被AA/KK 5-Bet，然后你被迫fold或call off 260BB只有29%胜率。' }
+                    ],
+                    deepStackNote: '深筹码剥削调整：对抗深筹码nit，即使AK也要考虑fold 3-bet。他们的3-Bet range极窄（2-5%），你的equity不够支持大底池对抗。'
                 },
                 {
-                    position: 'CO',
-                    yourHand: ['8♠', '8♥'],
-                    action: '你在CO加注到2.5BB',
-                    situation: 'BTN 3-Bet到9BB（这个BTN是疯子，3-Bet频率40%）',
-                    stack: '100BB',
-                    opponent: '超级LAG（3-Bet range极宽，包括垃圾牌）',
+                    position: 'MP',
+                    yourHand: ['K♦', 'Q♠'],
+                    action: '起始底池15BB。你在MP加注到9BB',
+                    situation: 'CO 3-Bet到28BB（CO是深筹码疯子，3-Bet频率35%）',
+                    stack: '240BB',
+                    potSize: '底池: 46BB',
+                    opponent: '超级LAG（3-Bet range极宽：22+/ATC suited/任何A）',
                     options: [
-                        { action: 'Fold', correct: false, reason: '对抗40%的3-Bet频率，88 fold太弱了。' },
-                        { action: 'Call', correct: true, reason: '✅ 88面对疯子的3-Bet，call是最好的选择。你有set mining价值，而且对手range很弱，翻牌后你可以经常赢下底池。' },
-                        { action: '4-Bet到22BB', correct: false, reason: '⚠️ 可以考虑，但88是边缘的4-Bet牌。如果对手经常fold给4-Bet，可以；但如果对手喜欢call/5-Bet，88会很难打。' }
-                    ]
+                        { action: 'Fold', correct: true, reason: '✅ 正确！即使对手3-Bet频率35%，KQo在OOP面对3-Bet应该fold。深筹码环境下，你需要更强的牌才能打OOP大底池。KQo翻后决策太难。' },
+                        { action: 'Call 19BB', correct: false, reason: '❌ KQo在深筹码OOP call 3-bet是亏钱打法。即使击中top pair，面对持续下注你也不知道是否领先。而且对手range很宽，可能有KK/QQ/AK压制你。' },
+                        { action: '4-Bet到70BB', correct: false, reason: '⚠️ 虽然对抗疯子可以考虑4-Bet，但KQo不是最佳选择（没有blocker效应）。如果要4-Bet bluff，应该用A5s/K5s。KQo被call后不好打。' }
+                    ],
+                    deepStackNote: '深筹码对抗疯子：不要被高3-Bet频率诱惑而过度反击。应该用紧的range call（TT+/AQ+），用极化的range 4-Bet（AA/KK/AK+Axs bluff）。'
                 }
             ],
             module4: [
                 {
-                    position: 'EP',
-                    yourHand: ['A♣', 'K♥'],
-                    action: '你在EP加注到3BB',
-                    situation: 'MP 3-Bet到10BB（MP是标准玩家）',
-                    stack: '100BB',
-                    opponent: '标准TAG',
+                    position: 'UTG(Straddle后)',
+                    yourHand: ['A♥', 'Q♦'],
+                    action: '起始底池15BB（含Straddle）。你在UTG开局加注到10BB',
+                    situation: 'MP 3-Bet到32BB（MP是标准TAG）',
+                    stack: '270BB',
+                    potSize: '底池: 56BB（含Antes）',
+                    opponent: '标准TAG（UTG open后3-Bet range: QQ+/AK）',
                     options: [
-                        { action: 'Fold', correct: false, reason: 'AK太强了不能fold。' },
-                        { action: 'Call', correct: false, reason: '⚠️ AK在OOP call 3-Bet不是最优。翻牌后难打。' },
-                        { action: '4-Bet到25BB', correct: true, reason: '✅ EP的AK面对3-Bet应该4-Bet。AK是你EP范围的顶端，面对5-Bet可以call。但要注意对手是超级紧手时考虑fold。' }
-                    ]
+                        { action: 'Fold', correct: true, reason: '✅ UTG位置的纪律！AQo从UTG open被MP 3-Bet，你大概率被QQ+/AK压制。深筹码OOP环境，即使AQ也要fold。这不是弱，而是位置劣势下的正确决策。' },
+                        { action: 'Call 22BB', correct: false, reason: '❌ AQo在最差位置(OOP from UTG)打56BB底池是灾难。你对抗QQ+/AK只有31%胜率，而且翻后240BB有效筹码极难打。' },
+                        { action: '4-Bet到75BB', correct: false, reason: '❌ 过度激进！UTG位置的AQo 4-Bet会被MP的紧range（QQ+/AK）5-Bet或call，你处于劣势或flip。深筹码环境fold是正确选择。' }
+                    ],
+                    deepStackNote: 'Straddle环境位置压力：UTG是最差位置，面对3-Bet你的防守range要非常紧（JJ+/AK）。AQ虽然是好牌，但位置+对手range让它变成fold。'
                 },
                 {
-                    position: 'MP',
-                    yourHand: ['A♥', 'Q♠'],
-                    action: '你在MP加注到3BB',
-                    situation: 'CO 3-Bet到10BB（CO是标准玩家）',
-                    stack: '100BB',
-                    opponent: '标准TAG',
+                    position: 'Straddle',
+                    yourHand: ['9♠', '9♥'],
+                    action: '起始底池15BB。BTN开局加注到12BB，你在Straddle位置',
+                    situation: '你是Straddle（4BB），BTN加注到12BB。轮到你行动',
+                    stack: '250BB',
+                    potSize: '底池: 27BB（12+SB+BB+Antes）',
+                    opponent: 'BTN标准TAG开局玩家',
                     options: [
-                        { action: 'Fold', correct: true, reason: '✅ AQ面对位置玩家的3-Bet应该fold。你在OOP，被3-Bet range压制（他有AK/QQ+），翻牌后很难打。' },
-                        { action: 'Call', correct: false, reason: '❌ AQ在OOP call 3-Bet是亏钱打法。即使击中top pair，也不知道自己是否领先。' },
-                        { action: '4-Bet', correct: false, reason: '❌ 典型的过度激进！AQ不应该4-Bet，你会被AK/QQ+压制，只能fold掉5-Bet。' }
-                    ]
+                        { action: 'Fold', correct: false, reason: '99太强了不能fold。' },
+                        { action: 'Call 8BB', correct: true, reason: '✅ Straddle位置完美防守！99 call只需8BB（已投4BB），获得：①便宜看翻牌 ②12.5%中set能破解对手 ③Straddle位置最后行动有优势。深筹码set mining的隐含赔率极高。' },
+                        { action: '3-Bet到35BB', correct: false, reason: '❌ 从Straddle 3-Bet 99在深筹码环境太激进。BTN的开局range较宽，但你3-Bet后被4-Bet时进退两难。Call保留灵活性更优。' }
+                    ],
+                    deepStackNote: 'Straddle位置策略：Straddle是"便宜的BB"，你已经投入4BB，面对8-12BB的开局，call成本很低。小对子/同花连牌在这个位置call价值很高。'
                 }
             ],
             module5: [
                 {
-                    position: 'BTN',
-                    yourHand: ['7♦', '7♣'],
-                    action: '你在BTN加注到3BB，SB 3-Bet到10BB，你4-Bet到28BB',
-                    situation: 'SB 5-Bet ALL-IN 100BB（SB是紧手）',
-                    stack: '100BB',
-                    opponent: '紧手（5-Bet range = AA/KK）',
+                    position: 'CO',
+                    yourHand: ['J♥', 'J♠'],
+                    action: '起始底池15BB。你在CO加注到10BB，BTN 3-Bet到30BB，你4-Bet到75BB',
+                    situation: 'BTN 5-Bet到170BB（BTN是标准TAG）',
+                    stack: '280BB（你已投入75BB）',
+                    potSize: '底池: 190BB',
+                    opponent: '标准TAG（5-Bet range: KK+，可能有QQ）',
                     options: [
-                        { action: 'Fold', correct: true, reason: '✅ 必须fold！77面对紧手的5-Bet只有15%胜率。你之前的4-Bet就是错误，现在必须及时止损。这就是过度激进的代价。' },
-                        { action: 'Call（All-In）', correct: false, reason: '❌ 送钱！面对紧手5-Bet，77只是在赌博。即使对手有KK，你也只有18%胜率。这是经典的失控升级陷阱。' }
-                    ]
+                        { action: 'Fold（损失75BB）', correct: true, reason: '✅ 止损！JJ面对深筹码职业玩家的5-Bet到170BB（60%筹码），他的range是KK/AA，你只有18%胜率。虽然已投入75BB，但fold止损比call off 280BB亏170BB要强。' },
+                        { action: 'Call 95BB（All-In）', correct: false, reason: '❌ 送钱！JJ面对深筹码5-Bet到170BB（60%筹码）通常是KK/AA。你需要投入95BB去赢190BB（2:1赔率），但胜率只有18%，长期严重亏损。这是过度激进的代价。' }
+                    ],
+                    deepStackNote: '深筹码5-Bet止损：当对手5-Bet到>50%筹码（140BB+），他的range极紧（KK+）。即使你已投入75BB（sunk cost），JJ也要fold。'
                 },
                 {
-                    position: 'CO',
-                    yourHand: ['A♠', 'K♣'],
-                    action: '你在CO加注到2.5BB，BTN 3-Bet到9BB，你4-Bet到24BB',
-                    situation: 'BTN 5-Bet到55BB（BTN是标准TAG）',
-                    stack: '100BB',
-                    opponent: '标准TAG（5-Bet range = QQ+/AK）',
+                    position: 'BTN',
+                    yourHand: ['A♠', 'Q♥'],
+                    action: '起始底池15BB。你在BTN加注到10BB，SB 3-Bet到32BB，你4-Bet到80BB',
+                    situation: 'SB 5-Bet到180BB（SB是紧手TAG）',
+                    stack: '270BB（你已投入80BB）',
+                    potSize: '底池: 205BB',
+                    opponent: '紧手TAG（5-Bet range: QQ+/AK）',
                     options: [
-                        { action: 'Fold', correct: false, reason: 'AK面对TAG的5-Bet不能fold，太弱了。' },
-                        { action: 'Call/All-In', correct: true, reason: '✅ AK面对标准TAG的5-Bet应该call。你对抗QQ+/AK range有45%+的equity，而且底池赔率很好。这是正确的激进。' }
-                    ]
+                        { action: 'Fold（损失80BB）', correct: true, reason: '✅ 纪律性止损！AQo面对紧手5-Bet到180BB（67%筹码），对抗QQ+/AK你只有31-35%胜率。虽然损失80BB很痛，但比call off 270BB要强得多。这是深筹码的纪律。' },
+                        { action: 'Call 100BB（All-In）', correct: false, reason: '❌ AQo面对紧手5-Bet range（QQ+/AK）只有flip equity，需要投入100BB赢205BB（2:1），但胜率不够。你的4-Bet AQo就是错误，现在必须止损。' }
+                    ],
+                    deepStackNote: '深筹码4-Bet纪律：AQo在深筹码环境不应该4-Bet（除非对抗极松的3-Bet）。4-Bet range应该是AA/KK/AK（价值）+ A5s/A4s（bluff），AQ是"夹心饼"。'
                 }
             ],
             module6: [
                 {
-                    position: 'BTN',
-                    yourHand: ['K♠', 'J♠'],
-                    action: '你在BTN加注到3BB',
-                    situation: 'BB 3-Bet到12BB（BB是松凶玩家，3-Bet频率22%）',
-                    stack: '100BB',
-                    opponent: 'LAG（3-Bet range较宽）',
+                    position: 'MP',
+                    yourHand: ['T♠', 'T♥'],
+                    action: '起始底池15BB。你在MP加注到9BB',
+                    situation: 'BTN 3-Bet到30BB（BTN是深筹码高手，3-Bet频率14%）',
+                    stack: '290BB',
+                    potSize: '底池: 51BB',
+                    opponent: '深筹码高手TAG（3-Bet range平衡）',
                     options: [
-                        { action: 'Fold', correct: true, reason: '✅ KJs面对3-Bet应该fold。虽然对手可能诈唬，但KJs不够强，call会OOP打大底池，4-Bet又太激进。Fold是最稳妥的选择。' },
-                        { action: 'Call', correct: false, reason: '❌ KJs在OOP call 3-Bet是亏钱打法。翻牌后你会面对很多困难决策，容易丢失大量筹码。' },
-                        { action: '4-Bet到25BB', correct: false, reason: '❌ 过度激进！KJs不是4-Bet牌。如果想4-Bet bluff，应该用blockers更好的牌（如A5s）。' }
-                    ]
-                },
-                {
-                    position: 'SB',
-                    yourHand: ['Q♠', 'Q♥'],
-                    action: 'BTN加注到3BB，你在SB 3-Bet到12BB',
-                    situation: 'BTN 4-Bet到30BB（BTN是标准玩家）',
-                    stack: '100BB',
-                    opponent: '标准TAG（4-Bet range = JJ+/AK）',
-                    options: [
-                        { action: 'Fold', correct: false, reason: 'QQ面对4-Bet不应该fold，太弱了。' },
-                        { action: 'Call', correct: true, reason: '✅ QQ面对标准4-Bet最好的打法是call。你有30%机会翻牌击中set，而且有位置优势。5-Bet太激进（只被KK/AA call）。' },
-                        { action: '5-Bet All-In', correct: false, reason: '❌ 过度激进！QQ对抗标准4-Bet range (JJ+/AK) 是flip或略微领先，但5-Bet all-in只会被KK/AA call，你会损失很多EV。' }
-                    ]
+                        { action: 'Fold', correct: false, reason: 'TT在深筹码环境fold掉浪费了set mining价值。' },
+                        { action: 'Call 21BB', correct: true, reason: '✅ 深筹码TT标准打法！Call的优势：①12.5%中set能赢走80-150BB ②小底池可控 ③保留280BB筹码灵活性。4-Bet TT在深筹码环境被JJ+/AK call或5-Bet时进退两难。' },
+                        { action: '4-Bet到75BB', correct: false, reason: '❌ 过度激进！TT在深筹码4-Bet会被JJ+/AK继续或5-Bet，你处于flip或劣势。而且浪费了12.5%中set赢大底池的机会。深筹码TT应该set mining。' }
+                    ],
+                    deepStackNote: '深筹码中对子策略：77-TT在深筹码面对3-Bet应该100% call（只要SPR>8）。Set mining的投资回报率在200BB+环境下是最优策略。'
                 },
                 {
                     position: 'CO',
-                    yourHand: ['T♥', 'T♠'],
-                    action: '你在CO加注到2.5BB',
-                    situation: 'BTN 3-Bet到9BB（BTN 3-Bet频率15%）',
-                    stack: '100BB',
-                    opponent: '标准玩家',
+                    yourHand: ['A♥', 'K♠'],
+                    action: '起始底池15BB。你在CO加注到10BB',
+                    situation: 'BTN 3-Bet到32BB（BTN是深筹码LAG，3-Bet频率23%）',
+                    stack: '260BB',
+                    potSize: '底池: 54BB',
+                    opponent: 'LAG松手（3-Bet range: 88+/AT+/KQs+/一些bluff）',
                     options: [
-                        { action: 'Fold', correct: false, reason: 'TT太强了，不能fold。' },
-                        { action: 'Call', correct: true, reason: '✅ TT面对标准3-Bet应该call。Set mining价值很高，4-Bet会被JJ+压制。这是平衡的打法。' },
-                        { action: '4-Bet到22BB', correct: false, reason: '❌ 过度激进！TT 4-Bet会被JJ+/AK call或re-raise，你处于不利位置。Call更有利可图。' }
-                    ]
+                        { action: 'Fold', correct: false, reason: 'AK太强了不能fold。' },
+                        { action: 'Call 22BB', correct: false, reason: '⚠️ AK在深筹码call 3-bet会损失价值。你应该4-Bet建立大底池，而不是让对手便宜看翻牌实现equity。' },
+                        { action: '4-Bet到80BB', correct: true, reason: '✅ 深筹码AK标准4-Bet！对抗LAG的宽3-Bet range，你的AK是价值4-Bet。Sizing=80BB可以：①让对手fold 88-JJ/AQ/KQ ②被QQ+继续时你有46%+ equity ③建立160BB+大底池。' }
+                    ],
+                    deepStackNote: '深筹码AK策略：对抗LAG的3-Bet，AK应该4-Bet到75-85BB。对抗紧手TAG，根据对手3-Bet频率决定（<8%考虑fold，8-15%可以call或4-Bet）。'
                 },
                 {
                     position: 'BTN',
-                    yourHand: ['A♦', 'J♦'],
-                    action: '你在BTN加注到3BB',
-                    situation: 'BB 3-Bet到11BB（BB是超级紧手，3-Bet频率5%）',
-                    stack: '100BB',
-                    opponent: 'Nit（只用AA/KK/QQ/AK 3-Bet）',
-                    options: [
-                        { action: 'Fold', correct: true, reason: '✅ 读懂对手！AJs面对只用顶级牌3-Bet的nit必须fold。你被严重压制（对抗QQ+/AK只有30-35%胜率）。' },
-                        { action: 'Call', correct: false, reason: '❌ 即使有位置，AJs call也是亏钱的。对手range太强，你翻牌后很少能持续。' },
-                        { action: '4-Bet', correct: false, reason: '❌ 极度过度激进！对抗nit 4-Bet只会被5-Bet，然后你必须fold，白白损失筹码。' }
-                    ]
-                },
-                {
-                    position: 'MP',
                     yourHand: ['K♥', 'K♠'],
-                    action: '你在MP加注到3BB',
-                    situation: 'BTN 3-Bet到10BB（BTN是标准玩家）',
-                    stack: '100BB',
-                    opponent: '标准TAG',
+                    action: '起始底池15BB。你在BTN加注到10BB',
+                    situation: 'SB 3-Bet到32BB（SB是标准TAG）',
+                    stack: '280BB',
+                    potSize: '底池: 54BB',
+                    opponent: '标准TAG（3-Bet range: TT+/AQs+/AKo）',
                     options: [
-                        { action: 'Fold', correct: false, reason: 'KK绝对不能fold！' },
-                        { action: 'Call', correct: false, reason: '❌ KK太强了，call会损失价值。必须4-Bet建立大底池。' },
-                        { action: '4-Bet到26BB', correct: true, reason: '✅ KK必须4-Bet！你想建立大底池获取价值，而且面对5-Bet（通常只有AA）可以考虑call。这是价值4-Bet的标准牌。' }
-                    ]
+                        { action: 'Fold', correct: false, reason: '❌ KK绝对不能fold！' },
+                        { action: 'Call 22BB', correct: false, reason: '❌ KK太强了，深筹码必须4-Bet建立大底池。Slow play会：①让对手便宜看翻牌hit set ②损失巨大价值。KK在深筹码环境应该激进地建立150BB+底池。' },
+                        { action: '4-Bet到85BB', correct: true, reason: '✅ 深筹码KK标准打法！4-Bet sizing=85BB（2.5-2.7x）建立大底池。面对5-Bet：对抗AA你有18%，对抗AK你有69%，对抗QQ你是压制。深筹码KK应该打光筹码。' }
+                    ],
+                    deepStackNote: '深筹码AA/KK/AK策略：这三手牌在深筹码环境应该4-Bet到80-90BB建立大底池。不要担心"吓跑"对手，深筹码环境QQ+/AK会继续给你价值。'
                 }
             ]
         };
@@ -784,9 +790,10 @@
         let stats = {
             total: 0,
             correct: 0,
-            aggressive: 0,  // 过度激进的次数
+            aggressive: 0,
             foldCorrect: 0,
-            foldTotal: 0
+            foldTotal: 0,
+            deepStackAware: 0  // 新增：深筹码意识得分
         };
 
         // 开始模块
@@ -794,7 +801,6 @@
             currentModule = moduleNum;
             currentQuestion = 0;
             
-            // 更新模块卡片状态
             document.querySelectorAll('.module-card').forEach((card, index) => {
                 card.classList.remove('active');
                 if (index + 1 === moduleNum) {
@@ -802,10 +808,7 @@
                 }
             });
 
-            // 显示训练区域
             document.getElementById('trainingArea').classList.add('show');
-            
-            // 加载第一题
             loadQuestion();
         }
 
@@ -825,6 +828,8 @@
                     <div class="scenario-info">
                         <span class="position-info">位置: ${q.position}</span>
                         <span class="position-info">筹码: ${q.stack}</span>
+                        <br>
+                        <span class="pot-info">${q.potSize}</span>
                     </div>
                 </div>
 
@@ -843,6 +848,12 @@
                     <strong>对手类型：</strong> ${q.opponent}
                 </div>
 
+                ${q.deepStackNote ? `
+                    <div class="deep-stack-info">
+                        <strong>💡 深筹码关键点：</strong> ${q.deepStackNote}
+                    </div>
+                ` : ''}
+
                 <div style="text-align: center; margin: 20px 0; font-size: 1.2em; color: #f1c40f;">
                     <strong>你会怎么做？</strong>
                 </div>
@@ -856,7 +867,6 @@
                 </div>
             `;
 
-            // 隐藏反馈和下一题按钮
             document.getElementById('feedback').classList.remove('show');
             document.getElementById('nextBtn').style.display = 'none';
         }
@@ -869,13 +879,11 @@
             
             stats.total++;
 
-            // 禁用所有按钮
             document.querySelectorAll('.action-btn').forEach(btn => {
                 btn.disabled = true;
                 btn.style.opacity = '0.5';
             });
 
-            // 显示反馈
             const feedback = document.getElementById('feedback');
             let feedbackClass = 'wrong';
             let feedbackIcon = '❌';
@@ -885,42 +893,43 @@
                 feedbackClass = 'correct';
                 feedbackIcon = '✅';
                 
-                // 如果选择了正确的fold，记录
-                if (selected.action === 'Fold' || selected.action.includes('Fold')) {
+                // 深筹码意识判断
+                if (selected.reason.includes('深筹码') || selected.reason.includes('隐含赔率') || selected.reason.includes('set mining')) {
+                    stats.deepStackAware++;
+                }
+                
+                if (selected.action.includes('Fold') || selected.action.includes('fold')) {
                     stats.foldCorrect++;
                     stats.foldTotal++;
                 }
             } else {
-                // 检查是否过度激进
-                if (selected.action.includes('4-Bet') || selected.action.includes('Raise') || selected.action.includes('Re-raise')) {
+                if (selected.action.includes('4-Bet') || selected.action.includes('All-In')) {
                     stats.aggressive++;
                     feedbackClass = 'warning';
                     feedbackIcon = '⚠️';
                 }
                 
-                if (selected.action === 'Fold') {
+                if (selected.action.includes('Fold')) {
                     stats.foldTotal++;
                 }
             }
 
             feedback.className = `feedback ${feedbackClass} show`;
             feedback.innerHTML = `
-                <h3>${feedbackIcon} ${selected.correct ? '正确！' : selected.action.includes('4-Bet') || selected.action.includes('Raise') ? '过度激进！' : '错误！'}</h3>
+                <h3>${feedbackIcon} ${selected.correct ? '正确！' : (selected.action.includes('4-Bet') || selected.action.includes('All-In')) ? '过度激进！' : '错误！'}</h3>
                 <div class="explanation">
-                    <strong>分析：</strong>${selected.reason}
+                    ${selected.reason}
                 </div>
                 ${!selected.correct ? `
                     <div class="explanation" style="margin-top: 15px; border: 2px solid #2ecc71;">
-                        <strong>✅ 正确答案：</strong>
+                        <strong>✅ 正确答案：</strong><br>
+                        ${q.options.find(o => o.correct).action}<br><br>
                         ${q.options.find(o => o.correct).reason}
                     </div>
                 ` : ''}
             `;
 
-            // 更新统计
             updateStats();
-
-            // 显示下一题按钮
             document.getElementById('nextBtn').style.display = 'block';
         }
 
@@ -934,18 +943,29 @@
         function showModuleComplete() {
             const container = document.getElementById('scenarioContainer');
             const accuracy = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
+            const deepStackScore = stats.total > 0 ? Math.round((stats.deepStackAware / stats.total) * 100) : 0;
+            
+            let feedback = '';
+            if (accuracy >= 80 && stats.aggressive / stats.total < 0.15) {
+                feedback = '🎉 优秀！你已经掌握了深筹码环境的激进度控制！';
+            } else if (stats.aggressive / stats.total > 0.3) {
+                feedback = '⚠️ 仍然过度激进！需要更多训练来控制4-Bet冲动。';
+            } else {
+                feedback = '💪 继续努力！多练习深筹码场景的fold纪律。';
+            }
             
             container.innerHTML = `
                 <div style="text-align: center; padding: 40px;">
                     <h2>🎉 模块 ${currentModule} 完成！</h2>
+                    <p style="margin: 20px 0; font-size: 1.2em;">${feedback}</p>
                     <div class="stats-panel" style="margin: 30px auto; max-width: 600px;">
                         <div class="stat-card">
                             <div class="stat-label">正确率</div>
                             <div class="stat-value">${accuracy}%</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-label">完成题目</div>
-                            <div class="stat-value">${stats.total}</div>
+                            <div class="stat-label">深筹码意识</div>
+                            <div class="stat-value">${deepStackScore}%</div>
                         </div>
                     </div>
                     <button class="next-btn" onclick="location.reload()">返回选择模块</button>
@@ -961,15 +981,16 @@
             const accuracy = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
             const aggressionRate = stats.total > 0 ? Math.round((stats.aggressive / stats.total) * 100) : 0;
             const foldAcc = stats.foldTotal > 0 ? Math.round((stats.foldCorrect / stats.foldTotal) * 100) : 0;
+            const deepStackScore = stats.total > 0 ? Math.round((stats.deepStackAware / stats.total) * 100) : 0;
 
             document.getElementById('accuracy').textContent = accuracy + '%';
             document.getElementById('completed').textContent = `${stats.correct}/${stats.total}`;
             document.getElementById('aggression').textContent = aggressionRate + '%';
             document.getElementById('foldAccuracy').textContent = foldAcc + '%';
+            document.getElementById('deepStackScore').textContent = deepStackScore + '%';
 
-            // 更新进攻性指示器
             const indicator = document.getElementById('aggressionIndicator');
-            const position = 100 - aggressionRate;  // 100% 激进 = 0% 位置（右边）
+            const position = 100 - aggressionRate;
             indicator.style.left = position + '%';
         }
 
@@ -979,13 +1000,12 @@
         }
 
         function getButtonClass(action) {
-            if (action.includes('Fold')) return 'fold';
+            if (action.includes('Fold') || action.includes('fold')) return 'fold';
             if (action.includes('Call')) return 'call';
-            if (action.includes('4-Bet') || action.includes('Re-raise')) return 'reraise';
+            if (action.includes('4-Bet') || action.includes('All-In')) return 'reraise';
             if (action.includes('Raise')) return 'raise';
             return '';
         }
     </script>
 </body>
 </html>
-
