@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>终极深筹码训练器 - 300BB+ 世界第一养成系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0a14 0%, #1a1a2e 50%, #0a0a14 100%);
+            color: #e8e8e8;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(255, 215, 0, 0.05) 100%);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+            animation: headerGlow 8s linear infinite;
+        }
+
+        @keyframes headerGlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        h1 {
+            font-size: 3em;
+            background: linear-gradient(135deg, #d4af37 0%, #ffd700 50%, #d4af37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+            font-weight: 900;
+            text-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            color: #d4af37;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            font-weight: 700;
+        }
+
+        .game-structure {
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px 30px;
+            border-radius: 10px;
+            margin-top: 15px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .structure-item {
+            display: inline-block;
+            margin: 0 15px;
+            color: #ffd700;
+            font-weight: 700;
+        }
+
+        .back-nav {
+            display: inline-block;
+            padding: 12px 30px;
+            background: rgba(212, 175, 55, 0.2);
+            border: 2px solid #d4af37;
+            color: #d4af37;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 700;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .back-nav:hover {
+            background: rgba(212, 175, 55, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+        }
+
+        .training-modules {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .module-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .module-card:hover::before {
+            left: 100%;
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+            border-color: #d4af37;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+        }
+
+        .module-card.active {
+            border-color: #00ff00;
+            background: linear-gradient(135deg, rgba(0, 255, 0, 0.1) 0%, rgba(0, 255, 0, 0.05) 100%);
+        }
+
+        .module-icon {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .module-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+
+        .module-desc {
+            color: #b0b0b0;
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+
+        .module-stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-badge {
+            background: rgba(212, 175, 55, 0.2);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            color: #d4af37;
+            font-weight: 600;
+        }
+
+        .training-area {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(212, 175, 55, 0.2);
+            border-radius: 15px;
+            padding: 40px;
+            display: none;
+        }
+
+        .training-area.active {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .scenario-card {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(255, 215, 0, 0.05) 100%);
+            border-left: 5px solid #d4af37;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .scenario-title {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
+
+        .game-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .info-box {
+            text-align: center;
+        }
+
+        .info-label {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #ffd700;
+        }
+
+        .situation-panel {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .panel-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #d4af37;
+            margin-bottom: 15px;
+        }
+
+        .player-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .player-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 3px solid #d4af37;
+        }
+
+        .player-position {
+            font-weight: 700;
+            color: #ffd700;
+            margin-bottom: 8px;
+        }
+
+        .player-stack {
+            color: #00ff00;
+            font-weight: 700;
+        }
+
+        .player-type {
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        .decision-section {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .question-text {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: rgba(102, 126, 234, 0.2);
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .option-btn {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #e8e8e8;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .option-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #d4af37;
+            transform: translateX(5px);
+        }
+
+        .option-btn.correct {
+            background: rgba(0, 255, 0, 0.2);
+            border-color: #00ff00;
+        }
+
+        .option-btn.wrong {
+            background: rgba(255, 0, 0, 0.2);
+            border-color: #ff0000;
+        }
+
+        .explanation-box {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #00ff00;
+            display: none;
+        }
+
+        .explanation-box.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        .explanation-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #00ff00;
+            margin-bottom: 15px;
+        }
+
+        .explanation-content {
+            color: #d0d0d0;
+            line-height: 1.8;
+            white-space: pre-line;
+        }
+
+        .world-class-tip {
+            background: rgba(138, 43, 226, 0.1);
+            border: 2px solid #8a2be2;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .tip-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #9370db;
+            margin-bottom: 10px;
+        }
+
+        .tip-content {
+            color: #d0d0d0;
+            line-height: 1.7;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #d4af37 0%, #ffd700 100%);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #000;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 15px;
+            background: linear-gradient(135deg, #d4af37 0%, #ffd700 100%);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .nav-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #d4af37;
+            border: 2px solid #d4af37;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            
+            .training-modules {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏆 终极深筹码训练器</h1>
+            <div class="subtitle">300BB+ 世界第一养成系统</div>
+            <div class="game-structure">
+                <span class="structure-item">👥 8人桌</span>
+                <span class="structure-item">💰 300BB+</span>
+                <span class="structure-item">🎯 SB/BB/4BB Straddle/1BB Ante</span>
+            </div>
+            <br>
+            <a href="index.html?v=7" class="back-nav">← 返回导航</a>
+        </header>
+
+        <!-- 训练模块选择 -->
+        <div id="module-selection">
+            <div class="training-modules">
+                <div class="module-card" onclick="selectModule('table_dynamics')">
+                    <span class="module-icon">🎭</span>
+                    <div class="module-title">桌面动态掌控</div>
+                    <div class="module-desc">3-8人动态调整，识别桌面player flow，掌握座位选择，利用松紧变化</div>
+                    <div class="module-stats">
+                        <span class="stat-badge">📊 40场景</span>
+                        <span class="stat-badge">🎯 实战</span>
+                    </div>
+                </div>
+
+                <div class="module-card" onclick="selectModule('ante_exploitation')">
+                    <span class="module-icon">💎</span>
+                    <div class="module-title">Ante底池剥削</div>
+                    <div class="module-desc">Ante改变底池赔率，放宽范围策略，死钱利用最大化，防守频率调整</div>
+                    <div class="module-stats">
+                        <span class="stat-badge">💰 35场景</span>
+                        <span class="stat-badge">🔥 剥削</span>
+                    </div>
+                </div>
+
+                <div class="module-card" onclick="selectModule('straddle_mastery')">
+                    <span class="module-icon">⚡</span>
+                    <div class="module-title">4BB Straddle大师</div>
+                    <div class="module-desc">Straddle位置利用，开池sizing调整，3-Bet pot策略，特殊位置优势</div>
+                    <div class="module-stats">
+                        <span class="stat-badge">🎲 45场景</span>
+                        <span class="stat-badge">👑 大师</span>
+                    </div>
+                </div>
+
+                <div class="module-card" onclick="selectModule('deep_stack_spr')">
+                    <span class="module-icon">📐</span>
+                    <div class="module-title">超深SPR管理</div>
+                    <div class="module-desc">300BB的SPR计算，commitment避免，逆向隐含赔率，多街规划深度</div>
+                    <div class="module-stats">
+                        <span class="stat-badge">🧮 50场景</span>
+                        <span class="stat-badge">🏦 深筹码</span>
+                    </div>
+                </div>
+
+                <div class="module-card" onclick="selectModule('multiway_pot')">
+                    <span class="module-icon">🎯</span>
+                    <div class="module-title">多人底池精通</div>
+                    <div class="module-desc">3-5人pot策略，范围窄化，保护vs榨取，动态equity计算</div>
+                    <div class="module-stats">
+                        <span class="stat-badge">👥 38场景</span>
+                        <span class="stat-badge">🎪 多人</span>
+                    </div>
+                </div>
+
+                <div class="module-card" onclick="selectModule('speculative_hands')">
+                    <span class="module-icon">🎰</span>
+                    <div class="module-title">投机牌深度利用</div>
+                    <div class="module-desc">小对子set mining，同花连牌价值，深筹码隐含赔率，击中后最大化</div>
+                    <div class="module-stats">
+                        <span class="stat-badge">🃏 42场景</span>
+                        <span class="stat-badge">💰 投机</span>
+                    </div>
+                </div>
+
+                <div class="module-card" onclick="selectModule('shorthand_adjust')">
+                    <span class="module-icon">🔥</span>
+                    <div class="module-title">短桌激进调整</div>
+                    <div class="module-desc">3-5人short-handed，范围放宽策略，激进度提升，位置价值放大</div>
+                    <div class="module-stats">
+                        <span class="stat-badge">⚔️ 36场景</span>
+                        <span class="stat-badge">🚀 激进</span>
+                    </div>
+                </div>
+
+                <div class="module-card" onclick="selectModule('opponent_profiling')">
+                    <span class="module-icon">🕵️</span>
+                    <div class="module-title">对手深度画像</div>
+                    <div class="module-desc">长期观察数据，倾向性识别，动态调整策略，meta game运用</div>
+                    <div class="module-stats">
+                        <span class="stat-badge">🎭 44场景</span>
+                        <span class="stat-badge">🧠 读人</span>
+                    </div>
+                </div>
+
+                <div class="module-card" onclick="selectModule('world_class_combat')">
+                    <span class="module-icon">👑</span>
+                    <div class="module-title">世界级实战</div>
+                    <div class="module-desc">vs顶级职业玩家，高频决策训练，压力测试，冠军思维培养</div>
+                    <div class="module-stats">
+                        <span class="stat-badge">🏆 60场景</span>
+                        <span class="stat-badge">💎 冠军</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 训练区域 -->
+        <div id="training-area" class="training-area">
+            <div id="scenario-content">
+                <!-- 场景内容将由JavaScript动态生成 -->
+            </div>
+
+            <div class="nav-buttons">
+                <button class="nav-btn secondary" onclick="backToModules()">← 返回模块选择</button>
+                <button class="nav-btn" onclick="previousScenario()" id="prev-btn">← 上一题</button>
+                <button class="nav-btn" onclick="nextScenario()" id="next-btn">下一题 →</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="ultimate_deep_stack_data.js"></script>
+    <script>
+        let currentModule = null;
+        let currentScenarioIndex = 0;
+        let currentScenarios = [];
+        let score = 0;
+        let totalAnswered = 0;
+
+        function selectModule(moduleId) {
+            currentModule = moduleId;
+            currentScenarioIndex = 0;
+            currentScenarios = window.ULTIMATE_TRAINING[moduleId] || [];
+            score = 0;
+            totalAnswered = 0;
+            
+            document.getElementById('module-selection').style.display = 'none';
+            document.getElementById('training-area').classList.add('active');
+            
+            renderScenario();
+        }
+
+        function renderScenario() {
+            const scenario = currentScenarios[currentScenarioIndex];
+            if (!scenario) return;
+
+            let html = `
+                <div class="scenario-card">
+                    <div class="scenario-title">${scenario.title}</div>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${((currentScenarioIndex + 1) / currentScenarios.length * 100).toFixed(0)}%">
+                            ${currentScenarioIndex + 1} / ${currentScenarios.length}
+                        </div>
+                    </div>
+
+                    <div class="game-info-grid">
+                        <div class="info-box">
+                            <div class="info-label">桌面人数</div>
+                            <div class="info-value">${scenario.table_size}人</div>
+                        </div>
+                        <div class="info-box">
+                            <div class="info-label">有效筹码</div>
+                            <div class="info-value">${scenario.effective_stack}</div>
+                        </div>
+                        <div class="info-box">
+                            <div class="info-label">当前底池</div>
+                            <div class="info-value">${scenario.pot}</div>
+                        </div>
+                        <div class="info-box">
+                            <div class="info-label">SPR</div>
+                            <div class="info-value">${scenario.spr}</div>
+                        </div>
+                    </div>
+
+                    <div class="situation-panel">
+                        <div class="panel-title">🎴 游戏情况</div>
+                        <p style="color: #d0d0d0; line-height: 1.8; margin-bottom: 15px;">${scenario.situation}</p>
+                        ${scenario.players ? renderPlayers(scenario.players) : ''}
+                    </div>
+
+                    ${scenario.your_hand ? `
+                        <div class="situation-panel" style="border-color: rgba(0, 255, 0, 0.3);">
+                            <div class="panel-title">🃏 你的手牌</div>
+                            <p style="color: #00ff00; font-size: 1.3em; font-weight: 700;">${scenario.your_hand}</p>
+                        </div>
+                    ` : ''}
+
+                    <div class="decision-section">
+                        <div class="question-text">${scenario.question}</div>
+                        <div class="options-grid" id="options-${currentScenarioIndex}">
+            `;
+
+            scenario.options.forEach((option, idx) => {
+                html += `
+                    <button class="option-btn" onclick="selectOption(${idx}, ${currentScenarioIndex})" id="option-${currentScenarioIndex}-${idx}">
+                        <strong>${String.fromCharCode(65 + idx)}.</strong> ${option.text}
+                    </button>
+                `;
+            });
+
+            html += `
+                        </div>
+                        <div class="explanation-box" id="explanation-${currentScenarioIndex}">
+                            <div class="explanation-title">✅ 详细分析</div>
+                            <div class="explanation-content">${scenario.explanation}</div>
+                        </div>
+                    </div>
+
+                    ${scenario.world_class_tip ? `
+                        <div class="world-class-tip">
+                            <div class="tip-title">💡 世界级洞察</div>
+                            <div class="tip-content">${scenario.world_class_tip}</div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+
+            document.getElementById('scenario-content').innerHTML = html;
+            updateNavigationButtons();
+        }
+
+        function renderPlayers(players) {
+            let html = '<div class="player-grid">';
+            players.forEach(player => {
+                html += `
+                    <div class="player-card">
+                        <div class="player-position">${player.position}</div>
+                        <div class="player-stack">筹码: ${player.stack}</div>
+                        <div class="player-type">${player.type}</div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            return html;
+        }
+
+        function selectOption(optionIdx, scenarioIdx) {
+            if (totalAnswered > currentScenarioIndex) return; // 已经回答过
+
+            const scenario = currentScenarios[scenarioIdx];
+            const isCorrect = scenario.options[optionIdx].correct;
+            
+            const optionBtn = document.getElementById(`option-${scenarioIdx}-${optionIdx}`);
+            
+            if (isCorrect) {
+                optionBtn.classList.add('correct');
+                score++;
+            } else {
+                optionBtn.classList.add('wrong');
+                // 高亮正确答案
+                scenario.options.forEach((opt, idx) => {
+                    if (opt.correct) {
+                        document.getElementById(`option-${scenarioIdx}-${idx}`).classList.add('correct');
+                    }
+                });
+            }
+            
+            totalAnswered++;
+            
+            // 禁用所有选项
+            scenario.options.forEach((opt, idx) => {
+                document.getElementById(`option-${scenarioIdx}-${idx}`).disabled = true;
+            });
+            
+            // 显示解释
+            document.getElementById(`explanation-${scenarioIdx}`).classList.add('show');
+        }
+
+        function previousScenario() {
+            if (currentScenarioIndex > 0) {
+                currentScenarioIndex--;
+                renderScenario();
+            }
+        }
+
+        function nextScenario() {
+            if (currentScenarioIndex < currentScenarios.length - 1) {
+                currentScenarioIndex++;
+                renderScenario();
+            } else {
+                showFinalScore();
+            }
+        }
+
+        function showFinalScore() {
+            const percentage = ((score / currentScenarios.length) * 100).toFixed(1);
+            let rating = '';
+            let message = '';
+            
+            if (percentage >= 90) {
+                rating = '🏆 世界冠军级别';
+                message = '你已经达到世界第一的水平！可以主宰这个游戏！';
+            } else if (percentage >= 75) {
+                rating = '💎 职业高手';
+                message = '非常出色！继续保持，你正在通往世界第一的路上！';
+            } else if (percentage >= 60) {
+                rating = '⚡ 中级选手';
+                message = '不错的表现，继续训练提升！';
+            } else {
+                rating = '📚 需要加强';
+                message = '多练习，重点复习错题！';
+            }
+
+            document.getElementById('scenario-content').innerHTML = `
+                <div class="scenario-card" style="text-align: center; padding: 60px 30px;">
+                    <div style="font-size: 5em; margin-bottom: 20px;">🎯</div>
+                    <h2 style="font-size: 2.5em; color: #ffd700; margin-bottom: 20px;">${rating}</h2>
+                    <div style="font-size: 3em; color: #00ff00; font-weight: 700; margin: 30px 0;">${score} / ${currentScenarios.length}</div>
+                    <div style="font-size: 1.5em; color: #d0d0d0; margin-bottom: 30px;">正确率: ${percentage}%</div>
+                    <p style="font-size: 1.2em; color: #b0b0b0; margin-bottom: 40px;">${message}</p>
+                    <button class="nav-btn" onclick="backToModules()" style="max-width: 400px; margin: 0 auto;">返回选择其他模块</button>
+                </div>
+            `;
+        }
+
+        function backToModules() {
+            document.getElementById('module-selection').style.display = 'block';
+            document.getElementById('training-area').classList.remove('active');
+            currentModule = null;
+        }
+
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            
+            prevBtn.disabled = currentScenarioIndex === 0;
+            nextBtn.disabled = false;
+            
+            if (currentScenarioIndex === currentScenarios.length - 1) {
+                nextBtn.textContent = '查看成绩 🏆';
+            } else {
+                nextBtn.textContent = '下一题 →';
+            }
+        }
+    </script>
+</body>
+</html>
+
