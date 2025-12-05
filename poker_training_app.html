@@ -45,6 +45,23 @@
             align-items: center;
         }
 
+        .home-btn {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #333;
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 12px;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .home-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
+        }
+
         .app-title {
             font-size: 20px;
             font-weight: bold;
@@ -592,6 +609,7 @@
         <!-- 首页 -->
         <div id="homePage" class="page">
             <div class="top-bar">
+                <a href="index.html" class="home-btn">🏠 返回</a>
                 <div class="app-title">🎯 德扑决策训练</div>
                 <button class="install-btn" id="installBtn">📲 安装</button>
             </div>
