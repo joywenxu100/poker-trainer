@@ -31,6 +31,28 @@
             background: rgba(255, 255, 255, 0.1);
             border-radius: 20px;
             backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .home-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #333;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .home-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
         }
 
         h1 {
@@ -383,6 +405,7 @@
 <body>
     <div class="container">
         <header>
+            <a href="index.html" class="home-btn">🏠 返回导航中心</a>
             <h1>🎯 进攻性控制大师</h1>
             <div class="subtitle">深筹码 3-Bet & 4-Bet 防御专项训练</div>
             <div class="subtitle">200-300BB · Straddle+Ante · 世界级策略</div>

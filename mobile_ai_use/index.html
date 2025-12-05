@@ -29,6 +29,27 @@
             color: white;
             padding: 20px 10px;
             margin-bottom: 20px;
+            position: relative;
+        }
+
+        .home-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #333;
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 12px;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .home-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
         }
 
         .header h1 {
@@ -393,6 +414,7 @@
 <body>
     <div class="container">
         <div class="header">
+            <a href="../index.html" class="home-btn">🏠 返回导航中心</a>
             <h1>🤖 多模型AI对比助手</h1>
             <p>同时询问Claude 4.5、Gemini 2.5 Pro、DeepSeek R1推理+VL视觉</p>
         </div>

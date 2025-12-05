@@ -27,6 +27,27 @@
             text-align: center;
             color: white;
             margin-bottom: 30px;
+            position: relative;
+        }
+
+        .home-btn {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #333;
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 13px;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .home-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
         }
 
         .header h1 {
@@ -381,6 +402,7 @@
 <body>
     <div class="container">
         <div class="header">
+            <a href="index.html" class="home-btn">🏠 返回导航中心</a>
             <h1>🎯 C-bet Mastery Trainer</h1>
             <p>掌握LAG玩家最核心的武器 - 持续下注</p>
         </div>
